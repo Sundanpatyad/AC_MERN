@@ -3,7 +3,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { login, googleLogin } from "../../../services/operations/authAPI"; // Import googleLogin action
+import { login, googleLogin } from "../../../services/operations/authAPI";
 import { GoogleLogin } from '@react-oauth/google';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
@@ -112,19 +112,17 @@ function LoginForm() {
             <span className="px-2 bg-black text-gray-300">Or continue with</span>
           </div>
         </div>
-        <div>
+        <div className="flex align-center justify-center">
           <GoogleLogin 
             onSuccess={handleGoogleLoginSuccess}
             onError={handleGoogleLoginError}
             useOneTap
-            render={(renderProps) => (
+            render={({ onClick }) => (
               <button
-                type="button"
-                onClick={renderProps.onClick}
-                disabled={renderProps.disabled}
-                className="w-full flex justify-center items-center py-2 px-4 border border-slate-300 rounded-md shadow-sm text-md font-medium text-white bg-transparent hover:bg-slate-900"
+                onClick={onClick}
+                className="w-full flex justify-center items-center py-2 px-4 border border-slate-300 rounded-md shadow-sm text-md font-medium text-white bg-black hover:bg-slate-900"
               >
-                <FcGoogle className="h-5 w-5 mr-2" />
+                <FcGoogle className="mr-2 h-5 w-5" />
                 Sign in with Google
               </button>
             )}
