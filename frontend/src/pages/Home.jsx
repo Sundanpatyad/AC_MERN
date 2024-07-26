@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState, useEffect } from 'react'
 import { Link, useNavigate } from "react-router-dom"
 import { useDispatch, useSelector } from 'react-redux'
 import { motion } from 'framer-motion'
@@ -13,9 +13,9 @@ import ReviewSlider from '../components/common/ReviewSlider'
 import ConfirmationModal from "../components/common/ConfirmationModal"
 
 import { getCatalogPageData } from '../services/operations/pageAndComponentData'
-import { fetchAllMockTests, fetchMockTestDetails } from '../services/operations/mocktest'
+import { fetchAllMockTests } from '../services/operations/mocktest'
 import { buyItem } from '../services/operations/studentFeaturesAPI'
-import { addToCart } from '../slices/cartSlice'
+import { addToCart, removeFromCart } from '../slices/cartSlice'
 
 import { MdOutlineRateReview } from 'react-icons/md'
 import { FaArrowRight, FaBookOpen, FaShoppingCart } from "react-icons/fa"
@@ -24,19 +24,17 @@ import { fadeIn } from './../components/common/motionFrameVarients'
 import { ACCOUNT_TYPE } from "../utils/constants"
 
 import Marquee from '../components/magicui/marquee'
+import CourseReviewModal from '../components/core/ViewCourse/CourseReviewModal'
 
-const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, handleStartTest, setShowLoginModal, isLoggedIn }) => {
-  const { token } = useSelector((state) => state.auth)
-  const { user } = useSelector((state) => state.profile)
+const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleRemoveFromCart, handleBuyNow, handleStartTest, setShowLoginModal, isLoggedIn, userId }) => {
+  const { cart } = useSelector((state) => state.cart)
+  const [isInCart, setIsInCart] = useState(false)
 
-  const { data: enrollmentDetails } = useQuery(
-    ['mockTestEnrollment', mockTest._id, token],
-    () => fetchMockTestDetails(mockTest._id, token),
-    {
-      enabled: !!token,
-      select: (data) => data.studentsEnrolled.includes(user?._id)
-    }
-  )
+  useEffect(() => {
+    setIsInCart(cart.some(item => item._id === mockTest._id))
+  }, [cart, mockTest._id])
+
+  const isEnrolled = mockTest.studentsEnrolled?.includes(userId)
 
   const handleButtonClick = (action) => {
     if (!isLoggedIn) {
@@ -68,7 +66,7 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
         </div>
         <div className="flex flex-col space-y-2">
           {isLoggedIn ? (
-            enrollmentDetails ? (
+            isEnrolled ? (
               <button
                 onClick={(e) => {
                   e.preventDefault()
@@ -80,16 +78,28 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
               </button>
             ) : (
               <>
-                <button
-                  onClick={(e) => {
-                    e.preventDefault()
-                    handleButtonClick(handleAddToCart)
-                  }}
-                  className="w-full py-2 px-3 bg-richblack-700 text-white font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-600 text-sm"
-                >
-                  <FaShoppingCart className="inline mr-1" />
-                  Add to Cart
-                </button>
+                {isInCart ? (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      handleButtonClick(handleRemoveFromCart)
+                    }}
+                    className="w-full py-2 px-3 bg-richblack-700 text-white font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-600 text-sm"
+                  >
+                    View Cart
+                  </button>
+                ) : (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      handleButtonClick(handleAddToCart)
+                    }}
+                    className="w-full py-2 px-3 bg-richblack-700 text-white font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-600 text-sm"
+                  >
+                    <FaShoppingCart className="inline mr-1" />
+                    Add to Cart
+                  </button>
+                )}
                 <button
                   onClick={(e) => {
                     e.preventDefault()
@@ -124,6 +134,7 @@ const Home = () => {
   const { token } = useSelector((state) => state.auth)
   const { user } = useSelector((state) => state.profile)
   const [showLoginModal, setShowLoginModal] = useState(false)
+  const [reviewModal, setReviewModal] = useState(false)
 
   const categoryID = "6506c9dff191d7ffdb4a3fe2" // hard coded
 
@@ -151,8 +162,13 @@ const Home = () => {
     }
 
     dispatch(addToCart(mockTest))
-    // toast.success("Added to cart successfully!")
+    toast.success("Added to cart successfully!")
   }, [user, dispatch])
+
+  const handleRemoveFromCart = useCallback(async (mockTest) => {
+    dispatch(removeFromCart(mockTest))
+    toast.success("Removed from cart successfully!")
+  }, [dispatch])
 
   const handleBuyNow = useCallback(async (mockTest) => {
     if (user?.accountType === ACCOUNT_TYPE.INSTRUCTOR) {
@@ -236,10 +252,12 @@ const Home = () => {
                   key={mockTest._id} 
                   mockTest={mockTest} 
                   handleAddToCart={handleAddToCart}
+                  handleRemoveFromCart={handleRemoveFromCart}
                   handleBuyNow={handleBuyNow}
                   handleStartTest={handleStartTest}
                   setShowLoginModal={setShowLoginModal}
                   isLoggedIn={isLoggedIn}
+                  userId={user?._id}
                 />
               ))}
             </div>
@@ -251,13 +269,15 @@ const Home = () => {
         <InstructorSection />
 
         <h1 className="text-center text-3xl lg:text-4xl font-semibold mt-8 flex justify-center items-center gap-x-3">
-          Reviews from other learners <MdOutlineRateReview className='text-white' />
+          Reviews from other learners
+           <MdOutlineRateReview onClick={()=>setReviewModal(true)} className='text-white' />
         </h1>
+        
         <ReviewSlider />
       </div>
 
       <Footer />
-
+      { token && reviewModal && <CourseReviewModal setReviewModal={setReviewModal} />}
       {showLoginModal && (
         <ConfirmationModal
           modalData={{
