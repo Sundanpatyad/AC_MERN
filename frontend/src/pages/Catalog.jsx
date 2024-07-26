@@ -199,7 +199,7 @@ function Catalog() {
     return (
         <div className="min-h-screen flex flex-col">
             {/* Hero Section */}
-            <div className="bg-richblack-800 px-4 py-8 sm:py-12">
+            {/* <div className="bg-richblack-800 px-4 py-8 sm:py-12">
                 <div className="mx-auto flex min-h-[180px] sm:min-h-[220px] max-w-maxContentTab flex-col justify-center gap-4 lg:max-w-maxContent">
                     <p className="text-xs sm:text-sm text-richblack-300">
                         {`Home / Catalog / `}
@@ -214,7 +214,7 @@ function Catalog() {
                         {currentCatalogData?.selectedCategory?.description}
                     </p>
                 </div>
-            </div>
+            </div> */}
 
             {/* Courses Section */}
             <div className="flex-grow mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
