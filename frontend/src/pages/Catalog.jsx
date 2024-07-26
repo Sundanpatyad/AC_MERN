@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react"
+import React, { useState, useCallback, useMemo } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { useSelector, useDispatch } from "react-redux"
+import { useQuery } from 'react-query'
 import Footer from "../components/common/Footer"
 import Loading from './../components/common/Loading'
 import ConfirmationModal from "../components/common/ConfirmationModal"
@@ -17,7 +18,7 @@ const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLogged
     const navigate = useNavigate()
     const { user } = useSelector((state) => state.profile)
 
-    useEffect(() => {
+    React.useEffect(() => {
         setIsEnrolled(course.studentsEnrolled?.includes(user?._id))
     }, [course.studentsEnrolled, user?._id])
 
@@ -100,48 +101,36 @@ const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLogged
 function Catalog() {
     const { catalogName } = useParams()
     const [active, setActive] = useState(1)
-    const [catalogPageData, setCatalogPageData] = useState(null)
-    const [categoryId, setCategoryId] = useState("")
-    const [loading, setLoading] = useState(false)
     const [confirmationModal, setConfirmationModal] = useState(null)
-    const [isLoggedIn, setIsLoggedIn] = useState(false)
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const { token } = useSelector((state) => state.auth)
     const { user } = useSelector((state) => state.profile)
 
-    useEffect(() => {
-        setIsLoggedIn(!!token)
-    }, [token])
+    const isLoggedIn = !!token
 
-    useEffect(() => {
-        (async () => {
-            try {
-                const res = await fetchCourseCategories()
-                const category_id = res.filter(
-                    (ct) => ct.name.split(" ").join("-").toLowerCase() === catalogName
-                )[0]._id
-                setCategoryId(category_id)
-            } catch (error) {
-                console.log("Could not fetch Categories.", error)
-            }
-        })()
-    }, [catalogName])
+    // Fetch categories
+    const { data: categories = [] } = useQuery('categories', fetchCourseCategories, {
+        staleTime: Infinity,
+        cacheTime: Infinity,
+    })
 
-    useEffect(() => {
-        if (categoryId) {
-            (async () => {
-                setLoading(true)
-                try {
-                    const res = await getCatalogPageData(categoryId)
-                    setCatalogPageData(res)
-                } catch (error) {
-                    console.log(error)
-                }
-                setLoading(false)
-            })()
+    const categoryId = useMemo(() => {
+        return categories.find(
+            (ct) => ct.name.split(" ").join("-").toLowerCase() === catalogName
+        )?._id
+    }, [categories, catalogName])
+
+    // Fetch catalog page data
+    const { data: currentCatalogData, isLoading } = useQuery(
+        ['catalogPageData', categoryId],
+        () => getCatalogPageData(categoryId),
+        {
+            enabled: !!categoryId,
+            staleTime: 5 * 60 * 1000, // 5 minutes
+            cacheTime: 10 * 60 * 1000, // 10 minutes
         }
-    }, [categoryId])
+    )
 
     const handleAddToCart = useCallback(async (course) => {
         if (!isLoggedIn) {
@@ -170,16 +159,7 @@ function Catalog() {
 
         try {
             await buyItem(token, [course._id], ['course'], user, navigate, dispatch)
-            toast.success("Course purchased successfully!")
-            setCatalogPageData(prevData => ({
-                ...prevData,
-                selectedCategory: {
-                    ...prevData.selectedCategory,
-                    courses: prevData.selectedCategory.courses.map(c => 
-                        c._id === course._id ? {...c, studentsEnrolled: [...c.studentsEnrolled, user._id]} : c
-                    )
-                }
-            }))
+            // Note: We're not updating the local state here as React Query will handle refetching
         } catch (error) {
             console.error("Error purchasing course:", error)
             toast.error("Failed to purchase course")
@@ -200,7 +180,7 @@ function Catalog() {
     )
 
     const renderCourseCards = (courses) => {
-        if (loading) {
+        if (isLoading) {
             return Array(6).fill().map((_, index) => (
                 <CourseCardSkeleton key={index} />
             ))
@@ -216,26 +196,6 @@ function Catalog() {
         ))
     }
 
-    // if (!loading && !catalogPageData) {
-    //     return (
-    //         <div className="min-h-screen flex flex-col items-center justify-center bg-richblack-900 px-4">
-    //             <div className="text-center">
-    //                 <h2 className="text-3xl md:text-4xl font-bold text-richblack-5 mb-4">
-    //                     No Courses Found
-    //                 </h2>
-    //                 <p className="text-lg md:text-xl text-richblack-300 mb-8">
-    //                     We couldn't find any courses for the selected category.
-    //                 </p>
-    //                 <button 
-    //                     onClick={() => navigate('/')}
-    //                     className="px-6 py-3 text-lg font-semibold bg-white text-richblack-900 rounded-md hover:scale-105 transition-all duration-200"
-    //                 >
-    //                     Back to Home
-    //                 </button>
-    //             </div>
-    //         </div>
-    //     )
-    // }
     return (
         <div className="min-h-screen flex flex-col">
             {/* Hero Section */}
@@ -244,14 +204,14 @@ function Catalog() {
                     <p className="text-xs sm:text-sm text-richblack-300">
                         {`Home / Catalog / `}
                         <span className="text-white">
-                            {catalogPageData?.selectedCategory?.name}
+                            {currentCatalogData?.selectedCategory?.name}
                         </span>
                     </p>
                     <h1 className="text-2xl sm:text-3xl md:text-4xl text-richblack-5 font-bold">
-                        {catalogPageData?.selectedCategory?.name}
+                        {currentCatalogData?.selectedCategory?.name}
                     </h1>
                     <p className="max-w-[870px] text-sm sm:text-base text-richblack-200">
-                        {catalogPageData?.selectedCategory?.description}
+                        {currentCatalogData?.selectedCategory?.description}
                     </p>
                 </div>
             </div>
@@ -280,17 +240,17 @@ function Catalog() {
                     </p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8">
-                    {renderCourseCards(catalogPageData?.selectedCategory?.courses)}
+                    {renderCourseCards(currentCatalogData?.selectedCategory?.courses)}
                 </div>
             </div>
 
             {/* Top Courses Section */}
             <div className="mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
                 <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-richblack-5 mb-4">
-                    Top Courses in {catalogPageData?.differentCategory?.name}
+                    Top Courses in {currentCatalogData?.differentCategory?.name}
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8">
-                    {renderCourseCards(catalogPageData?.differentCategory?.courses)}
+                    {renderCourseCards(currentCatalogData?.differentCategory?.courses)}
                 </div>
             </div>
 
@@ -298,7 +258,7 @@ function Catalog() {
             <div className="mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
                 <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-richblack-5 mb-4">Frequently Bought</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8">
-                    {renderCourseCards(catalogPageData?.mostSellingCourses?.slice(0, 4))}
+                    {renderCourseCards(currentCatalogData?.mostSellingCourses?.slice(0, 4))}
                 </div>
             </div>
 
