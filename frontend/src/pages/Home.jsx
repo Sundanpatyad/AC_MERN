@@ -25,7 +25,7 @@ import { ACCOUNT_TYPE } from "../utils/constants"
 
 import Marquee from '../components/magicui/marquee'
 
-const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, handleStartTest, setShowLoginModal }) => {
+const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, handleStartTest, setShowLoginModal, isLoggedIn }) => {
   const { token } = useSelector((state) => state.auth)
   const { user } = useSelector((state) => state.profile)
 
@@ -39,7 +39,7 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
   )
 
   const handleButtonClick = (action) => {
-    if (!token) {
+    if (!isLoggedIn) {
       setShowLoginModal(true)
     } else {
       action(mockTest)
@@ -48,16 +48,16 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
 
   return (
     <Link to={`/mock-test/${mockTest._id}`} 
-      className="bg-richblack-900 w-64 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer flex flex-col"
+      className="bg-richblack-900 w-72 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer flex flex-col"
     >
-      <div className="relative h-28 bg-gradient-to-br from-white to-pink-500">
-        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-80 p-2">
-          <h3 className="text-base font-bold text-white text-center">{mockTest.seriesName}</h3>
+      <div className="relative h-36 bg-gradient-to-br from-white to-pink-500">
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-80 p-3">
+          <h3 className="text-lg font-bold text-white text-center">{mockTest.seriesName}</h3>
         </div>
       </div>
-      <div className="p-3 flex-grow flex flex-col justify-between">
-        <p className="text-xs text-richblack-100 mb-2 line-clamp-2">{mockTest.description}</p>
-        <div className="flex justify-between items-center text-xs text-richblack-200 mb-2">
+      <div className="p-4 flex-grow flex flex-col justify-between">
+        <p className="text-sm text-richblack-100 mb-3 line-clamp-3">{mockTest.description}</p>
+        <div className="flex justify-between items-center text-sm text-richblack-200 mb-3">
           <div className="flex items-center">
             <p className="font-medium">₹{mockTest.price}</p>
           </div>
@@ -67,38 +67,50 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
           </div>
         </div>
         <div className="flex flex-col space-y-2">
-          {enrollmentDetails ? (
+          {isLoggedIn ? (
+            enrollmentDetails ? (
+              <button
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleStartTest(mockTest._id)
+                }}
+                className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-sm"
+              >
+                Start Test
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleButtonClick(handleAddToCart)
+                  }}
+                  className="w-full py-2 px-3 bg-richblack-700 text-white font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-600 text-sm"
+                >
+                  <FaShoppingCart className="inline mr-1" />
+                  Add to Cart
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleButtonClick(handleBuyNow)
+                  }}
+                  className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-sm"
+                >
+                  Buy Now
+                </button>
+              </>
+            )
+          ) : (
             <button
               onClick={(e) => {
                 e.preventDefault()
-                handleStartTest(mockTest._id)
+                setShowLoginModal(true)
               }}
-              className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-xs"
+              className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-sm"
             >
-              Start Test
+              Login to Purchase
             </button>
-          ) : (
-            <>
-              <button
-                onClick={(e) => {
-                  e.preventDefault()
-                  handleButtonClick(handleAddToCart)
-                }}
-                className="w-full py-2 px-3 bg-richblack-700 text-white font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-600 text-xs"
-              >
-                <FaShoppingCart className="inline mr-1" />
-                Add to Cart
-              </button>
-              <button
-                onClick={(e) => {
-                  e.preventDefault()
-                  handleButtonClick(handleBuyNow)
-                }}
-                className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-xs"
-              >
-                Buy Now
-              </button>
-            </>
           )}
         </div>
       </div>
@@ -129,6 +141,8 @@ const Home = () => {
       select: (data) => data.filter(test => test.status !== 'draft')
     }
   )
+
+  const isLoggedIn = !!token
 
   const handleAddToCart = useCallback(async (mockTest) => {
     if (user?.accountType === ACCOUNT_TYPE.INSTRUCTOR) {
@@ -214,9 +228,9 @@ const Home = () => {
         </p>
        
         <h2 className="text-3xl mt-20 font-bold text-richblack-5 mb-6">Popular Mock Tests</h2>
-        <div className="flex justify-center align-center w-full max-w-full py-12">
+        <div className="flex justify-center align-center w-full max-w-full">
           <div className="overflow-x-auto pb-4">
-            <div className="flex space-x-4" style={{ width: `${mockTests?.length * 270}px` }}>
+            <div className="flex space-x-4" style={{ width: `${mockTests?.length * 300}px` }}>
               {mockTests?.map((mockTest) => (
                 <MemoizedMockTestCard 
                   key={mockTest._id} 
@@ -225,6 +239,7 @@ const Home = () => {
                   handleBuyNow={handleBuyNow}
                   handleStartTest={handleStartTest}
                   setShowLoginModal={setShowLoginModal}
+                  isLoggedIn={isLoggedIn}
                 />
               ))}
             </div>

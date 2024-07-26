@@ -2,22 +2,18 @@ import { useState } from "react"
 import { toast } from "react-hot-toast"
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"
 import { useDispatch } from "react-redux"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 
 import { sendOtp } from "../../../services/operations/authAPI"
 import { setSignupData } from "../../../slices/authSlice"
 import { ACCOUNT_TYPE } from "../../../utils/constants"
 import Tab from "../../common/Tab"
 
-
-
 function SignupForm() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // student or instructor
   const [accountType, setAccountType] = useState(ACCOUNT_TYPE.STUDENT);
-
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -28,50 +24,70 @@ function SignupForm() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const { firstName, lastName, email, password, confirmPassword } = formData;
 
-  // Handle input fields, when some value changes
   const handleOnChange = (e) => {
     setFormData((prevData) => ({
       ...prevData,
       [e.target.name]: e.target.value,
     }));
-
-    // console.log('signup form data - ', formData);
+    setErrors((prev) => ({ ...prev, [e.target.name]: "" }));
   };
 
-  // Handle Form Submission
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!firstName.trim()) newErrors.firstName = "First name is required";
+    if (!lastName.trim()) newErrors.lastName = "Last name is required";
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!emailRegex.test(email)) {
+      newErrors.email = "Invalid email format";
+    }
+
+    if (!password) {
+      newErrors.password = "Password is required";
+    } else if (password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters long";
+    }
+
+    if (password !== confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleOnSubmit = (e) => {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
-      toast.error("Passwords Do Not Match")
+    if (!validateForm()) {
       return;
     }
+
     const signupData = {
       ...formData,
       accountType,
     };
 
-    // Setting signup data to state
-    // To be used after otp verification
     dispatch(setSignupData(signupData));
-    // Send OTP to user for verification
     dispatch(sendOtp(formData.email, navigate));
 
-    // Reset form data
     setFormData({
       firstName: "",
       lastName: "",
       email: "",
       password: "",
       confirmPassword: "",
-    })
+    });
     setAccountType(ACCOUNT_TYPE.STUDENT);
   };
 
-  // data to pass to Tab component
   const tabData = [
     {
       id: 1,
@@ -87,14 +103,11 @@ function SignupForm() {
 
   return (
     <div>
-      {/* Tab */}
       {/* <Tab tabData={tabData} field={accountType} setField={setAccountType} /> */}
 
-      {/* Form */}
       <form onSubmit={handleOnSubmit} className="flex w-full flex-col gap-y-4">
         <div className="flex gap-x-4">
-          {/* First Name */}
-          <label>
+          <label className="w-full">
             <p className="mb-1 text-[0.875rem] leading-[1.375rem] text-richblack-5">
               First Name <sup className="text-pink-200">*</sup>
             </p>
@@ -105,15 +118,15 @@ function SignupForm() {
               value={firstName}
               onChange={handleOnChange}
               placeholder="Enter first name"
+              className="w-full rounded-[0.5rem] bg-richblack-800 p-[12px] text-richblack-5 outline-none"
               style={{
                 boxShadow: "inset 0px -1px 0px rgba(255, 255, 255, 0.18)",
               }}
-              className="w-full rounded-[0.5rem] bg-richblack-800 p-[12px] text-richblack-5 outline-none"
             />
+            {errors.firstName && <p className="text-pink-200 text-xs mt-1">{errors.firstName}</p>}
           </label>
 
-          {/* Last Name */}
-          <label>
+          <label className="w-full">
             <p className="mb-1 text-[0.875rem] leading-[1.375rem] text-richblack-5">
               Last Name <sup className="text-pink-200">*</sup>
             </p>
@@ -124,37 +137,36 @@ function SignupForm() {
               value={lastName}
               onChange={handleOnChange}
               placeholder="Enter last name"
+              className="w-full rounded-[0.5rem] bg-richblack-800 p-[12px] text-richblack-5 outline-none"
               style={{
                 boxShadow: "inset 0px -1px 0px rgba(255, 255, 255, 0.18)",
               }}
-              className="w-full rounded-[0.5rem] bg-richblack-800 p-[12px] text-richblack-5 outline-none"
             />
+            {errors.lastName && <p className="text-pink-200 text-xs mt-1">{errors.lastName}</p>}
           </label>
         </div>
 
-        {/* Email Address */}
         <label className="w-full">
           <p className="mb-1 text-[0.875rem] leading-[1.375rem] text-richblack-5">
             Email Address <sup className="text-pink-200">*</sup>
           </p>
           <input
             required
-            type="text"
+            type="email"
             name="email"
             value={email}
             onChange={handleOnChange}
             placeholder="Enter email address"
+            className="w-full rounded-[0.5rem] bg-richblack-800 p-[12px] text-richblack-5 outline-none"
             style={{
               boxShadow: "inset 0px -1px 0px rgba(255, 255, 255, 0.18)",
             }}
-            className="w-full rounded-[0.5rem] bg-richblack-800 p-[12px] text-richblack-5 outline-none"
           />
+          {errors.email && <p className="text-pink-200 text-xs mt-1">{errors.email}</p>}
         </label>
 
-
         <div className="flex gap-x-4">
-          {/* Create Password */}
-          <label className="relative">
+          <label className="relative w-full">
             <p className="mb-1 text-[0.875rem] leading-[1.375rem] text-richblack-5">
               Create Password <sup className="text-pink-200">*</sup>
             </p>
@@ -165,10 +177,10 @@ function SignupForm() {
               value={password}
               onChange={handleOnChange}
               placeholder="Enter Password"
+              className="w-full rounded-[0.5rem] bg-richblack-800 p-[12px] pr-10 text-richblack-5 outline-none"
               style={{
                 boxShadow: "inset 0px -1px 0px rgba(255, 255, 255, 0.18)",
               }}
-              className="w-full rounded-[0.5rem] bg-richblack-800 p-[12px] pr-10 text-richblack-5 outline-none"
             />
             <span
               onClick={() => setShowPassword((prev) => !prev)}
@@ -180,10 +192,10 @@ function SignupForm() {
                 <AiOutlineEye fontSize={24} fill="#AFB2BF" />
               )}
             </span>
+            {errors.password && <p className="text-pink-200 text-xs mt-1">{errors.password}</p>}
           </label>
 
-          {/* Confirm Password  */}
-          <label className="relative">
+          <label className="relative w-full">
             <p className="mb-1 text-[0.875rem] leading-[1.375rem] text-richblack-5">
               Confirm Password <sup className="text-pink-200">*</sup>
             </p>
@@ -194,10 +206,10 @@ function SignupForm() {
               value={confirmPassword}
               onChange={handleOnChange}
               placeholder="Confirm Password"
+              className="w-full rounded-[0.5rem] bg-richblack-800 p-[12px] pr-10 text-richblack-5 outline-none"
               style={{
                 boxShadow: "inset 0px -1px 0px rgba(255, 255, 255, 0.18)",
               }}
-              className="w-full rounded-[0.5rem] bg-richblack-800 p-[12px] pr-10 text-richblack-5 outline-none"
             />
             <span
               onClick={() => setShowConfirmPassword((prev) => !prev)}
@@ -209,19 +221,26 @@ function SignupForm() {
                 <AiOutlineEye fontSize={24} fill="#AFB2BF" />
               )}
             </span>
+            {errors.confirmPassword && <p className="text-pink-200 text-xs mt-1">{errors.confirmPassword}</p>}
           </label>
         </div>
 
-
         <button
           type="submit"
-          className="mt-6 rounded-[8px] border border-slate-300 bg-transparent py-[8px] px-[12px] font-medium text-white text-md"
+          className="mt-6 rounded-[8px] bg-transparent border border-slate-200 py-[8px] px-[12px] font-medium text-slate-100 text-md"
         >
           Create Account
         </button>
       </form>
+
+      <p className="mt-4 text-center text-richblack-5">
+        Already have an account?{" "}
+        <Link to="/login" className="text-blue-500 hover:underline">
+          Log in
+        </Link>
+      </p>
     </div>
   )
 }
 
-export default SignupForm
+export default SignupForm;

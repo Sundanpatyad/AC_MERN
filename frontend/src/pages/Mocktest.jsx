@@ -11,7 +11,7 @@ import Footer from "../components/common/Footer"
 import ConfirmationModal from "../components/common/ConfirmationModal"
 import { ACCOUNT_TYPE } from "../utils/constants"
 
-const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, handleStartTest }) => {
+const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, handleStartTest, isLoggedIn }) => {
   const navigate = useNavigate()
   const { token } = useSelector((state) => state.auth)
   const { user } = useSelector((state) => state.profile)
@@ -47,38 +47,50 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
           </div>
         </div>
         <div className="flex flex-col space-y-2">
-          {enrollmentStatus ? (
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                handleStartTest(mockTest._id)
-              }}
-              className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-xs sm:text-sm"
-            >
-              Start Test
-            </button>
-          ) : (
-            <>
+          {isLoggedIn ? (
+            enrollmentStatus ? (
               <button
                 onClick={(e) => {
                   e.stopPropagation()
-                  handleAddToCart(mockTest)
-                }}
-                className="w-full py-2 px-3 bg-richblack-700 text-white font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-600 text-xs sm:text-sm"
-              >
-                <FaShoppingCart className="inline mr-1" />
-                Add to Cart
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  handleBuyNow(mockTest)
+                  handleStartTest(mockTest._id)
                 }}
                 className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-xs sm:text-sm"
               >
-                Buy Now
+                Start Test
               </button>
-            </>
+            ) : (
+              <>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleAddToCart(mockTest)
+                  }}
+                  className="w-full py-2 px-3 bg-richblack-700 text-white font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-600 text-xs sm:text-sm"
+                >
+                  <FaShoppingCart className="inline mr-1" />
+                  Add to Cart
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleBuyNow(mockTest)
+                  }}
+                  className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-xs sm:text-sm"
+                >
+                  Buy Now
+                </button>
+              </>
+            )
+          ) : (
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                navigate("/login")
+              }}
+              className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-xs sm:text-sm"
+            >
+              Login to Purchase
+            </button>
           )}
         </div>
       </div>
@@ -97,16 +109,17 @@ const MockTestComponent = () => {
 
   const { data: mockTests, isLoading } = useQuery(
     'mockTests',
-    () => fetchAllMockTests(token),
+    () => fetchAllMockTests(),
     {
       select: (data) => data.filter(test => test.status !== 'draft'),
-      enabled: !!token,
       staleTime: 5 * 60 * 1000, // 5 minutes
     }
   )
 
+  const isLoggedIn = !!token
+
   const handleAddToCart = useCallback((mockTest) => {
-    if (!token) {
+    if (!isLoggedIn) {
       setConfirmationModal({
         text1: "You are not logged in!",
         text2: "Please login to add to cart",
@@ -124,10 +137,10 @@ const MockTestComponent = () => {
     }
 
     dispatch(addToCart(mockTest))
-  }, [token, user, navigate, dispatch])
+  }, [isLoggedIn, user, navigate, dispatch])
 
   const handleBuyNow = useCallback(async (mockTest) => {
-    if (!token) {
+    if (!isLoggedIn) {
       setConfirmationModal({
         text1: "You are not logged in!",
         text2: "Please login to purchase this mock test.",
@@ -150,11 +163,22 @@ const MockTestComponent = () => {
     } catch (error) {
       console.error("Error purchasing mock test:", error)
     }
-  }, [token, user, navigate, dispatch, queryClient])
+  }, [isLoggedIn, user, navigate, dispatch, queryClient, token])
 
   const handleStartTest = useCallback((mockTestId) => {
+    if (!isLoggedIn) {
+      setConfirmationModal({
+        text1: "You are not logged in!",
+        text2: "Please login to start the test",
+        btn1Text: "Login",
+        btn2Text: "Cancel",
+        btn1Handler: () => navigate("/login"),
+        btn2Handler: () => setConfirmationModal(null),
+      })
+      return
+    }
     navigate(`/view-mock/${mockTestId}`)
-  }, [navigate])
+  }, [isLoggedIn, navigate])
 
   const memoizedMockTests = useMemo(() => mockTests || [], [mockTests])
 
@@ -165,7 +189,7 @@ const MockTestComponent = () => {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Hero Section */}
-      <div className="bg-richblack-800 px-4 py-8 sm:py-12">
+      {/* <div className="bg-richblack-800 px-4 py-8 sm:py-12">
         <div className="mx-auto flex min-h-[180px] sm:min-h-[220px] max-w-maxContentTab flex-col justify-center gap-4 lg:max-w-maxContent">
           <p className="text-xs sm:text-sm text-richblack-300">
             Home / <span className="text-white">Mock Tests</span>
@@ -175,11 +199,11 @@ const MockTestComponent = () => {
             Enhance your skills and boost your confidence with our comprehensive mock tests designed to simulate real exam conditions.
           </p>
         </div>
-      </div>
+      </div> */}
 
       {/* Mock Tests Section */}
       <div className="flex-grow mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-richblack-5 mb-4">Available Mock Test Series</h2>
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-richblack-5 mb-4">Test Yourself With Our Mock Tests 👍</h2>
         <div className="my-4 flex border-b border-b-richblack-600 text-xs sm:text-sm">
           <p
             className={`px-2 sm:px-4 py-2 ${active === 1
@@ -209,6 +233,7 @@ const MockTestComponent = () => {
                 handleAddToCart={handleAddToCart}
                 handleBuyNow={handleBuyNow}
                 handleStartTest={handleStartTest}
+                isLoggedIn={isLoggedIn}
               />
             ))}
           </div>
