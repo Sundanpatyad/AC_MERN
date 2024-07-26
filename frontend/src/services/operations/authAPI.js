@@ -300,6 +300,14 @@ export function logout(navigate) {
 export const googleLogin = (credential, navigate) => {
   return async (dispatch) => {
     try {
+      const toastId = toast.loading("Loading...", {
+        style: {
+          borderRadius: '10px',
+          background: '#333',
+          color: '#fff',
+        },
+      });
+      
       const response = await apiConnector("POST", GOOGLE_API, { token: credential });
 
       if (!response.data.success) {
@@ -318,8 +326,18 @@ export const googleLogin = (credential, navigate) => {
       dispatch(setUser({ ...userData, image: userImage }));
       localStorage.setItem("token", JSON.stringify(token));
       localStorage.setItem("user", JSON.stringify({ ...userData, image: userImage }));
+      toast.dismiss(toastId)
+      toast('Login Successful', {
+        icon: '👏',
+        style: {
+          borderRadius: '10px',
+          background: '#333',
+          color: '#fff',
+        },
+      });
 
       navigate("/dashboard/my-profile");
+
     } catch (error) {
       console.log("Error in Google Login", error);
       toast.error("Google Login Failed", {
