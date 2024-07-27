@@ -128,8 +128,15 @@ function LoginForm() {
             )}
           />
         </div>
+        <p className="mt-4 text-center text-richblack-5">
+        Dont't have an account?{" "}
+        <Link to="/signup" className="text-blue-500 hover:underline">
+          Sign up
+        </Link>
+      </p>
       </form>
     </GoogleOAuthProvider>
+    
   );
 }
 

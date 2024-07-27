@@ -53,7 +53,7 @@ const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLogged
                         <button
                             onClick={(e) => {
                                 e.stopPropagation()
-                                navigate(`/view-course/${course._id}/section/${course.courseContent[0]?._id}/sub-section/${course.courseContent[0]?.subSection[0]?._id}`)
+                                navigate(`/view-course/${course._id}/section/${course.courseContent?._id}/sub-section/${course.courseContent?.subSection?._id}`)
                             }}
                             className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-xs sm:text-sm"
                         >
