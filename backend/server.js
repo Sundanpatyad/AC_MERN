@@ -65,4 +65,4 @@ app.get('/', (req, res) => {
     This is Default Route  
     <p>Everything is OK</p>
     </div>`);
-})
+});
