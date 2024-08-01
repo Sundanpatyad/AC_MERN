@@ -20,12 +20,12 @@ import { addToCart, removeFromCart } from '../slices/cartSlice'
 import { MdOutlineRateReview } from 'react-icons/md'
 import { FaArrowRight, FaBookOpen, FaShoppingCart } from "react-icons/fa"
 
-import { fadeIn } from './../components/common/motionFrameVarients'
+import { fadeIn } from '../components/common/motionFrameVarients'
 import { ACCOUNT_TYPE } from "../utils/constants"
 
-import Marquee from '../components/magicui/marquee'
 import ReactTypingEffect from 'react-typing-effect';
 import CourseReviewModal from '../components/core/ViewCourse/CourseReviewModal'
+import { Spotlight } from '../components/ui/Spotlight'
 
 const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleRemoveFromCart, handleBuyNow, handleStartTest, setShowLoginModal, isLoggedIn, userId }) => {
   const { cart } = useSelector((state) => state.cart)
@@ -192,7 +192,7 @@ const PageLoader = () => (
     >
       <ReactTypingEffect
         text="Together We Can"
-        typingDelay={2700}
+        typingDelay={100}
         speed={50}
         eraseDelay={10000000}
         cursorRenderer={cursor => <span className="text-pink-500">{cursor}</span>}
@@ -285,18 +285,18 @@ const Home = () => {
 
   return (
     <div className='overflow-hidden'>
-      <div className='relative h-100vh mb-40 md:h-100vh justify-center mx-auto flex flex-col w-11/12 max-w-full items-center text-white '>
-        <Link to={"/mocktest"}>
-          <div className='z-0 group p-1 mx-auto rounded-full bg-transparent border border-richblack-25 mt-20 font-bold text-richblack-200
-                          transition-all duration-200 hover:scale-95 w-fit'>
-            <div className='flex flex-row items-center gap-2 rounded-full px-5 py-[3px]
-                transition-all duration-200 group-hover:bg-richblack-900'>
-              <p>Mock Tests</p>
+      <Spotlight/>
+      <div className='h-screen w-full dark:bg-black bg-white dark:bg-grid-white/[0.2] bg-grid-black/[0.2] relative flex items-center flex-col'>
+        <div className="absolute cursor-pointer inset-0 w-full h-full bg-black [mask-image:radial-gradient(ellipse_at_center,transparent_10%,black)]"></div>
+
+        <Link to={"/mocktest"} className='z-10'>
+          <div className='group p-1 mx-auto rounded-full bg-transparent border border-richblack-25 mt-20 font-bold text-richblack-200 transition-all duration-200 hover:scale-95 w-fit'>
+            <div className='flex z-10 flex-row items-center gap-2 rounded-full px-5 py-[3px] transition-all duration-200 group-hover:bg-richblack-900'>
+              <button>Mock Tests</button>
               <FaArrowRight />
             </div>
           </div>
         </Link>
-        <Marquee/>
 
         <motion.div
           id='heading-hero'
@@ -304,9 +304,9 @@ const Home = () => {
           initial='hidden'
           whileInView={'show'}
           viewport={{ once: false, amount: 0.1 }}
-          className='text-center text-gray-200 text-4xl font-semibold w-80 lg:w-full lg:text-6xl  '
+          className='text-center text-white text-4xl mt-10 z-10 font-semibold w-80 lg:w-full lg:text-6xl'
         >
-          We Only Teach <br /> What we are <i>really</i> really <i>Good </i>At <br /> 
+          We Only Teach <br /> What we are <i>really</i> really <i>Good </i>At <br />
           <HighlightText text={"Awakening Classes"} />
         </motion.div>
 
@@ -315,12 +315,12 @@ const Home = () => {
           initial='hidden'
           whileInView={'show'}
           viewport={{ once: false, amount: 0.1 }}
-          className='mt-2 w-[90%] text-center text-base lg:text-lg font-bold text-richblack-300'
+          className='mt-2 w-[90%] text-center text-base lg:text-lg font-bold text-slate-200'
         >
           With our online courses, you can learn at your own pace, from anywhere in the world, and get access to a wealth of resources, quizzes, and personalized feedback from instructors.
         </motion.div>
 
-        <div className='flex flex-row gap-7 mt-8'>
+        <div className='flex flex-row gap-7 mt-8 z-10'>
           <CTAButton active={false} linkto={"/login"}>
             Explore The Knowledge
           </CTAButton>

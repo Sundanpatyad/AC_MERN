@@ -41,7 +41,7 @@ function LoginForm() {
 
   return (
     <GoogleOAuthProvider clientId="217412143147-6l1q2l190t36rp0452f3hl5mtl3nrhjq.apps.googleusercontent.com">
-      <form onSubmit={handleOnSubmit} className="mt-8 space-y-6 w-full max-w-md mx-auto">
+      <form onSubmit={handleOnSubmit} className="mt-8 space-y-3 w-full max-w-md mx-auto">
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-100">
             Email Address
@@ -53,7 +53,7 @@ function LoginForm() {
             required
             value={email}
             onChange={handleOnChange}
-            className="mt-1 block w-full px-3 py-2 bg-transparent text-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-white focus:border-white"
+            className="block w-full px-3 py-2 bg-transparent text-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-white focus:border-white"
             placeholder="Enter your email"
           />
         </div>
@@ -62,7 +62,7 @@ function LoginForm() {
           <label htmlFor="password" className="block text-sm font-medium text-gray-100">
             Password
           </label>
-          <div className="mt-1 relative">
+          <div className="relative">
             <input
               id="password"
               name="password"
@@ -116,6 +116,7 @@ function LoginForm() {
           <GoogleLogin 
             onSuccess={handleGoogleLoginSuccess}
             onError={handleGoogleLoginError}
+            theme="dark"
             useOneTap
             render={({ onClick }) => (
               <button
