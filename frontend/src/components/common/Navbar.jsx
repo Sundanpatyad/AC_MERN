@@ -6,9 +6,12 @@ import { fetchCourseCategories } from './../../services/operations/courseDetails
 import ProfileDropDown from '../core/Auth/ProfileDropDown'
 import MobileProfileDropDown from '../core/Auth/MobileProfileDropDown'
 import { AiOutlineShoppingCart, AiOutlineUser } from "react-icons/ai"
+import { HiBars2 } from "react-icons/hi2";
 import { MdKeyboardArrowDown } from "react-icons/md"
 import { motion } from 'framer-motion'
 import rzpLogo from "../../assets/Logo/rzp_logo.png";
+import { AiOutlineHome, AiOutlineBook, AiOutlineFileDone, AiOutlineInfoCircle, AiOutlineContacts, AiOutlineLogin, AiOutlineUserAdd } from 'react-icons/ai'
+
 
 const Navbar = () => {
     const { token } = useSelector((state) => state.auth)
@@ -116,35 +119,77 @@ const Navbar = () => {
                             </Link>
                         )}
                         {token === null ? (
-                            <div className="relative group">
-                                <button 
-                                    onClick={() => setIsAuthDropdownOpen(!isAuthDropdownOpen)}
-                                    className="flex items-center space-x-1 text-white hover:text-blue-200 transition-colors duration-200"
-                                >
-                                    <AiOutlineUser className="text-xl sm:text-2xl" />
-                                    <MdKeyboardArrowDown className={`transition-transform duration-200 ${isAuthDropdownOpen ? 'rotate-180' : ''}`} />
-                                </button>
-                                {isAuthDropdownOpen && (
-                                    <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-slate-800 ring-1 ring-black ring-opacity-5">
-                                        <div className="py-1">
-                                            <Link 
-                                                to="/login" 
-                                                className="block px-4 py-2 text-sm text-white hover:bg-slate-600"
-                                                onClick={() => setIsAuthDropdownOpen(false)}
-                                            >
-                                                Log in
-                                            </Link>
-                                            <Link 
-                                                to="/signup" 
-                                                className="block px-4 py-2 text-sm text-white hover:bg-slate-600"
-                                                onClick={() => setIsAuthDropdownOpen(false)}
-                                            >
-                                                Sign Up
-                                            </Link>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
+                             <div className="relative group">
+                             <button
+                               onClick={() => setIsAuthDropdownOpen(!isAuthDropdownOpen)}
+                               className="flex items-center space-x-1 text-white transition-colors duration-200 p-2 rounded-md bg-transparent "
+                             >
+                               <HiBars2 className={`transition-transform duration-200 ${isAuthDropdownOpen ? 'rotate-180' : ''} text-xl`} />
+                             </button>
+                             {isAuthDropdownOpen && (
+                               <div className="absolute right-0 mt-2 w-64 rounded-md shadow-lg bg-black ring-1 border border-slate-700 ring-black ring-opacity-5 overflow-hidden">
+                                 <div className="py-1">
+                                   <Link
+                                     to="/"
+                                     className="flex items-center px-4 py-2 text-sm text-white hover:bg-slate-900 transition-colors duration-150"
+                                     onClick={() => setIsAuthDropdownOpen(false)}
+                                   >
+                                     <AiOutlineHome className="mr-3 text-lg" />
+                                     Home
+                                   </Link>
+                                   <Link
+                                     to="/catalog/mock-tests"
+                                     className="flex items-center px-4 py-2 text-sm text-white hover:bg-slate-900 transition-colors duration-150"
+                                     onClick={() => setIsAuthDropdownOpen(false)}
+                                   >
+                                     <AiOutlineBook className="mr-3 text-lg" />
+                                     Courses
+                                   </Link>
+                                   <Link
+                                     to="/mocktest"
+                                     className="flex items-center px-4 py-2 text-sm text-white hover:bg-slate-900 transition-colors duration-150"
+                                     onClick={() => setIsAuthDropdownOpen(false)}
+                                   >
+                                     <AiOutlineFileDone className="mr-3 text-lg" />
+                                     Mock Tests
+                                   </Link>
+                                   <Link
+                                     to="/about"
+                                     className="flex items-center px-4 py-2 text-sm text-white hover:bg-slate-900 transition-colors duration-150"
+                                     onClick={() => setIsAuthDropdownOpen(false)}
+                                   >
+                                     <AiOutlineInfoCircle className="mr-3 text-lg" />
+                                     About Us
+                                   </Link>
+                                   <Link
+                                     to="/contact"
+                                     className="flex items-center px-4 py-2 text-sm text-white hover:bg-slate-900 transition-colors duration-150"
+                                     onClick={() => setIsAuthDropdownOpen(false)}
+                                   >
+                                     <AiOutlineContacts className="mr-3 text-lg" />
+                                     Contact Us
+                                   </Link>
+                                   <div className="border-t border-slate-700 my-1"></div>
+                                   <Link
+                                     to="/login"
+                                     className="flex items-center px-4 py-2 text-sm text-white hover:bg-slate-900 transition-colors duration-150"
+                                     onClick={() => setIsAuthDropdownOpen(false)}
+                                   >
+                                     <AiOutlineLogin className="mr-3 text-lg" />
+                                     Log in
+                                   </Link>
+                                   <Link
+                                     to="/signup"
+                                     className="flex items-center px-4 py-2 text-sm text-white hover:bg-slate-900 transition-colors duration-150"
+                                     onClick={() => setIsAuthDropdownOpen(false)}
+                                   >
+                                     <AiOutlineUserAdd className="mr-3 text-lg" />
+                                     Sign Up
+                                   </Link>
+                                 </div>
+                               </div>
+                             )}
+                           </div>
                         ) : (
                             <>
                                 <div className='hidden sm:block'>

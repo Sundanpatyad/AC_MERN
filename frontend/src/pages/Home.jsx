@@ -46,7 +46,7 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleRemoveFromCa
 
   return (
     <Link to={`/mock-test/${mockTest._id}`} 
-      className="bg-richblack-900 w-72 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer flex flex-col"
+      className="bg-richblack-900 w-72 rounded-xl overflow-hidden shadow-lg cursor-pointer flex flex-col"
     >
       <div className="relative h-36 bg-gradient-to-br from-white to-pink-500">
         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-80 p-3">
