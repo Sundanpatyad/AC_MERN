@@ -24,6 +24,7 @@ import { fadeIn } from './../components/common/motionFrameVarients'
 import { ACCOUNT_TYPE } from "../utils/constants"
 
 import Marquee from '../components/magicui/marquee'
+import ReactTypingEffect from 'react-typing-effect';
 import CourseReviewModal from '../components/core/ViewCourse/CourseReviewModal'
 
 const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleRemoveFromCart, handleBuyNow, handleStartTest, setShowLoginModal, isLoggedIn, userId }) => {
@@ -128,6 +129,62 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleRemoveFromCa
   )
 })
 
+const MockTestSkeleton = () => (
+  <div className="bg-richblack-900 w-72 rounded-xl overflow-hidden shadow-lg flex flex-col animate-pulse">
+    <div className="h-36 bg-richblack-700"></div>
+    <div className="p-4 flex-grow flex flex-col justify-between">
+      <div className="h-4 bg-richblack-700 rounded w-3/4 mb-3"></div>
+      <div className="h-4 bg-richblack-700 rounded w-1/2 mb-3"></div>
+      <div className="flex justify-between items-center mb-3">
+        <div className="h-4 bg-richblack-700 rounded w-1/4"></div>
+        <div className="h-4 bg-richblack-700 rounded w-1/4"></div>
+      </div>
+      <div className="space-y-2">
+        <div className="h-8 bg-richblack-700 rounded"></div>
+        <div className="h-8 bg-richblack-700 rounded"></div>
+      </div>
+    </div>
+  </div>
+)
+
+const PageLoader = () => (
+  <div className="fixed inset-0 bg-black flex flex-col items-center justify-center z-50">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.5 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+      className="text-2xl font-extrabold text-white mb-4 font-serif"
+    >
+      <ReactTypingEffect
+        text="Awakening Classes"
+        typingDelay={100}
+        speed={50}
+        eraseDelay={10000000}
+      />
+    </motion.div>
+    <motion.div
+      initial={{ width: 0 }}
+      animate={{ width: '300px' }}
+      transition={{ duration: 0.5, delay: 1.5 }}
+      className="h-1 bg-white mb-4"
+    />
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5, delay: 2 }}
+      className="text-2xl text-white mb-8 font-light italic"
+    >
+      <ReactTypingEffect
+        text="Together We Can"
+        typingDelay={2200}
+        speed={50}
+        eraseDelay={10000000}
+      />
+    </motion.div>
+  </div>
+);
+
+
 const Home = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -135,6 +192,7 @@ const Home = () => {
   const { user } = useSelector((state) => state.profile)
   const [showLoginModal, setShowLoginModal] = useState(false)
   const [reviewModal, setReviewModal] = useState(false)
+  const [isPageLoading, setIsPageLoading] = useState(true)
 
   const categoryID = "6506c9dff191d7ffdb4a3fe2" // hard coded
 
@@ -144,7 +202,7 @@ const Home = () => {
     { staleTime: Infinity }
   )
 
-  const { data: mockTests } = useQuery(
+  const { data: mockTests, isLoading: isMockTestsLoading } = useQuery(
     ['mockTests', token],
     () => fetchAllMockTests(token),
     { 
@@ -152,6 +210,14 @@ const Home = () => {
       select: (data) => data.filter(test => test.status !== 'draft')
     }
   )
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsPageLoading(false)
+    }, 1500) // Adjust this time as needed
+
+    return () => clearTimeout(timer)
+  }, [])
 
   const isLoggedIn = !!token
 
@@ -189,6 +255,10 @@ const Home = () => {
   }, [navigate])
 
   const MemoizedMockTestCard = useMemo(() => MockTestCard, [])
+
+  if (isPageLoading) {
+    return <PageLoader />
+  }
 
   return (
     <div className='overflow-hidden'>
@@ -246,20 +316,24 @@ const Home = () => {
         <h2 className="text-3xl mt-20 font-bold text-richblack-5 mb-6">Popular Mock Tests</h2>
         <div className="flex justify-center align-center w-full max-w-full">
           <div className="overflow-x-auto pb-4">
-            <div className="flex space-x-4" style={{ width: `${mockTests?.length * 300}px` }}>
-              {mockTests?.map((mockTest) => (
-                <MemoizedMockTestCard 
-                  key={mockTest._id} 
-                  mockTest={mockTest} 
-                  handleAddToCart={handleAddToCart}
-                  handleRemoveFromCart={handleRemoveFromCart}
-                  handleBuyNow={handleBuyNow}
-                  handleStartTest={handleStartTest}
-                  setShowLoginModal={setShowLoginModal}
-                  isLoggedIn={isLoggedIn}
-                  userId={user?._id}
-                />
-              ))}
+            <div className="flex space-x-4" style={{ width: `${(isMockTestsLoading ? 5 : mockTests?.length) * 300}px` }}>
+              {isMockTestsLoading
+                ? Array(5).fill().map((_, index) => (
+                    <MockTestSkeleton key={index} />
+                  ))
+                : mockTests?.map((mockTest) => (
+                    <MemoizedMockTestCard 
+                      key={mockTest._id} 
+                      mockTest={mockTest} 
+                      handleAddToCart={handleAddToCart}
+                      handleRemoveFromCart={handleRemoveFromCart}
+                      handleBuyNow={handleBuyNow}
+                      handleStartTest={handleStartTest}
+                      setShowLoginModal={setShowLoginModal}
+                      isLoggedIn={isLoggedIn}
+                      userId={user?._id}
+                    />
+                  ))}
             </div>
           </div>
         </div>
