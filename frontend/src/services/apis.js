@@ -1,4 +1,4 @@
-const BASE_URL = 'https://ac-backend-production.up.railway.app';
+const BASE_URL = 'https://awakening-classes.up.railway.app';
 // const BASE_URL = 'https://awakening-classes.onrender.com';
 
 // AUTH ENDPOINTS
