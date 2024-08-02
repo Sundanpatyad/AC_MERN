@@ -1,7 +1,8 @@
-
 import { useEffect, useState } from "react";
 import { Route, Routes, useLocation, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { motion } from 'framer-motion';
+import ReactTypingEffect from 'react-typing-effect';
 
 import Home from "./pages/Home"
 import Login from "./pages/Login"
@@ -27,7 +28,6 @@ import MyCourses from './components/core/Dashboard/MyCourses';
 import EditCourse from './components/core/Dashboard/EditCourse/EditCourse';
 import Instructor from './components/core/Dashboard/Instructor';
 
-
 import Cart from "./components/core/Dashboard/Cart/Cart";
 import EnrolledCourses from "./components/core/Dashboard/EnrolledCourses";
 import AddCourse from "./components/core/Dashboard/AddCourse/AddCourse";
@@ -47,13 +47,73 @@ import MockTestDetails from "./pages/MockDetails";
 import MockTestSeries from "./components/core/ConductMockTests/MockTestSeries";
 import EditMockTestSeries from "./components/core/Dashboard/AddCourse/EditMockTest";
 
+const PageLoader = () => (
+  <motion.div 
+    className="fixed inset-0 flex flex-col items-center justify-center z-50 overflow-hidden"
+    initial={{ background: "linear-gradient(45deg, #000000, #1a1a1a)" }}
+    animate={{ 
+      background: [
+        "linear-gradient(45deg, #000000, #1a1a1a)",
+        "linear-gradient(45deg, #1a1a1a, #2c2c2c)",
+        "linear-gradient(45deg, #2c2c2c, #3d3d3d)",
+        "linear-gradient(45deg, #3d3d3d, #1a1a1a)",
+        "linear-gradient(45deg, #1a1a1a, #000000)"
+      ]
+    }}
+    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+  >
+    <motion.div
+      initial={{ opacity: 0, scale: 0.5, rotateY: 180 }}
+      animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+      transition={{ duration: 1, type: "spring", stiffness: 100 }}
+      className="text-3xl font-extrabold text-white mb-6 font-serif"
+    >
+      <ReactTypingEffect
+        text="Awakening Classes"
+        typingDelay={100}
+        speed={50}
+        eraseDelay={10000000}
+        cursorRenderer={cursor => <span className="text-blue-100">{cursor}</span>}
+      />
+    </motion.div>
+
+    <motion.div
+      initial={{ width: 0 }}
+      animate={{ width: '300px' }}
+      transition={{ duration: 1.5, delay: 1, type: "spring", stiffness: 50 }}
+      className="h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 mb-6 rounded-full"
+    />
+
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1, delay: 2.5, type: "spring", stiffness: 100 }}
+      className="text-2xl text-white mb-8 font-light italic"
+    >
+      <ReactTypingEffect
+        text="Together We Can"
+        typingDelay={100}
+        speed={50}
+        eraseDelay={10000000}
+        cursorRenderer={cursor => <span className="text-pink-500">{cursor}</span>}
+      />
+    </motion.div>
+
+    <motion.div
+      initial={{ opacity: 0, scale: 0 }}
+      animate={{ opacity: [0, 1, 0], scale: [0, 1, 0] }}
+      transition={{ duration: 2, repeat: Infinity, repeatDelay: 0.5 }}
+      className="w-16 h-16 border-t-4 border-purple-500 rounded-full animate-spin"
+    />
+  </motion.div>
+);
 
 function App() {
-
   const { user } = useSelector((state) => state.profile)
-
-  // Scroll to the top of the page when the component mounts
   const location = useLocation();
+  const [showArrow, setShowArrow] = useState(false)
+  const [isPageLoading, setIsPageLoading] = useState(true)
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname])
@@ -65,10 +125,6 @@ function App() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [])
-
-
-  // Go upward arrow - show , unshow
-  const [showArrow, setShowArrow] = useState(false)
 
   const handleArrow = () => {
     if (window.scrollY > 500) {
@@ -83,12 +139,22 @@ function App() {
     }
   }, [showArrow])
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsPageLoading(false)
+    }, 1500) // Adjust this time as needed
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (isPageLoading) {
+    return <PageLoader />
+  }
 
   return (
     <div className="w-screen min-h-screen bg-black flex flex-col font-inter">
       <Navbar />
 
-      {/* go upward arrow */}
       <button onClick={() => window.scrollTo(0, 0)}
         className={`bg-yellow-25 hover:bg-yellow-50 hover:scale-110 p-3 text-lg text-black rounded-2xl fixed right-3 z-10 duration-500 ease-in-out ${showArrow ? 'bottom-6' : '-bottom-24'} `} >
         <HiArrowNarrowUp />
@@ -102,8 +168,6 @@ function App() {
         <Route path="courses/:courseId" element={<CourseDetails />} />
         <Route path="/mock-test/:mockId" element={<MockTestDetails />} />
 
-
-        {/* Open Route - for Only Non Logged in User */}
         <Route
           path="signup" element={
             <OpenRoute>
@@ -144,11 +208,6 @@ function App() {
           }
         />
 
-
-
-
-        {/* Protected Route - for Only Logged in User */}
-        {/* Dashboard */}
         <Route element={
           <ProtectedRoute>
             <Dashboard />
@@ -158,8 +217,6 @@ function App() {
           <Route path="dashboard/my-profile" element={<MyProfile />} />
           <Route path="dashboard/Settings" element={<Settings />} />
 
-          {/* Route only for Students */}
-          {/* cart , EnrolledCourses */}
           {user?.accountType === ACCOUNT_TYPE.STUDENT && (
             <>
               <Route path="dashboard/cart" element={<Cart />} />
@@ -167,8 +224,6 @@ function App() {
             </>
           )}
 
-          {/* Route only for Instructors */}
-          {/* add course , MyCourses, EditCourse*/}
           {user?.accountType === ACCOUNT_TYPE.INSTRUCTOR && (
             <>
               <Route path="dashboard/instructor" element={<Instructor />} />
@@ -182,8 +237,6 @@ function App() {
           )}
         </Route>
 
-
-        {/* For the watching course lectures */}
         <Route
           element={
             <ProtectedRoute>
@@ -198,7 +251,6 @@ function App() {
             element={<VideoDetails />}
           /> 
           </>
-            
           )}
         </Route>
         <Route
@@ -206,15 +258,10 @@ function App() {
               element={<Mocktest/>}
             />
         
-        
-
-
-
         <Route
             path="view-mock/:mockId"
             element={<MockTestSeries />}
           />
-        {/* Page Not Found (404 Page ) */}
         <Route path="*" element={<PageNotFound />} />
 
       </Routes>

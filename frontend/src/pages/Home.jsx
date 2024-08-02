@@ -6,7 +6,6 @@ import toast from 'react-hot-toast'
 import { useQuery } from 'react-query'
 
 import HighlightText from '../components/core/HomePage/HighlightText'
-import CTAButton from "../components/core/HomePage/Button"
 import InstructorSection from '../components/core/HomePage/InstructorSection'
 import Footer from '../components/common/Footer'
 import ReviewSlider from '../components/common/ReviewSlider'
@@ -23,7 +22,6 @@ import { FaArrowRight, FaBookOpen, FaShoppingCart } from "react-icons/fa"
 import { fadeIn } from '../components/common/motionFrameVarients'
 import { ACCOUNT_TYPE } from "../utils/constants"
 
-import ReactTypingEffect from 'react-typing-effect';
 import CourseReviewModal from '../components/core/ViewCourse/CourseReviewModal'
 import { Spotlight } from '../components/ui/Spotlight'
 
@@ -147,67 +145,6 @@ const MockTestSkeleton = () => (
   </div>
 )
 
-const PageLoader = () => (
-  <motion.div 
-    className="fixed inset-0 flex flex-col items-center justify-center z-50 overflow-hidden"
-    initial={{ background: "linear-gradient(45deg, #000000, #1a1a1a)" }}
-    animate={{ 
-      background: [
-        "linear-gradient(45deg, #000000, #1a1a1a)",
-        "linear-gradient(45deg, #1a1a1a, #2c2c2c)",
-        "linear-gradient(45deg, #2c2c2c, #3d3d3d)",
-        "linear-gradient(45deg, #3d3d3d, #1a1a1a)",
-        "linear-gradient(45deg, #1a1a1a, #000000)"
-      ]
-    }}
-    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-  >
-    <motion.div
-      initial={{ opacity: 0, scale: 0.5, rotateY: 180 }}
-      animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-      transition={{ duration: 1, type: "spring", stiffness: 100 }}
-      className="text-3xl font-extrabold text-white mb-6 font-serif"
-    >
-      <ReactTypingEffect
-        text="Awakening Classes"
-        typingDelay={100}
-        speed={50}
-        eraseDelay={10000000}
-        cursorRenderer={cursor => <span className="text-blue-100">{cursor}</span>}
-      />
-    </motion.div>
-
-    <motion.div
-      initial={{ width: 0 }}
-      animate={{ width: '300px' }}
-      transition={{ duration: 1.5, delay: 1, type: "spring", stiffness: 50 }}
-      className="h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 mb-6 rounded-full"
-    />
-
-    <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1, delay: 2.5, type: "spring", stiffness: 100 }}
-      className="text-2xl text-white mb-8 font-light italic"
-    >
-      <ReactTypingEffect
-        text="Together We Can"
-        typingDelay={100}
-        speed={50}
-        eraseDelay={10000000}
-        cursorRenderer={cursor => <span className="text-pink-500">{cursor}</span>}
-      />
-    </motion.div>
-
-    <motion.div
-      initial={{ opacity: 0, scale: 0 }}
-      animate={{ opacity: [0, 1, 0], scale: [0, 1, 0] }}
-      transition={{ duration: 2, repeat: Infinity, repeatDelay: 0.5 }}
-      className="w-16 h-16 border-t-4 border-purple-500 rounded-full animate-spin"
-    />
-  </motion.div>
-);
-
 const Home = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -279,9 +216,6 @@ const Home = () => {
 
   const MemoizedMockTestCard = useMemo(() => MockTestCard, [])
 
-  if (isPageLoading) {
-    return <PageLoader />
-  }
 
   return (
     <div className='overflow-hidden'>
