@@ -23,7 +23,7 @@ const BackButton = ({ onClick }) => (
 const MockTestInfo = ({ seriesName, description, mockTestsCount, creator, createdAt, status }) => (
   <div className="mb-5 flex flex-col justify-center gap-4 py-5 text-lg text-richblack-5">
     <h1 className="text-4xl font-bold text-richblack-5 sm:text-[42px]">{seriesName}</h1>
-    <p className="text-richblack-200">{description}</p>
+    <p className="text-richblack-200 text-xs">{description}</p>
     <div className="text-md flex flex-wrap items-center gap-2">
       <span>{`${mockTestsCount || 0} tests`}</span>
       <span className="capitalize">• Status: {status}</span>
@@ -201,11 +201,10 @@ function MockTestDetails() {
   } = courseDetails
 
   return (
-    <div className="min-h-screen bg-richblack-900">
+    <div className="min-h-screen bg-black">
       <div className="relative w-11/12 max-w-maxContent mx-auto">
         <div className="grid md:grid-cols-[2fr,1fr] gap-8 items-start py-8">
           <div>
-            <BackButton onClick={() => navigate(-1)} />
             <MockTestInfo
               seriesName={seriesName}
               description={description}

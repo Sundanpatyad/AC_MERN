@@ -56,7 +56,7 @@ export default function MobileProfileDropDown() {
     return (
         <div className="relative sm:hidden">
             <button 
-                className="flex items-center gap-x-1 bg-black p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-white transition-all duration-300"
+                className="flex items-center gap-x-1 bg-transparent p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-white transition-all duration-300"
                 onClick={() => setOpen(!open)}
             >
                 <Img
@@ -78,7 +78,7 @@ export default function MobileProfileDropDown() {
                         ref={ref}
                     >
                         {[
-                            { to: "/dashboard/my-profile", icon: VscDashboard, label: "Dashboard" },
+                            { to: "/dashboard/my-profile", icon: VscDashboard, label: "Profile" },
                             { to: "/", icon: AiOutlineHome, label: "Home" },
                             { to: "/catalog/mock-tests", icon: PiNotebook, label: "Courses" },
                             { to: "/mocktest", icon: PiNotebook, label: "Mock Tests" },

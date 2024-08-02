@@ -154,12 +154,10 @@ function CourseDetails() {
 
   return (
     <>
-      <div className="relative w-full bg-richblack-800">
+      <div className="relative w-full bg-black">
         <div className="mx-auto box-content px-4 lg:w-[1260px] 2xl:relative">
           <div className="mx-auto grid min-h-[450px] max-w-maxContentTab justify-items-center py-8 lg:mx-0 lg:justify-items-start lg:py-0 xl:max-w-[810px]">
-            <div className="mb-5 lg:mt-10 lg:mb-0 z-[100]" onClick={() => navigate(-1)}>
-              <GiReturnArrow className="w-10 h-10 text-white hover:text-richblack-25 cursor-pointer" />
-            </div>
+          
             <div className="relative block max-h-[30rem] lg:hidden">
               <Img
                 src={thumbnail}
@@ -170,7 +168,7 @@ function CourseDetails() {
             </div>
             <div className="mb-5 flex flex-col justify-center gap-4 py-5 text-lg text-richblack-5">
               <h1 className="text-4xl font-bold text-richblack-5 sm:text-[42px]">{courseName}</h1>
-              <p className='text-richblack-200'>{courseDescription}</p>
+              <p className='text-richblack-200 text-xs'>{courseDescription}</p>
               <div className="text-md flex flex-wrap items-center gap-2">
                 <span className="text-white">{avgReviewCount}</span>
                 <RatingStars Review_Count={avgReviewCount} Star_Size={24} />
