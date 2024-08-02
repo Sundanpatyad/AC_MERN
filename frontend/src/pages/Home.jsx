@@ -6,6 +6,7 @@ import toast from 'react-hot-toast'
 import { useQuery } from 'react-query'
 
 import HighlightText from '../components/core/HomePage/HighlightText'
+import CTAButton from "../components/core/HomePage/Button"
 import InstructorSection from '../components/core/HomePage/InstructorSection'
 import Footer from '../components/common/Footer'
 import ReviewSlider from '../components/common/ReviewSlider'
@@ -22,6 +23,7 @@ import { FaArrowRight, FaBookOpen, FaShoppingCart } from "react-icons/fa"
 import { fadeIn } from '../components/common/motionFrameVarients'
 import { ACCOUNT_TYPE } from "../utils/constants"
 
+import ReactTypingEffect from 'react-typing-effect';
 import CourseReviewModal from '../components/core/ViewCourse/CourseReviewModal'
 import { Spotlight } from '../components/ui/Spotlight'
 
@@ -145,6 +147,8 @@ const MockTestSkeleton = () => (
   </div>
 )
 
+
+
 const Home = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -217,6 +221,7 @@ const Home = () => {
   const MemoizedMockTestCard = useMemo(() => MockTestCard, [])
 
 
+
   return (
     <div className='overflow-hidden'>
       <Spotlight/>
@@ -255,9 +260,9 @@ const Home = () => {
         </motion.div>
 
         <div className='flex flex-row gap-7 mt-8 z-10'>
-        <Link to={"/login"} className="w-full py-4 px-5 bg-white text-black rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-xs">
+          <CTAButton active={false} linkto={"/login"}>
             Explore The Knowledge
-          </Link>
+          </CTAButton>
         </div>
       </div>
 

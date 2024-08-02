@@ -17,7 +17,6 @@ const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLogged
     const [isEnrolled, setIsEnrolled] = useState(false)
     const navigate = useNavigate()
     const { user } = useSelector((state) => state.profile)
-
     React.useEffect(() => {
         setIsEnrolled(course.studentsEnrolled?.includes(user?._id))
     }, [course.studentsEnrolled, user?._id])
@@ -30,8 +29,7 @@ const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLogged
             <div className="relative h-28 sm:h-32 md:h-40">
                 <img 
                     src={course.thumbnail} 
-                    alt={course.courseName}
-                    className="w-full h-full object-cover"
+                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
                     <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-white text-center p-2">{course.courseName}</h3>
@@ -41,7 +39,7 @@ const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLogged
                 <p className="text-xs sm:text-sm md:text-base text-richblack-100 mb-2 sm:mb-4 line-clamp-2">{course.courseDescription}</p>
                 <div className="flex justify-between items-center text-xs sm:text-sm text-richblack-200 mb-2 sm:mb-4 md:mb-6">
                     <div className="flex items-center">
-                        <p className="font-medium">₹{course.price}</p>
+                        <p className="font-semibold bg-white px-3 rounded-full text-black">₹{course.price}</p>
                     </div>
                     <div className="flex items-center">
                         <FaBookOpen className="mr-1 text-richblack-50" />
@@ -53,7 +51,7 @@ const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLogged
                         <button
                             onClick={(e) => {
                                 e.stopPropagation()
-                                navigate(`/view-course/${course._id}/section/${course.courseContent?._id}/sub-section/${course.courseContent?.subSection?._id}`)
+                                navigate(`/view-course/${course._id}/section/${course.courseContent[0]?._id}/sub-section/${course.courseContent[0]?.subSection[0]}`)
                             }}
                             className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-xs sm:text-sm"
                         >
@@ -218,27 +216,8 @@ function Catalog() {
 
             {/* Courses Section */}
             <div className="flex-grow mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-richblack-5 mb-4">Courses to get you started</h2>
-                <div className="my-4 flex border-b border-b-richblack-600 text-xs sm:text-sm">
-                    <p
-                        className={`px-2 sm:px-4 py-2 ${active === 1
-                            ? "border-b border-b-white text-white"
-                            : "text-richblack-50"
-                            } cursor-pointer`}
-                        onClick={() => setActive(1)}
-                    >
-                        Most Popular
-                    </p>
-                    <p
-                        className={`px-2 sm:px-4 py-2 ${active === 2
-                            ? "border-b border-b-white text-white"
-                            : "text-richblack-50"
-                            } cursor-pointer`}
-                        onClick={() => setActive(2)}
-                    >
-                        New
-                    </p>
-                </div>
+                <h2 className="text-3xl sm:text-3xl md:text-4xl text-center my-10 font-bold text-richblack-5 mb-4">Advance Your <i className="text-slate-400">Skills</i> With Us</h2>
+              
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8">
                     {renderCourseCards(currentCatalogData?.selectedCategory?.courses)}
                 </div>

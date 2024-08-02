@@ -44,7 +44,7 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
         <p className="text-xs sm:text-sm md:text-base text-richblack-100 mb-2 sm:mb-4 line-clamp-2">{mockTest.description}</p>
         <div className="flex justify-between items-center text-xs sm:text-sm text-richblack-200 mb-2 sm:mb-4 md:mb-6">
           <div className="flex items-center">
-            <p className="font-medium">₹{mockTest.price}</p>
+            <p className="font-semibold bg-white px-3 rounded-full text-black">₹{mockTest.price}</p>
           </div>
           <div className="flex items-center">
             <FaBookOpen className="mr-1 text-richblack-50" />
@@ -208,27 +208,8 @@ const MockTestComponent = () => {
 
       {/* Mock Tests Section */}
       <div className="flex-grow mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-richblack-5 mb-4">Available Mock Test Series</h2>
-        <div className="my-4 flex border-b border-b-richblack-600 text-xs sm:text-sm">
-          <p
-            className={`px-2 sm:px-4 py-2 ${active === 1
-              ? "border-b border-b-white text-white"
-              : "text-richblack-50"
-              } cursor-pointer`}
-            onClick={() => setActive(1)}
-          >
-            Most Popular
-          </p>
-          <p
-            className={`px-2 sm:px-4 py-2 ${active === 2
-              ? "border-b border-b-white text-white"
-              : "text-richblack-50"
-              } cursor-pointer`}
-            onClick={() => setActive(2)}
-          >
-            New
-          </p>
-        </div>
+        <h2 className="text-3xl sm:text-3xl md:text-4xl text-center my-10 font-bold text-richblack-5 mb-4">Test Your Knowledge with <i className='text-slate-300'>Confidence</i></h2>
+        
         {memoizedMockTests.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8">
             {memoizedMockTests.map((mockTest) => (

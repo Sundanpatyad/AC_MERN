@@ -1,5 +1,5 @@
-const BASE_URL = 'https://awakening-classes.up.railway.app';
-// const BASE_URL = 'https://awakening-classes.onrender.com';
+// const BASE_URL = 'https://awakening-classes.up.railway.app';
+const BASE_URL = 'http://localhost:8000';
 
 // AUTH ENDPOINTS
 export const endpoints = {

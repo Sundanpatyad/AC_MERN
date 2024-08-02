@@ -9,7 +9,7 @@ import ConfirmationModal from "../../common/ConfirmationModal"
 import SidebarLink from "./SidebarLink"
 import Loading from './../../common/Loading';
 
-import { HiMenuAlt1 } from 'react-icons/hi'
+import { HiBars2 } from "react-icons/hi2";
 import { IoMdClose } from 'react-icons/io'
 
 import { setOpenSideMenu, setScreenSize } from "../../../slices/sidebarSlice";
@@ -65,7 +65,7 @@ export default function Sidebar() {
     <>
       <div className="sm:hidden text-white absolute left-7 top-3 cursor-pointer " onClick={() => dispatch(setOpenSideMenu(!openSideMenu))}>
         {
-          openSideMenu ? <IoMdClose size={33} /> : <HiMenuAlt1 size={33} />
+          openSideMenu ? <IoMdClose size={33} /> : <HiBars2 size={33} />
         }
       </div>
 

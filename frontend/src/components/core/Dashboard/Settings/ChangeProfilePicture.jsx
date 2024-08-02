@@ -1,12 +1,9 @@
 import { useEffect, useRef, useState } from "react"
 import { FiUpload } from "react-icons/fi"
 import { useDispatch, useSelector } from "react-redux"
-
 import { updateUserProfileImage } from "../../../../services/operations/SettingsAPI"
 import IconBtn from "../../../common/IconBtn"
-import Img from './../../../common/Img';
-
-
+import Img from './../../../common/Img'
 
 export default function ChangeProfilePicture() {
   const { token } = useSelector((state) => state.auth)
@@ -25,7 +22,6 @@ export default function ChangeProfilePicture() {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0]
-    // console.log(file)
     if (file) {
       setProfileImage(file)
       previewFile(file)
@@ -42,7 +38,6 @@ export default function ChangeProfilePicture() {
 
   const handleFileUpload = () => {
     try {
-      // console.log("uploading...")
       setLoading(true)
       const formData = new FormData()
       formData.append("profileImage", profileImage)
@@ -61,49 +56,57 @@ export default function ChangeProfilePicture() {
     }
   }, [profileImage])
 
-
   return (
-    <>
-      <div className="flex items-center justify-between rounded-md border-[1px] border-richblack-700 bg-richblack-800 p-8 px-3 sm:px-12 text-richblack-5">
-        <div className="flex items-center gap-x-4">
+    <div className="bg-black rounded-3xl overflow-hidden shadow-2xl p-6 sm:p-8 md:p-10">
+      <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6">Change Profile Picture</h2>
+      <div className="flex flex-col sm:flex-row items-center gap-6">
+        <div className="relative">
           <Img
             src={previewSource || user?.image}
             alt={`profile-${user?.firstName}`}
-            className="aspect-square w-[78px] rounded-full object-cover"
+            className="w-32 h-32 sm:w-40 sm:h-40 rounded-full object-cover border-4 border-white"
           />
-
-          <div className="space-y-2">
-            <p className="font-medium">Change Profile Picture</p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                className="hidden"
-                accept="image/png, image/gif, image/jpeg, image/jpg"
-              />
-
-              <button
-                onClick={handleClick}
-                disabled={loading}
-                className="cursor-pointer rounded-md py-2 px-5 font-semibold bg-richblack-200 text-richblack-900 hover:bg-richblack-900 hover:text-richblack-200 duration-300"
-              >
-                Select
-              </button>
-
-              <IconBtn
-                text={loading ? "Uploading..." : "Upload"}
-                onclick={handleFileUpload}
-              >
-                {!loading && (
-                  <FiUpload className="text-lg" />
-                )}
-              </IconBtn>
-              
-            </div>
+          <div className="absolute inset-0 bg-black bg-opacity-40 rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
+            <button
+              onClick={handleClick}
+              className="text-white text-sm font-semibold bg-transparent border border-white rounded-full py-1 px-3 hover:bg-white hover:text-black transition-colors duration-300"
+            >
+              Change
+            </button>
+          </div>
+        </div>
+        <div className="space-y-4 text-center sm:text-left">
+          <p className="text-gray-300 text-sm sm:text-base">
+            Upload a new profile picture. <br />
+            Image should be in PNG, JPG, or GIF format.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              className="hidden"
+              accept="image/png, image/gif, image/jpeg, image/jpg"
+            />
+            <button
+              onClick={handleClick}
+              disabled={loading}
+              className="bg-white text-black px-6 py-2 rounded-full transition duration-300 hover:bg-gray-200 text-sm sm:text-base font-semibold"
+            >
+              Select File
+            </button>
+            <IconBtn
+              text={loading ? "Uploading..." : "Upload"}
+              onclick={handleFileUpload}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full transition duration-300 flex items-center justify-center text-sm sm:text-base"
+            >
+              {!loading && (
+                <FiUpload className="mr-2" />
+              )}
+            </IconBtn>
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }

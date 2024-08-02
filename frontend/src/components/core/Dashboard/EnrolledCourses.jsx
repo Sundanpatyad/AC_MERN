@@ -78,36 +78,34 @@ export default function EnrolledCourses() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-richblack-900 to-richblack-800 py-6 px-4 sm:py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-black text-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-pink-600 font-extrabold text-center mb-8">
-          Your Learning Journey
+        <h1 className="text-4xl md:text-5xl font-extrabold text-center mb-12 bg-gradient-to-r from-white to-slate-400 text-transparent bg-clip-text">
+          Your Learning Dashboard
         </h1>
 
         {/* Enrolled Courses Section */}
-        <section className="mb-10">
-          <h2 className="text-2xl sm:text-3xl text-richblack-5 font-bold mb-4">Enrolled Courses</h2>
-          <div className="bg-richblack-800 rounded-xl shadow-lg overflow-hidden">
+        <section className="mb-16">
+          <h2 className="text-3xl font-bold mb-6 text-gray-100">Enrolled Courses</h2>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {loading.courses ? (
-              <p className="text-center text-richblack-300 py-8">Loading enrolled courses...</p>
+              <p className="col-span-full text-center text-gray-400 py-8">Loading enrolled courses...</p>
             ) : error.courses ? (
-              <p className="text-center text-red-500 py-8">Error: {error.courses}</p>
+              <p className="col-span-full text-center text-red-500 py-8">Error: {error.courses}</p>
             ) : !enrolledCourses || enrolledCourses.length === 0 ? (
-              <p className="text-center text-richblack-300 py-8">You haven't enrolled in any courses yet.</p>
+              <p className="col-span-full text-center text-gray-400 py-8">You haven't enrolled in any courses yet.</p>
             ) : (
               enrolledCourses.map((course, i) => (
-                <div key={i} className="flex flex-col p-4 border-b border-richblack-700 hover:bg-richblack-700 transition-all duration-200">
-                  <div className="flex items-center space-x-4 cursor-pointer mb-3" onClick={() => navigate(`/view-course/${course?._id}/section/${course.courseContent?.[0]?._id}/sub-section/${course.courseContent?.[0]?.subSection?.[0]?._id}`)}>
-                    <Img src={course.thumbnail} alt="course_img" className="h-16 w-16 rounded-lg object-cover" />
-                    <div>
-                      <p className="font-semibold text-richblack-5">{course.courseName}</p>
-                      <p className="text-sm text-richblack-300 mt-1">{course.courseDescription.slice(0, 50)}...</p>
+                <div key={i} className="bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300">
+                  <div className="p-6 cursor-pointer" onClick={() => navigate(`/view-course/${course?._id}/section/${course.courseContent?.[0]?._id}/sub-section/${course.courseContent?.[0]?.subSection?.[0]?._id}`)}>
+                    <Img src={course.thumbnail} alt="course_img" className="h-48 w-full rounded-lg object-cover mb-4" />
+                    <h3 className="font-bold text-xl mb-2 text-gray-100">{course.courseName}</h3>
+                    <p className="text-gray-400 mb-4">{course.courseDescription.slice(0, 100)}...</p>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm text-gray-400">Duration: {course?.totalDuration}</span>
+                      <span className="text-sm font-semibold text-blue-400">Progress: {course.progressPercentage || 0}%</span>
                     </div>
-                  </div>
-                  <div className="mt-2">
-                    <p className="text-sm text-richblack-300 mb-1">Duration: {course?.totalDuration}</p>
-                    <p className="text-sm text-richblack-300 mb-2">Progress: {course.progressPercentage || 0}%</p>
-                    <ProgressBar completed={course.progressPercentage || 0} height="8px" isLabelVisible={false} bgColor="#60A5FA" />
+                    <ProgressBar completed={course.progressPercentage || 0} height="8px" isLabelVisible={false} bgColor="#60A5FA" baseBgColor="#4B5563" />
                   </div>
                 </div>
               ))
@@ -116,30 +114,30 @@ export default function EnrolledCourses() {
         </section>
 
         {/* Enrolled Mock Tests Section */}
-        <section className="mb-10">
-          <h2 className="text-2xl sm:text-3xl text-richblack-5 font-bold mb-4">Enrolled Mock Tests</h2>
-          <div className="bg-richblack-800 rounded-xl shadow-lg overflow-hidden">
+        <section className="mb-16">
+          <h2 className="text-3xl font-bold mb-6 text-gray-100">Enrolled Mock Tests</h2>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {loading.mockTests ? (
-              <p className="text-center text-richblack-300 py-8">Loading enrolled mock tests...</p>
+              <p className="col-span-full text-center text-gray-400 py-8">Loading enrolled mock tests...</p>
             ) : error.mockTests ? (
-              <p className="text-center text-red-500 py-8">Error: {error.mockTests}</p>
+              <p className="col-span-full text-center text-red-500 py-8">Error: {error.mockTests}</p>
             ) : !enrolledMockTests || enrolledMockTests.length === 0 ? (
-              <p className="text-center text-richblack-300 py-8">You haven't enrolled in any mock tests yet.</p>
+              <p className="col-span-full text-center text-gray-400 py-8">You haven't enrolled in any mock tests yet.</p>
             ) : (
               enrolledMockTests.map((mockTest, i) => (
-                <div key={i} className="flex flex-col p-4 border-b border-richblack-700 hover:bg-richblack-700 transition-all duration-200">
-                  <div className="flex items-center space-x-4 mb-3">
-                    <Img src={mockTest.thumbnail} alt="mock_test_img" className="h-16 w-16 rounded-lg object-cover" />
-                    <div>
-                      <p className="font-semibold text-white">{mockTest.testName}</p>
-                      <p className="text-sm text-richblack-300 mt-1">{mockTest.description.slice(0, 50)}...</p>
+                <div
+                onClick={() => navigate(`/mock-test/${mockTest._id}`)}
+                key={i} className="bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300">
+                  <div className="p-6">
+                    <Img src={mockTest.thumbnail} alt="mock_test_img" className="h-48 w-full rounded-lg object-cover mb-4" />
+                    <h3 className="font-bold text-xl mb-2 text-gray-100">{mockTest.testName}</h3>
+                    <p className="text-gray-400 mb-4">{mockTest.description.slice(0, 100)}...</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-lg font-semibold text-green-400">Rs. {mockTest.price}</span>
+                      <span className={`text-sm font-medium px-3 py-1 rounded-full ${mockTest.status === 'completed' ? 'bg-green-500 text-green-100' : 'bg-yellow-500 text-yellow-100'}`}>
+                        {mockTest.status === 'draft' ? 'Draft' : 'Published'}
+                      </span>
                     </div>
-                  </div>
-                  <div className="flex justify-between items-center mt-2">
-                    <p className="text-richblack-300">Rs.{mockTest.price}</p>
-                    <p className={`text-sm font-medium ${mockTest.status === 'completed' ? 'text-green-500' : 'text-yellow-500'}`}>
-                      {mockTest.status === 'draft' ? 'Draft' : 'Published'}
-                    </p>
                   </div>
                 </div>
               ))
@@ -148,42 +146,42 @@ export default function EnrolledCourses() {
         </section>
 
         {/* Mock Test Attempts Section */}
-        <section className="text-center mb-10">
+        <section className="text-center mb-16">
           <button
             onClick={() => {
               setShowMockAttempts(!showMockAttempts)
               if (!mockAttempts) getMockAttempts()
             }}
-            className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-3 px-6 rounded-full hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-lg"
+            className="bg-gradient-to-r from-slate-400 to-white text-black font-bold py-3 px-8 rounded-full hover:from-slate-400 hover:to-white transition-all duration-300 shadow-lg text-lg"
           >
             {showMockAttempts ? "Hide Mock Test Attempts" : "Show Mock Test Attempts"}
           </button>
 
           {showMockAttempts && (
-            <div className="mt-8">
-              <h2 className="text-2xl sm:text-3xl text-richblack-5 font-bold mb-4">Mock Test Attempts</h2>
+            <div className="mt-12">
+              <h2 className="text-3xl font-bold mb-6 text-gray-100">Mock Test Attempts</h2>
               {loading.attempts ? (
-                <p className="text-center text-richblack-300 py-8">Loading mock test attempts...</p>
+                <p className="text-center text-gray-400 py-8">Loading mock test attempts...</p>
               ) : error.attempts ? (
                 <p className="text-center text-red-500 py-8">Error: {error.attempts}</p>
               ) : !mockAttempts || mockAttempts.length === 0 ? (
-                <p className="text-center text-richblack-300 py-8">You haven't attempted any mock tests yet.</p>
+                <p className="text-center text-gray-400 py-8">You haven't attempted any mock tests yet.</p>
               ) : (
                 Object.entries(groupAttemptsBySeriesName(mockAttempts)).map(([seriesName, attempts]) => (
-                  <div key={seriesName} className="mt-6 bg-richblack-800 rounded-xl p-4 shadow-lg">
-                    <h3 className="text-xl text-richblack-5 font-semibold mb-3">{seriesName}</h3>
-                    <div className="grid gap-4">
+                  <div key={seriesName} className="mt-8 bg-gray-800 rounded-xl p-6 shadow-lg">
+                    <h3 className="text-2xl text-gray-100 font-semibold mb-4">{seriesName}</h3>
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                       {attempts.map((attempt, index) => (
-                        <div key={index} className="bg-richblack-700 rounded-lg p-4 hover:bg-richblack-600 transition-all duration-200">
-                          <p className="text-richblack-5 font-semibold mb-2">{attempt.testName}</p>
-                          <p className="text-richblack-300 text-sm mb-2">{new Date(attempt.createdAt).toLocaleDateString()}</p>
+                        <div key={index} className="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition-all duration-300">
+                          <h4 className="text-lg text-gray-100 font-semibold mb-2">{attempt.testName}</h4>
+                          <p className="text-gray-400 text-sm mb-3">{new Date(attempt.createdAt).toLocaleDateString()}</p>
                           <div className="flex justify-between items-center mb-2">
-                            <p className="text-richblack-300">Score: {attempt.score} / {attempt.totalQuestions}</p>
-                            <p className="text-richblack-300">Time: {attempt.timeTaken}</p>
+                            <span className="text-blue-400 font-medium">Score: {attempt.score} / {attempt.totalQuestions}</span>
+                            <span className="text-purple-400 font-medium">Time: {attempt.timeTaken}</span>
                           </div>
                           <div className="flex justify-between items-center">
-                            <p className="text-green-500">Correct: {attempt.correctAnswers}</p>
-                            <p className="text-red-500">Incorrect: {attempt.incorrectAnswers}</p>
+                            <span className="text-green-400">Correct: {attempt.correctAnswers}</span>
+                            <span className="text-red-400">Incorrect: {attempt.incorrectAnswers}</span>
                           </div>
                         </div>
                       ))}
