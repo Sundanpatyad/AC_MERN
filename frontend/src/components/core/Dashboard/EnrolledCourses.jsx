@@ -96,7 +96,7 @@ export default function EnrolledCourses() {
               <p className="col-span-full text-center text-gray-400 py-8">You haven't enrolled in any courses yet.</p>
             ) : (
               enrolledCourses.map((course, i) => (
-                <div key={i} className="bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300">
+                <div key={i} className="bg-black rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300">
                   <div className="p-6 cursor-pointer" onClick={() => navigate(`/view-course/${course?._id}/section/${course.courseContent?.[0]?._id}/sub-section/${course.courseContent?.[0]?.subSection?.[0]?._id}`)}>
                     <Img src={course.thumbnail} alt="course_img" className="h-48 w-full rounded-lg object-cover mb-4" />
                     <h3 className="font-bold text-xl mb-2 text-gray-100">{course.courseName}</h3>
@@ -127,7 +127,7 @@ export default function EnrolledCourses() {
               enrolledMockTests.map((mockTest, i) => (
                 <div
                 onClick={() => navigate(`/mock-test/${mockTest._id}`)}
-                key={i} className="bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300">
+                key={i} className="bg-black rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300">
                   <div className="p-6">
                     <Img src={mockTest.thumbnail} alt="mock_test_img" className="h-48 w-full rounded-lg object-cover mb-4" />
                     <h3 className="font-bold text-xl mb-2 text-gray-100">{mockTest.testName}</h3>

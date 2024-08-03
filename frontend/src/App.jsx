@@ -153,6 +153,7 @@ const PageLoader = () => {
         <motion.span
           animate={{ opacity: [1, 0.5, 1] }}
           transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
+          className="text-3xl"
         >
           Awakening Classes 
         </motion.span>

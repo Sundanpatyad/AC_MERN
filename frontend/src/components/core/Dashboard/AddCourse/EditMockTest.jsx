@@ -151,7 +151,7 @@ const EditMockTestSeries = () => {
                 name="seriesName"
                 value={series.seriesName}
                 onChange={handleSeriesChange}
-                className="mt-1 block w-full bg-richblack-700 border border-richblack-600 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                className="mt-1 block w-full bg-richblack-700 border border-richblack-600 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2 "
               />
             </div>
             <div>
@@ -161,7 +161,7 @@ const EditMockTestSeries = () => {
                 name="description"
                 value={series.description}
                 onChange={handleSeriesChange}
-                className="mt-1 block w-full bg-richblack-700 border border-richblack-600 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                className="mt-1 block w-full bg-richblack-700 border border-richblack-600 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2"
               ></textarea>
             </div>
             <div>
@@ -172,7 +172,7 @@ const EditMockTestSeries = () => {
                 name="price"
                 value={series.price}
                 onChange={handleSeriesChange}
-                className="mt-1 block w-full bg-richblack-700 border border-richblack-600 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                className="mt-1 block w-full bg-richblack-700 border border-richblack-600 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2"
               />
             </div>
             <div>
@@ -182,7 +182,7 @@ const EditMockTestSeries = () => {
                 name="status"
                 value={series.status}
                 onChange={handleSeriesStatusChange}
-                className="mt-1 block w-full bg-richblack-700 border border-richblack-600 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                className="mt-1 block w-full bg-richblack-700 border border-richblack-600 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2"
               >
                 <option value="draft">Draft</option>
                 <option value="published">Published</option>
@@ -200,7 +200,7 @@ const EditMockTestSeries = () => {
                     name="testName"
                     value={test.testName}
                     onChange={(e) => handleTestChange(e, testIndex)}
-                    className="mt-1 block w-full bg-richblack-700 border border-richblack-600 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                    className="mt-1 block w-full bg-richblack-700 border border-richblack-600 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2 "
                   />
                 </div>
                 <div>
@@ -211,7 +211,7 @@ const EditMockTestSeries = () => {
                     name="duration"
                     value={test.duration}
                     onChange={(e) => handleTestChange(e, testIndex)}
-                    className="mt-1 block w-full bg-richblack-700 border border-richblack-600 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                    className="mt-1 block w-full bg-richblack-700 border border-richblack-600 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2 "
                   />
                 </div>
                 <div>
@@ -221,7 +221,7 @@ const EditMockTestSeries = () => {
                     name="status"
                     value={test.status}
                     onChange={(e) => handleTestStatusChange(e, testIndex)}
-                    className="mt-1 block w-full bg-richblack-700 border border-richblack-600 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                    className="mt-1 block w-full bg-richblack-700 border border-richblack-600 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2"
                   >
                     <option value="draft">Draft</option>
                     <option value="published">Published</option>
@@ -238,7 +238,7 @@ const EditMockTestSeries = () => {
                         name="text"
                         value={question.text}
                         onChange={(e) => handleQuestionChange(e, testIndex, questionIndex)}
-                        className="mt-1 block w-full bg-richblack-600 border border-richblack-500 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                        className="mt-1 block w-full bg-richblack-600 border border-richblack-500 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2"
                       />
                     </div>
                     {question.options && question.options.map((option, optionIndex) => (
@@ -255,14 +255,20 @@ const EditMockTestSeries = () => {
                     ))}
                     <div>
                       <label htmlFor={`correctAnswer-${testIndex}-${questionIndex}`} className="block text-sm font-medium text-richblack-5">Correct Answer</label>
-                      <input
-                        type="text"
+                      <select
                         id={`correctAnswer-${testIndex}-${questionIndex}`}
                         name="correctAnswer"
                         value={question.correctAnswer}
                         onChange={(e) => handleQuestionChange(e, testIndex, questionIndex)}
                         className="mt-1 block w-full bg-richblack-600 border border-richblack-500 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-                      />
+                      >
+                        <option value="">Select correct answer</option>
+                        {question.options.map((option, optionIndex) => (
+                          <option key={optionIndex} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <button
                       type="button"
@@ -276,7 +282,7 @@ const EditMockTestSeries = () => {
                 <button
                   type="button"
                   onClick={() => addQuestion(testIndex)}
-                  className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-richblack-900 bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200"
+                  className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-richblack-900 bg-white hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200"
                 >
                   Add Question
                 </button>
@@ -293,7 +299,7 @@ const EditMockTestSeries = () => {
             <button
               type="button"
               onClick={addTest}
-              className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-richblack-900 bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200"
+              className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-richblack-900 bg-white hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200"
             >
               Add New Test
             </button>
@@ -301,12 +307,12 @@ const EditMockTestSeries = () => {
             <div className="flex gap-x-4">
               <button 
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-richblack-900 bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-richblack-900 bg-white hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2  transition-colors duration-200"
               >
                 Save Series
               </button>
               <Link to="/dashboard/instructor"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-richblack-900 bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-richblack-900 bg-white hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200"
               >
                 Cancel
               </Link>

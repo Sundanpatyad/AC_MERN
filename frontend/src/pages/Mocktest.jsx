@@ -32,10 +32,10 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
 
   return (
     <div 
-      className="bg-richblack-900 w-full rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer flex flex-col"
+      className="bg-black border border-slate-500 w-full rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer flex flex-col"
       onClick={() => navigate(`/mock-test/${mockTest._id}`)}
     >
-      <div className="relative h-28 sm:h-32 md:h-40 bg-gradient-to-br from-white to-pink-500">
+      <div className="relative h-28 sm:h-32 md:h-40 bg-gradient-to-br from-white to-slate-700">
         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-80 p-2">
           <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-white text-center">{mockTest.seriesName}</h3>
         </div>

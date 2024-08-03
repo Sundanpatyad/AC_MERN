@@ -23,7 +23,7 @@ const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLogged
 
     return (
         <div 
-            className="bg-richblack-900 w-full rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer flex flex-col"
+            className="bg-black border border-slate-500 w-full rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer flex flex-col"
             onClick={() => navigate(`/courses/${course._id}`)}
         >
             <div className="relative h-28 sm:h-32 md:h-40">
@@ -31,11 +31,11 @@ const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLogged
                     src={course.thumbnail} 
                    className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
-                    <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-white text-center p-2">{course.courseName}</h3>
-                </div>
+               
             </div>
             <div className="p-3 sm:p-4 md:p-6 flex-grow flex flex-col justify-between">
+            <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-white text-center p-2">{course.courseName}</h3>
+
                 <p className="text-xs sm:text-sm md:text-base text-richblack-100 mb-2 sm:mb-4 line-clamp-2">{course.courseDescription}</p>
                 <div className="flex justify-between items-center text-xs sm:text-sm text-richblack-200 mb-2 sm:mb-4 md:mb-6">
                     <div className="flex items-center">
@@ -95,6 +95,40 @@ const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLogged
         </div>
     )
 })
+
+const HeroSkeleton = () => (
+  <div className="bg-richblack-800 px-4 py-8 sm:py-12 animate-pulse">
+    <div className="mx-auto flex min-h-[180px] sm:min-h-[220px] max-w-maxContentTab flex-col justify-center gap-4 lg:max-w-maxContent">
+      <div className="h-4 bg-richblack-700 rounded w-1/4"></div>
+      <div className="h-8 bg-richblack-700 rounded w-3/4"></div>
+      <div className="h-4 bg-richblack-700 rounded w-full"></div>
+    </div>
+  </div>
+)
+
+const CourseCardSkeleton = () => (
+  <div className="bg-richblack-900 w-full rounded-xl overflow-hidden shadow-lg animate-pulse">
+    <div className="h-40 bg-richblack-700"></div>
+    <div className="p-6">
+      <div className="h-4 bg-richblack-700 rounded w-3/4 mb-4"></div>
+      <div className="h-3 bg-richblack-700 rounded w-1/2 mb-2"></div>
+      <div className="h-3 bg-richblack-700 rounded w-1/4 mb-4"></div>
+      <div className="h-8 bg-richblack-700 rounded mb-2"></div>
+      <div className="h-8 bg-richblack-700 rounded"></div>
+    </div>
+  </div>
+)
+
+const SectionSkeleton = ({ title }) => (
+  <div className="mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
+    <div className="h-8 bg-richblack-700 rounded w-1/4 mb-4"></div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8">
+      {Array(3).fill().map((_, index) => (
+        <CourseCardSkeleton key={index} />
+      ))}
+    </div>
+  </div>
+)
 
 function Catalog() {
     const { catalogName } = useParams()
@@ -164,19 +198,6 @@ function Catalog() {
         }
     }, [isLoggedIn, user, navigate, dispatch, token])
 
-    const CourseCardSkeleton = () => (
-        <div className="bg-richblack-900 w-full rounded-xl overflow-hidden shadow-lg animate-pulse">
-            <div className="h-40 bg-richblack-700"></div>
-            <div className="p-6">
-                <div className="h-4 bg-richblack-700 rounded w-3/4 mb-4"></div>
-                <div className="h-3 bg-richblack-700 rounded w-1/2 mb-2"></div>
-                <div className="h-3 bg-richblack-700 rounded w-1/4 mb-4"></div>
-                <div className="h-8 bg-richblack-700 rounded mb-2"></div>
-                <div className="h-8 bg-richblack-700 rounded"></div>
-            </div>
-        </div>
-    )
-
     const renderCourseCards = (courses) => {
         if (isLoading) {
             return Array(6).fill().map((_, index) => (
@@ -194,26 +215,21 @@ function Catalog() {
         ))
     }
 
+    // if (isLoading) {
+    //     return (
+    //       <div className="min-h-screen flex flex-col">
+    //         <HeroSkeleton />
+    //         <SectionSkeleton title="Courses" />
+    //         <SectionSkeleton title="Top Courses" />
+    //         <SectionSkeleton title="Frequently Bought" />
+    //         <Footer />
+    //       </div>
+    //     )
+    // }
+
     return (
         <div className="min-h-screen flex flex-col">
-            {/* Hero Section */}
-            {/* <div className="bg-richblack-800 px-4 py-8 sm:py-12">
-                <div className="mx-auto flex min-h-[180px] sm:min-h-[220px] max-w-maxContentTab flex-col justify-center gap-4 lg:max-w-maxContent">
-                    <p className="text-xs sm:text-sm text-richblack-300">
-                        {`Home / Catalog / `}
-                        <span className="text-white">
-                            {currentCatalogData?.selectedCategory?.name}
-                        </span>
-                    </p>
-                    <h1 className="text-2xl sm:text-3xl md:text-4xl text-richblack-5 font-bold">
-                        {currentCatalogData?.selectedCategory?.name}
-                    </h1>
-                    <p className="max-w-[870px] text-sm sm:text-base text-richblack-200">
-                        {currentCatalogData?.selectedCategory?.description}
-                    </p>
-                </div>
-            </div> */}
-
+       
             {/* Courses Section */}
             <div className="flex-grow mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
                 <h2 className="text-3xl sm:text-3xl md:text-4xl text-center my-10 font-bold text-richblack-5 mb-4">Advance Your <i className="text-slate-400">Skills</i> With Us</h2>
@@ -224,22 +240,22 @@ function Catalog() {
             </div>
 
             {/* Top Courses Section */}
-            <div className="mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
+            {/* <div className="mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
                 <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-richblack-5 mb-4">
                     Top Courses in {currentCatalogData?.differentCategory?.name}
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8">
                     {renderCourseCards(currentCatalogData?.differentCategory?.courses)}
                 </div>
-            </div>
+            </div> */}
 
             {/* Frequently Bought Section */}
-            <div className="mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
+            {/* <div className="mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
                 <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-richblack-5 mb-4">Frequently Bought</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8">
                     {renderCourseCards(currentCatalogData?.mostSellingCourses?.slice(0, 4))}
                 </div>
-            </div>
+            </div> */}
 
             <Footer />
             {confirmationModal && <ConfirmationModal modalData={confirmationModal} />}

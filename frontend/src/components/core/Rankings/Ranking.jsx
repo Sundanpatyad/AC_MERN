@@ -81,7 +81,7 @@ const RankingsPage = () => {
           Student Rankings
         </h1>
         
-        <div className="bg-transparent border border-slate-300 rounded-lg shadow-xl p-6 mb-8">
+        <div className="bg-transparent border border-slate-500 rounded-lg shadow-xl p-6 mb-8">
           <h2 className="text-2xl font-bold mb-4 text-center text-gray-100">Select a Mock Test</h2>
           <div className="flex flex-wrap justify-center gap-4 mb-6">
             {testNames.map((testName) => (
