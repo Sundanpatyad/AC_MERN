@@ -225,7 +225,7 @@ const Home = () => {
   return (
     <div className='overflow-hidden'>
       <Spotlight/>
-      <div className='h-screen w-full dark:bg-black bg-white dark:bg-grid-white/[0.2] bg-grid-black/[0.2] relative flex items-center flex-col'>
+      <div className='h-screen w-full dark:bg-black bg-slate-300 dark:bg-grid-slate-400/[0.2] bg-grid-black/[0.2] relative flex items-center flex-col'>
         <div className="absolute cursor-pointer inset-0 w-full h-full bg-black [mask-image:radial-gradient(ellipse_at_center,transparent_10%,black)]"></div>
 
         <Link to={"/mocktest"} className='z-10'>
@@ -243,9 +243,9 @@ const Home = () => {
           initial='hidden'
           whileInView={'show'}
           viewport={{ once: false, amount: 0.1 }}
-          className='text-center text-white text-4xl mt-10 z-10 font-semibold w-80 lg:w-full lg:text-6xl'
+          className='text-center text-white text-4xl mt-10 z-10 font-semibold w-80 lg:w-full lg:text-7xl'
         >
-          We Only Teach <br /> What we are <i>really</i> really <i>Good </i>At <br />
+         We Know That <strong>Together</strong><i> We</i> Can  <br />
           <HighlightText text={"Awakening Classes"} />
         </motion.div>
 
@@ -267,7 +267,7 @@ const Home = () => {
       </div>
 
       <div className='relative mx-auto flex flex-col w-11/12 max-w-full mt-10 items-center text-white justify-between'>
-        <div className='text-5xl lg:text-3xl font-semibold'>
+        <div className='text-3xl text-center lg:text-3xl font-semibold'>
           Courses That Make an
           <HighlightText text={"Impact "} />
         </div>

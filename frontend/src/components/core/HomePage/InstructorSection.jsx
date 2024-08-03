@@ -1,5 +1,5 @@
 import React from 'react'
-import Instructor from '../../../assets/Images/teacher3.png'
+import Instructor from '../../../assets/Images/teacher2.png'
 import HighlightText from './HighlightText'
 import CTAButton from "../HomePage/Button"
 import { FaArrowRight } from 'react-icons/fa'
@@ -29,23 +29,23 @@ const InstructorSection = () => {
         </motion.div>
 
         <div className='lg:w-[50%] flex flex-col'>
-          <div className='text-3xl lg:text-4xl font-semobold w-[50%] mb-2'>
-            Enroll Now
-            <HighlightText text={"Mock Test"} />
+          <div className='text-3xl text-center lg:text-4xl font-semobold mb-2'>
+            Enroll Now <br /> <strong>Mock Test</strong>
+              {/* <HighlightText text={"Mock Test"} /> */}
           </div>
 
-          <p className='font-medium text-[16px] w-[80%] text-richblack-300 mb-12'>
+          <p className='font-medium text-[16px] text-center text-richblack-300 mb-12'>
             With our Mock Tests Imporve your skills and make an impact in your journey.
           </p>
 
-          <div className='w-fit'>
+          {/* <div className='w-fit'>
             <CTAButton active={true} linkto={"/signup"}>
               <div className='flex flex-row gap-2 items-center'>
                 Start Learning Today
                 <FaArrowRight />
               </div>
             </CTAButton>
-          </div>
+          </div> */}
         </div>
 
       </div>

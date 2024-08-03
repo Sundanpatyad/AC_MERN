@@ -5,7 +5,7 @@ const Button = ({children, active, linkto}) => {
   return (
     <Link to={linkto}>
 
-        <div className={`text-center text-[13px] px-6 py-3 rounded-md font-medium
+        <div className={`text-center text-[13px] px-6 py-3 rounded-full font-semibold
         ${active ? "bg-white text-black":" bg-white"}
         hover:scale-95 transition-all duration-200
         `}>

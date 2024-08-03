@@ -48,66 +48,139 @@ import MockTestSeries from "./components/core/ConductMockTests/MockTestSeries";
 import EditMockTestSeries from "./components/core/Dashboard/AddCourse/EditMockTest";
 import RankingsPage from "./components/core/Rankings/Ranking";
 
-const PageLoader = () => (
-  <motion.div 
-    className="fixed inset-0 flex flex-col items-center justify-center z-50 overflow-hidden"
-    initial={{ background: "linear-gradient(45deg, #000000, #1a1a1a)" }}
-    animate={{ 
-      background: [
-        "linear-gradient(45deg, #000000, #1a1a1a)",
-        "linear-gradient(45deg, #1a1a1a, #2c2c2c)",
-        "linear-gradient(45deg, #2c2c2c, #3d3d3d)",
-        "linear-gradient(45deg, #3d3d3d, #1a1a1a)",
-        "linear-gradient(45deg, #1a1a1a, #000000)"
-      ]
-    }}
-    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-  >
+
+
+
+const PageLoader = () => {
+  const [isSun, setIsSun] = useState(false);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIsSun(prev => !prev);
+    }, 3000); // Toggle every 3 seconds
+
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.5, rotateY: 180 }}
-      animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-      transition={{ duration: 1, type: "spring", stiffness: 100 }}
-      className="text-3xl font-extrabold text-white mb-6 font-serif"
+      className="fixed inset-0 bg-gray-900 flex items-center justify-center overflow-hidden"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
     >
-      <ReactTypingEffect
-        text="Awakening Classes"
-        typingDelay={100}
-        speed={50}
-        eraseDelay={10000000}
-        cursorRenderer={cursor => <span className="text-blue-100">{cursor}</span>}
-      />
+      {/* Stars */}
+      {[...Array(50)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-1 h-1 bg-white rounded-full"
+          initial={{
+            opacity: 0,
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+          }}
+          animate={{
+            opacity: [0, 1, 0],
+            scale: [0, 1, 0],
+          }}
+          transition={{
+            duration: Math.random() * 2 + 1,
+            repeat: Infinity,
+            repeatType: 'loop',
+            ease: 'easeInOut',
+          }}
+        />
+      ))}
+
+      {/* Moon/Sun */}
+      <motion.div
+        className="relative w-32 h-32 rounded-full overflow-hidden"
+        animate={{
+          backgroundColor: isSun ? '#FDB813' : '#C6C6C6',
+          boxShadow: isSun 
+            ? ['0 0 20px 0px #FDB813', '0 0 60px 10px #FDB813', '0 0 100px 20px #FDB813']
+            : ['0 0 20px 0px #718096', '0 0 40px 10px #718096', '0 0 20px 0px #718096'],
+        }}
+        transition={{
+          duration: 1,
+          ease: 'easeInOut',
+        }}
+      >
+        {/* Craters/Sunspots */}
+        {!isSun && (
+          <>
+            <motion.div
+              className="absolute w-8 h-8 bg-gray-400 rounded-full"
+              style={{ top: '20%', left: '15%' }}
+            />
+            <motion.div
+              className="absolute w-6 h-6 bg-gray-400 rounded-full"
+              style={{ bottom: '30%', right: '20%' }}
+            />
+            <motion.div
+              className="absolute w-4 h-4 bg-gray-400 rounded-full"
+              style={{ top: '60%', left: '40%' }}
+            />
+          </>
+        )}
+        {isSun && (
+          <>
+            <motion.div
+              className="absolute w-full h-full"
+              style={{
+                background: 'radial-gradient(circle, #FDB813 0%, #FDB813 50%, #f7931e 100%)',
+              }}
+            />
+            <motion.div
+              className="absolute w-full h-full"
+              style={{
+                background: 'repeating-conic-gradient(from 0deg, #f7931e 0deg 10deg, transparent 10deg 20deg)',
+              }}
+              animate={{ rotate: 360 }}
+              transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+            />
+          </>
+        )}
+      </motion.div>
+
+      {/* Loading text */}
+      <motion.div
+        className="absolute bottom-16 text-white text-2xl font-bold"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.25, duration: 0.5 }}
+      >
+        <motion.span
+          animate={{ opacity: [1, 0.5, 1] }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          Awakening Classes 
+        </motion.span>
+        <motion.span
+          animate={{ opacity: [1, 0.5, 1] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut', delay: 0.2 }}
+        >
+          .
+        </motion.span>
+        <motion.span
+          animate={{ opacity: [1, 0.5, 1] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
+        >
+          .
+        </motion.span>
+        <motion.span
+          animate={{ opacity: [1, 0.5, 1] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}
+        >
+          .
+        </motion.span>
+      </motion.div>
     </motion.div>
+  );
+};
 
-    <motion.div
-      initial={{ width: 0 }}
-      animate={{ width: '300px' }}
-      transition={{ duration: 1.5, delay: 1, type: "spring", stiffness: 50 }}
-      className="h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 mb-6 rounded-full"
-    />
 
-    <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1, delay: 2.5, type: "spring", stiffness: 100 }}
-      className="text-2xl text-white mb-8 font-light italic"
-    >
-      <ReactTypingEffect
-        text="Together We Can"
-        typingDelay={100}
-        speed={50}
-        eraseDelay={10000000}
-        cursorRenderer={cursor => <span className="text-pink-500">{cursor}</span>}
-      />
-    </motion.div>
 
-    <motion.div
-      initial={{ opacity: 0, scale: 0 }}
-      animate={{ opacity: [0, 1, 0], scale: [0, 1, 0] }}
-      transition={{ duration: 2, repeat: Infinity, repeatDelay: 0.5 }}
-      className="w-16 h-16 border-t-4 border-purple-500 rounded-full animate-spin"
-    />
-  </motion.div>
-);
 
 function App() {
   const { user } = useSelector((state) => state.profile)
