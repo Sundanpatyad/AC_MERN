@@ -46,6 +46,7 @@ import MockTestProductPage from "./pages/MockDetails";
 import MockTestDetails from "./pages/MockDetails";
 import MockTestSeries from "./components/core/ConductMockTests/MockTestSeries";
 import EditMockTestSeries from "./components/core/Dashboard/AddCourse/EditMockTest";
+import RankingsPage from "./components/core/Rankings/Ranking";
 
 const PageLoader = () => (
   <motion.div 
@@ -164,6 +165,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
+        <Route path="/rankings" element={<RankingsPage />} />
         <Route path="catalog/:catalogName" element={<Catalog />} />
         <Route path="courses/:courseId" element={<CourseDetails />} />
         <Route path="/mock-test/:mockId" element={<MockTestDetails />} />

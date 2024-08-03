@@ -144,3 +144,77 @@ exports.getAttemptsByMockTest = async (req, res) => {
     });
   }
 };
+
+
+exports.getRankings = async (req, res) => {
+  try {
+    const rankings = await AttemptDetails.aggregate([
+      // Group by user to get the latest attempt for each user
+      {
+        $sort: { attemptDate: -1 }
+      },
+      {
+        $group: {
+          _id: '$user',
+          latestAttempt: { $first: '$$ROOT' }
+        }
+      },
+      // Unwind to flatten the result
+      {
+        $replaceRoot: { newRoot: '$latestAttempt' }
+      },
+      // Sort by score in descending order
+      {
+        $sort: { score: -1 }
+      },
+      // Add rank field
+      {
+        $setWindowFields: {
+          sortBy: { score: -1 },
+          output: {
+            rank: {
+              $rank: {}
+            }
+          }
+        }
+      },
+      // Lookup to get user details
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'user',
+          foreignField: '_id',
+          as: 'userDetails'
+        }
+      },
+      {
+        $unwind: '$userDetails'
+      },
+      // Project only necessary fields
+      {
+        $project: {
+          rank: 1,
+          userName: { 
+            $concat: ['$userDetails.firstName', ' ', '$userDetails.lastName'] 
+          },
+          score: 1,
+          testName: 1,
+          attemptDate: 1,
+          userImage: '$userDetails.image'
+        }
+      }
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: rankings
+    });
+  } catch (error) {
+    console.error('Error in getRankings:', error);
+    res.status(500).json({
+      success: false,
+      message: 'An error occurred while fetching rankings'
+    });
+  }
+};
+

@@ -1,6 +1,6 @@
 
-const BASE_URL = 'https://awakening-classes.up.railway.app';
-// const BASE_URL = 'http://localhost:8000';
+// const BASE_URL = 'https://awakening-classes.up.railway.app';
+const BASE_URL = 'http://localhost:8000';
 
 // AUTH ENDPOINTS
 export const endpoints = {
@@ -27,6 +27,7 @@ export const studentEndpoints = {
   COURSE_PAYMENT_API: `${BASE_URL}/api/v1/payment/capturePayment`,
   COURSE_VERIFY_API: `${BASE_URL}/api/v1/payment/verifyPayment`,
   SEND_PAYMENT_SUCCESS_EMAIL_API: `${BASE_URL}/api/v1/payment/sendPaymentSuccessEmail`,
+  RANKINGS_API:`${BASE_URL}/api/v1/mock/getRankings`
 }
 
 // MOCK TEST PAYMENT ENDPOINTS

@@ -44,8 +44,8 @@ export const sidebarLinks = [
   },
   {
     id: 6,
-    name: "Purchase History",
-    path: "/dashboard/purchase-history",
+    name: "Rankings",
+    path: "/rankings",
     type: ACCOUNT_TYPE.STUDENT,
     icon: "VscHistory",
   },
