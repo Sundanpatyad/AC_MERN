@@ -223,7 +223,7 @@ const Home = () => {
 
 
   return (
-    <div className='overflow-hidden w-screen'>
+    <div className='overflow-hidden'>
       <Spotlight/>
       <div className='h-screen w-full dark:bg-black bg-slate-300 dark:bg-grid-slate-400/[0.2] bg-grid-black/[0.2] relative flex items-center flex-col'>
         <div className="absolute cursor-pointer inset-0 w-full h-full bg-black [mask-image:radial-gradient(ellipse_at_center,transparent_10%,black)]"></div>
@@ -259,11 +259,23 @@ const Home = () => {
           With our online courses, you can learn at your own pace, from anywhere in the world, and get access to a wealth of resources, quizzes, and personalized feedback from instructors.
         </motion.div>
 
-        <div className='flex flex-row gap-7 mt-8 z-10'>
-          <CTAButton active={false} linkto={"/login"}>
-            Explore The Knowledge
-          </CTAButton>
-        </div>
+        {token ? /* From Uiverse.io by Javierrocadev */ 
+          <Link to={"/login"} className=" z-20 px-6 py-3 mt-4 rounded-lg border border-black bg-white text-black text-md hover:shadow-[4px_4px_0px_0px_rgba(0,0,0)] transition duration-200">
+  Discover More 
+</Link>
+
+
+ :
+        <div className='mt-3 md:mt-8 flex gap-x-4'>
+        <Link to={"/login"} className=" z-20 inline px-10 py-3 mt-4 rounded-lg border border-whitek bg-transparent text-white text-md hover:shadow-[4px_4px_0px_0px_rgba(0,0,0)] transition duration-200">
+  Login
+</Link>
+
+<Link to={"/signup"} className=" z-20 px-10 py-3 mt-4 rounded-lg border border-black bg-white text-black text-md hover:shadow-[4px_4px_0px_0px_rgba(0,0,0)] transition duration-200">
+  Sign Up
+</Link>
+      </div>
+        }
       </div>
 
       <div className='relative mx-auto flex flex-col w-11/12 max-w-full mt-10 items-center text-white justify-between'>
