@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { useQuery, useQueryClient } from 'react-query'
+import { useQuery, useQueryClient, useMutation } from 'react-query'
 import { fetchAllMockTests } from '../services/operations/mocktest'
 import { buyItem } from '../services/operations/studentFeaturesAPI'
 import { addToCart } from '../slices/cartSlice'
@@ -123,6 +123,25 @@ const MockTestComponent = () => {
 
   const isLoggedIn = !!token
 
+  const buyMockTestMutation = useMutation(
+    (mockTestId) => buyItem(token, [mockTestId], ['MOCK_TEST'], user, navigate, dispatch),
+    {
+      onSuccess: (data, variables) => {
+        toast.success("Mock test purchased successfully!")
+        queryClient.setQueryData('mockTests', (oldData) => {
+          if (!oldData) return oldData;
+          return oldData.map(test => 
+            test._id === variables ? { ...test, studentsEnrolled: [...test.studentsEnrolled, user._id] } : test
+          )
+        })
+      },
+      onError: (error) => {
+        console.error("Error purchasing mock test:", error)
+        toast.error("Failed to purchase mock test")
+      }
+    }
+  )
+
   const handleAddToCart = useCallback((mockTest) => {
     if (!isLoggedIn) {
       setConfirmationModal({
@@ -162,13 +181,8 @@ const MockTestComponent = () => {
       return
     }
 
-    try {
-      await buyItem(token, [mockTest._id], ['MOCK_TEST'], user, navigate, dispatch)
-      queryClient.invalidateQueries('mockTests')
-    } catch (error) {
-      console.error("Error purchasing mock test:", error)
-    }
-  }, [isLoggedIn, user, navigate, dispatch, queryClient, token])
+    buyMockTestMutation.mutate(mockTest._id)
+  }, [isLoggedIn, user, navigate, buyMockTestMutation])
 
   const handleStartTest = useCallback((mockTestId) => {
     if (!isLoggedIn) {
@@ -193,19 +207,6 @@ const MockTestComponent = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Hero Section */}
-      {/* <div className="bg-richblack-800 px-4 py-8 sm:py-12">
-        <div className="mx-auto flex min-h-[180px] sm:min-h-[220px] max-w-maxContentTab flex-col justify-center gap-4 lg:max-w-maxContent">
-          <p className="text-xs sm:text-sm text-richblack-300">
-            Home / <span className="text-white">Mock Tests</span>
-          </p>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl text-richblack-5 font-bold">Prepare with Our Mock Tests</h1>
-          <p className="max-w-[870px] text-sm sm:text-base text-richblack-200">
-            Enhance your skills and boost your confidence with our comprehensive mock tests designed to simulate real exam conditions.
-          </p>
-        </div>
-      </div> */}
-
       {/* Mock Tests Section */}
       <div className="flex-grow mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
         <h2 className="text-3xl sm:text-3xl md:text-4xl text-center my-10 font-bold text-richblack-5 mb-4">Test Your Knowledge with <i className='text-slate-300'>Confidence</i></h2>

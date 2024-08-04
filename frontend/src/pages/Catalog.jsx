@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useMemo } from "react"
+import React, { useState, useCallback, useMemo, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { useSelector, useDispatch } from "react-redux"
-import { useQuery } from 'react-query'
+import { useQuery, useMutation, useQueryClient } from 'react-query'
 import Footer from "../components/common/Footer"
 import Loading from './../components/common/Loading'
 import ConfirmationModal from "../components/common/ConfirmationModal"
@@ -12,14 +12,10 @@ import { buyItem } from '../services/operations/studentFeaturesAPI'
 import toast from 'react-hot-toast'
 import { FaBookOpen, FaShoppingCart } from 'react-icons/fa'
 import { ACCOUNT_TYPE } from "../utils/constants"
+import { motion } from 'framer-motion';
 
-const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLoggedIn }) => {
-    const [isEnrolled, setIsEnrolled] = useState(false)
+const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLoggedIn, isEnrolled }) => {
     const navigate = useNavigate()
-    const { user } = useSelector((state) => state.profile)
-    React.useEffect(() => {
-        setIsEnrolled(course.studentsEnrolled?.includes(user?._id))
-    }, [course.studentsEnrolled, user?._id])
 
     return (
         <div 
@@ -134,10 +130,12 @@ function Catalog() {
     const { catalogName } = useParams()
     const [active, setActive] = useState(1)
     const [confirmationModal, setConfirmationModal] = useState(null)
+    const [isLoading, setIsLoading] = useState(true)
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const { token } = useSelector((state) => state.auth)
     const { user } = useSelector((state) => state.profile)
+    const queryClient = useQueryClient()
 
     const isLoggedIn = !!token
 
@@ -154,7 +152,7 @@ function Catalog() {
     }, [categories, catalogName])
 
     // Fetch catalog page data
-    const { data: currentCatalogData, isLoading } = useQuery(
+    const { data: currentCatalogData, isLoading: isCatalogDataLoading } = useQuery(
         ['catalogPageData', categoryId],
         () => getCatalogPageData(categoryId),
         {
@@ -163,6 +161,41 @@ function Catalog() {
             cacheTime: 10 * 60 * 1000, // 10 minutes
         }
     )
+
+    // Mutation for buying a course
+    const buyCourseMutation = useMutation(
+        (courseId) => buyItem(token, [courseId], ['course'], user, navigate, dispatch),
+        {
+            onSuccess: (data, variables) => {
+                toast.success("Course purchased successfully!")
+                queryClient.setQueryData(['catalogPageData', categoryId], (oldData) => {
+                    if (!oldData) return oldData;
+                    return {
+                        ...oldData,
+                        selectedCategory: {
+                            ...oldData.selectedCategory,
+                            courses: oldData.selectedCategory.courses.map(course => 
+                                course._id === variables ? { ...course, studentsEnrolled: [...course.studentsEnrolled, user._id] } : course
+                            )
+                        }
+                    }
+                })
+            },
+            onError: (error) => {
+                console.error("Error purchasing course:", error)
+                toast.error("Failed to purchase course")
+            }
+        }
+    )
+
+    useEffect(() => {
+        // Simulate loading
+        const timer = setTimeout(() => {
+            setIsLoading(false)
+        }, 2000)
+
+        return () => clearTimeout(timer)
+    }, [])
 
     const handleAddToCart = useCallback(async (course) => {
         if (!isLoggedIn) {
@@ -189,17 +222,11 @@ function Catalog() {
             return
         }
 
-        try {
-            await buyItem(token, [course._id], ['course'], user, navigate, dispatch)
-            // Note: We're not updating the local state here as React Query will handle refetching
-        } catch (error) {
-            console.error("Error purchasing course:", error)
-            toast.error("Failed to purchase course")
-        }
-    }, [isLoggedIn, user, navigate, dispatch, token])
+        buyCourseMutation.mutate(course._id)
+    }, [isLoggedIn, user, navigate, buyCourseMutation])
 
     const renderCourseCards = (courses) => {
-        if (isLoading) {
+        if (isCatalogDataLoading) {
             return Array(6).fill().map((_, index) => (
                 <CourseCardSkeleton key={index} />
             ))
@@ -211,21 +238,34 @@ function Catalog() {
                 handleAddToCart={handleAddToCart}
                 handleBuyNow={handleBuyNow}
                 isLoggedIn={isLoggedIn}
+                isEnrolled={course.studentsEnrolled?.includes(user?._id)}
             />
         ))
     }
 
-    // if (isLoading) {
-    //     return (
-    //       <div className="min-h-screen flex flex-col">
-    //         <HeroSkeleton />
-    //         <SectionSkeleton title="Courses" />
-    //         <SectionSkeleton title="Top Courses" />
-    //         <SectionSkeleton title="Frequently Bought" />
-    //         <Footer />
-    //       </div>
-    //     )
-    // }
+    if (isLoading) {
+        return (
+            <motion.div 
+                className="fixed inset-0 flex items-center justify-center bg-richblack-black z-50"
+                initial={{ opacity: 0  }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+            >
+                <motion.h1
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{
+                        duration: 0.5,
+                        delay: 0.2,
+                        ease: "easeOut"
+                    }}
+                    className="text-white text-3xl font-bold"
+                >
+                    Loading Courses
+                </motion.h1>
+            </motion.div>
+        );
+    }
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -238,24 +278,6 @@ function Catalog() {
                     {renderCourseCards(currentCatalogData?.selectedCategory?.courses)}
                 </div>
             </div>
-
-            {/* Top Courses Section */}
-            {/* <div className="mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-richblack-5 mb-4">
-                    Top Courses in {currentCatalogData?.differentCategory?.name}
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8">
-                    {renderCourseCards(currentCatalogData?.differentCategory?.courses)}
-                </div>
-            </div> */}
-
-            {/* Frequently Bought Section */}
-            {/* <div className="mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-richblack-5 mb-4">Frequently Bought</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8">
-                    {renderCourseCards(currentCatalogData?.mostSellingCourses?.slice(0, 4))}
-                </div>
-            </div> */}
 
             <Footer />
             {confirmationModal && <ConfirmationModal modalData={confirmationModal} />}

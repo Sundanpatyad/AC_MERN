@@ -95,7 +95,9 @@ export default function ChangeProfilePicture() {
             >
               Select File
             </button>
-            <IconBtn
+           {
+            previewFile && (
+              <IconBtn
               text={loading ? "Uploading..." : "Upload"}
               onclick={handleFileUpload}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full transition duration-300 flex items-center justify-center text-sm sm:text-base"
@@ -104,6 +106,8 @@ export default function ChangeProfilePicture() {
                 <FiUpload className="mr-2" />
               )}
             </IconBtn>
+            )
+           }
           </div>
         </div>
       </div>
