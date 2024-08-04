@@ -52,7 +52,7 @@ const Footer = () => {
           <a href="https://github.com/Sundanpatyad" target="_blank" rel="noopener noreferrer" className="text-white hover:underline">
             Sundan Sharma
           </a>
-          <span> © 2023 Awakening Classes</span>
+          <span> © 2024 Awakening Classes</span>
         </div>
 
         <div className="flex items-center mt-4 lg:mt-0">
