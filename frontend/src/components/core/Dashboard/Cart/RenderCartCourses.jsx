@@ -5,71 +5,75 @@ import ReactStars from "react-rating-stars-component"
 import { useDispatch, useSelector } from "react-redux"
 import { removeFromCart } from "../../../../slices/cartSlice"
 import Img from './../../../common/Img'
+import { IoThermometer } from "react-icons/io5"
 
 export default function RenderCartItems() {
   const { cart } = useSelector((state) => state.cart)
   const dispatch = useDispatch()
 
   return (
-    <div className="flex flex-1 flex-col space-y-8 bg-richblack-900 rounded-2xl p-6 shadow-lg">
+    <div className="flex flex-1 flex-col space-y-4 bg-black border border-slate-500 rounded-xl p-4 shadow-lg overflow-hidden">
       {cart.map((item, indx) => (
         <div
           key={item._id}
-          className={`flex flex-col sm:flex-row w-full items-center sm:items-start justify-between gap-6 
-            ${indx !== cart.length - 1 && "border-b border-richblack-700 pb-8"}
-            ${indx !== 0 && "pt-8"}`}
+          className={`flex flex-col w-full gap-4 pb-4
+            ${indx !== cart.length - 1 && "border-b border-richblack-700"}`}
         >
-          <div className="flex flex-1 flex-col sm:flex-row gap-6 w-full">
+          <div className="flex flex-col sm:flex-row gap-4">
             {/* Item thumbnail */}
-            <div className="relative w-full sm:w-[200px] h-[180px] rounded-xl overflow-hidden group">
-              <Img
-                src={item ? item.thumbnail : ""}
-                alt={item?.itemName}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <span className="text-white text-lg font-semibold">View Details</span>
+         {
+          item.thumbnail && (
+            <div className="relative w-full sm:w-[100px] h-[100px] rounded-lg overflow-hidden flex-shrink-0">
+            <Img
+              src={item ? item.thumbnail : ""}
+              alt={item?.seriesName}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          )
+         }
+
+            <div className="flex flex-col justify-between flex-grow">
+              <div>
+                <h3 className="text-base font-semibold text-white line-clamp-2 mb-1">
+                  {item && item.courseName}
+                  {item && item.seriesName}
+                 
+                </h3>
+                <div className="flex flex-wrap items-center gap-2 text-xs text-richblack-300 mb-2">
+                  <span className="px-2 py-1 bg-richblack-700 rounded-full">{item?.category?.name}</span>
+                  <span className="px-2 py-1 bg-richblack-700 rounded-full">{item?.itemType}</span>
+                </div>
               </div>
-            </div>
-            
-            <div className="flex flex-col space-y-3 flex-grow">
-              <h3 className="text-xl font-bold text-richblack-5 line-clamp-2">
-                {item ? item.seriesName : item.itemName}
-              </h3>
-              <div className="flex flex-wrap items-center gap-2 text-sm text-richblack-300">
-                <span className="px-2 py-1 bg-richblack-700 rounded-full">{item?.category?.name}</span>
-                <span className="px-2 py-1 bg-richblack-700 rounded-full">{item?.itemType}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-yellow-50 font-semibold">4.5</span>
-                <ReactStars
-                  count={5}
-                  value={item?.ratingAndReviews?.length}
-                  size={18}
-                  edit={false}
-                  activeColor="#ffd700"
-                  emptyIcon={<FaStar />}
-                  fullIcon={<FaStar />}
-                />
-                <span className="text-richblack-300 text-sm">
-                  ({item?.ratingAndReviews?.length} Ratings)
-                </span>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-2 sm:mt-0">
+                <p className="text-lg font-bold text-yellow-50 mb-2 sm:mb-0">
+                  ₹{item?.price}
+                </p>
+                <div className="flex items-center gap-1">
+                  <ReactStars
+                    count={5}
+                    value={4.5}
+                    size={16}
+                    edit={false}
+                    activeColor="#ffd700"
+                    emptyIcon={<FaStar />}
+                    fullIcon={<FaStar />}
+                  />
+                  <span className="text-richblack-300 text-xs">
+                    ({item?.ratingAndReviews?.length})
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-          
-          <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto space-y-0 sm:space-y-4">
-            <p className="text-3xl font-bold text-yellow-50">
-              ₹{item?.price}
-            </p>
-            <button
-              onClick={() => dispatch(removeFromCart(item._id))}
-              className="flex items-center gap-x-2 rounded-lg border border-pink-700 bg-pink-700 py-2 px-4 text-white hover:bg-pink-800 transition-all duration-200"
-            >
-              <RiDeleteBin6Line size={20} />
-              <span>Remove</span>
-            </button>
-          </div>
+
+          <button
+            onClick={() => dispatch(removeFromCart(item._id))}
+            className="flex items-center justify-center gap-x-2 rounded-lg border border-red-700 bg-red-700 py-2 px-3 text-sm text-white hover:bg-pink-800 transition-all duration-200 w-full"
+          >
+            <RiDeleteBin6Line size={18} />
+            <span>Remove</span>
+          </button>
         </div>
       ))}
     </div>

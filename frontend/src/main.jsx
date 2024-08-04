@@ -25,7 +25,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <Provider store={store}>
       <React.StrictMode>
       <GoogleOAuthProvider clientId={CLIENT_ID}>
-        <App />
+        <App/>
         </GoogleOAuthProvider>
         <Toaster position="bottom-center" />
       </React.StrictMode>
