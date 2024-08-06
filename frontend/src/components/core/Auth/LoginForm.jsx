@@ -41,7 +41,7 @@ function LoginForm() {
 
   return (
     <GoogleOAuthProvider clientId="217412143147-6l1q2l190t36rp0452f3hl5mtl3nrhjq.apps.googleusercontent.com">
-      <form onSubmit={handleOnSubmit} className="mt-8 space-y-3 w-full max-w-md mx-auto">
+      <form onSubmit={handleOnSubmit} className="mt-4 space-y-3 w-full max-w-md mx-auto">
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-100">
             Email Address

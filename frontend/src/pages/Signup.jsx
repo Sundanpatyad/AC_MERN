@@ -4,9 +4,7 @@ import Template from "../components/core/Auth/Template"
 function Signup() {
   return (
     <Template
-      title="Sign Up with Awakening CLasses for free"
-      // description1="Build skills for today, tomorrow, and beyond."
-      // description2="Education to future-proof your career."
+      title="Sign Up with Awakening Classes for Free 😊"
       image={signupImg}
       formType="signup"
     />
