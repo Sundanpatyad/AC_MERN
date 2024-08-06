@@ -322,7 +322,7 @@ const MockTestSeries = () => {
             className={`py-3 px-6 font-semibold rounded-lg transition duration-300 ${
               selectedAnswer
                 ? 'bg-white text-black hover:bg-gray-100'
-                : 'bg-gray-700 border border-white text-white text-gray-400 cursor-not-allowed'
+                : 'bg-gray-700 border border-white text-white cursor-not-allowed'
             }`}
           >
             {currentQuestion + 1 === currentTest.questions.length ? 'Finish Test' : 'Next'}
