@@ -4,17 +4,13 @@ import RankingTable from "./RankingTable"
 import Footer from '../../common/Footer';
 import { studentEndpoints } from '../../../services/apis';
 
-
-
 const RankingsPage = () => {
-  const [rankings, setRankings] = useState([]);
-  const [filteredRankings, setFilteredRankings] = useState([]);
+  const [rankings, setRankings] = useState({});
   const [testNames, setTestNames] = useState([]);
   const [selectedTest, setSelectedTest] = useState(null);
   const { token } = useSelector((state) => state.auth);
   const [error, setError] = useState(null);
-  const{RANKINGS_API}=studentEndpoints;
- 
+  const { RANKINGS_API } = studentEndpoints;
 
   useEffect(() => {
     const fetchRankings = async () => {
@@ -29,9 +25,16 @@ const RankingsPage = () => {
         }
         const data = await response.json();
         if (data.success) {
-          setRankings(data.data);
-          const uniqueTestNames = [...new Set(data.data.map(ranking => ranking.testName))];
-          setTestNames(uniqueTestNames);
+          // Group rankings by testName
+          const groupedRankings = data.data.reduce((acc, ranking) => {
+            if (!acc[ranking.testName]) {
+              acc[ranking.testName] = [];
+            }
+            acc[ranking.testName].push(ranking);
+            return acc;
+          }, {});
+          setRankings(groupedRankings);
+          setTestNames(Object.keys(groupedRankings));
         } else {
           setError(data.message || 'Failed to fetch rankings');
         }
@@ -45,29 +48,10 @@ const RankingsPage = () => {
     } else {
       setError('Authentication token is missing');
     }
-  }, [token]);
-
-  useEffect(() => {
-    if (selectedTest) {
-      const filtered = rankings.filter(ranking => ranking.testName === selectedTest);
-      const sortedAndRanked = filtered
-        .sort((a, b) => b.score - a.score)
-        .map((ranking, index) => ({
-          ...ranking,
-          rank: index + 1
-        }));
-      setFilteredRankings(sortedAndRanked);
-    } else {
-      setFilteredRankings([]);
-    }
-  }, [selectedTest, rankings]);
+  }, [token, RANKINGS_API]);
 
   const handleTestSelect = (testName) => {
-    if (selectedTest === testName) {
-      setSelectedTest(null);
-    } else {
-      setSelectedTest(testName);
-    }
+    setSelectedTest(testName === selectedTest ? null : testName);
   };
 
   if (error) {
@@ -102,9 +86,9 @@ const RankingsPage = () => {
 
         <div className="bg-black rounded-lg shadow-xl p-6">
           {selectedTest ? (
-            filteredRankings.length > 0 ? (
+            rankings[selectedTest] && rankings[selectedTest].length > 0 ? (
               <div className="overflow-x-auto">
-                <RankingTable rankings={filteredRankings} />
+                <RankingTable rankings={rankings[selectedTest]} />
               </div>
             ) : (
               <p className="text-center text-gray-400 font-medium text-lg">
@@ -114,13 +98,12 @@ const RankingsPage = () => {
           ) : (
             <p className="text-center text-gray-400 font-medium text-lg">
               Click on a mock test name to view rankings.
-              </p>
+            </p>
           )}
         </div>
       </div>
       <Footer/>
     </div>
-
   );
 };
 

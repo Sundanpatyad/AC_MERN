@@ -149,27 +149,27 @@ exports.getAttemptsByMockTest = async (req, res) => {
 exports.getRankings = async (req, res) => {
   try {
     const rankings = await AttemptDetails.aggregate([
-      // Group by user to get the latest attempt for each user
-      {
-        $sort: { attemptDate: -1 }
-      },
+      // Sort by attemptDate in descending order
+      { $sort: { attemptDate: -1 } },
+      
+      // Group by user and testName to get the latest attempt for each user per test
       {
         $group: {
-          _id: '$user',
+          _id: { user: '$user', testName: '$testName' },
           latestAttempt: { $first: '$$ROOT' }
         }
       },
+      
       // Unwind to flatten the result
-      {
-        $replaceRoot: { newRoot: '$latestAttempt' }
-      },
+      { $replaceRoot: { newRoot: '$latestAttempt' } },
+      
       // Sort by score in descending order
-      {
-        $sort: { score: -1 }
-      },
+      { $sort: { score: -1 } },
+      
       // Add rank field
       {
         $setWindowFields: {
+          partitionBy: '$testName',
           sortBy: { score: -1 },
           output: {
             rank: {
@@ -178,6 +178,7 @@ exports.getRankings = async (req, res) => {
           }
         }
       },
+      
       // Lookup to get user details
       {
         $lookup: {
@@ -187,22 +188,25 @@ exports.getRankings = async (req, res) => {
           as: 'userDetails'
         }
       },
-      {
-        $unwind: '$userDetails'
-      },
+      
+      { $unwind: '$userDetails' },
+      
       // Project only necessary fields
       {
         $project: {
           rank: 1,
-          userName: { 
-            $concat: ['$userDetails.firstName', ' ', '$userDetails.lastName'] 
+          userName: {
+            $concat: ['$userDetails.firstName', ' ', '$userDetails.lastName']
           },
           score: 1,
           testName: 1,
           attemptDate: 1,
           userImage: '$userDetails.image'
         }
-      }
+      },
+      
+      // Sort by testName and then by rank
+      { $sort: { testName: 1, rank: 1 } }
     ]);
 
     res.status(200).json({

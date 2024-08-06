@@ -22,6 +22,7 @@ const MockTestSeries = () => {
   const [correctAnswers, setCorrectAnswers] = useState([]);
   const [incorrectAnswers, setIncorrectAnswers] = useState([]);
   const [showAttemptDetails, setShowAttemptDetails] = useState(false);
+  const [userAnswers, setUserAnswers] = useState([]);
   const { GET_MCOKTEST_SERIES_BY_ID , CREATE_ATTEMPT_DETAILS} = mocktestEndpoints
 
   useEffect(() => {
@@ -62,6 +63,7 @@ const MockTestSeries = () => {
     setAnsweredQuestions(new Array(test.questions.length).fill(false));
     setCorrectAnswers([]);
     setIncorrectAnswers([]);
+    setUserAnswers(new Array(test.questions.length).fill(''));
   };
 
   const handleAnswerSelect = (answer) => {
@@ -69,26 +71,16 @@ const MockTestSeries = () => {
     const newAnsweredQuestions = [...answeredQuestions];
     newAnsweredQuestions[currentQuestion] = true;
     setAnsweredQuestions(newAnsweredQuestions);
+
+    const newUserAnswers = [...userAnswers];
+    newUserAnswers[currentQuestion] = answer;
+    setUserAnswers(newUserAnswers);
   };
 
   const handleNextQuestion = () => {
-    const currentQuestionData = currentTest.questions[currentQuestion];
-    if (selectedAnswer === currentQuestionData.correctAnswer) {
-      setScore(score + 1);
-      setCorrectAnswers([...correctAnswers, currentQuestion]);
-    } else {
-      setScore(score - 0.25); // Apply negative marking
-      setIncorrectAnswers([...incorrectAnswers, {
-        questionIndex: currentQuestion,
-        userAnswer: selectedAnswer,
-        correctAnswer: currentQuestionData.correctAnswer
-      }]);
-    }
-
-    setSelectedAnswer('');
-    
     if (currentQuestion + 1 < currentTest.questions.length) {
       setCurrentQuestion(currentQuestion + 1);
+      setSelectedAnswer(userAnswers[currentQuestion + 1] || '');
     } else {
       endTest();
     }
@@ -96,22 +88,53 @@ const MockTestSeries = () => {
 
   const handleQuestionNavigation = (index) => {
     setCurrentQuestion(index);
-    setSelectedAnswer('');
+    setSelectedAnswer(userAnswers[index] || '');
   };
 
-  const sendScoreToBackend = async () => {
+  const calculateScore = () => {
+    let newScore = 0;
+    let newCorrectAnswers = [];
+    let newIncorrectAnswers = [];
+
+    currentTest.questions.forEach((question, index) => {
+      if (userAnswers[index] === question.correctAnswer) {
+        newScore += 1;
+        newCorrectAnswers.push(index);
+      } else if (userAnswers[index] !== '') {
+        newScore -= 0.25;
+        newIncorrectAnswers.push({
+          questionIndex: index,
+          userAnswer: userAnswers[index],
+          correctAnswer: question.correctAnswer
+        });
+      }
+    });
+
+    setScore(newScore);
+    setCorrectAnswers(newCorrectAnswers);
+    setIncorrectAnswers(newIncorrectAnswers);
+
+    return {
+      score: newScore,
+      correctAnswers: newCorrectAnswers.length,
+      incorrectAnswers: newIncorrectAnswers.length,
+      incorrectAnswerDetails: newIncorrectAnswers
+    };
+  };
+
+  const sendScoreToBackend = async (scoreData) => {
     try {
       const response = await axios.post(
         CREATE_ATTEMPT_DETAILS,
         {
           mockId,
           testName: currentTest.testName,
-          score,
+          score: scoreData.score,
           totalQuestions: currentTest.questions.length,
           timeTaken: currentTest.duration * 60 - timeLeft,
-          correctAnswers: correctAnswers.length,
-          incorrectAnswers: incorrectAnswers.length,
-          incorrectAnswerDetails: incorrectAnswers.map(item => ({
+          correctAnswers: scoreData.correctAnswers,
+          incorrectAnswers: scoreData.incorrectAnswers,
+          incorrectAnswerDetails: scoreData.incorrectAnswerDetails.map(item => ({
             questionText: currentTest.questions[item.questionIndex].text,
             userAnswer: item.userAnswer,
             correctAnswer: item.correctAnswer
@@ -134,9 +157,10 @@ const MockTestSeries = () => {
   };
 
   const endTest = () => {
+    const scoreData = calculateScore();
     setShowScore(true);
     setTimeLeft(0);
-    sendScoreToBackend();
+    sendScoreToBackend(scoreData);
   };
 
   const formatTime = (seconds) => {
@@ -145,46 +169,46 @@ const MockTestSeries = () => {
     return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   };
 
-const renderAttemptDetails = () => {
-  return (
-    <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row justify-between items-center">
-        <h3 className="text-2xl font-bold text-white mb-2 sm:mb-0">Attempt Details</h3>
-        <p className="text-indigo-300 text-lg">
-          Total Time: {formatTime(currentTest.duration * 60 - timeLeft)}
-        </p>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {currentTest.questions.map((question, index) => {
-          const incorrectAnswer = incorrectAnswers.find(item => item.questionIndex === index);
-          const isCorrect = correctAnswers.includes(index);
-          const userAnswer = incorrectAnswer ? incorrectAnswer.userAnswer : (isCorrect ? question.correctAnswer : "Not answered");
-          
-          return (
-            <div key={index} className="bg-gray-700 p-6 rounded-xl shadow-lg border border-gray-600">
-              <div className="flex justify-between items-center mb-4">
-                <h4 className="text-lg font-semibold text-white">Question {index + 1}</h4>
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${isCorrect ? "bg-green-900 text-green-300" : "bg-red-900 text-red-300"}`}>
-                  {isCorrect ? "Correct" : "Incorrect"}
-                </span>
+  const renderAttemptDetails = () => {
+    return (
+      <div className="space-y-8">
+        <div className="flex flex-col sm:flex-row justify-between items-center">
+          <h3 className="text-2xl font-bold text-white mb-2 sm:mb-0">Attempt Details</h3>
+          <p className="text-indigo-300 text-lg">
+            Total Time: {formatTime(currentTest.duration * 60 - timeLeft)}
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {currentTest.questions.map((question, index) => {
+            const incorrectAnswer = incorrectAnswers.find(item => item.questionIndex === index);
+            const isCorrect = correctAnswers.includes(index);
+            const userAnswer = userAnswers[index] || "Not answered";
+            
+            return (
+              <div key={index} className="bg-gray-700 p-6 rounded-xl shadow-lg border border-gray-600">
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="text-lg font-semibold text-white">Question {index + 1}</h4>
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${isCorrect ? "bg-green-900 text-green-300" : "bg-red-900 text-red-300"}`}>
+                    {isCorrect ? "Correct" : "Incorrect"}
+                  </span>
+                </div>
+                <p className="text-gray-100 mb-4">{question.text}</p>
+                <div className="space-y-2">
+                  <p className="text-gray-300">
+                    <span className="font-medium text-indigo-300">Your Answer:</span> {userAnswer}
+                  </p>
+                  <p className="text-gray-300">
+                    <span className="font-medium text-indigo-300">Correct Answer:</span> {question.correctAnswer}
+                  </p>
+                </div>
               </div>
-              <p className="text-gray-100 mb-4">{question.text}</p>
-              <div className="space-y-2">
-                <p className="text-gray-300">
-                  <span className="font-medium text-indigo-300">Your Answer:</span> {userAnswer}
-                </p>
-                <p className="text-gray-300">
-                  <span className="font-medium text-indigo-300">Correct Answer:</span> {question.correctAnswer}
-                </p>
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
   if (loading) {
     return <LoadingSpinner title={"Loading Tests"}/>;
@@ -302,6 +326,7 @@ const renderAttemptDetails = () => {
                 Back to Test List
               </button>
             </div>
+
             
             {showAttemptDetails && (
               <div className="mt-8 bg-gray-700 p-6 rounded-lg">
