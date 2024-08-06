@@ -118,7 +118,7 @@ const PageLoader = () => {
 
       {/* Digital Loader */}
       <motion.div
-        className="absolute bottom-16 right-16 text-white text-2xl font-bold"
+        className="absolute bottom-10 right-10 text-white text-2xl font-bold"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 0.5 }}
