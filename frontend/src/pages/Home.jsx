@@ -242,10 +242,9 @@ const opacityText = useTransform(scrollY, [0, 300], [1, 0]);
 
     <motion.div
   id='heading-hero'
-  variants={fadeIn('left', 0.1)}
+ 
   initial='hidden'
   whileInView={'show'}
-  viewport={{ once: false, amount: 0.1 }}
   className='text-center text-white text-4xl mt-10 z-10 font-semibold w-80 lg:w-full lg:text-7xl'
   style={{
     y: yText,
@@ -300,8 +299,9 @@ const opacityText = useTransform(scrollY, [0, 300], [1, 0]);
         },
       }}
     >
-      <span className="text-3xl text-white font-bold mr-8">JKSSB • JUNIOR ASSISTANT •  JKSSB VLW • JKSSB PATWARI • JKP CONSTABLE •</span>
-      <span className="text-3xl text-white font-bold mr-8">JKSSB • JUNIOR ASSISTANT •  JKSSB VLW • JKSSB PATWARI • JKP CONSTABLE •</span>
+      <span className="text-xl text-white font-bold mr-8">JKSSB • JUNIOR ASSISTANT •  JKSSB VLW • JKSSB PATWARI • JKP CONSTABLE •</span>
+      <span className="text-xl text-white font-bold mr-8">JKSSB • JUNIOR ASSISTANT •  JKSSB VLW • JKSSB PATWARI • JKP CONSTABLE •</span>
+      <span className="text-xl text-white font-bold mr-8">JKSSB • JUNIOR ASSISTANT •  JKSSB VLW • JKSSB PATWARI • JKP CONSTABLE •</span>
     </motion.div>
     <motion.div
       className="inline-block"
@@ -317,6 +317,7 @@ const opacityText = useTransform(scrollY, [0, 300], [1, 0]);
         },
       }}
     >
+      <span className="text-3xl text-white font-bold mr-8">Learn • Grow • Succeed • Excel • Achieve • </span>
       <span className="text-3xl text-white font-bold mr-8">Learn • Grow • Succeed • Excel • Achieve • </span>
       <span className="text-3xl text-white font-bold mr-8">Learn • Grow • Succeed • Excel • Achieve • </span>
     </motion.div>
@@ -336,8 +337,9 @@ const opacityText = useTransform(scrollY, [0, 300], [1, 0]);
       },
     }}
   >
-    <span className="text-3xl text-white font-bold mr-8">JKSSB • JUNIOR ASSISTANT •  JKSSB VLW • JKSSB PATWARI • JKP CONSTABLE •</span>
-    <span className="text-3xl text-white font-bold mr-8">JKSSB • JUNIOR ASSISTANT •  JKSSB VLW • JKSSB PATWARI • JKP CONSTABLE •</span>
+    <span className="text-xl text-white font-bold mr-8">JKSSB • JUNIOR ASSISTANT •  JKSSB VLW • JKSSB PATWARI • JKP CONSTABLE •</span>
+    <span className="text-xl text-white font-bold mr-8">JKSSB • JUNIOR ASSISTANT •  JKSSB VLW • JKSSB PATWARI • JKP CONSTABLE •</span>
+    <span className="text-xl text-white font-bold mr-8">JKSSB • JUNIOR ASSISTANT •  JKSSB VLW • JKSSB PATWARI • JKP CONSTABLE •</span>
   </motion.div>
   <motion.div
     className="inline-block"
@@ -353,8 +355,9 @@ const opacityText = useTransform(scrollY, [0, 300], [1, 0]);
       },
     }}
   >
-    <span className="text-3xl text-white font-bold mr-8">Learn • Grow • Succeed • Excel • Achieve • </span>
-    <span className="text-3xl text-white font-bold mr-8">Learn • Grow • Succeed • Excel • Achieve • </span>
+    <span className="text-xl text-white font-bold mr-8">Learn • Grow • Succeed • Excel • Achieve • </span>
+    <span className="text-xl text-white font-bold mr-8">Learn • Grow • Succeed • Excel • Achieve • </span>
+    <span className="text-xl text-white font-bold mr-8">Learn • Grow • Succeed • Excel • Achieve • </span>
   </motion.div>
 </div>
 </div>
