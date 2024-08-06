@@ -24,7 +24,7 @@ export default function Cart() {
         >
           <div className="px-6 sm:px-8 py-6 bg-black flex justify-between items-center">
             <h1 className="text-2xl sm:text-3xl font-bold">Your Cart</h1>
-            <span className="bg-white text-indigo-600 rounded-full px-4 py-2 text-sm font-semibold">
+            <span className="bg-white text-black rounded-full px-4 py-2 text-sm font-semibold">
               {totalItems} {totalItems === 1 ? 'Item' : 'Items'}
             </span>
           </div>
@@ -38,7 +38,7 @@ export default function Cart() {
               <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
                 <Link
                   to="/"
-                  className="group flex items-center text-indigo-400 hover:text-indigo-300 transition-colors duration-200"
+                  className="group flex items-center text-slate-400 hover:text-indigo-300 transition-colors duration-200"
                 >
                   <FiChevronLeft className="mr-2 group-hover:transform group-hover:-translate-x-1 transition-transform duration-200" />
                   Continue Shopping
@@ -58,7 +58,7 @@ export default function Cart() {
               <p className="mt-3 text-xl text-gray-400">Looks like you haven't added any courses yet.</p>
               <Link
                 to="/"
-                className="mt-8 inline-flex items-center px-8 py-3 border border-transparent text-lg font-medium rounded-lg text-indigo-600 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg"
+                className="mt-8 inline-flex items-center px-8 py-3 border border-transparent text-lg font-medium rounded-lg text-black bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg"
               >
                 Browse Courses
               </Link>

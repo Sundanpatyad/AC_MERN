@@ -154,7 +154,7 @@ async function verifyPayment(bodyData, token, navigate, dispatch) {
         }
 
         // Reset cart if necessary (you might want to handle this differently for mock tests)
-        if (bodyData.itemType) {
+        if (bodyData) {
             dispatch(resetCart());
         }
     }
