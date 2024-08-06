@@ -13,6 +13,7 @@ import { buyItem } from "../services/operations/studentFeaturesAPI"
 import { ACCOUNT_TYPE } from "../utils/constants"
 import { addToCart } from "../slices/cartSlice"
 import { fetchMockTestDetails } from "../services/operations/mocktest"
+import LoadingSpinner from "../components/core/ConductMockTests/Spinner"
 
 const BackButton = ({ onClick }) => (
   <button className="mb-5 lg:mt-10 lg:mb-0 z-[100]" onClick={onClick} aria-label="Go back">
@@ -71,16 +72,7 @@ const MockTestContent = ({ mockTests }) => (
           <div className="ml-4">
             <h4 className="font-medium text-richblack-100 mb-2">Questions:</h4>
             <ul className="list-disc list-inside space-y-2">
-              {/* {test.questions.map((question, qIndex) => (
-                <li key={qIndex} className="text-richblack-200">
-                  {question.text}
-                  <ul className="list-circle list-inside ml-4 mt-1 space-y-1">
-                    {question.options.map((option, oIndex) => (
-                      <li key={oIndex} className="text-richblack-300">{option}</li>
-                    ))}
-                  </ul>
-                </li>
-              ))} */}
+              {/* Question rendering logic */}
             </ul>
           </div>
         </div>
@@ -89,19 +81,17 @@ const MockTestContent = ({ mockTests }) => (
   </div>
 )
 
-const LoadingSkeleton = () => (
-  <div className="mt-24 p-5 flex flex-col justify-center gap-4" aria-label="Loading">
-    <div className="flex flex-col sm:flex-col-reverse gap-4">
-      <div className="h-44 sm:h-24 sm:w-[60%] rounded-xl skeleton"></div>
-      <div className="h-9 sm:w-[39%] rounded-xl skeleton"></div>
+const DigitalPreloader = () => (
+  <div className="flex flex-col items-center justify-center h-screen bg-richblack-900">
+    <div className="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-blue-500"></div>
+    <p className="mt-4 text-richblack-5">Loading Mock Test Details...</p>
+    <div className="mt-4 w-64 h-4 bg-richblack-700 rounded-full overflow-hidden">
+      <div className="w-full h-full bg-blue-500 rounded-full animate-pulse"></div>
     </div>
-    <div className="h-4 w-[55%] lg:w-[25%] rounded-xl skeleton"></div>
-    <div className="h-4 w-[75%] lg:w-[30%] rounded-xl skeleton"></div>
-    <div className="h-4 w-[35%] lg:w-[10%] rounded-xl skeleton"></div>
-    <div className="right-[1.5rem] top-[20%] hidden lg:block lg:absolute min-h-[450px] w-1/3 max-w-[410px] translate-y-24 md:translate-y-0 rounded-xl skeleton"></div>
-    <div className="mt-24 h-60 lg:w-[60%] rounded-xl skeleton"></div>
   </div>
 )
+
+
 
 function MockTestDetails() {
   const { user } = useSelector((state) => state.profile)
@@ -113,16 +103,19 @@ function MockTestDetails() {
 
   const [courseDetails, setCourseDetails] = useState(null)
   const [confirmationModal, setConfirmationModal] = useState(null)
-  console.log(courseDetails);
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchCourseDetailsData = async () => {
       try {
+        setIsLoading(true)
         const res = await fetchMockTestDetails(mockId)
         setCourseDetails(res)
       } catch (error) {
         console.error("Could not fetch Course Details:", error)
         toast.error("Failed to load course details")
+      } finally {
+        setIsLoading(false)
       }
     }
     fetchCourseDetailsData()
@@ -152,7 +145,7 @@ function MockTestDetails() {
     }
 
     try {
-      await buyItem(token, [mockId], user, navigate, dispatch)
+      await buyItem(token, [mockId], ['MOCK_TEST'], user, navigate, dispatch)
     } catch (error) {
       console.error("Error purchasing course:", error)
       toast.error("Failed to purchase course")
@@ -185,8 +178,8 @@ function MockTestDetails() {
     dispatch(addToCart(courseDetails))
   }
 
-  if (loading || !courseDetails) {
-    return <LoadingSkeleton />
+  if (loading || isLoading) {
+    return <LoadingSpinner />
   }
 
   const {
