@@ -69,8 +69,9 @@ const MockTestContent = ({ mockTests }) => (
           <h3 className="font-semibold text-lg text-richblack-50 mb-2">{test.testName}</h3>
           <p className="text-richblack-300">Duration: {test.duration} minutes</p>
           <p className="text-richblack-300 mb-2">Status: {test.status}</p>
+          <p className="text-richblack-300 mb-2">Questions: {test.questions.length}</p>
           <div className="ml-4">
-            <h4 className="font-medium text-richblack-100 mb-2">Questions:</h4>
+            {/* <h4 className="font-medium text-richblack-100 mb-2">Questions:</h4> */}
             <ul className="list-disc list-inside space-y-2">
               {/* Question rendering logic */}
             </ul>

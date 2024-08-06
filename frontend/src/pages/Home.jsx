@@ -19,6 +19,7 @@ import { addToCart, removeFromCart } from '../slices/cartSlice'
 
 import { MdOutlineRateReview } from 'react-icons/md'
 import { FaArrowRight, FaBookOpen, FaShoppingCart } from "react-icons/fa"
+import { useScroll, useTransform } from 'framer-motion';
 
 import { fadeIn } from '../components/common/motionFrameVarients'
 import { ACCOUNT_TYPE } from "../utils/constants"
@@ -219,7 +220,9 @@ const Home = () => {
   }, [navigate])
 
   const MemoizedMockTestCard = useMemo(() => MockTestCard, [])
-
+  const { scrollY } = useScroll();
+  const yText = useTransform(scrollY, [0, 300], ['0%', '-100%']);
+const opacityText = useTransform(scrollY, [0, 300], [1, 0]);
 
 
   return (
@@ -237,24 +240,28 @@ const Home = () => {
           </div>
         </Link>
 
-        <motion.div
-          id='heading-hero'
-          variants={fadeIn('left', 0.1)}
-          initial='hidden'
-          whileInView={'show'}
-          viewport={{ once: false, amount: 0.1 }}
-          className='text-center text-white text-4xl mt-10 z-10 font-semibold w-80 lg:w-full lg:text-7xl'
-        >
-         We Know That <strong>Together</strong><i> We</i> Can  <br />
-          <HighlightText text={"Awakening Classes"} />
-        </motion.div>
+    <motion.div
+  id='heading-hero'
+  variants={fadeIn('left', 0.1)}
+  initial='hidden'
+  whileInView={'show'}
+  viewport={{ once: false, amount: 0.1 }}
+  className='text-center text-white text-4xl mt-10 z-10 font-semibold w-80 lg:w-full lg:text-7xl'
+  style={{
+    y: yText,
+    opacity: opacityText,
+  }}
+>
+  We Know That <strong>Together</strong><i> We</i> Can  <br />
+  <HighlightText text={"Awakening Classes"} />
+</motion.div>
 
         <motion.div
           variants={fadeIn('right', 0.1)}
           initial='hidden'
           whileInView={'show'}
           viewport={{ once: false, amount: 0.1 }}
-          className='mt-2 w-[90%] text-center text-base lg:text-lg font-bold text-slate-200'
+          className='mt-2 w-[80%] text-center text-base lg:text-lg font-bold text-slate-200'
         >
           With our online courses, you can learn at your own pace, from anywhere in the world, and get access to a wealth of resources, quizzes, and personalized feedback from instructors.
         </motion.div>
@@ -263,6 +270,7 @@ const Home = () => {
           <Link to={"/login"} className=" z-20 px-6 py-3 mt-4 rounded-lg border border-black bg-white text-black text-md hover:shadow-[4px_4px_0px_0px_rgba(0,0,0)] transition duration-200">
   Discover More 
 </Link>
+
 
 
  :
@@ -276,6 +284,80 @@ const Home = () => {
 </Link>
       </div>
         }
+<div className="w-full mt-10 md:mt-20 overflow-hidden">
+  <div className="whitespace-nowrap z-[-40] inline-block  [mask-image:radial-gradient(ellipse_at_center,transparent_10%,black)]">
+    <motion.div
+      className="inline-block"
+      animate={{
+        x: ["0%", "-50%"]
+      }}
+      transition={{
+        x: {
+          repeat: Infinity,
+          repeatType: "loop",
+          duration: 20,
+          ease: "linear",
+        },
+      }}
+    >
+      <span className="text-3xl text-white font-bold mr-8">JKSSB • JUNIOR ASSISTANT •  JKSSB VLW • JKSSB PATWARI • JKP CONSTABLE •</span>
+      <span className="text-3xl text-white font-bold mr-8">JKSSB • JUNIOR ASSISTANT •  JKSSB VLW • JKSSB PATWARI • JKP CONSTABLE •</span>
+    </motion.div>
+    <motion.div
+      className="inline-block"
+      animate={{
+        x: ["0%", "-50%"]
+      }}
+      transition={{
+        x: {
+          repeat: Infinity,
+          repeatType: "loop",
+          duration: 20,
+          ease: "linear",
+        },
+      }}
+    >
+      <span className="text-3xl text-white font-bold mr-8">Learn • Grow • Succeed • Excel • Achieve • </span>
+      <span className="text-3xl text-white font-bold mr-8">Learn • Grow • Succeed • Excel • Achieve • </span>
+    </motion.div>
+  </div>
+  <div className="whitespace-nowrap z-[-40] inline-block mt-3 [mask-image:radial-gradient(ellipse_at_center,transparent_10%,black)]">
+  <motion.div
+    className="inline-block"
+    animate={{
+      x: ["-50%", "0%"]  // Changed from ["0%", "-50%"] to ["-50%", "0%"]
+    }}
+    transition={{
+      x: {
+        repeat: Infinity,
+        repeatType: "loop",
+        duration: 20,
+        ease: "linear",
+      },
+    }}
+  >
+    <span className="text-3xl text-white font-bold mr-8">JKSSB • JUNIOR ASSISTANT •  JKSSB VLW • JKSSB PATWARI • JKP CONSTABLE •</span>
+    <span className="text-3xl text-white font-bold mr-8">JKSSB • JUNIOR ASSISTANT •  JKSSB VLW • JKSSB PATWARI • JKP CONSTABLE •</span>
+  </motion.div>
+  <motion.div
+    className="inline-block"
+    animate={{
+      x: ["-50%", "0%"]  // Changed from ["0%", "-50%"] to ["-50%", "0%"]
+    }}
+    transition={{
+      x: {
+        repeat: Infinity,
+        repeatType: "loop",
+        duration: 20,
+        ease: "linear",
+      },
+    }}
+  >
+    <span className="text-3xl text-white font-bold mr-8">Learn • Grow • Succeed • Excel • Achieve • </span>
+    <span className="text-3xl text-white font-bold mr-8">Learn • Grow • Succeed • Excel • Achieve • </span>
+  </motion.div>
+</div>
+</div>
       </div>
 
       <div className='relative mx-auto flex flex-col w-11/12 max-w-full mt-10 items-center text-white justify-between'>
