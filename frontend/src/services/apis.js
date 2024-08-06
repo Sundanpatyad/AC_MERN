@@ -93,7 +93,8 @@ export const mocktestEndpoints = {
   FETCH_MOCKTEST_BY_ID:`${BASE_URL}/api/v1/mock/getMockTestSeriesById`,
   ENORLL_MOCKTEST:`${BASE_URL}/api/v1/mock/enroll`,
   GET_MCOKTEST_SERIES_BY_ID:`${BASE_URL}/api/v1/mock/getMockTestSeriesById`,
-  CREATE_ATTEMPT_DETAILS:`${BASE_URL}/api/v1/mock/createAttemptDetails`
+  CREATE_ATTEMPT_DETAILS:`${BASE_URL}/api/v1/mock/createAttemptDetails`,
+  TEXT_EDIT_MOCKTEST:`${BASE_URL}/api/v1/mock/addMocktestToSeries`
   // http://localhost:8000/api/v1/mock/getMockTestSeriesById
 
 }

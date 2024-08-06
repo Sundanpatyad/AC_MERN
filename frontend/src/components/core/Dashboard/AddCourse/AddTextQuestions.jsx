@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
+import { mocktestEndpoints } from '../../../../services/apis';
 
 const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
@@ -28,6 +29,7 @@ const AddMockTest = ({ seriesId, onClose }) => {
   const [testData, setTestData] = useState('');
   const [duration, setDuration] = useState('');
   const [message, setMessage] = useState('');
+  const {TEXT_EDIT_MOCKTEST} = mocktestEndpoints;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,7 +37,7 @@ const AddMockTest = ({ seriesId, onClose }) => {
 
     try {
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      await axios.post('http://localhost:8000/api/v1/mock/addMocktestToSeries', {
+      await axios.post(TEXT_EDIT_MOCKTEST, {
         seriesId,
         testName,
         testData,
