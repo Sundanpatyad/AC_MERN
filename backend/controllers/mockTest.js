@@ -132,3 +132,61 @@ exports.createMockTests = async (req, res) => {
     }
   };
   
+
+
+
+exports.addMockTestToSeries = async (req, res) => {
+  try {
+    const { seriesId, testName, testData, duration } = req.body;
+
+    const questions = parseTestData(testData);
+
+    const updatedSeries = await MockTestSeries.findByIdAndUpdate(
+      seriesId,
+      {
+        $push: {
+          mockTests: {
+            testName,
+            questions,
+            duration,
+            status: 'published',
+            createdAt: new Date(),
+            updatedAt: new Date()
+          }
+        },
+        $inc: { totalTests: 1 }
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedSeries) {
+      return res.status(404).json({ message: 'Mock Test Series not found' });
+    }
+
+    res.status(201).json({ message: 'Mock test added successfully', updatedSeries });
+  } catch (error) {
+    res.status(500).json({ message: 'Error adding mock test', error: error.message });
+  }
+}
+
+function parseTestData(testData) {
+  const lines = testData.split('\n').filter(line => line.trim() !== '');
+  const questions = [];
+  
+  for (let i = 0; i < lines.length; i += 6) {
+    if (i + 5 < lines.length) {
+      questions.push({
+        text: lines[i].trim(),
+        options: [
+          lines[i + 1].trim(),
+          lines[i + 2].trim(),
+          lines[i + 3].trim(),
+          lines[i + 4].trim()
+        ],
+        correctAnswer: lines[i + 5].trim()
+      });
+    }
+  }
+  
+  return questions;
+}

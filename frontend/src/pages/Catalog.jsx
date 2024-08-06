@@ -1,9 +1,8 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { useSelector, useDispatch } from "react-redux"
-import { useQuery, useMutation, useQueryClient } from 'react-query'
+import { useQuery } from 'react-query'
 import Footer from "../components/common/Footer"
-import Loading from './../components/common/Loading'
 import ConfirmationModal from "../components/common/ConfirmationModal"
 import { getCatalogPageData } from '../services/operations/pageAndComponentData'
 import { fetchCourseCategories } from './../services/operations/courseDetailsAPI'
@@ -12,26 +11,28 @@ import { buyItem } from '../services/operations/studentFeaturesAPI'
 import toast from 'react-hot-toast'
 import { FaBookOpen, FaShoppingCart } from 'react-icons/fa'
 import { ACCOUNT_TYPE } from "../utils/constants"
-import { motion } from 'framer-motion';
+import { motion } from 'framer-motion'
+import { setCourse, setStep } from '../slices/courseSlice'
 
-const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLoggedIn, isEnrolled }) => {
-    const navigate = useNavigate()
+const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLoggedIn, user, handleCourseClick }) => {
+    const isEnrolled = useMemo(() => {
+        return course.studentsEnrolled?.includes(user?._id)
+    }, [course.studentsEnrolled, user?._id])
 
     return (
         <div 
             className="bg-black border border-slate-500 w-full rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer flex flex-col"
-            onClick={() => navigate(`/courses/${course._id}`)}
+            onClick={() => handleCourseClick(course)}
         >
             <div className="relative h-28 sm:h-32 md:h-40">
                 <img 
                     src={course.thumbnail} 
-                   className="w-full h-full object-cover"
+                    className="w-full h-full object-cover"
+                    alt={course.courseName}
                 />
-               
             </div>
             <div className="p-3 sm:p-4 md:p-6 flex-grow flex flex-col justify-between">
-            <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-white text-center p-2">{course.courseName}</h3>
-
+                <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-white text-center p-2">{course.courseName}</h3>
                 <p className="text-xs sm:text-sm md:text-base text-richblack-100 mb-2 sm:mb-4 line-clamp-2">{course.courseDescription}</p>
                 <div className="flex justify-between items-center text-xs sm:text-sm text-richblack-200 mb-2 sm:mb-4 md:mb-6">
                     <div className="flex items-center">
@@ -47,7 +48,7 @@ const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLogged
                         <button
                             onClick={(e) => {
                                 e.stopPropagation()
-                                navigate(`/view-course/${course._id}/section/${course.courseContent[0]?._id}/sub-section/${course.courseContent[0]?.subSection[0]}`)
+                                handleCourseClick(course)
                             }}
                             className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-xs sm:text-sm"
                         >
@@ -135,7 +136,7 @@ function Catalog() {
     const dispatch = useDispatch()
     const { token } = useSelector((state) => state.auth)
     const { user } = useSelector((state) => state.profile)
-    const queryClient = useQueryClient()
+    const { course, step } = useSelector((state) => state.course)
 
     const isLoggedIn = !!token
 
@@ -162,32 +163,6 @@ function Catalog() {
         }
     )
 
-    // Mutation for buying a course
-    const buyCourseMutation = useMutation(
-        (courseId) => buyItem(token, [courseId], ['course'], user, navigate, dispatch),
-        {
-            onSuccess: (data, variables) => {
-                toast.success("Course purchased successfully!")
-                queryClient.setQueryData(['catalogPageData', categoryId], (oldData) => {
-                    if (!oldData) return oldData;
-                    return {
-                        ...oldData,
-                        selectedCategory: {
-                            ...oldData.selectedCategory,
-                            courses: oldData.selectedCategory.courses.map(course => 
-                                course._id === variables ? { ...course, studentsEnrolled: [...course.studentsEnrolled, user._id] } : course
-                            )
-                        }
-                    }
-                })
-            },
-            onError: (error) => {
-                console.error("Error purchasing course:", error)
-                toast.error("Failed to purchase course")
-            }
-        }
-    )
-
     useEffect(() => {
         // Simulate loading
         const timer = setTimeout(() => {
@@ -196,6 +171,12 @@ function Catalog() {
 
         return () => clearTimeout(timer)
     }, [])
+
+    const handleCourseClick = useCallback((course) => {
+        dispatch(setCourse(course))
+        dispatch(setStep(1))
+        navigate(`/courses/${course._id}`)
+    }, [dispatch, navigate])
 
     const handleAddToCart = useCallback(async (course) => {
         if (!isLoggedIn) {
@@ -208,6 +189,7 @@ function Catalog() {
             return
         }
 
+        dispatch(setCourse(course))
         dispatch(addToCart(course))
     }, [isLoggedIn, user, navigate, dispatch])
 
@@ -222,8 +204,9 @@ function Catalog() {
             return
         }
 
-        buyCourseMutation.mutate(course._id)
-    }, [isLoggedIn, user, navigate, buyCourseMutation])
+        dispatch(setCourse(course))
+        buyItem(token, [course._id], ['course'], user, navigate, dispatch)
+    }, [isLoggedIn, user, navigate, dispatch, token])
 
     const renderCourseCards = (courses) => {
         if (isCatalogDataLoading) {
@@ -238,38 +221,38 @@ function Catalog() {
                 handleAddToCart={handleAddToCart}
                 handleBuyNow={handleBuyNow}
                 isLoggedIn={isLoggedIn}
-                isEnrolled={course.studentsEnrolled?.includes(user?._id)}
+                user={user}
+                handleCourseClick={handleCourseClick}
             />
         ))
     }
 
-    if (isLoading) {
-        return (
-            <motion.div 
-                className="fixed inset-0 flex items-center justify-center bg-richblack-black z-50"
-                initial={{ opacity: 0  }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-            >
-                <motion.h1
-                    initial={{ scale: 0.5, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{
-                        duration: 0.5,
-                        delay: 0.2,
-                        ease: "easeOut"
-                    }}
-                    className="text-white text-3xl font-bold"
-                >
-                    Loading Courses
-                </motion.h1>
-            </motion.div>
-        );
-    }
+    // if (isLoading) {
+    //     return (
+    //         <motion.div 
+    //             className="fixed inset-0 flex items-center justify-center bg-richblack-black z-50"
+    //             initial={{ opacity: 0  }}
+    //             animate={{ opacity: 1 }}
+    //             transition={{ duration: 0.5 }}
+    //         >
+    //             <motion.h1
+    //                 initial={{ scale: 0.5, opacity: 0 }}
+    //                 animate={{ scale: 1, opacity: 1 }}
+    //                 transition={{
+    //                     duration: 0.5,
+    //                     delay: 0.2,
+    //                     ease: "easeOut"
+    //                 }}
+    //                 className="text-white text-3xl font-bold"
+    //             >
+    //                 Loading Courses
+    //             </motion.h1>
+    //         </motion.div>
+    //     );
+    // }
 
     return (
         <div className="min-h-screen flex flex-col">
-       
             {/* Courses Section */}
             <div className="flex-grow mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
                 <h2 className="text-3xl sm:text-3xl md:text-4xl text-center my-10 font-bold text-richblack-5 mb-4">Advance Your <i className="text-slate-400">Skills</i> With Us</h2>

@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { useQuery, useQueryClient, useMutation } from 'react-query'
+import { useQuery } from 'react-query'
 import { fetchAllMockTests } from '../services/operations/mocktest'
 import { buyItem } from '../services/operations/studentFeaturesAPI'
 import { addToCart } from '../slices/cartSlice'
@@ -106,11 +106,9 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
 const MockTestComponent = () => {
   const { token } = useSelector((state) => state.auth)
   const { user } = useSelector((state) => state.profile)
-  const [active, setActive] = useState(1)
   const [confirmationModal, setConfirmationModal] = useState(null)
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const queryClient = useQueryClient()
 
   const { data: mockTests, isLoading } = useQuery(
     'mockTests',
@@ -122,25 +120,6 @@ const MockTestComponent = () => {
   )
 
   const isLoggedIn = !!token
-
-  const buyMockTestMutation = useMutation(
-    (mockTestId) => buyItem(token, [mockTestId], ['MOCK_TEST'], user, navigate, dispatch),
-    {
-      onSuccess: (data, variables) => {
-        toast.success("Mock test purchased successfully!")
-        queryClient.setQueryData('mockTests', (oldData) => {
-          if (!oldData) return oldData;
-          return oldData.map(test => 
-            test._id === variables ? { ...test, studentsEnrolled: [...test.studentsEnrolled, user._id] } : test
-          )
-        })
-      },
-      onError: (error) => {
-        console.error("Error purchasing mock test:", error)
-        toast.error("Failed to purchase mock test")
-      }
-    }
-  )
 
   const handleAddToCart = useCallback((mockTest) => {
     if (!isLoggedIn) {
@@ -181,8 +160,14 @@ const MockTestComponent = () => {
       return
     }
 
-    buyMockTestMutation.mutate(mockTest._id)
-  }, [isLoggedIn, user, navigate, buyMockTestMutation])
+    try {
+      await buyItem(token, [mockTest._id], ['MOCK_TEST'], user, navigate, dispatch)
+      toast.success("Mock test purchased successfully!")
+    } catch (error) {
+      console.error("Error purchasing mock test:", error)
+      toast.error("Failed to purchase mock test")
+    }
+  }, [isLoggedIn, user, navigate, dispatch, token])
 
   const handleStartTest = useCallback((mockTestId) => {
     if (!isLoggedIn) {
@@ -207,7 +192,6 @@ const MockTestComponent = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Mock Tests Section */}
       <div className="flex-grow mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
         <h2 className="text-3xl sm:text-3xl md:text-4xl text-center my-10 font-bold text-richblack-5 mb-4">Test Your Knowledge with <i className='text-slate-300'>Confidence</i></h2>
         

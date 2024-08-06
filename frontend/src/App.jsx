@@ -39,10 +39,7 @@ import { ACCOUNT_TYPE } from './utils/constants';
 
 import { HiArrowNarrowUp } from "react-icons/hi"
 import Mocktest from "./pages/Mocktest";
-import AddMockTest from "./components/core/Dashboard/AddCourse/AddMockTest";
-import ViewMockTest from "./components/core/Dashboard/AddCourse/ViewMockTest";
 import AddMockTestSeries from "./components/core/Dashboard/AddCourse/MockTestSeries";
-import MockTestProductPage from "./pages/MockDetails";
 import MockTestDetails from "./pages/MockDetails";
 import MockTestSeries from "./components/core/ConductMockTests/MockTestSeries";
 import EditMockTestSeries from "./components/core/Dashboard/AddCourse/EditMockTest";
@@ -305,7 +302,6 @@ function App() {
               <Route path="dashboard/instructor" element={<Instructor />} />
               <Route path="dashboard/add-course" element={<AddCourse />} />
               <Route path="dashboard/add-mocktest" element={<AddMockTestSeries />} />
-              <Route path="dashboard/add-mocktest/:id" element={<AddMockTest />} />
               <Route path="dashboard/my-courses" element={<MyCourses />} />
               <Route path="dashboard/edit-course/:courseId" element={<EditCourse />} />
               <Route path="dashboard/edit-mock-test-series/:seriesId" element={<EditMockTestSeries />} />

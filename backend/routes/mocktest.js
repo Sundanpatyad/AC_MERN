@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { createMockTests, getMockDetails, getMockTests } = require('../controllers/mockTest');
+const { createMockTests, getMockDetails, getMockTests, addMockTestToSeries } = require('../controllers/mockTest');
 const { auth, isInstructor, isStudent } = require('../middleware/auth');
 const { createMockTestSeries, getAllMockTestSeries, getAllMockTestSeriesStudent, getMockTestSeriesById, updateMockTestSeries } = require('../controllers/mockTestSeries');
 const { createAttempt, getAttemptsByUser, getRankings } = require('../controllers/attemptDetails');
@@ -15,5 +15,6 @@ router.get('/getAttemptsByUser',auth , getAttemptsByUser);
 router.post('/createAttemptDetails', auth , createAttempt);
 router.get('/getRankings', auth , getRankings);
 router.put('/updateMockTestSeries/:id', auth , updateMockTestSeries);
+router.post('/addMocktestToSeries', auth , addMockTestToSeries);
 
 module.exports = router;

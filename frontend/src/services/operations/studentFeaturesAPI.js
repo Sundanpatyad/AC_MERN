@@ -144,6 +144,7 @@ async function verifyPayment(bodyData, token, navigate, dispatch) {
 
         const itemTypeName = bodyData.itemType === 'course' ? 'course' : 'mock test';
         toast.success(`Payment Successful, you are added to the ${itemTypeName}`, toastOptions);
+        
 
         // Navigate to the appropriate dashboard page
         if (bodyData.itemType === 'course') {

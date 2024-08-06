@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
-import AddMockTest from './AddMockTest';
 import { mocktestEndpoints } from '../../../../services/apis';
 
 const AddMockTestSeries = () => {
@@ -66,7 +65,7 @@ const AddMockTestSeries = () => {
 
   return (
     <>
-      {submitStatus === "success" && <Navigate to={`/dashboard/add-mocktest/${redirectId}`}></Navigate>}
+      {submitStatus === "success" && <Navigate to={`/dashboard/edit-mock-test-series/${redirectId}`}></Navigate>}
       <div className="flex w-full items-start gap-x-6 bg-richblack-900 min-h-screen p-8">
         <div className="flex flex-1 flex-col">
           <h1 className="mb-14 text-3xl font-medium text-richblack-5 font-boogaloo text-center lg:text-left">

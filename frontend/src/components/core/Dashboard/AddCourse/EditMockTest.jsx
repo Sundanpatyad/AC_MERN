@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { FaTrash } from 'react-icons/fa';
 import { fetchSeries } from '../../../../services/operations/mocktest';
 import { saveSeries } from '../../../../services/operations/profileAPI';
+import AddMockTest from './AddTextQuestions';
 
 const EditMockTestSeries = () => {
   const { token } = useSelector((state) => state.auth);
@@ -12,6 +13,11 @@ const EditMockTestSeries = () => {
   const [series, setSeries] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [submitStatus, setSubmitStatus] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
 
   useEffect(() => {
     const loadSeries = async () => {
@@ -125,6 +131,25 @@ const EditMockTestSeries = () => {
         navigate('/dashboard/instructor');
       }, 1000);
     }
+  };
+
+
+  const Modal = ({ isOpen, onClose, children }) => {
+    if (!isOpen) return null;
+  
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+        <div className="bg-gray-800 rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <button
+            onClick={onClose}
+            className="float-right text-gray-300 hover:text-white"
+          >
+            &times;
+          </button>
+          {children}
+        </div>
+      </div>
+    );
   };
 
   if (isLoading) {
@@ -325,6 +350,15 @@ const EditMockTestSeries = () => {
             <p className="mt-4 text-3xl font-medium text-richblack-5">Error updating mock test series. Please try again.</p>
           )}
         </div>
+        <button
+        onClick={openModal}
+        className="mt-4 bg-white text-black py-2 px-4 rounded-md hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-2 "
+      >
+        Add Mock Test
+      </button>
+      <Modal isOpen={isModalOpen} onClose={closeModal}>
+        <AddMockTest seriesId={seriesId} onClose={closeModal} />
+      </Modal>
       </div>
       
      {/* Tips Section */}

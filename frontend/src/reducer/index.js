@@ -8,6 +8,8 @@ import viewCourseReducer from "../slices/viewCourseSlice"
 import enrolledContentReducer from "../slices/enrolledContentSlice"
 import catalogReducer from "../slices/catlogSlice";
 import sidebarSlice from "../slices/sidebarSlice";
+import mockTestSeriesReducer from "../slices/editmockSlice";
+import editMockReducer from "../slices/editmockSlice"
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -18,6 +20,8 @@ const rootReducer = combineReducers({
   sidebar: sidebarSlice,
   catalog: catalogReducer,
   enrolledContent: enrolledContentReducer,
+  mockTestSeries: mockTestSeriesReducer,
+  editmock : editMockReducer
 })
 
 export default rootReducer

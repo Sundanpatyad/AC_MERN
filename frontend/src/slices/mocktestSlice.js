@@ -1,43 +1,55 @@
-import { createSlice } from "@reduxjs/toolkit";
+// src/redux/slices/mockTestSlice.js
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  createStatus: null, 
-  editMockTest: false, // Flag to indicate if a mock test is being edited
-  selectedMockTest: null, // Stores the currently selected mock test details (optional)
-  mockTests: [], // List of existing mock tests (fetched or created)
+  mockTests: [],
+  isLoading: false,
+  error: null,
+  selectedMockTest: null,
+  enrolledTests: [],
 };
 
 const mockTestSlice = createSlice({
-  name: "mockTest",
+  name: 'mockTest',
   initialState,
   reducers: {
-    setCreateStatus: (state, action) => {
-      state.createStatus = action.payload; // Update createStatus based on action
-    },
-    setEditMockTest: (state, action) => {
-      state.editMockTest = action.payload; // Set editMockTest flag
-    },
-    setSelectedMockTest: (state, action) => {
-      state.selectedMockTest = action.payload; // Store the selected mock test
-    },
     setMockTests: (state, action) => {
-      state.mockTests = action.payload; // Update list of mock tests
+      state.mockTests = action.payload;
     },
-    resetMockTestState: (state) => { // Reset mock test state
-      state.createStatus = null;
-      state.editMockTest = false;
-      state.selectedMockTest = null;
-      state.mockTests = [];
+    setLoading: (state, action) => {
+      state.isLoading = action.payload;
+    },
+    setError: (state, action) => {
+      state.error = action.payload;
+    },
+    selectMockTest: (state, action) => {
+      state.selectedMockTest = action.payload;
+    },
+    addToEnrolledTests: (state, action) => {
+      state.enrolledTests.push(action.payload);
+    },
+    removeFromEnrolledTests: (state, action) => {
+      state.enrolledTests = state.enrolledTests.filter(
+        testId => testId !== action.payload
+      );
+    },
+    updateMockTest: (state, action) => {
+      const index = state.mockTests.findIndex(test => test._id === action.payload._id);
+      if (index !== -1) {
+        state.mockTests[index] = action.payload;
+      }
     },
   },
 });
 
 export const {
-  setCreateStatus,
-  setEditMockTest,
-  setSelectedMockTest,
   setMockTests,
-  resetMockTestState,
+  setLoading,
+  setError,
+  selectMockTest,
+  addToEnrolledTests,
+  removeFromEnrolledTests,
+  updateMockTest,
 } = mockTestSlice.actions;
 
 export default mockTestSlice.reducer;
