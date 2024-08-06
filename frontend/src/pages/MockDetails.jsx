@@ -179,7 +179,7 @@ function MockTestDetails() {
   }
 
   if (loading || isLoading) {
-    return <LoadingSpinner title={"Loading Mock Test"} />
+    return <LoadingSpinner title={"Loading MockTest "} />
   }
 
   const {
