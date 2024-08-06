@@ -145,32 +145,46 @@ const MockTestSeries = () => {
     return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   };
 
-  const renderAttemptDetails = () => {
-    return (
-      <div className="space-y-6">
-        <h3 className="text-2xl font-bold text-white">Attempt Details</h3>
-        <p className="text-richblack-100">Total Time Taken: {formatTime(currentTest.duration * 60 - timeLeft)}</p>
-        <div className="space-y-4">
-          {currentTest.questions.map((question, index) => {
-            const incorrectAnswer = incorrectAnswers.find(item => item.questionIndex === index);
-            const isCorrect = correctAnswers.includes(index);
-            const userAnswer = incorrectAnswer ? incorrectAnswer.userAnswer : (isCorrect ? question.correctAnswer : "Not answered");
-            
-            return (
-              <div key={index} className="bg-gray-700 p-4 rounded-lg shadow-md">
-                <p className="text-gray-100 font-semibold mb-2">Question {index + 1}: {question.text}</p>
-                <p className="text-gray-300">Your Answer: {userAnswer}</p>
-                <p className="text-gray-300">Correct Answer: {question.correctAnswer}</p>
-                <p className={isCorrect ? "text-green-400" : "text-rose-500"}>
+const renderAttemptDetails = () => {
+  return (
+    <div className="space-y-8">
+      <div className="flex flex-col sm:flex-row justify-between items-center">
+        <h3 className="text-2xl font-bold text-white mb-2 sm:mb-0">Attempt Details</h3>
+        <p className="text-indigo-300 text-lg">
+          Total Time: {formatTime(currentTest.duration * 60 - timeLeft)}
+        </p>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {currentTest.questions.map((question, index) => {
+          const incorrectAnswer = incorrectAnswers.find(item => item.questionIndex === index);
+          const isCorrect = correctAnswers.includes(index);
+          const userAnswer = incorrectAnswer ? incorrectAnswer.userAnswer : (isCorrect ? question.correctAnswer : "Not answered");
+          
+          return (
+            <div key={index} className="bg-gray-700 p-6 rounded-xl shadow-lg border border-gray-600">
+              <div className="flex justify-between items-center mb-4">
+                <h4 className="text-lg font-semibold text-white">Question {index + 1}</h4>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${isCorrect ? "bg-green-900 text-green-300" : "bg-red-900 text-red-300"}`}>
                   {isCorrect ? "Correct" : "Incorrect"}
+                </span>
+              </div>
+              <p className="text-gray-100 mb-4">{question.text}</p>
+              <div className="space-y-2">
+                <p className="text-gray-300">
+                  <span className="font-medium text-indigo-300">Your Answer:</span> {userAnswer}
+                </p>
+                <p className="text-gray-300">
+                  <span className="font-medium text-indigo-300">Correct Answer:</span> {question.correctAnswer}
                 </p>
               </div>
-            );
-          })}
-        </div>
+            </div>
+          );
+        })}
       </div>
-    );
-  };
+    </div>
+  );
+};
 
   if (loading) {
     return <LoadingSpinner title={"Loading Tests"}/>;
@@ -188,7 +202,7 @@ const MockTestSeries = () => {
 
   if (!testSeries) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-900">
+      <div className="flex justify-center items-center h-screen bg-black">
         <div className="text-center text-2xl font-bold text-white p-8 bg-gray-800 rounded-lg shadow-md max-w-md">
           No test series found.
         </div>
@@ -200,8 +214,8 @@ const MockTestSeries = () => {
     const publishedTests = testSeries.mockTests.filter(test => test.status === 'published');
     
     return (
-      <div className="min-h-screen bg-gray-900 flex justify-center p-4">
-        <div className="w-full max-w-6xl bg-gray-800 shadow-2xl rounded-xl overflow-hidden">
+      <div className="min-h-screen bg-black flex justify-center p-4">
+        <div className="w-full max-w-6xl bg-black border border-gray-700 shadow-2xl rounded-xl overflow-hidden">
           <div className="p-6 md:p-10">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white text-center">{testSeries.seriesName}</h1>
             <p className="text-richblack-300 text-lg text-center mt-2">{testSeries.description}</p>
@@ -225,7 +239,7 @@ const MockTestSeries = () => {
               ))}
             </div>
             
-            <div className="bg-gray-700 p-6 rounded-lg">
+            <div className="bg-gray-900 p-6 rounded-lg">
               <h2 className="font-semibold text-xl text-white mb-4">Test Instructions:</h2>
               <ol className="list-decimal list-inside space-y-2 text-richblack-100">
                 <li>This is a timed test. Once you start, the timer cannot be paused.</li>
@@ -249,33 +263,53 @@ const MockTestSeries = () => {
 
   if (showScore) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-        <div className="w-full max-w-2xl bg-gray-800 shadow-2xl rounded-xl p-8 text-center space-y-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-white">{currentTest.testName} Completed</h2>
-          <div className="space-y-4">
-            <p className="text-2xl md:text-3xl text-white">
-              Your score: <span className="font-bold text-blue-400">{score.toFixed(2)}</span> out of {currentTest.questions.length}
-            </p>
-            <p className="text-xl text-white">
-              Correct answers: <span className="font-bold text-green-400">{correctAnswers.length}</span>
-            </p>
-            <p className="text-xl text-white">
-              Incorrect answers: <span className="font-bold text-red-400">{incorrectAnswers.length}</span>
-            </p>
+      <div className="min-h-screen bg-black flex items-center justify-center p-4">
+        <div className="w-full max-w-4xl bg-black border border-gray-700 shadow-2xl rounded-2xl overflow-hidden">
+          <div className="bg-black p-6 text-center">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
+              {currentTest.testName} Completed
+            </h2>
           </div>
-          <button
-            onClick={() => setShowAttemptDetails(!showAttemptDetails)}
-            className="py-3 px-6  bg-white text-gray-900 font-bold rounded-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105 shadow-lg"
-          >
-            {showAttemptDetails ? "Hide Attempt Details" : "Show Attempt Details"}
-          </button>
-          {showAttemptDetails && renderAttemptDetails()}
-          <button
-            onClick={() => setCurrentTest(null)}
-            className="py-3 px-6 bg-white text-gray-900 font-bold rounded-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105 shadow-lg"
-          >
-            Back to Test List
-          </button>
+          <div className="p-6 sm:p-8 space-y-6 sm:space-y-8">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+              <div className="bg-black border border-gray-700 p-4 rounded-lg">
+                <p className="text-lg sm:text-xl font-semibold text-gray-300">Score</p>
+                <p className="text-2xl sm:text-3xl font-bold text-blue-400">
+                  {score.toFixed(2)} / {currentTest.questions.length}
+                </p>
+              </div>
+              <div className="bg-black border border-gray-700 p-4 rounded-lg">
+                <p className="text-lg sm:text-xl font-semibold text-gray-300">Correct</p>
+                <p className="text-2xl sm:text-3xl font-bold text-green-400">{correctAnswers.length}</p>
+              </div>
+              <div className="bg-black border border-gray-700 p-4 rounded-lg">
+                <p className="text-lg sm:text-xl font-semibold text-gray-300">Incorrect</p>
+                <p className="text-2xl sm:text-3xl font-bold text-red-400">{incorrectAnswers.length}</p>
+              </div>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+              <button
+                onClick={() => setShowAttemptDetails(!showAttemptDetails)}
+                className="py-3 px-6 bg-slate-200 text-black font-bold rounded-lg hover:bg-gray-700transition duration-300 shadow-md"
+              >
+                {showAttemptDetails ? "Hide Attempt Details" : "Show Attempt Details"}
+              </button>
+              <button
+                onClick={() => setCurrentTest(null)}
+                className="py-3 px-6 bg-slate-200 text-black font-bold rounded-lg hover:bg-gray-700 transition duration-300 shadow-md"
+              >
+                Back to Test List
+              </button>
+            </div>
+            
+            {showAttemptDetails && (
+              <div className="mt-8 bg-gray-700 p-6 rounded-lg">
+                <h3 className="text-xl font-semibold mb-4 text-white">Attempt Details</h3>
+                {renderAttemptDetails()}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -284,8 +318,8 @@ const MockTestSeries = () => {
   const currentQuestionData = currentTest.questions[currentQuestion];
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-4xl bg-gray-800 shadow-2xl rounded-xl p-6 md:p-10 space-y-6">
+    <div className="min-h-screen bg-black flex items-center overflow-hidden justify-center p-4">
+      <div className="w-[80vw]  bg-black border border-gray-700 shadow-2xl rounded-xl p-6 md:p-10 space-y-6">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white">{currentTest.testName}</h2>
           <div className="text-lg md:text-xl font-semibold text-white">
@@ -303,10 +337,10 @@ const MockTestSeries = () => {
             <button
               key={index}
               onClick={() => handleAnswerSelect(option)}
-              className={`w-full py-3 px-6 text-left rounded-lg transition duration-300 ${
+              className={`w-full py-3 px-6  text-sm text-left rounded-lg transition duration-300 ${
                 selectedAnswer === option
                   ? 'bg-white text-gray-900 font-semibold'
-                  : 'bg-gray-700 border border-white text-white hover:bg-gray-600'
+                  : 'bg-black border border-white text-white hover:bg-gray-600'
               }`}
             >
               {option}
@@ -317,7 +351,7 @@ const MockTestSeries = () => {
           <button 
             onClick={() => currentQuestion > 0 && setCurrentQuestion(currentQuestion - 1)}
             disabled={currentQuestion === 0}
-            className={`py-3 px-6 font-semibold rounded-lg transition duration-300 ${
+            className={`py-3 px-6 text-sm font-semibold rounded-lg transition duration-300 ${
               currentQuestion > 0
                 ? 'bg-white text-gray-900 hover:bg-gray-100'
                 : 'bg-gray-700  text-gray-400 cursor-not-allowed'
@@ -328,7 +362,7 @@ const MockTestSeries = () => {
           <button 
             onClick={handleNextQuestion} 
             disabled={!selectedAnswer}
-            className={`py-3 px-6 font-semibold rounded-lg transition duration-300 ${
+            className={`py-3 px-6 font-semibold rounded-lg text-sm transition duration-300 ${
               selectedAnswer
                 ? 'bg-white text-black hover:bg-gray-100'
                 : 'bg-gray-700 border border-white text-white cursor-not-allowed'

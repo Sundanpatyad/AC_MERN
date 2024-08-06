@@ -110,7 +110,7 @@ const PageLoader = () => {
 
       {/* Loading text */}
       <motion.div
-        className="text-white text-4xl font-bold mb-1"
+        className="text-white text-2xl md:4xl font-bold mb-1"
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 1, ease: 'easeInOut' }}
@@ -118,7 +118,7 @@ const PageLoader = () => {
         Awakening Classes <br />
       </motion.div>
       <motion.div
-        className="text-white text-xl font-bold mb-4"
+        className="text-white text-sm md:text-xl font-bold mb-4"
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 1, ease: 'easeInOut' }}
