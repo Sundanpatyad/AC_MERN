@@ -12,7 +12,7 @@ import ConfirmationModal from "../components/common/ConfirmationModal"
 import { ACCOUNT_TYPE } from "../utils/constants"
 
 const MockTestCardSkeleton = () => (
-  <div className="bg-richblack-900 w-full rounded-xl overflow-hidden shadow-lg animate-pulse">
+  <div className="bg-black w-full rounded-xl overflow-hidden shadow-lg animate-pulse">
     <div className="h-28 sm:h-32 md:h-40 bg-richblack-700"></div>
     <div className="p-3 sm:p-4 md:p-6">
       <div className="h-4 bg-richblack-700 rounded w-3/4 mb-2"></div>
@@ -223,7 +223,7 @@ const MockTestComponent = () => {
 }
 
 const LoadingSkeleton = React.memo(() => (
-  <div className="w-full p-4 sm:p-8 bg-richblack-900">
+  <div className="w-full p-4 sm:p-8 bg-black">
     <div className="h-8 sm:h-10 w-3/4 bg-richblack-700 rounded-full mb-8 sm:mb-12 mx-auto"></div>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
       {[...Array(6)].map((_, index) => (

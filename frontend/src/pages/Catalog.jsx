@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect } from "react"
+import React, { useState, useCallback, useMemo } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { useSelector, useDispatch } from "react-redux"
 import { useQuery } from 'react-query'
@@ -11,7 +11,6 @@ import { buyItem } from '../services/operations/studentFeaturesAPI'
 import toast from 'react-hot-toast'
 import { FaBookOpen, FaShoppingCart } from 'react-icons/fa'
 import { ACCOUNT_TYPE } from "../utils/constants"
-import { motion } from 'framer-motion'
 import { setCourse, setStep } from '../slices/courseSlice'
 
 const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLoggedIn, user, handleCourseClick }) => {
@@ -93,18 +92,10 @@ const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLogged
     )
 })
 
-const HeroSkeleton = () => (
-  <div className="bg-richblack-800 px-4 py-8 sm:py-12 animate-pulse">
-    <div className="mx-auto flex min-h-[180px] sm:min-h-[220px] max-w-maxContentTab flex-col justify-center gap-4 lg:max-w-maxContent">
-      <div className="h-4 bg-richblack-700 rounded w-1/4"></div>
-      <div className="h-8 bg-richblack-700 rounded w-3/4"></div>
-      <div className="h-4 bg-richblack-700 rounded w-full"></div>
-    </div>
-  </div>
-)
+
 
 const CourseCardSkeleton = () => (
-  <div className="bg-richblack-900 w-full rounded-xl overflow-hidden shadow-lg animate-pulse">
+  <div className="bg-black w-full rounded-xl overflow-hidden shadow-lg animate-pulse">
     <div className="h-40 bg-richblack-700"></div>
     <div className="p-6">
       <div className="h-4 bg-richblack-700 rounded w-3/4 mb-4"></div>
@@ -118,7 +109,7 @@ const CourseCardSkeleton = () => (
 
 const SectionSkeleton = ({ title }) => (
   <div className="mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
-    <div className="h-8 bg-richblack-700 rounded w-1/4 mb-4"></div>
+    <div className="h-8 bg-black rounded w-1/4 mb-4"></div>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8">
       {Array(3).fill().map((_, index) => (
         <CourseCardSkeleton key={index} />
@@ -131,7 +122,6 @@ function Catalog() {
     const { catalogName } = useParams()
     const [active, setActive] = useState(1)
     const [confirmationModal, setConfirmationModal] = useState(null)
-    const [isLoading, setIsLoading] = useState(true)
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const { token } = useSelector((state) => state.auth)
@@ -141,7 +131,7 @@ function Catalog() {
     const isLoggedIn = !!token
 
     // Fetch categories
-    const { data: categories = [] } = useQuery('categories', fetchCourseCategories, {
+    const { data: categories = [], isLoading: isCategoriesLoading } = useQuery('categories', fetchCourseCategories, {
         staleTime: Infinity,
         cacheTime: Infinity,
     })
@@ -162,15 +152,6 @@ function Catalog() {
             cacheTime: 10 * 60 * 1000, // 10 minutes
         }
     )
-
-    useEffect(() => {
-        // Simulate loading
-        const timer = setTimeout(() => {
-            setIsLoading(false)
-        }, 2000)
-
-        return () => clearTimeout(timer)
-    }, [])
 
     const handleCourseClick = useCallback((course) => {
         dispatch(setCourse(course))
@@ -227,29 +208,14 @@ function Catalog() {
         ))
     }
 
-    // if (isLoading) {
-    //     return (
-    //         <motion.div 
-    //             className="fixed inset-0 flex items-center justify-center bg-richblack-black z-50"
-    //             initial={{ opacity: 0  }}
-    //             animate={{ opacity: 1 }}
-    //             transition={{ duration: 0.5 }}
-    //         >
-    //             <motion.h1
-    //                 initial={{ scale: 0.5, opacity: 0 }}
-    //                 animate={{ scale: 1, opacity: 1 }}
-    //                 transition={{
-    //                     duration: 0.5,
-    //                     delay: 0.2,
-    //                     ease: "easeOut"
-    //                 }}
-    //                 className="text-white text-3xl font-bold"
-    //             >
-    //                 Loading Courses
-    //             </motion.h1>
-    //         </motion.div>
-    //     );
-    // }
+    if (isCategoriesLoading || isCatalogDataLoading) {
+        return (
+            <div className="min-h-screen flex flex-col">
+                <SectionSkeleton title="Loading Courses..." />
+                <Footer />
+            </div>
+        )
+    }
 
     return (
         <div className="min-h-screen flex flex-col">
