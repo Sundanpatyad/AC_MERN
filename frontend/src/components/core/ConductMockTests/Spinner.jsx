@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
-const LoadingSpinner = () => {
+const LoadingSpinner = ({title}) => {
   const [progress, setProgress] = useState(0);
-  const [loadingText, setLoadingText] = useState('Loading Mock Test');
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -30,7 +29,7 @@ const LoadingSpinner = () => {
 
   return (
     <div className="flex flex-col justify-center items-center h-screen bg-black text-gray-200">
-      <div className="text-4xl font-bold mb-8 animate-pulse">{loadingText}</div>
+      <div className="text-4xl font-bold mb-8 animate-pulse">{title}</div>
       <div className="relative w-64 h-8 bg-gray-800 rounded-full overflow-hidden">
         <div
           className="absolute top-0 h-full bg-gradient-to-r from-white via-slate-500 to-gray-400 transition-all duration-300 ease-out"

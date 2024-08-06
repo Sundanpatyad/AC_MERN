@@ -12,6 +12,7 @@ import toast from 'react-hot-toast'
 import { FaBookOpen, FaShoppingCart } from 'react-icons/fa'
 import { ACCOUNT_TYPE } from "../utils/constants"
 import { setCourse, setStep } from '../slices/courseSlice'
+import LoadingSpinner from "../components/core/ConductMockTests/Spinner"
 
 const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLoggedIn, user, handleCourseClick }) => {
     const isEnrolled = useMemo(() => {
@@ -211,7 +212,8 @@ function Catalog() {
     if (isCategoriesLoading || isCatalogDataLoading) {
         return (
             <div className="min-h-screen flex flex-col">
-                <SectionSkeleton title="Loading Courses..." />
+                {/* <SectionSkeleton title="Loading Courses..." /> */}
+                <LoadingSpinner title={"Loading Courses..."}/>
                 <Footer />
             </div>
         )

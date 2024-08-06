@@ -21,6 +21,7 @@ import { GiReturnArrow } from 'react-icons/gi'
 import { MdOutlineVerified } from 'react-icons/md'
 import Img from './../components/common/Img';
 import toast from "react-hot-toast"
+import LoadingSpinner from "../components/core/ConductMockTests/Spinner"
 
 function CourseDetails() {
   const { user } = useSelector((state) => state.profile)
@@ -37,9 +38,11 @@ function CourseDetails() {
   const [isActive, setIsActive] = useState(Array(0))
   const [totalNoOfLectures, setTotalNoOfLectures] = useState(0)
   const [isUserEnrolled, setIsUserEnrolled] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchCourseDetailsData = async () => {
+      setIsLoading(true)
       try {
         const res = await fetchCourseDetails(courseId)
         setResponse(res)
@@ -49,6 +52,8 @@ function CourseDetails() {
         }
       } catch (error) {
         console.log("Could not fetch Course Details")
+      } finally {
+        setIsLoading(false)
       }
     }
     fetchCourseDetailsData();
@@ -79,22 +84,14 @@ function CourseDetails() {
     )
   }
 
-  if (paymentLoading || loading || !response) {
+  if (isLoading || paymentLoading || loading) {
     return (
-      <div className="mt-24 p-5 flex flex-col justify-center gap-4">
-        <div className="flex flex-col sm:flex-col-reverse gap-4">
-          <p className="h-44 sm:h-24 sm:w-[60%] rounded-xl skeleton"></p>
-          <p className="h-9 sm:w-[39%] rounded-xl skeleton"></p>
-        </div>
-        <p className="h-4 w-[55%] lg:w-[25%] rounded-xl skeleton"></p>
-        <p className="h-4 w-[75%] lg:w-[30%] rounded-xl skeleton"></p>
-        <p className="h-4 w-[35%] lg:w-[10%] rounded-xl skeleton"></p>
-        <div className="right-[1.5rem] top-[20%] hidden lg:block lg:absolute min-h-[450px] w-1/3 max-w-[410px] 
-            translate-y-24 md:translate-y-0 rounded-xl skeleton">
-        </div>
-        <p className="mt-24 h-60 lg:w-[60%] rounded-xl skeleton"></p>
-      </div>
+      <LoadingSpinner title={"Loading Course Details"}/>
     )
+  }
+
+  if (!response) {
+    return <div className="text-center mt-8">No course details available.</div>
   }
 
   const {
@@ -110,7 +107,7 @@ function CourseDetails() {
     studentsEnrolled,
     createdAt,
     tag
-  } = response?.data?.courseDetails
+  } = response.data.courseDetails
 
   const handleBuyCourse = () => {
     if (token) {
@@ -134,7 +131,7 @@ function CourseDetails() {
       return
     }
     if (token) {
-      dispatch(addToCart(response?.data.courseDetails))
+      dispatch(addToCart(response.data.courseDetails))
       return
     }
     setConfirmationModal({
@@ -149,7 +146,6 @@ function CourseDetails() {
 
   const handleGoToCourse = () => {
     navigate(`/dashboard/enrolled-courses`)
-    
   }
 
   return (

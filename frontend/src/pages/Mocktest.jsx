@@ -10,6 +10,7 @@ import { FaBookOpen, FaShoppingCart } from 'react-icons/fa'
 import Footer from "../components/common/Footer"
 import ConfirmationModal from "../components/common/ConfirmationModal"
 import { ACCOUNT_TYPE } from "../utils/constants"
+import LoadingSpinner from '../components/core/ConductMockTests/Spinner'
 
 const MockTestCardSkeleton = () => (
   <div className="bg-black w-full rounded-xl overflow-hidden shadow-lg animate-pulse">
@@ -187,7 +188,7 @@ const MockTestComponent = () => {
   const memoizedMockTests = useMemo(() => mockTests || [], [mockTests])
 
   if (isLoading) {
-    return <LoadingSkeleton />
+    return <LoadingSpinner title={"Loading Mocktest..."}/>
   }
 
   return (

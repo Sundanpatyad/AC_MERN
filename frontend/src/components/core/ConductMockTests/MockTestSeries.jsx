@@ -93,7 +93,7 @@ const MockTestSeries = () => {
     }
   };
 
-  if (loading) return <LoadingSpinner />;
+  if (loading) return <LoadingSpinner title={"Loading Test"} />;
   if (error) return <ErrorMessage message={error} />;
   if (!testSeries) return <ErrorMessage message="No test series found." />;
 
