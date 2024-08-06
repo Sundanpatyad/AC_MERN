@@ -66,6 +66,18 @@ const PageLoader = () => {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    // Load Orbitron font
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, []);
+
   return (
     <motion.div
       className="fixed inset-0 bg-black flex flex-col items-center justify-center overflow-hidden"
@@ -104,7 +116,6 @@ const PageLoader = () => {
         transition={{ duration: 1, ease: 'easeInOut' }}
       >
         Awakening Classes <br />
-       
       </motion.div>
       <motion.div
         className="text-white text-xl font-bold mb-4"
@@ -113,12 +124,12 @@ const PageLoader = () => {
         transition={{ duration: 1, ease: 'easeInOut' }}
       >
         Together We Can 😉 <br />
-       
       </motion.div>
 
       {/* Digital Loader */}
       <motion.div
-        className="absolute bottom-10 right-10 text-white text-2xl font-bold"
+        className="absolute bottom-10 right-10 text-white text-3xl font-bold"
+        style={{ fontFamily: 'Orbitron, sans-serif' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 0.5 }}
