@@ -49,19 +49,26 @@ import RankingsPage from "./components/core/Rankings/Ranking";
 
 
 const PageLoader = () => {
-  const [isSun, setIsSun] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setIsSun(prev => !prev);
-    }, 3000); // Toggle every 3 seconds
+      setLoadingProgress((prev) => {
+        if (prev < 100) {
+          return prev + 1;
+        } else {
+          clearInterval(timer);
+          return prev;
+        }
+      });
+    }, 50); // Increase progress every 50 milliseconds
 
     return () => clearInterval(timer);
   }, []);
 
   return (
     <motion.div
-      className="fixed inset-0 bg-black flex items-center justify-center overflow-hidden"
+      className="fixed inset-0 bg-black flex flex-col items-center justify-center overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
@@ -89,93 +96,39 @@ const PageLoader = () => {
         />
       ))}
 
-      {/* Moon/Sun */}
-      <motion.div
-        className="relative w-32 h-32 rounded-full overflow-hidden"
-        animate={{
-          backgroundColor: isSun ? '#FDB813' : '#C6C6C6',
-          boxShadow: isSun 
-            ? ['0 0 20px 0px #FDB813', '0 0 60px 10px #FDB813', '0 0 100px 20px #FDB813']
-            : ['0 0 20px 0px #718096', '0 0 40px 10px #718096', '0 0 20px 0px #718096'],
-        }}
-        transition={{
-          duration: 1,
-          ease: 'easeInOut',
-        }}
-      >
-        {/* Craters/Sunspots */}
-        {!isSun && (
-          <>
-            <motion.div
-              className="absolute w-8 h-8 bg-gray-400 rounded-full"
-              style={{ top: '20%', left: '15%' }}
-            />
-            <motion.div
-              className="absolute w-6 h-6 bg-gray-400 rounded-full"
-              style={{ bottom: '30%', right: '20%' }}
-            />
-            <motion.div
-              className="absolute w-4 h-4 bg-gray-400 rounded-full"
-              style={{ top: '60%', left: '40%' }}
-            />
-          </>
-        )}
-        {isSun && (
-          <>
-            <motion.div
-              className="absolute w-full h-full"
-              style={{
-                background: 'radial-gradient(circle, #FDB813 0%, #FDB813 50%, #f7931e 100%)',
-              }}
-            />
-            <motion.div
-              className="absolute w-full h-full"
-              style={{
-                background: 'repeating-conic-gradient(from 0deg, #f7931e 0deg 10deg, transparent 10deg 20deg)',
-              }}
-              animate={{ rotate: 360 }}
-              transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
-            />
-          </>
-        )}
-      </motion.div>
-
       {/* Loading text */}
       <motion.div
-        className="absolute bottom-16 text-white text-2xl font-bold"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.25, duration: 0.5 }}
+        className="text-white text-4xl font-bold mb-1"
+        initial={{ y: 50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 1, ease: 'easeInOut' }}
       >
-        <motion.span
-          animate={{ opacity: [1, 0.5, 1] }}
-          transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
-          className="text-3xl"
-        >
-          Awakening Classes 
-        </motion.span>
-        <motion.span
-          animate={{ opacity: [1, 0.5, 1] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut', delay: 0.2 }}
-        >
-          .
-        </motion.span>
-        <motion.span
-          animate={{ opacity: [1, 0.5, 1] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
-        >
-          .
-        </motion.span>
-        <motion.span
-          animate={{ opacity: [1, 0.5, 1] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}
-        >
-          .
-        </motion.span>
+        Awakening Classes <br />
+       
+      </motion.div>
+      <motion.div
+        className="text-white text-xl font-bold mb-4"
+        initial={{ y: 50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 1, ease: 'easeInOut' }}
+      >
+        Together We Can 😉 <br />
+       
+      </motion.div>
+
+      {/* Digital Loader */}
+      <motion.div
+        className="absolute bottom-16 right-16 text-white text-2xl font-bold"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5, duration: 0.5 }}
+      >
+        {loadingProgress}%
       </motion.div>
     </motion.div>
   );
 };
+
 
 
 
