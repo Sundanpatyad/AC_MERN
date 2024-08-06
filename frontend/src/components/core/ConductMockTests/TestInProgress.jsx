@@ -25,22 +25,27 @@ const TestInProgress = ({ currentTest, endTest }) => {
     setAnsweredQuestions(newAnsweredQuestions);
   };
 
-  const handleNextQuestion = () => {
+  const updateScoreAndAnswers = () => {
     const currentQuestionData = currentTest.questions[currentQuestion];
     if (selectedAnswer === currentQuestionData.correctAnswer) {
-      setScore(score + 1);
-      setCorrectAnswers([...correctAnswers, currentQuestion]);
+      setScore(prevScore => prevScore + 1);
+      setCorrectAnswers(prev => [...prev, currentQuestion]);
     } else {
-      setScore(score - 0.25);
-      setIncorrectAnswers([...incorrectAnswers, {
+      setScore(prevScore => prevScore - 0.25);
+      setIncorrectAnswers(prev => [...prev, {
         questionIndex: currentQuestion,
         userAnswer: selectedAnswer,
         correctAnswer: currentQuestionData.correctAnswer
       }]);
     }
+  };
 
-    setSelectedAnswer('');
-    
+  const handleNextQuestion = () => {
+    if (selectedAnswer) {
+      updateScoreAndAnswers();
+      setSelectedAnswer('');
+    }
+
     if (currentQuestion + 1 < currentTest.questions.length) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
@@ -54,6 +59,9 @@ const TestInProgress = ({ currentTest, endTest }) => {
   };
 
   const handleEndTest = () => {
+    if (selectedAnswer) {
+      updateScoreAndAnswers();
+    }
     endTest(score, correctAnswers, incorrectAnswers);
   };
 
@@ -112,29 +120,12 @@ const TestInProgress = ({ currentTest, endTest }) => {
             disabled={!selectedAnswer}
             className={`py-3 px-6 font-semibold rounded-lg transition duration-300 ${
               selectedAnswer
-                ? 'bg-white text-black hover:bg-gray-100'
-                : 'bg-gray-700 border border-white text-white cursor-not-allowed'
+                ? 'bg-white text-gray-900 hover:bg-gray-100'
+                : 'bg-gray-700 text-gray-400 cursor-not-allowed'
             }`}
           >
-            {currentQuestion + 1 === currentTest.questions.length ? 'Finish Test' : 'Next'}
+            {currentQuestion + 1 === currentTest.questions.length ? 'Finish' : 'Next'}
           </button>
-        </div>
-        <div className="flex flex-wrap justify-center gap-2 md:gap-3">
-          {currentTest.questions.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => handleQuestionNavigation(index)}
-              className={`w-8 h-8 md:w-10 md:h-10 rounded-full font-semibold text-sm transition duration-300 ${
-                index === currentQuestion
-                  ? 'bg-white text-gray-900'
-                  : answeredQuestions[index]
-                  ? 'bg-gray-600 text-white'
-                  : 'bg-gray-700 text-white hover:bg-gray-600'
-              }`}
-            >
-              {index + 1}
-            </button>
-          ))}
         </div>
       </div>
     </div>

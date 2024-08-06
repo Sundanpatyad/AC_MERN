@@ -18,15 +18,17 @@ const TestResult = ({ currentTest, score, correctAnswers, incorrectAnswers, setC
           {currentTest.questions.map((question, index) => {
             const incorrectAnswer = incorrectAnswers.find(item => item.questionIndex === index);
             const isCorrect = correctAnswers.includes(index);
-            const userAnswer = incorrectAnswer ? incorrectAnswer.userAnswer : (isCorrect ? question.correctAnswer : "Not answered");
-
+            const isAttempted = isCorrect || incorrectAnswer;
+            const userAnswer = isCorrect ? question.correctAnswer :
+                                (incorrectAnswer ? incorrectAnswer.userAnswer : "Not attempted");
+            
             return (
               <div key={index} className="bg-gray-700 p-4 rounded-lg shadow-md">
                 <p className="text-gray-100 font-semibold mb-2">Question {index + 1}: {question.text}</p>
                 <p className="text-gray-300">Your Answer: {userAnswer}</p>
                 <p className="text-gray-300">Correct Answer: {question.correctAnswer}</p>
-                <p className={isCorrect ? "text-green-400" : "text-rose-500"}>
-                  {isCorrect ? "Correct" : "Incorrect"}
+                <p className={isAttempted ? (isCorrect ? "text-green-400" : "text-rose-500") : "text-yellow-400"}>
+                  {isAttempted ? (isCorrect ? "Correct" : "Incorrect") : "Not Attempted"}
                 </p>
               </div>
             );
@@ -35,6 +37,9 @@ const TestResult = ({ currentTest, score, correctAnswers, incorrectAnswers, setC
       </div>
     );
   };
+
+  // Calculate not attempted count
+  const notAttemptedCount = currentTest.questions.length - correctAnswers.length - incorrectAnswers.length;
 
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
@@ -49,6 +54,9 @@ const TestResult = ({ currentTest, score, correctAnswers, incorrectAnswers, setC
           </p>
           <p className="text-xl text-white">
             Incorrect answers: <span className="font-bold text-red-400">{incorrectAnswers.length}</span>
+          </p>
+          <p className="text-xl text-white">
+            Not attempted: <span className="font-bold text-yellow-400">{notAttemptedCount}</span>
           </p>
         </div>
         <button
