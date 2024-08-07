@@ -225,7 +225,7 @@ const Home = () => {
   return (
     <div className='overflow-hidden w-[100vw]'>
       <Spotlight />
-      <div className='h-screen w-full dark:bg-black bg-slate-300 dark:bg-grid-slate-400/[0.2] bg-grid-black/[0.2] relative flex items-center flex-col'>
+      <div className='h-[80vh] w-full dark:bg-black bg-slate-300 dark:bg-grid-slate-400/[0.2] bg-grid-black/[0.2] relative flex items-center flex-col'>
         <div className="absolute cursor-pointer inset-0 w-full h-full bg-black [mask-image:radial-gradient(ellipse_at_center,transparent_10%,black)]"></div>
 
 
