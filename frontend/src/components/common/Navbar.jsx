@@ -127,7 +127,7 @@ const Navbar = () => {
                                <HiBars2 className={`transition-transform duration-200 ${isAuthDropdownOpen ? 'rotate-180' : ''} text-xl`} />
                              </button>
                              {isAuthDropdownOpen && (
-                               <div className="absolute right-0 mt-2 w-64 rounded-md shadow-lg bg-black ring-1 border border-slate-700 ring-black ring-opacity-5 overflow-hidden">
+                               <div className="absolute z-10 right-0 mt-2 w-64 rounded-md shadow-lg bg-black ring-1 border border-slate-700 ring-black ring-opacity-5 overflow-hidden">
                                  <div className="py-1">
                                    <Link
                                      to="/"
