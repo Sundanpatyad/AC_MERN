@@ -166,7 +166,7 @@ const Courses = ({ catalogPageData }) => {
       {/* View all courses link */}
       <div className="text-center mt-12">
         <Link
-          to="/catalog"
+          to="/catalog/mock-tests"
           className="inline-block px-6 py-2 text-sm md:text-xl bg-white text-black rounded-md hover:bg-gray-200 transition duration-300"
         >
           View All Courses
