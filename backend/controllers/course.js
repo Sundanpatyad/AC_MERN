@@ -5,8 +5,10 @@ const Section = require('../models/section')
 const SubSection = require('../models/subSection')
 const CourseProgress = require('../models/courseProgress')
 
+
 const { uploadImageToCloudinary, deleteResourceFromCloudinary } = require('../utils/imageUploader');
-const { convertSecondsToDuration } = require("../utils/secToDuration")
+const { convertSecondsToDuration } = require("../utils/secToDuration");
+const { MockTestSeries } = require('../models/mockTestSeries');
 
 
 
@@ -457,6 +459,81 @@ exports.deleteCourse = async (req, res) => {
         })
     }
 }
+
+exports.searchCoursesAndMockTests = async (req, res) => {
+    try {
+        const { query } = req.query; // Get the search query from the request
+
+        if (!query) {
+            return res.status(400).json({ success: false, message: "Search query is required" });
+        }
+
+        // Create a case-insensitive regular expression for the search
+        const searchRegex = new RegExp(query, 'i');
+
+        // Aggregation pipeline for courses
+        const coursePipeline = [
+            {
+                $match: { courseName: searchRegex }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    name: "$courseName",
+                    description: "$courseDescription",
+                    thumbnail: 1,
+                    price: 1,
+                    itemType: 1,
+                    type: { $literal: "course" }
+                }
+            }
+        ];
+
+        // Aggregation pipeline for mock test series
+        const mockTestPipeline = [
+            {
+                $match: { seriesName: searchRegex }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    name: "$seriesName",
+                    description: 1,
+                    thumbnail: 1,
+                    price: 1,
+                    itemType: 1,
+                    type: { $literal: "mocktest" }
+                }
+            }
+        ];
+
+        // Execute both aggregations in parallel
+        const [courses, mockTests] = await Promise.all([
+            Course.aggregate(coursePipeline),
+            MockTestSeries.aggregate(mockTestPipeline)
+        ]);
+
+        // Combine results
+        const results = [...courses, ...mockTests];
+
+        // Sort results alphabetically by name
+        results.sort((a, b) => a.name.localeCompare(b.name));
+
+        return res.status(200).json({
+            success: true,
+            message: "Search results retrieved successfully",
+            data: results
+        });
+
+    } catch (error) {
+        console.error("Error in searchCoursesAndMockTests:", error);
+        return res.status(500).json({
+            success: false,
+            message: "An error occurred while searching",
+            error: error.message
+        });
+    }
+};
 
 
 

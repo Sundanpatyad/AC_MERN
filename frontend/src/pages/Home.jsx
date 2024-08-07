@@ -27,6 +27,7 @@ import CourseReviewModal from '../components/core/ViewCourse/CourseReviewModal'
 import { Spotlight } from '../components/ui/Spotlight'
 import Courses from '../components/core/HomePage/Courses'
 import Marquee from '../components/core/HomePage/Marquee'
+import { PlaceholdersAndVanishInputDemo } from '../components/ui/Search'
 
 const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleRemoveFromCart, handleBuyNow, handleStartTest, setShowLoginModal, isLoggedIn, userId }) => {
   const { cart } = useSelector((state) => state.cart)
@@ -225,11 +226,11 @@ const Home = () => {
   return (
     <div className='overflow-hidden w-[100vw]'>
       <Spotlight />
-      <div className='h-[80vh] w-full dark:bg-black bg-slate-300 dark:bg-grid-slate-400/[0.2] bg-grid-black/[0.2] relative flex items-center flex-col'>
+      <div className='h-[100vh] w-full dark:bg-black bg-slate-300 dark:bg-grid-slate-400/[0.2] bg-grid-black/[0.2] relative flex items-center flex-col'>
         <div className="absolute cursor-pointer inset-0 w-full h-full bg-black [mask-image:radial-gradient(ellipse_at_center,transparent_10%,black)]"></div>
 
-
-        <Link to={"/mocktest"} className="bg-slate-900  mt-20 md:mt-30 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-full p-px text-xs font-semibold leading-6  text-white inline-block">
+          <PlaceholdersAndVanishInputDemo/>
+        <Link to={"/mocktest"} className="bg-slate-900 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-full p-px text-xs font-semibold leading-6  text-white inline-block">
           <span className="absolute inset-0 overflow-hidden rounded-full">
             <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
           </span>
