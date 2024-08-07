@@ -3,7 +3,6 @@ import { PlaceholdersAndVanishInput } from "./placeholder-vanish-input";
 import { Link } from 'react-router-dom';
 import { mocktestEndpoints } from '../../services/apis';
 
-
 export function PlaceholdersAndVanishInputDemo() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -67,51 +66,65 @@ export function PlaceholdersAndVanishInputDemo() {
   };
 
   return (
-    <div className="relative">
-      <div className="container mx-auto px-4 pt-8">
-        <div className="mb-8">
-          <PlaceholdersAndVanishInput
-            placeholders={placeholders}
-            onChange={handleChange}
-            onSubmit={onSubmit}
-            value={searchQuery}
-          />
-        </div>
-      </div>
-
-      {(isLoading || searchResults.length > 0 || (searchQuery && searchResults.length === 0)) && (
-        <div className="absolute w-full left-0 right-0 z-50 bg-black border border-slate-600 rounded text-stone-50 shadow-lg rounded-b-lg overflow-hidden max-h-96 overflow-y-auto">
-          <div className="container mx-auto px-4 py-4">
-            {isLoading && <p className="text-center">Loading...</p>}
-
-            {!isLoading && searchResults.length > 0 && (
-              <ul className="divide-y divide-gray-200">
-                {searchResults.map((result) => (
-                  <li key={result._id} className="py-4">
-                    <Link 
-                      to={getItemLink(result)} 
-                      className="flex items-center space-x-4  transition-colors duration-200 p-2 rounded"
-                    >
-                      {result.thumbnail && (
-                        <img src={result.thumbnail} alt={result.name} className="w-16 h-16 object-cover rounded" />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-medium text-gray-200 truncate">{result.name}</h3>
-                        <p className="text-sm text-gray-500">Type: {result.type}</p>
-                        <p className="text-sm text-gray-500">Price: ${result.price}</p>
-                      </div>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-
-            {!isLoading && searchQuery && searchResults.length === 0 && (
-              <p className="text-center py-4">No results found.</p>
-            )}
+    <>
+      <style>
+        {`
+          input, textarea {
+            font-size: 16px;
+          }
+          @media screen and (max-width: 768px) {
+            input, textarea {
+              font-size: 16px;
+            }
+          }
+        `}
+      </style>
+      <div className="relative">
+        <div className="container mx-auto px-4 pt-8">
+          <div className="mb-8">
+            <PlaceholdersAndVanishInput
+              placeholders={placeholders}
+              onChange={handleChange}
+              onSubmit={onSubmit}
+              value={searchQuery}
+            />
           </div>
         </div>
-      )}
-    </div>
+
+        {(isLoading || searchResults.length > 0 || (searchQuery && searchResults.length === 0)) && (
+          <div className="absolute w-full left-0 right-0 z-50 bg-black border border-slate-600 rounded text-stone-50 shadow-lg rounded-b-lg overflow-hidden max-h-96 overflow-y-auto">
+            <div className="container mx-auto px-4 py-4">
+              {isLoading && <p className="text-center">Loading...</p>}
+
+              {!isLoading && searchResults.length > 0 && (
+                <ul className="divide-y divide-gray-200">
+                  {searchResults.map((result) => (
+                    <li key={result._id} className="py-4">
+                      <Link
+                        to={getItemLink(result)}
+                        className="flex items-center space-x-4  transition-colors duration-200 p-2 rounded"
+                      >
+                        {result.thumbnail && (
+                          <img src={result.thumbnail} alt={result.name} className="w-16 h-16 object-cover rounded" />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-sm font-medium text-gray-200 truncate">{result.name}</h3>
+                          <p className="text-sm text-gray-500">Type: {result.type}</p>
+                          <p className="text-sm text-gray-500">Price: ${result.price}</p>
+                        </div>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {!isLoading && searchQuery && searchResults.length === 0 && (
+                <p className="text-center py-4">No results found.</p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
