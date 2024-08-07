@@ -27,10 +27,11 @@ import { ACCOUNT_TYPE } from "../utils/constants"
 import ReactTypingEffect from 'react-typing-effect';
 import CourseReviewModal from '../components/core/ViewCourse/CourseReviewModal'
 import { Spotlight } from '../components/ui/Spotlight'
+import Courses from '../components/core/HomePage/Courses'
 
 const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleRemoveFromCart, handleBuyNow, handleStartTest, setShowLoginModal, isLoggedIn, userId }) => {
   const { cart } = useSelector((state) => state.cart)
-  const [isInCart, setIsInCart] = useState(false)
+  const [isInCart, setIsInCart] = useState(false);
 
   useEffect(() => {
     setIsInCart(cart.some(item => item._id === mockTest._id))
@@ -159,14 +160,13 @@ const Home = () => {
   const [reviewModal, setReviewModal] = useState(false)
   const [isPageLoading, setIsPageLoading] = useState(true)
 
-  const categoryID = "6506c9dff191d7ffdb4a3fe2" // hard coded
+  const categoryID = "66758c6b75de4ef02cd497d1";
 
   const { data: catalogPageData } = useQuery(
     ['catalogPageData', categoryID],
     () => getCatalogPageData(categoryID, dispatch),
     { staleTime: Infinity }
   )
-
   const { data: mockTests, isLoading: isMockTestsLoading } = useQuery(
     ['mockTests', token],
     () => fetchAllMockTests(token),
@@ -360,7 +360,7 @@ const opacityText = useTransform(scrollY, [0, 300], [1, 0]);
   <motion.div
     className="inline-block"
     animate={{
-      x: ["-50%", "0%"]  // Changed from ["0%", "-50%"] to ["-50%", "0%"]
+      x: ["-50%", "0%"] 
     }}
     transition={{
       x: {
@@ -387,31 +387,43 @@ const opacityText = useTransform(scrollY, [0, 300], [1, 0]);
         <p className='mt-2 w-[90%] text-center text-base lg:text-lg font-bold text-richblack-300'>
           Our courses are designed and taught by experts who have years of experience and are passionate about sharing their knowledge with you.
         </p>
+      <div>
+        <Courses catalogPageData={catalogPageData}/>
+      </div>
        
         <h2 className="text-3xl mt-20 font-bold text-richblack-5 mb-6">Popular Mock Tests</h2>
-        <div className="flex justify-center align-center w-full max-w-full">
-          <div className="overflow-x-auto pb-4">
-            <div className="flex space-x-4" style={{ width: `${(isMockTestsLoading ? 5 : mockTests?.length) * 300}px` }}>
-              {isMockTestsLoading
-                ? Array(5).fill().map((_, index) => (
-                    <MockTestSkeleton key={index} />
-                  ))
-                : mockTests?.map((mockTest) => (
-                    <MemoizedMockTestCard 
-                      key={mockTest._id} 
-                      mockTest={mockTest} 
-                      handleAddToCart={handleAddToCart}
-                      handleRemoveFromCart={handleRemoveFromCart}
-                      handleBuyNow={handleBuyNow}
-                      handleStartTest={handleStartTest}
-                      setShowLoginModal={setShowLoginModal}
-                      isLoggedIn={isLoggedIn}
-                      userId={user?._id}
-                    />
-                  ))}
-            </div>
-          </div>
-        </div>
+        <div className="container mx-auto px-4 py-8">
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    {isMockTestsLoading
+      ? Array(8).fill().map((_, index) => (
+          <MockTestSkeleton key={index} />
+        ))
+      : mockTests?.map((mockTest) => (
+          <MemoizedMockTestCard
+            key={mockTest._id}
+            mockTest={mockTest}
+            handleAddToCart={handleAddToCart}
+            handleRemoveFromCart={handleRemoveFromCart}
+            handleBuyNow={handleBuyNow}
+            handleStartTest={handleStartTest}
+            setShowLoginModal={setShowLoginModal}
+            isLoggedIn={isLoggedIn}
+            userId={user?._id}
+          />
+        ))}
+     </div>
+  <div className="text-center mt-12">
+        <Link
+          to="/mocktest"
+          className="inline-block px-6 py-2 text-sm md:text-xl bg-white text-black rounded-md hover:bg-gray-200 transition duration-300"
+        >
+          View All MockTests
+        </Link>
+      </div>
+  {!isMockTestsLoading && mockTests?.length === 0 && (
+    <p className="text-center text-gray-400 mt-8">No mock tests available.</p>
+  )}
+</div>
       </div>
 
       <div className='mt-14 w-11/12 mx-auto max-w-full flex-col items-center justify-between gap-8 first-letter bg-black text-white'>
