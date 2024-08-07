@@ -6,7 +6,6 @@ import toast from 'react-hot-toast'
 import { useQuery } from 'react-query'
 
 import HighlightText from '../components/core/HomePage/HighlightText'
-import CTAButton from "../components/core/HomePage/Button"
 import InstructorSection from '../components/core/HomePage/InstructorSection'
 import Footer from '../components/common/Footer'
 import ReviewSlider from '../components/common/ReviewSlider'
@@ -18,16 +17,16 @@ import { buyItem } from '../services/operations/studentFeaturesAPI'
 import { addToCart, removeFromCart } from '../slices/cartSlice'
 
 import { MdOutlineRateReview } from 'react-icons/md'
-import { FaArrowRight, FaBookOpen, FaShoppingCart } from "react-icons/fa"
+import {  FaBookOpen, FaShoppingCart } from "react-icons/fa"
 import { useScroll, useTransform } from 'framer-motion';
 
 import { fadeIn } from '../components/common/motionFrameVarients'
 import { ACCOUNT_TYPE } from "../utils/constants"
 
-import ReactTypingEffect from 'react-typing-effect';
 import CourseReviewModal from '../components/core/ViewCourse/CourseReviewModal'
 import { Spotlight } from '../components/ui/Spotlight'
 import Courses from '../components/core/HomePage/Courses'
+import Marquee from '../components/core/HomePage/Marquee'
 
 const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleRemoveFromCart, handleBuyNow, handleStartTest, setShowLoginModal, isLoggedIn, userId }) => {
   const { cart } = useSelector((state) => state.cart)
@@ -48,22 +47,22 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleRemoveFromCa
   }
 
   return (
-    <Link to={`/mock-test/${mockTest._id}`} 
-      className="bg-black border border-gray-400 w-full rounded-xl overflow-hidden shadow-lg cursor-pointer flex flex-col"
+    <Link to={`/mock-test/${mockTest._id}`}
+      className="bg-black border border-gray-800 rounded-lg overflow-hidden shadow-lg cursor-pointer flex flex-col"
     >
-      <div className="relative h-36 bg-gradient-to-br from-white to-pink-500">
+      <div className="relative h-36 bg-gradient-to-br from-gray-800 to-black">
         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-80 p-3">
           <h3 className="text-lg font-bold text-white text-center">{mockTest.seriesName}</h3>
         </div>
       </div>
       <div className="p-4 flex-grow flex flex-col justify-between">
-        <p className="text-sm text-richblack-100 mb-3 line-clamp-3">{mockTest.description}</p>
-        <div className="flex justify-between items-center text-sm text-richblack-200 mb-3">
+        <p className="text-sm text-gray-400 mb-3 line-clamp-3">{mockTest.description}</p>
+        <div className="flex justify-between items-center text-sm text-gray-400 mb-3">
           <div className="flex items-center">
             <p className="font-medium">₹{mockTest.price}</p>
           </div>
           <div className="flex items-center">
-            <FaBookOpen className="mr-1 text-richblack-50" />
+            <FaBookOpen className="mr-1 text-gray-400" />
             <p className="font-medium">{mockTest.mockTests?.length || 0} Tests</p>
           </div>
         </div>
@@ -75,31 +74,29 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleRemoveFromCa
                   e.preventDefault()
                   handleStartTest(mockTest._id)
                 }}
-                className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-sm"
+                className="w-full py-2 px-4 bg-white text-black rounded-md hover:bg-gray-200 transition duration-300 text-center"
               >
                 Start Test
               </button>
             ) : (
               <>
                 {isInCart ? (
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault()
-                      handleButtonClick(handleRemoveFromCart)
-                    }}
-                    className="w-full py-2 px-3 bg-richblack-700 text-white font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-600 text-sm"
+                  <Link
+                    to="/dashboard/cart"
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-full py-2 px-4 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition duration-300 text-center"
                   >
-                    View Cart
-                  </button>
+                    Go to Cart
+                  </Link>
                 ) : (
                   <button
                     onClick={(e) => {
                       e.preventDefault()
                       handleButtonClick(handleAddToCart)
                     }}
-                    className="w-full py-2 px-3 bg-richblack-700 text-white font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-600 text-sm"
+                    className="w-full py-2 px-4 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition duration-300"
                   >
-                    <FaShoppingCart className="inline mr-1" />
+                    <FaShoppingCart className="inline-block mr-2" />
                     Add to Cart
                   </button>
                 )}
@@ -108,7 +105,7 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleRemoveFromCa
                     e.preventDefault()
                     handleButtonClick(handleBuyNow)
                   }}
-                  className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-sm"
+                  className="w-full py-2 px-4 bg-white text-black rounded-md hover:bg-gray-200 transition duration-300"
                 >
                   Buy Now
                 </button>
@@ -120,7 +117,7 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleRemoveFromCa
                 e.preventDefault()
                 setShowLoginModal(true)
               }}
-              className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-sm"
+              className="w-full py-2 px-4 bg-white text-black rounded-md hover:bg-gray-200 transition duration-300 text-center"
             >
               Login to Purchase
             </button>
@@ -170,7 +167,7 @@ const Home = () => {
   const { data: mockTests, isLoading: isMockTestsLoading } = useQuery(
     ['mockTests', token],
     () => fetchAllMockTests(token),
-    { 
+    {
       staleTime: Infinity,
       select: (data) => data.filter(test => test.status !== 'draft')
     }
@@ -222,42 +219,42 @@ const Home = () => {
   const MemoizedMockTestCard = useMemo(() => MockTestCard, [])
   const { scrollY } = useScroll();
   const yText = useTransform(scrollY, [0, 300], ['0%', '-100%']);
-const opacityText = useTransform(scrollY, [0, 300], [1, 0]);
+  const opacityText = useTransform(scrollY, [0, 300], [1, 0]);
 
 
   return (
     <div className='overflow-hidden w-[100vw]'>
-      <Spotlight/>
+      <Spotlight />
       <div className='h-screen w-full dark:bg-black bg-slate-300 dark:bg-grid-slate-400/[0.2] bg-grid-black/[0.2] relative flex items-center flex-col'>
         <div className="absolute cursor-pointer inset-0 w-full h-full bg-black [mask-image:radial-gradient(ellipse_at_center,transparent_10%,black)]"></div>
 
-       
-        <Link to={"/mocktest"} className="bg-slate-900  mt-20 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-full p-px text-xs font-semibold leading-6  text-white inline-block">
-  <span className="absolute inset-0 overflow-hidden rounded-full">
-    <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-  </span>
-  <div className="relative flex space-x-2 items-center z-10 rounded-full bg-zinc-950 py-0.5 px-4 ring-1 ring-white/10 ">
-    <span>
-      MockTests
-    </span>
-    <svg
-      fill="none"
-      height="16"
-      viewBox="0 0 24 24"
-      width="16"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M10.75 8.75L14.25 12L10.75 15.25"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.5"
-      />
-    </svg>
-  </div>
-  <span className="absolute -bottom-0 left-[1.125rem] h-px w-[calc(100%-2.25rem)] bg-gradient-to-r from-emerald-400/0 via-emerald-400/90 to-emerald-400/0 transition-opacity duration-500 group-hover:opacity-40" />
-</Link>
+
+        <Link to={"/mocktest"} className="bg-slate-900  mt-20 md:mt-30 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-full p-px text-xs font-semibold leading-6  text-white inline-block">
+          <span className="absolute inset-0 overflow-hidden rounded-full">
+            <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+          </span>
+          <div className="relative flex space-x-2 items-center z-10 rounded-full bg-zinc-950 py-0.5 px-4 ring-1 ring-white/10 ">
+            <span>
+              MockTests
+            </span>
+            <svg
+              fill="none"
+              height="16"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10.75 8.75L14.25 12L10.75 15.25"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.5"
+              />
+            </svg>
+          </div>
+          <span className="absolute -bottom-0 left-[1.125rem] h-px w-[calc(100%-2.25rem)] bg-gradient-to-r from-emerald-400/0 via-emerald-400/90 to-emerald-400/0 transition-opacity duration-500 group-hover:opacity-40" />
+        </Link>
 
         <motion.div
           id='heading-hero'
@@ -265,11 +262,12 @@ const opacityText = useTransform(scrollY, [0, 300], [1, 0]);
           initial='hidden'
           whileInView={'show'}
           viewport={{ once: false, amount: 0.1 }}
-          className='text-center z-20 text-gray-200 text-4xl mt-6 font-semibold w-80 lg:w-full lg:text-6xl  '
+          className='text-center z-20 text-gray-200 text-4xl mt-6 font-semibold w-80 lg:w-full lg:text-7xl  '
         >
-          We Know That Together <i>We</i> Can<br /> 
+          We Know That Together <i>We</i> Can<br />
           <HighlightText text={"Awakening Classes"} />
         </motion.div>
+
 
         <motion.div
           variants={fadeIn('right', 0.1)}
@@ -281,102 +279,29 @@ const opacityText = useTransform(scrollY, [0, 300], [1, 0]);
           With our online courses, you can learn at your own pace, from anywhere in the world, and get access to a wealth of resources, quizzes, and personalized feedback from instructors.
         </motion.div>
 
-        {token ? /* From Uiverse.io by Javierrocadev */ 
+        {token ? /* From Uiverse.io by Javierrocadev */
+       <>
           <Link to={"/login"} className=" z-20 px-6 py-3 mt-4 rounded-lg border border-black bg-white text-black text-md hover:shadow-[4px_4px_0px_0px_rgba(0,0,0)] transition duration-200">
-  Discover More 
-</Link>
+            Discover More
+          </Link>
+</>
 
 
+          :
+          <div className='mt-3 md:mt-8 flex gap-x-4'>
+            <Link to={"/login"} className=" z-20 inline px-10 py-3 mt-4 rounded-lg border border-whitek bg-transparent text-white text-md hover:shadow-[4px_4px_0px_0px_rgba(0,0,0)] transition duration-200">
+              Login
+            </Link>
 
- :
-        <div className='mt-3 md:mt-8 flex gap-x-4'>
-        <Link to={"/login"} className=" z-20 inline px-10 py-3 mt-4 rounded-lg border border-whitek bg-transparent text-white text-md hover:shadow-[4px_4px_0px_0px_rgba(0,0,0)] transition duration-200">
-  Login
-</Link>
+            <Link to={"/signup"} className=" z-20 px-10 py-3 mt-4 rounded-lg border border-black bg-white text-black text-md hover:shadow-[4px_4px_0px_0px_rgba(0,0,0)] transition duration-200">
+              Sign Up
+            </Link>
+          </div>
 
-<Link to={"/signup"} className=" z-20 px-10 py-3 mt-4 rounded-lg border border-black bg-white text-black text-md hover:shadow-[4px_4px_0px_0px_rgba(0,0,0)] transition duration-200">
-  Sign Up
-</Link>
-      </div>
         }
-<div className="w-full mt-10 md:mt-20 overflow-hidden">
-  <div className="whitespace-nowrap z-[-40] inline-block  [mask-image:radial-gradient(ellipse_at_center,transparent_10%,black)]">
-    <motion.div
-      className="inline-block"
-      animate={{
-        x: ["0%", "-50%"]
-      }}
-      transition={{
-        x: {
-          repeat: Infinity,
-          repeatType: "loop",
-          duration: 20,
-          ease: "linear",
-        },
-      }}
-    >
-      <span className="text-xl text-white font-bold mr-8">JKSSB • JUNIOR ASSISTANT •  JKSSB VLW • JKSSB PATWARI • JKP CONSTABLE •</span>
-      <span className="text-xl text-white font-bold mr-8">JKSSB • JUNIOR ASSISTANT •  JKSSB VLW • JKSSB PATWARI • JKP CONSTABLE •</span>
-      <span className="text-xl text-white font-bold mr-8">JKSSB • JUNIOR ASSISTANT •  JKSSB VLW • JKSSB PATWARI • JKP CONSTABLE •</span>
-    </motion.div>
-    <motion.div
-      className="inline-block"
-      animate={{
-        x: ["0%", "-50%"]
-      }}
-      transition={{
-        x: {
-          repeat: Infinity,
-          repeatType: "loop",
-          duration: 20,
-          ease: "linear",
-        },
-      }}
-    >
-      <span className="text-3xl text-white font-bold mr-8">Learn • Grow • Succeed • Excel • Achieve • </span>
-      <span className="text-3xl text-white font-bold mr-8">Learn • Grow • Succeed • Excel • Achieve • </span>
-      <span className="text-3xl text-white font-bold mr-8">Learn • Grow • Succeed • Excel • Achieve • </span>
-    </motion.div>
-  </div>
-  <div className="whitespace-nowrap z-[-40] inline-block mt-3 [mask-image:radial-gradient(ellipse_at_center,transparent_10%,black)]">
-  <motion.div
-    className="inline-block"
-    animate={{
-      x: ["-50%", "0%"]  // Changed from ["0%", "-50%"] to ["-50%", "0%"]
-    }}
-    transition={{
-      x: {
-        repeat: Infinity,
-        repeatType: "loop",
-        duration: 20,
-        ease: "linear",
-      },
-    }}
-  >
-    <span className="text-xl text-white font-bold mr-8">JKSSB • JUNIOR ASSISTANT •  JKSSB VLW • JKSSB PATWARI • JKP CONSTABLE •</span>
-    <span className="text-xl text-white font-bold mr-8">JKSSB • JUNIOR ASSISTANT •  JKSSB VLW • JKSSB PATWARI • JKP CONSTABLE •</span>
-    <span className="text-xl text-white font-bold mr-8">JKSSB • JUNIOR ASSISTANT •  JKSSB VLW • JKSSB PATWARI • JKP CONSTABLE •</span>
-  </motion.div>
-  <motion.div
-    className="inline-block"
-    animate={{
-      x: ["-50%", "0%"] 
-    }}
-    transition={{
-      x: {
-        repeat: Infinity,
-        repeatType: "loop",
-        duration: 20,
-        ease: "linear",
-      },
-    }}
-  >
-    <span className="text-xl text-white font-bold mr-8">Learn • Grow • Succeed • Excel • Achieve • </span>
-    <span className="text-xl text-white font-bold mr-8">Learn • Grow • Succeed • Excel • Achieve • </span>
-    <span className="text-xl text-white font-bold mr-8">Learn • Grow • Succeed • Excel • Achieve • </span>
-  </motion.div>
-</div>
-</div>
+        <div className="w-full mt-10 md:mt-20 overflow-hidden">
+
+        </div>
       </div>
 
       <div className='relative mx-auto flex flex-col w-11/12 max-w-full mt-10 items-center text-white justify-between'>
@@ -387,43 +312,43 @@ const opacityText = useTransform(scrollY, [0, 300], [1, 0]);
         <p className='mt-2 w-[90%] text-center text-base lg:text-lg font-bold text-richblack-300'>
           Our courses are designed and taught by experts who have years of experience and are passionate about sharing their knowledge with you.
         </p>
-      <div>
-        <Courses catalogPageData={catalogPageData}/>
-      </div>
-       
+        <div>
+          <Courses catalogPageData={catalogPageData} />
+        </div>
+
         <h2 className="text-3xl mt-20 font-bold text-richblack-5 mb-6">Popular Mock Tests</h2>
         <div className="container mx-auto px-4 py-8">
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-    {isMockTestsLoading
-      ? Array(8).fill().map((_, index) => (
-          <MockTestSkeleton key={index} />
-        ))
-      : mockTests?.map((mockTest) => (
-          <MemoizedMockTestCard
-            key={mockTest._id}
-            mockTest={mockTest}
-            handleAddToCart={handleAddToCart}
-            handleRemoveFromCart={handleRemoveFromCart}
-            handleBuyNow={handleBuyNow}
-            handleStartTest={handleStartTest}
-            setShowLoginModal={setShowLoginModal}
-            isLoggedIn={isLoggedIn}
-            userId={user?._id}
-          />
-        ))}
-     </div>
-  <div className="text-center mt-12">
-        <Link
-          to="/mocktest"
-          className="inline-block px-6 py-2 text-sm md:text-xl bg-white text-black rounded-md hover:bg-gray-200 transition duration-300"
-        >
-          View All MockTests
-        </Link>
-      </div>
-  {!isMockTestsLoading && mockTests?.length === 0 && (
-    <p className="text-center text-gray-400 mt-8">No mock tests available.</p>
-  )}
-</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {isMockTestsLoading
+              ? Array(8).fill().map((_, index) => (
+                <MockTestSkeleton key={index} />
+              ))
+              : mockTests?.map((mockTest) => (
+                <MemoizedMockTestCard
+                  key={mockTest._id}
+                  mockTest={mockTest}
+                  handleAddToCart={handleAddToCart}
+                  handleRemoveFromCart={handleRemoveFromCart}
+                  handleBuyNow={handleBuyNow}
+                  handleStartTest={handleStartTest}
+                  setShowLoginModal={setShowLoginModal}
+                  isLoggedIn={isLoggedIn}
+                  userId={user?._id}
+                />
+              ))}
+          </div>
+          <div className="text-center mt-12">
+            <Link
+              to="/mocktest"
+              className="inline-block px-6 py-2 text-sm md:text-xl bg-white text-black rounded-md hover:bg-gray-200 transition duration-300"
+            >
+              View All MockTests
+            </Link>
+          </div>
+          {!isMockTestsLoading && mockTests?.length === 0 && (
+            <p className="text-center text-gray-400 mt-8">No mock tests available.</p>
+          )}
+        </div>
       </div>
 
       <div className='mt-14 w-11/12 mx-auto max-w-full flex-col items-center justify-between gap-8 first-letter bg-black text-white'>
@@ -431,14 +356,15 @@ const opacityText = useTransform(scrollY, [0, 300], [1, 0]);
 
         <h1 className="text-center text-3xl lg:text-4xl font-semibold mt-8 flex justify-center items-center gap-x-3">
           Reviews from other learners
-           <MdOutlineRateReview onClick={()=>setReviewModal(true)} className='text-white' />
+          <MdOutlineRateReview onClick={() => setReviewModal(true)} className='text-white' />
         </h1>
-        
+
         <ReviewSlider />
       </div>
+      <Marquee />
 
       <Footer />
-      { token && reviewModal && <CourseReviewModal setReviewModal={setReviewModal} />}
+      {token && reviewModal && <CourseReviewModal setReviewModal={setReviewModal} />}
       {showLoginModal && (
         <ConfirmationModal
           modalData={{

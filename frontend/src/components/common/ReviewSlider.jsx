@@ -1,16 +1,13 @@
 import React, { useEffect, useState } from "react";
 import ReactStars from "react-rating-stars-component";
 import Img from './Img';
-import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css";
-import "swiper/css/free-mode";
-import "swiper/css/pagination";
+import { motion } from "framer-motion";
 import { FaStar } from "react-icons/fa";
 import { apiConnector } from "../../services/apiConnector";
 import { ratingsEndpoints } from "../../services/apis";
 
 function ReviewSlider() {
-  const [reviews, setReviews] = useState(null);
+  const [reviews, setReviews] = useState([]);
   const truncateWords = 15;
 
   useEffect(() => {
@@ -25,28 +22,27 @@ function ReviewSlider() {
     })();
   }, []);
 
-  if (!reviews) return null;
+  if (reviews.length === 0) return null;
 
   return (
-    <div className="bg-transparent py-16">
+    <div className="bg-transparent py-16 overflow-hidden">
       <div className="container mx-auto px-4">
-        <Swiper
-          breakpoints={{
-            640: { slidesPerView: 1 },
-            768: { slidesPerView: 2 },
-            1024: { slidesPerView: 3 },
+        <motion.div
+          className="flex"
+          animate={{
+            x: ["0%", "-100%"],
           }}
-          spaceBetween={30}
-          loop={true}
-          freeMode={true}
-          autoplay={{
-            delay: 3000,
-            disableOnInteraction: false,
+          transition={{
+            x: {
+              repeat: Infinity,
+              repeatType: "loop",
+              duration: 20,
+              ease: "linear",
+            },
           }}
-          className="w-full"
         >
-          {reviews.map((review, i) => (
-            <SwiperSlide key={i}>
+          {[...reviews, ...reviews].map((review, i) => (
+            <div key={i} className="flex-shrink-0 w-[300px] mx-4">
               <div className="bg-black rounded-lg shadow-xl overflow-hidden transform transition duration-300 hover:scale-105 border border-gray-700">
                 <div className="p-6">
                   <div className="flex items-center gap-4 mb-4">
@@ -83,9 +79,9 @@ function ReviewSlider() {
                   </div>
                 </div>
               </div>
-            </SwiperSlide>
+            </div>
           ))}
-        </Swiper>
+        </motion.div>
       </div>
     </div>
   );

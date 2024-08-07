@@ -7,8 +7,20 @@ import toast from 'react-hot-toast'
 import { buyItem } from '../../../services/operations/studentFeaturesAPI'
 
 const CourseCard = ({ course, handleAddToCart, handleBuyNow, isInCart, isEnrolled, isLoggedIn }) => {
+  const navigate = useNavigate();
+
+  const handleAddToCartClick = (e) => {
+    e.preventDefault(); // Prevent navigation
+    handleAddToCart(course);
+  };
+
+  const handleBuyNowClick = (e) => {
+    e.preventDefault(); // Prevent navigation
+    handleBuyNow(course);
+  };
+
   return (
-    <Link to={`courses/${course._id}`} className="bg-black border border-gray-800 rounded-lg overflow-hidden shadow-lg">
+    <Link to={`/courses/${course._id}`} className="bg-black border border-gray-800 rounded-lg overflow-hidden shadow-lg">
       <img src={course.thumbnail} alt={course.courseName} className="w-full h-48 object-cover" />
       <div className="p-4">
         <h3 className="text-xl font-semibold text-white mb-2">{course.courseName}</h3>
@@ -30,16 +42,23 @@ const CourseCard = ({ course, handleAddToCart, handleBuyNow, isInCart, isEnrolle
             </Link>
           ) : isEnrolled ? (
             <Link
-              to={`/course/${course._id}`}
+              to={`/dashboard/enrolled-courses`}
               className="w-full py-2 px-4 bg-white text-black rounded-md hover:bg-gray-200 transition duration-300 text-center"
             >
               Go to Course
             </Link>
           ) : (
             <>
-              {!isInCart && (
+              {isInCart ? (
+                <Link
+                  to="/dashboard/cart"
+                  className="w-full py-2 px-4 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition duration-300 text-center"
+                >
+                  Go to Cart
+                </Link>
+              ) : (
                 <button
-                  onClick={() => handleAddToCart(course)}
+                  onClick={handleAddToCartClick}
                   className="w-full py-2 px-4 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition duration-300"
                 >
                   <FaShoppingCart className="inline-block mr-2" />
@@ -47,7 +66,7 @@ const CourseCard = ({ course, handleAddToCart, handleBuyNow, isInCart, isEnrolle
                 </button>
               )}
               <button
-                onClick={() => handleBuyNow(course)}
+                onClick={handleBuyNowClick}
                 className="w-full py-2 px-4 bg-white text-black rounded-md hover:bg-gray-200 transition duration-300"
               >
                 Buy Now

@@ -24,6 +24,7 @@
     "copy-to-clipboard": "^3.3.3",
     "framer-motion": "^10.18.0",
     "gapi-script": "^1.2.0",
+    "locomotive-scroll": "^4.1.4",
     "lucide-react": "^0.414.0",
     "mini-svg-data-uri": "^1.4.4",
     "razorpay": "^2.9.2",
