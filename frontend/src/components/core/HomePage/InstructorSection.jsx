@@ -16,10 +16,7 @@ const InstructorSection = () => {
       <div className='flex flex-col-reverse lg:flex-row gap-10 lg:gap-20 items-center'>
 
         <motion.div
-          variants={scaleUp}
-          initial='hidden'
-          whileInView={'show'}
-          viewport={{ once: false, amount: 0.1 }}
+         
           className='lg:w-[50%] '>
           <Img
             src={Instructor}

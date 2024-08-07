@@ -26,7 +26,7 @@ const CourseCard = ({ course, handleAddToCart, handleBuyNow, isInCart, isEnrolle
         <h3 className="text-xl font-semibold text-white mb-2">{course.courseName}</h3>
         <p className="text-gray-400 mb-4 line-clamp-2">{course.courseDescription}</p>
         <div className="flex justify-between items-center text-gray-400 mb-4">
-          <span>₹{course.price}</span>
+          <span>{course.price === 0 ? 'Free' : `₹${course.price}`}</span>
           <span className="flex items-center">
             <FaBookOpen className="mr-1" />
             {course.lessons?.length || 0} lessons
@@ -38,14 +38,14 @@ const CourseCard = ({ course, handleAddToCart, handleBuyNow, isInCart, isEnrolle
               to="/login"
               className="w-full py-2 px-4 bg-white text-black rounded-md hover:bg-gray-200 transition duration-300 text-center"
             >
-              Login to Purchase
+              Login to {course.price === 0 ? 'Enroll' : 'Purchase'}
             </Link>
-          ) : isEnrolled ? (
+          ) : isEnrolled || course.price === 0 ? (
             <Link
               to={`/dashboard/enrolled-courses`}
               className="w-full py-2 px-4 bg-white text-black rounded-md hover:bg-gray-200 transition duration-300 text-center"
             >
-              Go to Course
+              {isEnrolled ? 'Go to Course' : 'Start Course'}
             </Link>
           ) : (
             <>
@@ -95,15 +95,23 @@ const Courses = ({ catalogPageData }) => {
   }, [catalogPageData])
 
   const handleAddToCart = (course) => {
+    if (course.price === 0) {
+      toast.error("This course is free. You can start it directly.")
+      return
+    }
     if (!isInCart(course)) {
       dispatch(addToCart(course))
-      toast.success("Course added to cart")
     }
   }
 
   const handleBuyNow = async (course) => {
     if (user?.accountType === "Instructor") {
       toast.error("You are an Instructor. You can't buy a course.")
+      return
+    }
+    if (course.price === 0) {
+      // For free courses, directly navigate to the course
+      navigate(`/courses/${course._id}`)
       return
     }
     try {
@@ -184,13 +192,13 @@ const Courses = ({ catalogPageData }) => {
 
       {/* View all courses link */}
       <div className="text-center mt-12">
-      <Link to={"/catalog/mock-tests"} className="bg-zinc-900 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-full p-px text-xs font-semibold leading-6  text-white inline-block">
+        <Link to={"/catalog/mock-tests"} className="bg-zinc-900 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-full p-px text-xs font-semibold leading-6  text-white inline-block">
           <span className="absolute inset-0 overflow-hidden rounded-full">
             <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
           </span>
           <div className="relative flex space-x-2 items-center z-10 rounded-full bg-zinc-950 py-0.5 px-4 ring-1 ring-white/10 ">
             <span>
-              Veiw All Courses
+              View All Courses
             </span>
             <svg
               fill="none"

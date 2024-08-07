@@ -14,10 +14,18 @@ import { ACCOUNT_TYPE } from "../utils/constants"
 import { setCourse, setStep } from '../slices/courseSlice'
 import LoadingSpinner from "../components/core/ConductMockTests/Spinner"
 
+
 const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLoggedIn, user, handleCourseClick }) => {
+    const navigate = useNavigate();
     const isEnrolled = useMemo(() => {
         return course.studentsEnrolled?.includes(user?._id)
     }, [course.studentsEnrolled, user?._id])
+
+    const handleStartTest = (e) => {
+        e.stopPropagation()
+        // Add logic here to start the test
+        console.log("Starting test for course:", course.courseName)
+    }
 
     return (
         <div 
@@ -36,7 +44,9 @@ const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLogged
                 <p className="text-xs sm:text-sm md:text-base text-richblack-100 mb-2 sm:mb-4 line-clamp-2">{course.courseDescription}</p>
                 <div className="flex justify-between items-center text-xs sm:text-sm text-richblack-200 mb-2 sm:mb-4 md:mb-6">
                     <div className="flex items-center">
-                        <p className="font-semibold bg-white px-3 rounded-full text-black">₹{course.price}</p>
+                        <p className="font-semibold bg-white px-3 rounded-full text-black">
+                            {course.price === 0 ? 'Free' : `₹${course.price}`}
+                        </p>
                     </div>
                     <div className="flex items-center">
                         <FaBookOpen className="mr-1 text-richblack-50" />
@@ -53,6 +63,13 @@ const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLogged
                             className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-xs sm:text-sm"
                         >
                             Go to Course
+                        </button>
+                    ) : course.price === 0 ? (
+                        <button
+                            onClick={handleStartTest}
+                            className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-xs sm:text-sm"
+                        >
+                            Start Test
                         </button>
                     ) : isLoggedIn ? (
                         <>

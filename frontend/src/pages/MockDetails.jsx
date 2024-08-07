@@ -41,15 +41,15 @@ const MockTestInfo = ({ seriesName, description, mockTestsCount, creator, create
 
 const PriceCard = ({ price, onBuyClick, onAddToCartClick, studentsEnrolled, user, mockId, navigate }) => (
   <div className="bg-richblack-700 p-4 rounded-xl shadow-lg">
-    <p className="text-2xl font-semibold text-white mb-4">Rs. {price}</p>
+    <p className="text-2xl font-semibold text-white mb-4">{price === 0 ? "Free" : `Rs. ${price}`}</p>
     <IconBtn
-      text={user && studentsEnrolled.includes(user?._id) ? "Go To Course" : "Buy Now"}
-      onclick={user && studentsEnrolled.includes(user?._id) 
+      text={user && (studentsEnrolled.includes(user?._id) || price === 0) ? "Start Test" : "Buy Now"}
+      onclick={user && (studentsEnrolled.includes(user?._id) || price === 0)
         ? () => navigate(`/view-mock/${mockId}`)
         : onBuyClick}
       customClasses="w-full mb-4"
     />
-    {(!user || !studentsEnrolled?.includes(user?._id)) && (
+    {(!user || (!studentsEnrolled?.includes(user?._id) && price !== 0)) && (
       <button
         onClick={onAddToCartClick}
         className="w-full bg-richblack-800 text-white py-2 px-4 rounded-md font-semibold hover:bg-richblack-700 transition-all duration-200"
@@ -92,8 +92,6 @@ const DigitalPreloader = () => (
   </div>
 )
 
-
-
 function MockTestDetails() {
   const { user } = useSelector((state) => state.profile)
   const { token } = useSelector((state) => state.auth)
@@ -126,7 +124,7 @@ function MockTestDetails() {
     if (!token) {
       setConfirmationModal({
         text1: "You are not logged in!",
-        text2: "Please login to purchase this course.",
+        text2: "Please login to access this mock test.",
         btn1Text: "Login",
         btn2Text: "Cancel",
         btn1Handler: () => navigate("/login"),
@@ -136,11 +134,11 @@ function MockTestDetails() {
     }
 
     if (user?.accountType === ACCOUNT_TYPE.INSTRUCTOR) {
-      toast.error("Instructors can't purchase courses.")
+      toast.error("Instructors can't purchase mock tests.")
       return
     }
 
-    if (courseDetails.studentsEnrolled.includes(user?._id)) {
+    if (courseDetails.studentsEnrolled.includes(user?._id) || courseDetails.price === 0) {
       navigate(`/view-mock/${mockId}`)
       return
     }
@@ -148,8 +146,8 @@ function MockTestDetails() {
     try {
       await buyItem(token, [mockId], ['MOCK_TEST'], user, navigate, dispatch)
     } catch (error) {
-      console.error("Error purchasing course:", error)
-      toast.error("Failed to purchase course")
+      console.error("Error purchasing mock test:", error)
+      toast.error("Failed to purchase mock test")
     }
   }
 
@@ -167,12 +165,12 @@ function MockTestDetails() {
     }
 
     if (user?.accountType === ACCOUNT_TYPE.INSTRUCTOR) {
-      toast.error("Instructors can't add courses to cart.")
+      toast.error("Instructors can't add mock tests to cart.")
       return
     }
 
-    if (courseDetails.studentsEnrolled.includes(user?._id)) {
-      toast.error("You are already enrolled in this course.")
+    if (courseDetails.studentsEnrolled.includes(user?._id) || courseDetails.price === 0) {
+      toast.error("This mock test is already available to you.")
       return
     }
 

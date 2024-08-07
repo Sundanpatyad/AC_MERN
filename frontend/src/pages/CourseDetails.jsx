@@ -148,6 +148,8 @@ function CourseDetails() {
     navigate(`/dashboard/enrolled-courses`)
   }
 
+  const isFree = price === 0
+
   return (
     <>
       <div className="relative w-full bg-black">
@@ -184,8 +186,10 @@ function CourseDetails() {
               </div>
             </div>
             <div className="flex w-full flex-col gap-4 border-y border-y-richblack-500 py-4 lg:hidden">
-              <p className="space-x-3 pb-4 text-3xl font-semibold text-richblack-5">Rs. {price}</p>
-              {isUserEnrolled ? (
+              <p className="space-x-3 pb-4 text-3xl font-semibold text-richblack-5">
+                {isFree ? "Free" : `Rs. ${price}`}
+              </p>
+              {isUserEnrolled || isFree ? (
                 <button 
                   className="bg-white text-richblack-900 font-semibold py-2 px-4 rounded-lg hover:bg-richblack-900 hover:text-white transition-all duration-200"
                   onClick={handleGoToCourse}
