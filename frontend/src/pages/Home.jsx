@@ -28,6 +28,7 @@ import { Spotlight } from '../components/ui/Spotlight'
 import Courses from '../components/core/HomePage/Courses'
 import Marquee from '../components/core/HomePage/Marquee'
 import { PlaceholdersAndVanishInputDemo } from '../components/ui/Search'
+import { HoverBorderGradientDemo } from '../components/ui/homebutton'
 
 const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleRemoveFromCart, handleBuyNow, handleStartTest, setShowLoginModal, isLoggedIn, userId }) => {
   const { cart } = useSelector((state) => state.cart)
@@ -280,22 +281,25 @@ const Home = () => {
           With our online courses, you can learn at your own pace, from anywhere in the world, and get access to a wealth of resources, quizzes, and personalized feedback from instructors.
         </motion.div>
 
-        {token ? /* From Uiverse.io by Javierrocadev */
+        {token ?
        <>
-          <Link to={"/login"} className=" z-20 px-6 py-3 mt-4 rounded-lg border border-black bg-white text-black text-md hover:shadow-[4px_4px_0px_0px_rgba(0,0,0)] transition duration-200">
-            Discover More
+          <Link to={"/login"}>
+
+          <HoverBorderGradientDemo title={"Explore More"}/>
           </Link>
-</>
+       </>
 
 
           :
-          <div className='mt-3 md:mt-8 flex gap-x-4'>
-            <Link to={"/login"} className=" z-20 inline px-10 py-3 mt-4 rounded-lg border border-whitek bg-transparent text-white text-md hover:shadow-[4px_4px_0px_0px_rgba(0,0,0)] transition duration-200">
-              Login
+          <div className=' flex gap-x-4'>
+            <Link to={"/login"}>
+          <HoverBorderGradientDemo title={"Login"}/>
+              
             </Link>
 
-            <Link to={"/signup"} className=" z-20 px-10 py-3 mt-4 rounded-lg border border-black bg-white text-black text-md hover:shadow-[4px_4px_0px_0px_rgba(0,0,0)] transition duration-200">
-              Sign Up
+            <Link to={"/signup"} >
+          <HoverBorderGradientDemo title={"Signup"}/>
+              
             </Link>
           </div>
 
@@ -339,12 +343,32 @@ const Home = () => {
               ))}
           </div>
           <div className="text-center mt-12">
-            <Link
-              to="/mocktest"
-              className="inline-block px-6 py-2 text-sm md:text-xl bg-white text-black rounded-md hover:bg-gray-200 transition duration-300"
-            >
+          <Link to={"/mocktest"} className="bg-zinc-900 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-full p-px text-xs font-semibold leading-6  text-white inline-block">
+          <span className="absolute inset-0 overflow-hidden rounded-full">
+            <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+          </span>
+          <div className="relative flex space-x-2 items-center z-10 rounded-full bg-zinc-950 py-0.5 px-4 ring-1 ring-white/10 ">
+            <span>
               View All MockTests
-            </Link>
+            </span>
+            <svg
+              fill="none"
+              height="16"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10.75 8.75L14.25 12L10.75 15.25"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.5"
+              />
+            </svg>
+          </div>
+          <span className="absolute -bottom-0 left-[1.125rem] h-px w-[calc(100%-2.25rem)] bg-gradient-to-r from-emerald-400/0 via-emerald-400/90 to-emerald-400/0 transition-opacity duration-500 group-hover:opacity-40" />
+        </Link>
           </div>
           {!isMockTestsLoading && mockTests?.length === 0 && (
             <p className="text-center text-gray-400 mt-8">No mock tests available.</p>
