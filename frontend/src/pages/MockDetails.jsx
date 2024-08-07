@@ -23,8 +23,8 @@ const BackButton = ({ onClick }) => (
 
 const MockTestInfo = ({ seriesName, description, mockTestsCount, creator, createdAt, status }) => (
   <div className="mb-5 flex flex-col justify-center gap-4 py-5 text-lg text-richblack-5">
-    <h1 className="text-4xl font-bold text-richblack-5 sm:text-[42px]">{seriesName}</h1>
-    <p className="text-richblack-200 text-xs">{description}</p>
+    <h1 className="text-4xl font-bold text-richblack-5 text-center md:text-left sm:text-[42px]">{seriesName}</h1>
+    <p className="text-richblack-200 text-center md:text-left text-xs">{description}</p>
     <div className="text-md flex flex-wrap items-center gap-2">
       <span>{`${mockTestsCount || 0} tests`}</span>
       <span className="capitalize">• Status: {status}</span>
