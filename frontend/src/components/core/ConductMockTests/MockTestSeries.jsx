@@ -23,7 +23,7 @@ const MockTestSeries = () => {
   const [incorrectAnswers, setIncorrectAnswers] = useState([]);
   const [showAttemptDetails, setShowAttemptDetails] = useState(false);
   const [userAnswers, setUserAnswers] = useState([]);
-  const { GET_MCOKTEST_SERIES_BY_ID , CREATE_ATTEMPT_DETAILS} = mocktestEndpoints
+  const { GET_MCOKTEST_SERIES_BY_ID, CREATE_ATTEMPT_DETAILS } = mocktestEndpoints
 
   useEffect(() => {
     fetchTestSeries();
@@ -144,7 +144,7 @@ const MockTestSeries = () => {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-      
+
       if (response.data.success) {
         toast.success("Score submitted successfully");
       } else {
@@ -178,13 +178,13 @@ const MockTestSeries = () => {
             Total Time: {formatTime(currentTest.duration * 60 - timeLeft)}
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {currentTest.questions.map((question, index) => {
             const incorrectAnswer = incorrectAnswers.find(item => item.questionIndex === index);
             const isCorrect = correctAnswers.includes(index);
             const userAnswer = userAnswers[index] || "Not answered";
-            
+
             return (
               <div key={index} className="bg-gray-700 p-6 rounded-xl shadow-lg border border-gray-600">
                 <div className="flex justify-between items-center mb-4">
@@ -211,7 +211,7 @@ const MockTestSeries = () => {
   };
 
   if (loading) {
-    return <LoadingSpinner title={"Loading Tests"}/>;
+    return <LoadingSpinner title={"Loading Tests"} />;
   }
 
   if (error) {
@@ -236,7 +236,7 @@ const MockTestSeries = () => {
 
   if (!currentTest) {
     const publishedTests = testSeries.mockTests.filter(test => test.status === 'published');
-    
+
     return (
       <div className="min-h-screen bg-black flex justify-center p-4">
         <div className="w-full max-w-6xl bg-black border border-gray-700 shadow-2xl rounded-xl overflow-hidden">
@@ -244,7 +244,7 @@ const MockTestSeries = () => {
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white text-center">{testSeries.seriesName}</h1>
             <p className="text-richblack-300 text-lg text-center mt-2">{testSeries.description}</p>
           </div>
-          
+
           <div className="p-6 md:p-10 space-y-8">
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {publishedTests.map((test, index) => (
@@ -261,8 +261,37 @@ const MockTestSeries = () => {
                   Start {test.testName}
                 </button>
               ))}
+           
+
+
             </div>
-            
+              {testSeries.attachments &&
+  testSeries.attachments.map((item, index) => (
+    <div
+      key={index}
+      className="py-4 px-6 bg-white text-gray-900 font-bold rounded-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105 shadow-lg flex flex-col items-start space-y-2"
+    >
+      <div className="flex items-center">
+        <span className="mr-2">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </span>
+        {item.name}
+      </div>
+      <a href={item.questionPaper} className="text-blue-500 hover:underline">
+        Download Question Paper
+      </a>
+      <a href={item.answerKey} className="text-blue-500 hover:underline">
+        Download Answer Key
+      </a>
+      <a href={item.omrSheet} className="text-blue-500 hover:underline">
+        Download OMR Sheet
+      </a>
+    </div>
+  ))
+}
+
             <div className="bg-gray-900 p-6 rounded-lg">
               <h2 className="font-semibold text-xl text-white mb-4">Test Instructions:</h2>
               <ol className="list-decimal list-inside space-y-2 text-richblack-100">
@@ -311,7 +340,7 @@ const MockTestSeries = () => {
                 <p className="text-2xl sm:text-3xl font-bold text-red-400">{incorrectAnswers.length}</p>
               </div>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
               <button
                 onClick={() => setShowAttemptDetails(!showAttemptDetails)}
@@ -327,7 +356,7 @@ const MockTestSeries = () => {
               </button>
             </div>
 
-            
+
             {showAttemptDetails && (
               <div className="mt-8 bg-gray-700 p-6 rounded-lg">
                 <h3 className="text-xl font-semibold mb-4 text-white">Attempt Details</h3>
@@ -362,36 +391,33 @@ const MockTestSeries = () => {
             <button
               key={index}
               onClick={() => handleAnswerSelect(option)}
-              className={`w-full py-3 px-6  text-sm text-left rounded-lg transition duration-300 ${
-                selectedAnswer === option
+              className={`w-full py-3 px-6  text-sm text-left rounded-lg transition duration-300 ${selectedAnswer === option
                   ? 'bg-white text-gray-900 font-semibold'
                   : 'bg-black border border-white text-white hover:bg-gray-600'
-              }`}
+                }`}
             >
               {option}
             </button>
           ))}
         </div>
         <div className="flex justify-between items-center">
-          <button 
+          <button
             onClick={() => currentQuestion > 0 && setCurrentQuestion(currentQuestion - 1)}
             disabled={currentQuestion === 0}
-            className={`py-3 px-6 text-sm font-semibold rounded-lg transition duration-300 ${
-              currentQuestion > 0
+            className={`py-3 px-6 text-sm font-semibold rounded-lg transition duration-300 ${currentQuestion > 0
                 ? 'bg-white text-gray-900 hover:bg-gray-100'
                 : 'bg-gray-700  text-gray-400 cursor-not-allowed'
-            }`}
+              }`}
           >
             Previous
           </button>
-          <button 
-            onClick={handleNextQuestion} 
+          <button
+            onClick={handleNextQuestion}
             disabled={!selectedAnswer}
-            className={`py-3 px-6 font-semibold rounded-lg text-sm transition duration-300 ${
-              selectedAnswer
+            className={`py-3 px-6 font-semibold rounded-lg text-sm transition duration-300 ${selectedAnswer
                 ? 'bg-white text-black hover:bg-gray-100'
                 : 'bg-gray-700 border border-white text-white cursor-not-allowed'
-            }`}
+              }`}
           >
             {currentQuestion + 1 === currentTest.questions.length ? 'Finish Test' : 'Next'}
           </button>
@@ -400,13 +426,12 @@ const MockTestSeries = () => {
           {currentTest.questions.map((_, index) => (
             <button
               key={index}
-              onClick={() => handleQuestionNavigation(index)}className={`w-8 h-8 md:w-10 md:h-10 rounded-full font-semibold text-sm transition duration-300 ${
-                index === currentQuestion
+              onClick={() => handleQuestionNavigation(index)} className={`w-8 h-8 md:w-10 md:h-10 rounded-full font-semibold text-sm transition duration-300 ${index === currentQuestion
                   ? 'bg-white text-gray-900'
                   : answeredQuestions[index]
-                  ? 'bg-gray-600 text-white'
-                  : 'bg-gray-700 text-white hover:bg-gray-600'
-              }`}
+                    ? 'bg-gray-600 text-white'
+                    : 'bg-gray-700 text-white hover:bg-gray-600'
+                }`}
             >
               {index + 1}
             </button>

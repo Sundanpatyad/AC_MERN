@@ -1,13 +1,21 @@
 const mongoose = require('mongoose');
 
 const MockTestSeriesSchema = new mongoose.Schema({
-  seriesName: { 
-    type: String, 
-    required: true 
+  seriesName: {
+    type: String,
+    required: true
   },
-  description: { 
-    type: String 
+  description: {
+    type: String
   },
+  attachments: [
+    { name:{type:String},
+      questionPaper: { type: String },
+      answerKey: { type: String },
+      omrSheet: { type: String },
+    }
+
+  ],
   mockTests: [
     {
       testName: { type: String, required: true },
@@ -37,18 +45,19 @@ const MockTestSeriesSchema = new mongoose.Schema({
   },
   thumbnail: {
     type: String
-},
-  price: {
-    type: Number
   },
-  itemType:{
+  price: {
+    type: Number,
+
+  },
+  itemType: {
     type: String,
-   default: 'mocktest'
- },
-  status: { 
-    type: String, 
-    enum: ['published', 'draft'], 
-    default: 'published' 
+    default: 'mocktest'
+  },
+  status: {
+    type: String,
+    enum: ['published', 'draft'],
+    default: 'published'
   },
   studentsEnrolled: [
     {

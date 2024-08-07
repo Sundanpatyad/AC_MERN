@@ -84,61 +84,63 @@ exports.getMockTestSeriesById = async (req, res) => {
 };
 
 exports.updateMockTestSeries = async (req, res) => {
-  try {
-    const { seriesName, description, price, status, mockTests } = req.body;
-
-    // Find the existing series
-    const existingSeries = await MockTestSeries.findById(req.params.id);
-    if (!existingSeries) {
-      return res.status(404).json({
-        success: false,
-        message: 'Mock test series not found'
-      });
-    }
-
-    // Check if any changes were made
-    const isChanged = 
-      seriesName !== existingSeries.seriesName ||
-      description !== existingSeries.description ||
-      price !== existingSeries.price ||
-      status !== existingSeries.status ||
-      JSON.stringify(mockTests) !== JSON.stringify(existingSeries.mockTests);
-
-    if (!isChanged) {
-      // If no changes, return the existing series
-      return res.status(200).json({
+    try {
+      const { seriesName, description, price, status, mockTests, attachments } = req.body;
+  
+      // Find the existing series
+      const existingSeries = await MockTestSeries.findById(req.params.id);
+      if (!existingSeries) {
+        return res.status(404).json({
+          success: false,
+          message: 'Mock test series not found'
+        });
+      }
+  
+      // Check if any changes were made
+      const isChanged = 
+        seriesName !== existingSeries.seriesName ||
+        description !== existingSeries.description ||
+        price !== existingSeries.price ||
+        status !== existingSeries.status ||
+        JSON.stringify(mockTests) !== JSON.stringify(existingSeries.mockTests) ||
+        JSON.stringify(attachments) !== JSON.stringify(existingSeries.attachments);
+  
+      if (!isChanged) {
+        // If no changes, return the existing series
+        return res.status(200).json({
+          success: true,
+          data: existingSeries,
+          message: 'No changes detected'
+        });
+      }
+  
+      // Update the series
+      const updatedSeries = await MockTestSeries.findByIdAndUpdate(
+        req.params.id,
+        {
+          seriesName,
+          description,
+          price,
+          status,
+          mockTests,
+          attachments,
+          totalTests: mockTests.length + attachments.length
+        },
+        { new: true, runValidators: true }
+      );
+  
+      res.status(200).json({
         success: true,
-        data: existingSeries,
-        message: 'No changes detected'
+        data: updatedSeries,
+        message: 'Mock test series updated successfully'
+      });
+    } catch (error) {
+      res.status(400).json({
+        success: false,
+        message: error.message
       });
     }
-
-    // Update the series
-    const updatedSeries = await MockTestSeries.findByIdAndUpdate(
-      req.params.id,
-      {
-        seriesName,
-        description,
-        price,
-        status,
-        mockTests,
-        totalTests: mockTests.length
-      },
-      { new: true, runValidators: true }
-    );
-
-    res.status(200).json({
-      success: true,
-      data: updatedSeries,
-      message: 'Mock test series updated successfully'
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message
-    });
-  }
-};
+  };
 
 exports.deleteMockTestSeries = async (req, res) => {
     try {

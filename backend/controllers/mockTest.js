@@ -190,3 +190,53 @@ function parseTestData(testData) {
   
   return questions;
 }
+
+
+exports.addAttachmentsToSeries = async (req, res) => {
+  try {
+    const { seriesId } = req.params;
+    const { questionPaper, answerKey, omrSheet , name} = req.body;
+
+    // Validate input
+    if (!seriesId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Series ID is required',
+      });
+    }
+
+    // Find the mock test series
+    const series = await MockTestSeries.findById(seriesId);
+    if (!series) {
+      return res.status(404).json({
+        success: false,
+        message: 'Mock test series not found',
+      });
+    }
+
+    // Create the attachment object
+    const newAttachment = {};
+    if (questionPaper) newAttachment.questionPaper = questionPaper;
+    if (answerKey) newAttachment.answerKey = answerKey;
+    if (omrSheet) newAttachment.omrSheet = omrSheet;
+    if (name) newAttachment.name = name;
+
+    // Add the new attachment to the series
+    series.attachments.push(newAttachment);
+
+    // Save the updated series
+    await series.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Attachments added to the series successfully',
+      data: series.attachments,
+    });
+  } catch (error) {
+    console.error('Error adding attachments:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+};
