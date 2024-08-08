@@ -166,9 +166,9 @@ const Home = () => {
           initial='hidden'
           whileInView={'show'}
           viewport={{ once: false, amount: 0.1 }}
-          className='text-center z-20 text-gray-200 text-4xl mt-6 font-semibold w-80 lg:w-full lg:text-7xl  '
+          className='text-center  z-20 text-gray-200 text-4xl mt-6 font-semibold w-80 lg:w-full lg:text-8xl  '
         >
-          We Know That Together <i>We</i> Can<br />
+          We Know That <br />Together <i>We</i> Can<br />
           <HighlightText text={"Awakening Classes"} />
         </motion.div>
 
