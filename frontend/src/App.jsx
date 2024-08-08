@@ -111,7 +111,7 @@ const PageLoader = () => {
 
       {/* Loading text */}
       <motion.div
-        className="text-white text-2xl md:4xl font-bold mb-1"
+        className="text-white text-3xl md:text-6xl font-bold mb-1"
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 1, ease: 'easeInOut' }}
@@ -119,7 +119,7 @@ const PageLoader = () => {
         Awakening Classes <br />
       </motion.div>
       <motion.div
-        className="text-white text-sm md:text-xl font-bold mb-4"
+        className="text-white text-md md:text-3xl font-bold mb-4"
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 1, ease: 'easeInOut' }}
@@ -129,7 +129,7 @@ const PageLoader = () => {
 
       {/* Digital Loader */}
       <motion.div
-        className="absolute bottom-10 right-10 text-white text-3xl font-bold"
+        className="absolute bottom-5 right-5 text-white text-xl font-bold"
         style={{ fontFamily: 'Orbitron, sans-serif' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
