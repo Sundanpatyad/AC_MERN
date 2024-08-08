@@ -235,13 +235,13 @@ const Navbar = () => {
 
             {/* Search Modal */}
             {isSearchModalOpen && (
-                <div className="fixed inset-0 z-50 flex my-10 justify-center bg-black bg-opacity-75">
+                <div className="fixed inset-0 z-50 flex py-10 justify-center align-top bg-black bg-opacity-75">
                     <div
-                        className="bg-transparent rounded-lg p-6 w-full max-w-lg"
+                        className="bg-transparent rounded-lg p-6 mb-40  w-full max-w-lg"
                         ref={searchModalRef}
                     >
                         <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-md :md:text-xl font-semibold text-white">Search</h2>
+                            <h2 className="text-xl :md:text-xl font-semibold text-white">Search</h2>
                             <button
                                 onClick={() => setIsSearchModalOpen(false)}
                                 className="text-gray-400 hover:text-gray-200"
