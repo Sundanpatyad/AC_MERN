@@ -133,8 +133,7 @@ const Home = () => {
       <div className='h-[100vh] w-full dark:bg-black bg-slate-300 dark:bg-grid-slate-400/[0.2] bg-grid-black/[0.2] relative flex items-center flex-col'>
         <div className="absolute cursor-pointer inset-0 w-full h-full bg-black [mask-image:radial-gradient(ellipse_at_center,transparent_10%,black)]"></div>
 
-          <PlaceholdersAndVanishInputDemo/>
-        <Link to={"/mocktest"} className="bg-zinc-900 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-full p-px text-xs font-semibold leading-6  text-white inline-block">
+        <Link to={"/mocktest"} className="bg-zinc-900 no-underline mt-20 group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-full p-px text-xs font-semibold leading-6  text-white inline-block">
           <span className="absolute inset-0 overflow-hidden rounded-full">
             <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
           </span>
@@ -196,12 +195,12 @@ const Home = () => {
           :
           <div className=' flex gap-x-4'>
             <Link to={"/login"}>
-          <HoverBorderGradientDemo title={"Login"}/>
+          <HoverBorderGradientDemo title={"Login "}/>
               
             </Link>
 
             <Link to={"/signup"} >
-          <HoverBorderGradientDemo title={"Signup"}/>
+          <HoverBorderGradientDemo title={"Signup For Free"}/>
               
             </Link>
           </div>
