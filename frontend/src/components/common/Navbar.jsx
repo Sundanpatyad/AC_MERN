@@ -5,13 +5,14 @@ import { NavbarLinks } from "../../../data/navbar-links"
 import { fetchCourseCategories } from './../../services/operations/courseDetailsAPI'
 import ProfileDropDown from '../core/Auth/ProfileDropDown'
 import MobileProfileDropDown from '../core/Auth/MobileProfileDropDown'
-import { AiOutlineShoppingCart, AiOutlineUser } from "react-icons/ai"
-import { HiBars2 } from "react-icons/hi2";
+import { AiOutlineShoppingCart, AiOutlineUser, AiOutlineSearch } from "react-icons/ai"
+import { HiBars2 } from "react-icons/hi2"
 import { MdKeyboardArrowDown } from "react-icons/md"
 import { motion } from 'framer-motion'
-import rzpLogo from "../../assets/Logo/rzp_logo.png";
+import rzpLogo from "../../assets/Logo/rzp_logo.png"
 import { AiOutlineHome, AiOutlineBook, AiOutlineFileDone, AiOutlineInfoCircle, AiOutlineContacts, AiOutlineLogin, AiOutlineUserAdd } from 'react-icons/ai'
-
+import { PlaceholdersAndVanishInputDemo } from '../ui/Search'
+import { RxCross1 } from "react-icons/rx";
 
 const Navbar = () => {
     const { token } = useSelector((state) => state.auth)
@@ -23,6 +24,7 @@ const Navbar = () => {
     const [loading, setLoading] = useState(false)
     const [isScrolled, setIsScrolled] = useState(false)
     const [isAuthDropdownOpen, setIsAuthDropdownOpen] = useState(false)
+    const [isSearchModalOpen, setIsSearchModalOpen] = useState(false) // State for controlling search modal
 
     useEffect(() => {
         const handleScroll = () => {
@@ -53,13 +55,12 @@ const Navbar = () => {
 
     return (
         <>
-            <motion.nav 
+            <motion.nav
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-                    isScrolled ? 'bg-richblack-900 bg-opacity-90 backdrop-blur-md shadow-lg' : 'bg-transparent'
-                }`}
+                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-richblack-900 bg-opacity-90 backdrop-blur-md shadow-lg' : 'bg-transparent'
+                    }`}
             >
                 <div className='flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 max-w-7xl mx-auto'>
                     <Link to="/" className='flex items-center space-x-2'>
@@ -95,11 +96,10 @@ const Navbar = () => {
                                         </div>
                                     </div>
                                 ) : (
-                                    <Link 
+                                    <Link
                                         to={link?.path}
-                                        className={`text-white hover:text-blue-200 transition-colors duration-200 ${
-                                            matchRoute(link?.path) ? 'font-semibold' : ''
-                                        }`}
+                                        className={`text-white hover:text-blue-200 transition-colors duration-200 ${matchRoute(link?.path) ? 'font-semibold' : ''
+                                            }`}
                                     >
                                         {link.title}
                                     </Link>
@@ -108,6 +108,14 @@ const Navbar = () => {
                         ))}
                     </ul>
                     <div className='flex items-center space-x-2 sm:space-x-4'>
+                        {/* Search Icon */}
+                        <button
+                            onClick={() => setIsSearchModalOpen(true)}
+                            className="text-white hover:text-blue-200 transition-colors duration-200"
+                        >
+                            <AiOutlineSearch className="text-xl sm:text-2xl" />
+                        </button>
+
                         {user && user?.accountType !== "Instructor" && (
                             <Link to="/dashboard/cart" className="relative text-white hover:text-blue-200 transition-colors duration-200">
                                 <AiOutlineShoppingCart className="text-xl sm:text-2xl" />
@@ -119,77 +127,77 @@ const Navbar = () => {
                             </Link>
                         )}
                         {token === null ? (
-                             <div className="relative group">
-                             <button
-                               onClick={() => setIsAuthDropdownOpen(!isAuthDropdownOpen)}
-                               className="flex items-center space-x-1 text-white transition-colors duration-200 p-2 rounded-md bg-transparent "
-                             >
-                               <HiBars2 className={`transition-transform duration-200 ${isAuthDropdownOpen ? 'rotate-180' : ''} text-xl`} />
-                             </button>
-                             {isAuthDropdownOpen && (
-                               <div className="absolute z-10 right-0 mt-2 w-64 rounded-md shadow-lg bg-black ring-1 border border-slate-700 ring-black ring-opacity-5 overflow-hidden">
-                                 <div className="py-1">
-                                   <Link
-                                     to="/"
-                                     className="flex items-center px-4 py-2 text-sm text-white hover:bg-slate-900 transition-colors duration-150"
-                                     onClick={() => setIsAuthDropdownOpen(false)}
-                                   >
-                                     <AiOutlineHome className="mr-3 text-lg" />
-                                     Home
-                                   </Link>
-                                   <Link
-                                     to="/catalog/mock-tests"
-                                     className="flex items-center px-4 py-2 text-sm text-white hover:bg-slate-900 transition-colors duration-150"
-                                     onClick={() => setIsAuthDropdownOpen(false)}
-                                   >
-                                     <AiOutlineBook className="mr-3 text-lg" />
-                                     Courses
-                                   </Link>
-                                   <Link
-                                     to="/mocktest"
-                                     className="flex items-center px-4 py-2 text-sm text-white hover:bg-slate-900 transition-colors duration-150"
-                                     onClick={() => setIsAuthDropdownOpen(false)}
-                                   >
-                                     <AiOutlineFileDone className="mr-3 text-lg" />
-                                     Mock Tests
-                                   </Link>
-                                   <Link
-                                     to="/about"
-                                     className="flex items-center px-4 py-2 text-sm text-white hover:bg-slate-900 transition-colors duration-150"
-                                     onClick={() => setIsAuthDropdownOpen(false)}
-                                   >
-                                     <AiOutlineInfoCircle className="mr-3 text-lg" />
-                                     About Us
-                                   </Link>
-                                   <Link
-                                     to="/contact"
-                                     className="flex items-center px-4 py-2 text-sm text-white hover:bg-slate-900 transition-colors duration-150"
-                                     onClick={() => setIsAuthDropdownOpen(false)}
-                                   >
-                                     <AiOutlineContacts className="mr-3 text-lg" />
-                                     Contact Us
-                                   </Link>
-                                   <div className="border-t border-slate-700 my-1"></div>
-                                   <Link
-                                     to="/login"
-                                     className="flex items-center px-4 py-2 text-sm text-white hover:bg-slate-900 transition-colors duration-150"
-                                     onClick={() => setIsAuthDropdownOpen(false)}
-                                   >
-                                     <AiOutlineLogin className="mr-3 text-lg" />
-                                     Log in
-                                   </Link>
-                                   <Link
-                                     to="/signup"
-                                     className="flex items-center px-4 py-2 text-sm text-white hover:bg-slate-900 transition-colors duration-150"
-                                     onClick={() => setIsAuthDropdownOpen(false)}
-                                   >
-                                     <AiOutlineUserAdd className="mr-3 text-lg" />
-                                     Sign Up
-                                   </Link>
-                                 </div>
-                               </div>
-                             )}
-                           </div>
+                            <div className="relative group">
+                                <button
+                                    onClick={() => setIsAuthDropdownOpen(!isAuthDropdownOpen)}
+                                    className="flex items-center space-x-1 text-white transition-colors duration-200 p-2 rounded-md bg-transparent "
+                                >
+                                    <HiBars2 className={`transition-transform duration-200 ${isAuthDropdownOpen ? 'rotate-180' : ''} text-xl`} />
+                                </button>
+                                {isAuthDropdownOpen && (
+                                    <div className="absolute z-10 right-0 mt-2 w-64 rounded-md shadow-lg bg-black ring-1 border border-slate-700 ring-black ring-opacity-5 overflow-hidden">
+                                        <div className="py-1">
+                                            <Link
+                                                to="/"
+                                                className="flex items-center px-4 py-2 text-sm text-white hover:bg-slate-900 transition-colors duration-150"
+                                                onClick={() => setIsAuthDropdownOpen(false)}
+                                            >
+                                                <AiOutlineHome className="mr-3 text-lg" />
+                                                Home
+                                            </Link>
+                                            <Link
+                                                to="/catalog/mock-tests"
+                                                className="flex items-center px-4 py-2 text-sm text-white hover:bg-slate-900 transition-colors duration-150"
+                                                onClick={() => setIsAuthDropdownOpen(false)}
+                                            >
+                                                <AiOutlineBook className="mr-3 text-lg" />
+                                                Courses
+                                            </Link>
+                                            <Link
+                                                to="/mocktest"
+                                                className="flex items-center px-4 py-2 text-sm text-white hover:bg-slate-900 transition-colors duration-150"
+                                                onClick={() => setIsAuthDropdownOpen(false)}
+                                            >
+                                                <AiOutlineFileDone className="mr-3 text-lg" />
+                                                Mock Tests
+                                            </Link>
+                                            <Link
+                                                to="/about"
+                                                className="flex items-center px-4 py-2 text-sm text-white hover:bg-slate-900 transition-colors duration-150"
+                                                onClick={() => setIsAuthDropdownOpen(false)}
+                                            >
+                                                <AiOutlineInfoCircle className="mr-3 text-lg" />
+                                                About Us
+                                            </Link>
+                                            <Link
+                                                to="/contact"
+                                                className="flex items-center px-4 py-2 text-sm text-white hover:bg-slate-900 transition-colors duration-150"
+                                                onClick={() => setIsAuthDropdownOpen(false)}
+                                            >
+                                                <AiOutlineContacts className="mr-3 text-lg" />
+                                                Contact Us
+                                            </Link>
+                                            <div className="border-t border-slate-700 my-1"></div>
+                                            <Link
+                                                to="/login"
+                                                className="flex items-center px-4 py-2 text-sm text-white hover:bg-slate-900 transition-colors duration-150"
+                                                onClick={() => setIsAuthDropdownOpen(false)}
+                                            >
+                                                <AiOutlineLogin className="mr-3 text-lg" />
+                                                Log in
+                                            </Link>
+                                            <Link
+                                                to="/signup"
+                                                className="flex items-center px-4 py-2 text-sm text-white hover:bg-slate-900 transition-colors duration-150"
+                                                onClick={() => setIsAuthDropdownOpen(false)}
+                                            >
+                                                <AiOutlineUserAdd className="mr-3 text-lg" />
+                                                Sign Up
+                                            </Link>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         ) : (
                             <>
                                 <div className='hidden sm:block'>
@@ -203,8 +211,28 @@ const Navbar = () => {
                     </div>
                 </div>
             </motion.nav>
-            {/* This div acts as a spacer to prevent content from being hidden behind the navbar */}
+
+            {/* Spacer to prevent content from being hidden behind the navbar */}
             <div className="h-[64px] md:h-[72px]"></div>
+
+            {/* Search Modal */}
+            {isSearchModalOpen && (
+                <div className="fixed inset-0 z-50 flex my-10 justify-center bg-black bg-opacity-75">
+                    <div className="bg-black rounded-lg p-6 w-full max-w-lg">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-md :md:text-xl font-semibold text-white">Search</h2>
+                            <button
+                                onClick={() => setIsSearchModalOpen(false)}
+                                className="text-gray-400 hover:text-gray-200"
+                            >
+                                <RxCross1/>
+                            </button>
+                        </div>
+                      <PlaceholdersAndVanishInputDemo/>
+                    </div>
+                </div>
+            )}
+
         </>
     )
 }
