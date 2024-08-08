@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { mocktestEndpoints } from '../../services/apis';
 
-export function PlaceholdersAndVanishInputDemo() {
+export function PlaceholdersAndVanishInputDemo({ onResultClick }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -66,6 +66,12 @@ export function PlaceholdersAndVanishInputDemo() {
     return '#'; // Default link if type is not recognized
   };
 
+  const handleResultClick = () => {
+    if (typeof onResultClick === 'function') {
+      onResultClick();
+    }
+  };
+
   return (
     <>
       <style>
@@ -105,7 +111,7 @@ export function PlaceholdersAndVanishInputDemo() {
               {!isLoading && searchResults.length > 0 && (
                 <ul className="divide-y divide-gray-600">
                   {searchResults.map((result) => (
-                    <motion.li 
+                    <motion.li
                       key={result._id}
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
@@ -115,6 +121,7 @@ export function PlaceholdersAndVanishInputDemo() {
                       <Link
                         to={getItemLink(result)}
                         className="flex items-center space-x-4 transition-colors duration-200 p-2 rounded hover:bg--900"
+                        onClick={handleResultClick}
                       >
                         {result.thumbnail && (
                           <img src={result.thumbnail} alt={result.name} className="w-16 h-16 object-cover rounded" />
