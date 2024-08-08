@@ -14,7 +14,6 @@ import { ACCOUNT_TYPE } from "../utils/constants"
 import { setCourse, setStep } from '../slices/courseSlice'
 import LoadingSpinner from "../components/core/ConductMockTests/Spinner"
 
-
 const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLoggedIn, user, handleCourseClick }) => {
     const navigate = useNavigate();
     const isEnrolled = useMemo(() => {
@@ -23,7 +22,6 @@ const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLogged
 
     const handleStartTest = (e) => {
         e.stopPropagation()
-        // Add logic here to start the test
         console.log("Starting test for course:", course.courseName)
     }
 
@@ -110,8 +108,6 @@ const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLogged
     )
 })
 
-
-
 const CourseCardSkeleton = () => (
   <div className="bg-black w-full rounded-xl overflow-hidden shadow-lg animate-pulse">
     <div className="h-40 bg-richblack-700"></div>
@@ -171,6 +167,8 @@ function Catalog() {
         }
     )
 
+    console.log("Current Catlog Pge adatd " , currentCatalogData);
+
     const handleCourseClick = useCallback((course) => {
         dispatch(setCourse(course))
         dispatch(setStep(1))
@@ -213,7 +211,11 @@ function Catalog() {
                 <CourseCardSkeleton key={index} />
             ))
         }
-        return courses?.map((course) => (
+
+        // Sort the courses in descending order based on createdAt
+        const sortedCourses = [...(courses || [])].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          {console.log("sortedcourses ", sortedCourses)}
+        return sortedCourses.map((course) => (
             <CourseCard
                 key={course._id}
                 course={course}
@@ -229,8 +231,7 @@ function Catalog() {
     if (isCategoriesLoading || isCatalogDataLoading) {
         return (
             <div className="min-h-screen flex flex-col">
-                {/* <SectionSkeleton title="Loading Courses..." /> */}
-                <LoadingSpinner title={"Loading Courses..."}/>
+                <LoadingSpinner title={"Loading Courses..."} />
                 <Footer />
             </div>
         )
@@ -240,8 +241,10 @@ function Catalog() {
         <div className="min-h-screen flex flex-col">
             {/* Courses Section */}
             <div className="flex-grow mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
-                <h2 className="text-3xl sm:text-3xl md:text-4xl text-center my-10 font-bold text-richblack-5 mb-4">Advance Your <i className="text-slate-400">Skills</i> With Us</h2>
-              
+                <h2 className="text-3xl sm:text-3xl md:text-4xl text-center my-10 font-bold text-richblack-5 mb-4">
+                    Advance Your <i className="text-slate-400">Skills</i> With Us
+                </h2>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8">
                     {renderCourseCards(currentCatalogData?.selectedCategory?.courses)}
                 </div>

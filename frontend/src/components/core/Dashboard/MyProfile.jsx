@@ -17,9 +17,7 @@ export default function MyProfile() {
   return (
     <div className="bg-black pb-6 px-4 sm:py-12 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-8 sm:mb-12 text-center tracking-tight">
-          My <span className="text-gray-400">Profile</span>
-        </h1>
+      
 
         <div className="relative bg-black rounded-3xl overflow-hidden shadow-2xl">
           <div className="absolute top-0 left-0 w-1/2 h-full bg-white opacity-5 transform -skew-x-12"></div>

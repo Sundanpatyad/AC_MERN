@@ -90,7 +90,10 @@ const Courses = ({ catalogPageData }) => {
 
   useEffect(() => {
     if (catalogPageData?.selectedCategory?.courses) {
-      setCourses(catalogPageData.selectedCategory.courses)
+      // Sort the courses in descending order based on createdAt
+      const sortedCourses = [...(catalogPageData.selectedCategory.courses)].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      // Get the latest 4 courses
+      setCourses(sortedCourses.slice(0, 4));
     }
   }, [catalogPageData])
 
@@ -128,9 +131,15 @@ const Courses = ({ catalogPageData }) => {
       const filteredCourses = catalogPageData?.data?.filter(
         (course) => course.category === category
       )
-      setCourses(filteredCourses)
+      // Sort the filtered courses in descending order based on createdAt
+      const sortedCourses = [...filteredCourses].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      // Get the latest 4 courses
+      setCourses(sortedCourses.slice(0, 4));
     } else {
-      setCourses(catalogPageData?.selectedCategory?.courses || [])
+      // Sort the selected category courses in descending order based on createdAt
+      const sortedCourses = [...(catalogPageData?.selectedCategory?.courses || [])].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      // Get the latest 4 courses
+      setCourses(sortedCourses.slice(0, 4));
     }
   }
 
@@ -146,7 +155,7 @@ const Courses = ({ catalogPageData }) => {
 
   return (
     <div className="container mx-auto px-4 py-8 bg-black text-white">
-      <h2 className="text-3xl font-bold mb-6">Our Courses</h2>
+      <h2 className="text-3xl font-bold text-center mb-6">Our Courses</h2>
       
       {/* Category filter */}
       <div className="mb-6">
@@ -172,7 +181,7 @@ const Courses = ({ catalogPageData }) => {
       </div>
 
       {/* Course grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
         {courses.map((course) => (
           <CourseCard
             key={course._id}

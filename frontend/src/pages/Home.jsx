@@ -212,8 +212,8 @@ const Home = () => {
       </div>
 
       <div className='relative mx-auto flex flex-col w-11/12 max-w-full mt-10 items-center text-white justify-between'>
-        <div className='text-3xl text-center lg:text-3xl font-semibold'>
-          Courses That Make an <br />
+        <div className='text-3xl text-center lg:text-5xl font-semibold'>
+          Courses <br /> That Make an <br />
           <HighlightText text={"Impact "} />
         </div>
         <p className='mt-2 w-[90%] text-center text-base lg:text-lg font-bold text-richblack-300'>
@@ -225,57 +225,61 @@ const Home = () => {
 
         <h2 className="text-3xl mt-20 font-bold text-richblack-5 mb-6">Popular Mock Tests</h2>
         <div className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {isMockTestsLoading
-              ? Array(8).fill().map((_, index) => (
-                <MockTestSkeleton key={index} />
-              ))
-              : mockTests?.map((mockTest) => (
-                <MemoizedMockTestCard
-                  key={mockTest._id}
-                  mockTest={mockTest}
-                  handleAddToCart={handleAddToCart}
-                  handleRemoveFromCart={handleRemoveFromCart}
-                  handleBuyNow={handleBuyNow}
-                  handleStartTest={handleStartTest}
-                  setShowLoginModal={setShowLoginModal}
-                  isLoggedIn={isLoggedIn}
-                  userId={user?._id}
-                />
-              ))}
-          </div>
-          <div className="text-center mt-12">
-          <Link to={"/mocktest"} className="bg-zinc-900 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-full p-px text-xs font-semibold leading-6  text-white inline-block">
-          <span className="absolute inset-0 overflow-hidden rounded-full">
-            <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-          </span>
-          <div className="relative flex space-x-2 items-center z-10 rounded-full bg-zinc-950 py-0.5 px-4 ring-1 ring-white/10 ">
-            <span>
-              View All MockTests
-            </span>
-            <svg
-              fill="none"
-              height="16"
-              viewBox="0 0 24 24"
-              width="16"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M10.75 8.75L14.25 12L10.75 15.25"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.5"
-              />
-            </svg>
-          </div>
-          <span className="absolute -bottom-0 left-[1.125rem] h-px w-[calc(100%-2.25rem)] bg-gradient-to-r from-emerald-400/0 via-emerald-400/90 to-emerald-400/0 transition-opacity duration-500 group-hover:opacity-40" />
-        </Link>
-          </div>
-          {!isMockTestsLoading && mockTests?.length === 0 && (
-            <p className="text-center text-gray-400 mt-8">No mock tests available.</p>
-          )}
-        </div>
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    {isMockTestsLoading
+      ? Array(4).fill().map((_, index) => (
+          <MockTestSkeleton key={index} />
+        ))
+      : mockTests
+          ?.slice(0, 4) // Get the latest 4 mock tests
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Sort by createdAt in descending order
+          .map((mockTest) => (
+            <MemoizedMockTestCard
+              key={mockTest._id}
+              mockTest={mockTest}
+              handleAddToCart={handleAddToCart}
+              handleRemoveFromCart={handleRemoveFromCart}
+              handleBuyNow={handleBuyNow}
+              handleStartTest={handleStartTest}
+              setShowLoginModal={setShowLoginModal}
+              isLoggedIn={isLoggedIn}
+              userId={user?._id}
+            />
+          ))}
+  </div>
+  <div className="text-center mt-12">
+    <Link
+      to="/mocktest"
+      className="bg-zinc-900 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-full p-px text-xs font-semibold leading-6 text-white inline-block"
+    >
+      <span className="absolute inset-0 overflow-hidden rounded-full">
+        <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+      </span>
+      <div className="relative flex space-x-2 items-center z-10 rounded-full bg-zinc-950 py-0.5 px-4 ring-1 ring-white/10 ">
+        <span>View All MockTests</span>
+        <svg
+          fill="none"
+          height="16"
+          viewBox="0 0 24 24"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M10.75 8.75L14.25 12L10.75 15.25"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.5"
+          />
+        </svg>
+      </div>
+      <span className="absolute -bottom-0 left-[1.125rem] h-px w-[calc(100%-2.25rem)] bg-gradient-to-r from-emerald-400/0 via-emerald-400/90 to-emerald-400/0 transition-opacity duration-500 group-hover:opacity-40" />
+    </Link>
+  </div>
+  {!isMockTestsLoading && mockTests?.length === 0 && (
+    <p className="text-center text-gray-400 mt-8">No mock tests available.</p>
+  )}
+</div>
       </div>
 
       <div className='mt-14 w-11/12 mx-auto max-w-full flex-col items-center justify-between gap-8 first-letter bg-black text-white'>

@@ -196,15 +196,21 @@ const MockTestComponent = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <div className="flex-grow mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
-        <h2 className="text-3xl sm:text-3xl md:text-4xl text-center my-10 font-bold text-richblack-5 mb-4">Test Your Knowledge with <i className='text-slate-300'>Confidence</i></h2>
-        
-        {memoizedMockTests.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8">
-            {memoizedMockTests.map((mockTest) => (
-              <MockTestCard 
-                key={mockTest._id} 
-                mockTest={mockTest} 
+    <div className="flex-grow mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
+      <h2 className="text-3xl sm:text-3xl md:text-4xl text-center my-10 font-bold text-richblack-5 mb-4">
+        Test Your Knowledge with <i className="text-slate-300">Confidence</i>
+      </h2>
+  
+      {memoizedMockTests.length > 0 ? (
+        <div>
+          {/* Display the latest mock test first */}
+          {memoizedMockTests
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 1)
+            .map((mockTest) => (
+              <MockTestCard
+                key={mockTest._id}
+                mockTest={mockTest}
                 handleAddToCart={handleAddToCart}
                 handleBuyNow={handleBuyNow}
                 handleStartTest={handleStartTest}
@@ -212,17 +218,35 @@ const MockTestComponent = () => {
                 isEnrolled={mockTest.studentsEnrolled?.includes(user?._id)}
               />
             ))}
+  
+          {/* Display the rest of the mock tests in descending order */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8">
+            {memoizedMockTests
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .slice(1)
+              .map((mockTest) => (
+                <MockTestCard
+                  key={mockTest._id}
+                  mockTest={mockTest}
+                  handleAddToCart={handleAddToCart}
+                  handleBuyNow={handleBuyNow}
+                  handleStartTest={handleStartTest}
+                  isLoggedIn={isLoggedIn}
+                  isEnrolled={mockTest.studentsEnrolled?.includes(user?._id)}
+                />
+              ))}
           </div>
-        ) : (
-          <p className="text-center text-xl text-richblack-5 bg-richblack-800 rounded-lg p-8 shadow-lg mt-8">
-            No published mock tests available at the moment. Check back soon!
-          </p>
-        )}
-      </div>
-
-      <Footer />
-      {confirmationModal && <ConfirmationModal modalData={confirmationModal} />}
+        </div>
+      ) : (
+        <p className="text-center text-xl text-richblack-5 bg-richblack-800 rounded-lg p-8 shadow-lg mt-8">
+          No published mock tests available at the moment. Check back soon!
+        </p>
+      )}
     </div>
+  
+    <Footer />
+    {confirmationModal && <ConfirmationModal modalData={confirmationModal} />}
+  </div>
   )
 }
 
