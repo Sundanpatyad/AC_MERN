@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Link, matchPath, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { NavbarLinks } from "../../../data/navbar-links"
@@ -12,7 +12,7 @@ import { motion } from 'framer-motion'
 import rzpLogo from "../../assets/Logo/rzp_logo.png"
 import { AiOutlineHome, AiOutlineBook, AiOutlineFileDone, AiOutlineInfoCircle, AiOutlineContacts, AiOutlineLogin, AiOutlineUserAdd } from 'react-icons/ai'
 import { PlaceholdersAndVanishInputDemo } from '../ui/Search'
-import { RxCross1 } from "react-icons/rx";
+import { RxCross1 } from "react-icons/rx"
 
 const Navbar = () => {
     const { token } = useSelector((state) => state.auth)
@@ -24,7 +24,8 @@ const Navbar = () => {
     const [loading, setLoading] = useState(false)
     const [isScrolled, setIsScrolled] = useState(false)
     const [isAuthDropdownOpen, setIsAuthDropdownOpen] = useState(false)
-    const [isSearchModalOpen, setIsSearchModalOpen] = useState(false) // State for controlling search modal
+    const [isSearchModalOpen, setIsSearchModalOpen] = useState(false)
+    const searchModalRef = useRef(null)
 
     useEffect(() => {
         const handleScroll = () => {
@@ -51,6 +52,23 @@ const Navbar = () => {
 
     const matchRoute = (route) => {
         return matchPath({ path: route }, location.pathname)
+    }
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (searchModalRef.current && !searchModalRef.current.contains(event.target)) {
+                setIsSearchModalOpen(false)
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside)
+        }
+    }, [])
+
+    const handleSearchResultClick = () => {
+        setIsSearchModalOpen(false)
     }
 
     return (
@@ -218,21 +236,25 @@ const Navbar = () => {
             {/* Search Modal */}
             {isSearchModalOpen && (
                 <div className="fixed inset-0 z-50 flex my-10 justify-center bg-black bg-opacity-75">
-                    <div className="bg-transparent rounded-lg p-6 w-full max-w-lg">
+                    <div
+                        className="bg-transparent rounded-lg p-6 w-full max-w-lg"
+                        ref={searchModalRef}
+                    >
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-md :md:text-xl font-semibold text-white">Search</h2>
                             <button
                                 onClick={() => setIsSearchModalOpen(false)}
                                 className="text-gray-400 hover:text-gray-200"
                             >
-                                <RxCross1/>
+                                <RxCross1 />
                             </button>
                         </div>
-                      <PlaceholdersAndVanishInputDemo/>
+                        <PlaceholdersAndVanishInputDemo
+                            onResultClick={handleSearchResultClick}
+                        />
                     </div>
                 </div>
             )}
-
         </>
     )
 }
