@@ -79,7 +79,25 @@ const CourseCard = ({ course, handleAddToCart, handleBuyNow, isInCart, isEnrolle
   )
 }
 
-const Courses = ({ catalogPageData }) => {
+const SkeletonCard = () => (
+  <div className="bg-black w-[80vw] md:w-[50vw] border border-gray-800 rounded-lg overflow-hidden shadow-lg animate-pulse">
+    <div className="w-full h-48 bg-gray-700"></div>
+    <div className="p-4">
+      <div className="h-6 bg-gray-700 rounded w-3/4 mb-2"></div>
+      <div className="h-4 bg-gray-700 rounded w-full mb-4"></div>
+      <div className="flex justify-between items-center text-gray-400 mb-4">
+        <div className="h-4 bg-gray-700 rounded w-1/4"></div>
+        <div className="h-4 bg-gray-700 rounded w-1/4"></div>
+      </div>
+      <div className="flex flex-col space-y-2">
+        <div className="h-10 bg-gray-700 rounded"></div>
+        <div className="h-10 bg-gray-700 rounded"></div>
+      </div>
+    </div>
+  </div>
+)
+
+const Courses = ({ catalogPageData, isLoading }) => {
   const [courses, setCourses] = useState([])
   const [selectedCategory, setSelectedCategory] = useState(null)
   const dispatch = useDispatch()
@@ -90,9 +108,7 @@ const Courses = ({ catalogPageData }) => {
 
   useEffect(() => {
     if (catalogPageData?.selectedCategory?.courses) {
-      // Sort the courses in descending order based on createdAt
       const sortedCourses = [...(catalogPageData.selectedCategory.courses)].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      // Get the latest 4 courses
       setCourses(sortedCourses.slice(0, 4));
     }
   }, [catalogPageData])
@@ -113,7 +129,6 @@ const Courses = ({ catalogPageData }) => {
       return
     }
     if (course.price === 0) {
-      // For free courses, directly navigate to the course
       navigate(`/courses/${course._id}`)
       return
     }
@@ -131,14 +146,10 @@ const Courses = ({ catalogPageData }) => {
       const filteredCourses = catalogPageData?.data?.filter(
         (course) => course.category === category
       )
-      // Sort the filtered courses in descending order based on createdAt
       const sortedCourses = [...filteredCourses].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      // Get the latest 4 courses
       setCourses(sortedCourses.slice(0, 4));
     } else {
-      // Sort the selected category courses in descending order based on createdAt
       const sortedCourses = [...(catalogPageData?.selectedCategory?.courses || [])].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      // Get the latest 4 courses
       setCourses(sortedCourses.slice(0, 4));
     }
   }
@@ -182,21 +193,30 @@ const Courses = ({ catalogPageData }) => {
 
       {/* Course grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
-        {courses.map((course) => (
-          <CourseCard
-            key={course._id}
-            course={course}
-            handleAddToCart={handleAddToCart}
-            handleBuyNow={handleBuyNow}
-            isInCart={isInCart(course)}
-            isEnrolled={isEnrolled(course)}
-            isLoggedIn={isLoggedIn}
-          />
-        ))}
+        {isLoading ? (
+          // Show skeleton loading when isLoading is true
+          Array(4).fill().map((_, index) => (
+            <SkeletonCard key={index} />
+          ))
+        ) : (
+          courses.map((course) => (
+            <CourseCard
+              key={course._id}
+              course={course}
+              handleAddToCart={handleAddToCart}
+              handleBuyNow={handleBuyNow}
+              isInCart={isInCart(course)}
+              isEnrolled={isEnrolled(course)}
+              isLoggedIn={isLoggedIn}
+            />
+          ))
+        )}
       </div>
 
-      {courses.length === 0 && (
-        <p className="text-center text-gray-400 mt-8">No courses found.</p>
+      {!isLoading && courses.length === 0 && (
+        Array(4).fill().map((_, index) => (
+          <SkeletonCard key={index} />
+        ))
       )}
 
       {/* View all courses link */}

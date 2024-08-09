@@ -65,7 +65,7 @@ const Home = () => {
 
   const categoryID = "66758c6b75de4ef02cd497d1";
 
-  const { data: catalogPageData } = useQuery(
+  const { data: catalogPageData , isloading: isCoursesLoading } = useQuery(
     ['catalogPageData', categoryID],
     () => getCatalogPageData(categoryID, dispatch),
     { staleTime: Infinity }
@@ -227,7 +227,7 @@ const Home = () => {
           Our courses are designed and taught by experts who have years of experience and are passionate about sharing their knowledge with you.
         </p>
         <div>
-          <Courses catalogPageData={catalogPageData} />
+          <Courses catalogPageData={catalogPageData} isloading={isCoursesLoading} />
         </div>
 
         <h2 className="text-3xl mt-20 font-bold text-richblack-5 mb-6">Popular Mock Tests</h2>
