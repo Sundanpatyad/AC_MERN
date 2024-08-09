@@ -147,7 +147,7 @@ export function login(email, password, navigate) {
         throw new Error(response.data.message)
       }
 
-      toast('Login Successful', {
+      toast('Login Successful , Enjoy The Expreience ', {
         icon: '👏',
         style: {
           borderRadius: '10px',
@@ -327,7 +327,7 @@ export const googleLogin = (credential, navigate) => {
       localStorage.setItem("token", JSON.stringify(token));
       localStorage.setItem("user", JSON.stringify({ ...userData, image: userImage }));
       toast.dismiss(toastId)
-      toast('Login Successful', {
+      toast('Login Successful , Enjoy The Experience', {
         icon: '👏',
         style: {
           borderRadius: '10px',
