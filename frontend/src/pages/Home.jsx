@@ -173,7 +173,7 @@ const Home = () => {
           Together <i>
             <AnimatedText
               texts={['We', 'Yes', 'We']}
-              interval={2000}
+              interval={1500}
             />
           </i> Can<br />
           <HighlightText text={"Awakening Classes"} />
