@@ -34,7 +34,7 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleRemoveFromCa
                 <p className="text-sm text-gray-400 mb-3 line-clamp-3">{mockTest.description}</p>
                 <div className="flex justify-between items-center text-sm text-gray-400 mb-3">
                     <div className="flex items-center">
-                        <p className="font-medium">{mockTest.price === 0 ? 'Free' : `₹${mockTest.price}`}</p>
+                        <p className='text-md bg-white text-black px-5 rounded-full font-semibold'>{mockTest.price === 0 ? 'Free' : `₹${mockTest.price}`}</p>
                     </div>
                     <div className="flex items-center">
                         <FaBookOpen className="mr-1 text-gray-400" />

@@ -26,7 +26,7 @@ const CourseCard = ({ course, handleAddToCart, handleBuyNow, isInCart, isEnrolle
         <h3 className="text-xl font-semibold text-white mb-2">{course.courseName}</h3>
         <p className="text-gray-400 mb-4 line-clamp-2">{course.courseDescription}</p>
         <div className="flex justify-between items-center text-gray-400 mb-4">
-          <span>{course.price === 0 ? 'Free' : `₹${course.price}`}</span>
+          <span className='text-md bg-white text-black px-5 rounded-full font-semibold'>{course.price === 0 ? 'Free' : `₹${course.price}`}</span>
           <span className="flex items-center">
             <FaBookOpen className="mr-1" />
             {course.lessons?.length || 0} lessons
