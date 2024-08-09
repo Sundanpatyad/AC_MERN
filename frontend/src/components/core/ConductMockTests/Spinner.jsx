@@ -20,7 +20,7 @@ const LoadingSpinner = ({ title }) => {
 
   return (
     <>
-    <div className="flex flex-col justify-center items-center h-screen bg-black text-gray-200 p-4">
+    <div className="flex flex-col mt-20 items-center h-screen bg-black text-gray-200 p-4">
       <div className="flex flex-col items-center">
         <motion.div
           animate={{ rotate: 360 }}
@@ -37,12 +37,12 @@ const LoadingSpinner = ({ title }) => {
           </svg>
         </motion.div>
 
-     
-      </div>
-    </div>
-       <div className="bottom-10 text-md md:text-sm text-gray-500 text-center">
+        <div className="mt-4 text-md md:text-sm text-gray-500 text-center">
        Awakening Classes
      </div>
+      </div>
+    </div>
+     
      </>
   );
 };
