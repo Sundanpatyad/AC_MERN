@@ -288,7 +288,7 @@ const Home = () => {
           )}
         </div>
       </div>
-
+           
       <div className='mt-14 w-11/12 mx-auto max-w-full flex-col items-center justify-between gap-8 first-letter bg-black text-white'>
         <InstructorSection />
 

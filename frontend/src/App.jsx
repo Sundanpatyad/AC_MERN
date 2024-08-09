@@ -48,7 +48,6 @@ import RankingsPage from "./components/core/Rankings/Ranking";
 
 
 
-
 const PageLoader = () => {
   const [loadingProgress, setLoadingProgress] = useState(0);
 
