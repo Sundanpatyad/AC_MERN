@@ -3,7 +3,7 @@ import { HoverBorderGradient } from "./hover-border-gradiennt";
 
 export function HoverBorderGradientDemo({title}) {
   return (
-    <div className=" mt-10 flex justify-center text-center">
+    <div className="flex justify-center text-center">
       <HoverBorderGradient
         containerClassName="rounded-full"
         as="button"

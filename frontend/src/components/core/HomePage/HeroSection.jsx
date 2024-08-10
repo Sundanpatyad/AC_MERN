@@ -73,13 +73,16 @@ const HeroSection = () => {
         </motion.div>
 
         {token ?
-          <>
+          <div className='flex mt-10 flex-col'>
             <Link to={"/login"}>
               <HoverBorderGradientDemo title={"Explore More"} />
             </Link>
-          </>
+            <Link to={"https://www.youtube.com/@awakeningclasses"} className='mt-5'>
+              <HoverBorderGradientDemo title={"Free Youtube Lectures"} />
+            </Link>
+          </div>
           :
-          <div className=' flex gap-x-4'>
+          <div className=' mt-10 flex gap-x-4'>
             <Link to={"/login"}>
               <HoverBorderGradientDemo title={"Login "} />
             </Link>
