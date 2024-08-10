@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { motion, useAnimation } from 'framer-motion';
+import { motion } from 'framer-motion';
+
 
 const PageLoader = () => {
   const [loadingProgress, setLoadingProgress] = useState(0);
-  const controls = useAnimation();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -15,18 +15,13 @@ const PageLoader = () => {
           return prev;
         }
       });
-    }, 50);
+    }, 50); // Increase progress every 50 milliseconds
 
     return () => clearInterval(timer);
   }, []);
 
   useEffect(() => {
-    if (loadingProgress === 100) {
-      controls.start("loaded");
-    }
-  }, [loadingProgress, controls]);
-
-  useEffect(() => {
+    // Load Orbitron font
     const link = document.createElement('link');
     link.href = 'https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap';
     link.rel = 'stylesheet';
@@ -37,46 +32,31 @@ const PageLoader = () => {
     };
   }, []);
 
-  const containerVariants = {
-    initial: { opacity: 0 },
-    animate: { opacity: 1 },
-    loaded: { opacity: 0, transition: { duration: 0.5, delay: 0.5 } }
-  };
-
-  const textVariants = {
-    initial: { y: 50, opacity: 0 },
-    animate: { y: 0, opacity: 1, transition: { duration: 0.8, ease: "easeOut" } },
-    loaded: { y: -50, opacity: 0, transition: { duration: 0.5 } }
-  };
-
-  const progressVariants = {
-    initial: { scaleX: 0 },
-    animate: { scaleX: loadingProgress / 100, transition: { duration: 0.2, ease: "easeInOut" } }
-  };
-
   return (
     <motion.div
       className="fixed inset-0 bg-black flex flex-col items-center justify-center overflow-hidden"
-      variants={containerVariants}
-      initial="initial"
-      animate={controls}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
     >
       {/* Stars */}
-      {[...Array(100)].map((_, i) => (
+      {[...Array(50)].map((_, i) => (
         <motion.div
           key={i}
           className="absolute w-1 h-1 bg-white rounded-full"
-          initial={{ opacity: 0, scale: 0 }}
+          initial={{
+            opacity: 0,
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+          }}
           animate={{
             opacity: [0, 1, 0],
             scale: [0, 1, 0],
-            x: [Math.random() * window.innerWidth, Math.random() * window.innerWidth],
-            y: [Math.random() * window.innerHeight, Math.random() * window.innerHeight],
           }}
           transition={{
-            duration: Math.random() * 3 + 2,
+            duration: Math.random() * 2 + 1,
             repeat: Infinity,
-            repeatType: 'reverse',
+            repeatType: 'loop',
             ease: 'easeInOut',
           }}
         />
@@ -85,23 +65,19 @@ const PageLoader = () => {
       {/* Loading text */}
       <motion.div
         className="text-white text-3xl md:text-6xl font-bold mb-1"
-        variants={textVariants}
+        initial={{ y: 50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 1, ease: 'easeInOut' }}
       >
-        Awakening Classes
+        Awakening Classes <br />
       </motion.div>
       <motion.div
         className="text-white text-md md:text-3xl font-bold mb-4"
-        variants={textVariants}
+        initial={{ y: 50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 1, ease: 'easeInOut' }}
       >
-        Together We Can 😉
-      </motion.div>
-
-      {/* Progress Bar */}
-      <motion.div className="w-64 h-2 bg-gray-700 rounded-full overflow-hidden mt-4">
-        <motion.div
-          className="h-full bg-white"
-          variants={progressVariants}
-        />
+        Together We Can 😉 <br />
       </motion.div>
 
       {/* Digital Loader */}
