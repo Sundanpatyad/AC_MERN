@@ -101,6 +101,7 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
             toast.error("Oops, payment failed", toastOptions);
             console.log("Payment failed: ", response.error);
         });
+
     }
     catch (error) {
         console.log("PAYMENT API ERROR:", error);
@@ -125,43 +126,49 @@ async function sendPaymentSuccessEmail(response, amount, token) {
     }
 }
 
-// ================ verify payment ================
-async function verifyPayment(bodyData, token, navigate, dispatch) {
+export default async function verifyPayment(bodyData, token, navigate, dispatch) {
     const toastId = toast.loading("Verifying Payment....", toastOptions);
     dispatch(setPaymentLoading(true));
-
+    
     try {
         // Determine the API endpoint based on the item type
         const VERIFY_API = bodyData.itemType === 'course' ? COURSE_VERIFY_API : MOCK_TEST_VERIFY_API;
-
+        
         const response = await apiConnector("POST", VERIFY_API, bodyData, {
             Authorization: `Bearer ${token}`,
         });
-
+        
+        console.log("this is verify response", response);
+        
         if (!response.data.success) {
             throw new Error(response.data.message);
         }
-
+        
         const itemTypeName = bodyData.itemType === 'course' ? 'course' : 'mock test';
         toast.success(`Payment Successful, you are added to the ${itemTypeName}`, toastOptions);
         
-
-        // Navigate to the appropriate dashboard page
-        if (bodyData.itemType === 'course') {
-            navigate("/dashboard/enrolled-courses");
-        } else {
-            navigate("/mocktest"); // Adjust this path as needed
-        }
-
         // Reset cart if necessary (you might want to handle this differently for mock tests)
         if (bodyData) {
             dispatch(resetCart());
         }
-    }
-    catch (error) {
+
+        if (response.data.success) {
+            window.location.reload();
+        } else {
+            // Navigate to the appropriate dashboard page
+            if (bodyData.itemType === 'course') {
+                navigate("/dashboard/enrolled-courses");
+            } else {
+                navigate("/mocktest"); // Adjust this path as needed
+            }
+        }
+
+        return response;
+    } catch (error) {
         console.log("PAYMENT VERIFY ERROR....", error);
         toast.error("Could not verify Payment", toastOptions);
+    } finally {
+        toast.dismiss(toastId);
+        dispatch(setPaymentLoading(false));
     }
-    toast.dismiss(toastId);
-    dispatch(setPaymentLoading(false));
 }

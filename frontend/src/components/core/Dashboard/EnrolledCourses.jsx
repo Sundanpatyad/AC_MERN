@@ -98,7 +98,7 @@ export default function EnrolledCourses() {
               enrolledCourses.map((course, i) => (
                 <div key={i} className="bg-black rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300">
                   <div className="p-6 cursor-pointer" onClick={() => navigate(`/view-course/${course?._id}/section/${course.courseContent?.[0]?._id}/sub-section/${course.courseContent?.[0]?.subSection?.[0]?._id}`)}>
-                    <Img src={course.thumbnail} alt="course_img" className="h-48 w-full rounded-lg object-cover mb-4" />
+                    <Img src={ course.thumbnail && course.thumbnail} alt="course_img" className="h-48 w-full rounded-lg object-cover mb-4" />
                     <h3 className="font-bold text-xl mb-2 text-gray-100">{course.courseName}</h3>
                     <p className="text-gray-400 mb-4">{course.courseDescription.slice(0, 100)}...</p>
                     <div className="flex justify-between items-center mb-2">
@@ -129,8 +129,7 @@ export default function EnrolledCourses() {
                 onClick={() => navigate(`/mock-test/${mockTest._id}`)}
                 key={i} className="bg-black rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300">
                   <div className="p-6">
-                    <Img src={mockTest.thumbnail} alt="mock_test_img" className="h-48 w-full rounded-lg object-cover mb-4" />
-                    <h3 className="font-bold text-xl mb-2 text-gray-100">{mockTest.testName}</h3>
+                    <h3 className="font-bold text-xl mb-2 text-slate-100">{mockTest.seriesName}</h3>
                     <p className="text-gray-400 mb-4">{mockTest.description.slice(0, 100)}...</p>
                     <div className="flex justify-between items-center">
                       <span className="text-lg font-semibold text-green-400">Rs. {mockTest.price}</span>

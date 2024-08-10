@@ -165,7 +165,7 @@ const Courses = ({ catalogPageData, isLoading }) => {
   const isLoggedIn = !!token
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-black text-white">
+    <div className="container mx-auto py-8 bg-black text-white">
       <h2 className="text-3xl font-bold text-center mb-6">Our Courses</h2>
       
       {/* Category filter */}
@@ -192,7 +192,7 @@ const Courses = ({ catalogPageData, isLoading }) => {
       </div>
 
       {/* Course grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {isLoading ? (
           // Show skeleton loading when isLoading is true
           Array(4).fill().map((_, index) => (

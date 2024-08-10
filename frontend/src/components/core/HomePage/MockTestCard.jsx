@@ -3,7 +3,17 @@ import { FaBookOpen, FaShoppingCart } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
-const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleRemoveFromCart, handleBuyNow, handleStartTest, setShowLoginModal, isLoggedIn, userId }) => {
+const MockTestCard = React.memo(({ 
+  mockTest, 
+  handleAddToCart, 
+  handleRemoveFromCart, 
+  handleBuyNow, 
+  handleStartTest, 
+  setShowLoginModal, 
+  isLoggedIn, 
+  userId,
+  isPurchased 
+}) => {
     const { cart } = useSelector((state) => state.cart);
     const [isInCart, setIsInCart] = useState(false);
 
@@ -11,7 +21,7 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleRemoveFromCa
         setIsInCart(cart.some(item => item._id === mockTest._id));
     }, [cart, mockTest._id]);
 
-    const isEnrolled = mockTest.studentsEnrolled?.includes(userId);
+    const isEnrolled = mockTest.studentsEnrolled?.includes(userId) || isPurchased;
 
     const handleButtonClick = (action) => {
         if (!isLoggedIn) {
