@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { Link, matchPath, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { motion, useMotionValueEvent, useScroll } from "framer-motion"
 import { NavbarLinks } from "../../../data/navbar-links"
 import { fetchCourseCategories } from './../../services/operations/courseDetailsAPI'
 import ProfileDropDown from '../core/Auth/ProfileDropDown'
@@ -13,7 +14,6 @@ import { PlaceholdersAndVanishInputDemo } from '../ui/Search'
 import { RxCross1 } from "react-icons/rx"
 
 const SCROLL_THRESHOLD = 50
-const SCROLL_TIMEOUT = 100
 
 const Navbar = () => {
     const { token } = useSelector((state) => state.auth)
@@ -23,69 +23,42 @@ const Navbar = () => {
 
     const [subLinks, setSubLinks] = useState([])
     const [loading, setLoading] = useState(false)
-    const [navbarStyle, setNavbarStyle] = useState({
-        transform: 'translateY(0)',
-        transition: 'transform 0.3s ease-in-out',
-        backgroundColor: 'transparent'
-    })
     const [isAuthDropdownOpen, setIsAuthDropdownOpen] = useState(false)
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false)
+    const [hidden, setHidden] = useState(false)
     const searchModalRef = useRef(null)
-    const lastScrollTop = useRef(0)
-    const scrollTimer = useRef(null)
+    const lastScrollY = useRef(0)
 
-    const handleScroll = useCallback(() => {
-        const st = window.pageYOffset || document.documentElement.scrollTop
-        if (st > lastScrollTop.current && st > SCROLL_THRESHOLD) {
-            // Scrolling down
-            setNavbarStyle(prev => ({
-                ...prev,
-                transform: 'translateY(-100%)',
-                backgroundColor: 'rgba(0, 0, 0, 0.8)'
-            }))
+    const { scrollY } = useScroll()
+
+    useMotionValueEvent(scrollY, "change", (latest) => {
+        if (latest > lastScrollY.current && latest > SCROLL_THRESHOLD) {
+            setHidden(true)
         } else {
-            // Scrolling up
-            setNavbarStyle(prev => ({
-                ...prev,
-                transform: 'translateY(0)',
-                backgroundColor: st > SCROLL_THRESHOLD ? 'rgba(0, 0, 0, 0.8)' : 'transparent'
-            }))
+            setHidden(false)
         }
-        lastScrollTop.current = st <= 0 ? 0 : st
-    }, [])
+        lastScrollY.current = latest
+    })
 
-    useEffect(() => {
-        const onScroll = () => {
-            if (scrollTimer.current !== null) {
-                clearTimeout(scrollTimer.current)
-            }
-            scrollTimer.current = setTimeout(() => {
-                handleScroll()
-            }, SCROLL_TIMEOUT)
-        }
-
-        window.addEventListener('scroll', onScroll)
-        return () => window.removeEventListener('scroll', onScroll)
-    }, [handleScroll])
-
-    const fetchSublinks = async () => {
+    const fetchSublinks = useCallback(async () => {
         try {
             setLoading(true)
             const res = await fetchCourseCategories()
             setSubLinks(res)
         } catch (error) {
             console.log("Could not fetch the category list = ", error)
+        } finally {
+            setLoading(false)
         }
-        setLoading(false)
-    }
+    }, [])
 
     useEffect(() => {
         fetchSublinks()
-    }, [])
+    }, [fetchSublinks])
 
-    const matchRoute = (route) => {
+    const matchRoute = useCallback((route) => {
         return matchPath({ path: route }, location.pathname)
-    }
+    }, [location.pathname])
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -104,9 +77,31 @@ const Navbar = () => {
         setIsSearchModalOpen(false)
     }
 
+    const navVariants = {
+        visible: { 
+            y: 0,
+            backgroundColor: scrollY.get() > SCROLL_THRESHOLD ? "rgba(0, 0, 0, 0.8)" : "transparent",
+            transition: { 
+                y: { type: "spring", stiffness: 300, damping: 30 },
+                backgroundColor: { duration: 0.2 }
+            }
+        },
+        hidden: { 
+            y: "-100%",
+            transition: { 
+                y: { type: "spring", stiffness: 300, damping: 30 },
+            }
+        }
+    }
+
     return (
         <>
-            <nav style={navbarStyle} className="fixed top-0 left-0 right-0 z-50">
+            <motion.nav
+                variants={navVariants}
+                animate={hidden ? "hidden" : "visible"}
+                initial="visible"
+                className="fixed top-0 left-0 right-0 z-50"
+            >
                 <div className='flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 max-w-7xl mx-auto'>
                     <Link to="/" className='flex items-center space-x-2'>
                         <img src={rzpLogo} alt="Logo" className='w-8 h-8 rounded-full' />
@@ -217,7 +212,7 @@ const Navbar = () => {
                         )}
                     </div>
                 </div>
-            </nav>
+            </motion.nav>
 
             {/* Spacer to prevent content from being hidden behind the navbar */}
             <div className="h-[64px] md:h-[72px]"></div>
@@ -248,4 +243,4 @@ const Navbar = () => {
     )
 }
 
-export default Navbar
+export default React.memo(Navbar)
