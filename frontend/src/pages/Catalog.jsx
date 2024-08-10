@@ -241,7 +241,7 @@ function Catalog() {
         <div className="min-h-screen flex flex-col">
             {/* Courses Section */}
             <div className="flex-grow mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
-                <h2 className="text-3xl sm:text-3xl md:text-4xl text-center my-10 font-bold text-richblack-5 mb-4">
+            <h2 className="text-3xl h-[20vh] sm:text-3xl md:text-5xl text-center my-10 text-richblack-5 mb-4">
                     Advance Your <i className="text-slate-400">Skills</i> With Us
                 </h2>
 

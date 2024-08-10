@@ -166,18 +166,10 @@ const Courses = ({ catalogPageData, isLoading }) => {
 
   return (
     <div className="container mx-auto py-8 bg-black text-white">
-      <h2 className="text-3xl font-bold text-center mb-6">Our Courses</h2>
       
       {/* Category filter */}
-      <div className="mb-6">
-        <button
-          onClick={() => filterCourses(null)}
-          className={`mr-2 mb-2 px-4 py-2 rounded-full ${
-            !selectedCategory ? 'bg-white text-black' : 'bg-gray-800 text-white'
-          }`}
-        >
-          All
-        </button>
+      <div className="mb-3">
+       
         {catalogPageData?.categories?.map((category) => (
           <button
             key={category}

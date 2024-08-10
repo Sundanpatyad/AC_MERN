@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import HighlightText from './HighlightText';
 import Courses from './Courses';
 import { getCatalogPageData } from '../../../services/operations/pageAndComponentData';
+import AnimatedText from './AnimatedText';
 
 const CourseSection = () => {
   const dispatch = useDispatch();
@@ -19,13 +20,17 @@ const CourseSection = () => {
 
   return (
     <div className='relative mx-auto flex flex-col w-11/12 max-w-full mt-10 items-center text-white justify-between'>
-      <div className='text-3xl text-center lg:text-5xl font-semibold'>
-        Courses <br /> That Make an <br />
-        <HighlightText text={"Impact "} />
+      <div className='text-4xl leading-11 text-center lg:text-5xl '>
+        Courses That Makes <br />
+        {/* <HighlightText text={"Impact "} /> */}
+        <AnimatedText
+              texts={['Impact', 'Progress', 'Impact']}
+              interval={1500}
+            />
       </div>
-      <p className='mt-2 w-[90%] text-center text-base lg:text-lg font-bold text-richblack-300'>
+      {/* <p className='mt-2 w-[90%] text-center text-base lg:text-lg font-bold text-richblack-300'>
         Our courses are designed and taught by experts who have years of experience and are passionate about sharing their knowledge with you.
-      </p>
+      </p> */}
       <div>
         <Courses catalogPageData={catalogPageData} isloading={isCoursesLoading} />
       </div>
