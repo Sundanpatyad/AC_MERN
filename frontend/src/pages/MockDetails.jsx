@@ -123,7 +123,7 @@ const MockTestDetails = () => {
 
             <div className="flex flex-col bg-black border-2 border-slate-300 p-3 sm:p-4 rounded-lg">
               <div className="flex justify-between items-center mb-3 sm:mb-4">
-                <div className="text-lg sm:text-xl font-bold text-black bg-white px-2 sm:px-3 py-1 rounded-md">
+                <div className="text-lg sm:text-md font-bold text-black bg-white px-2 sm:px-3 py-1 rounded-md">
                   {testDetails.price === 0 ? "Free" : `₹${testDetails.price}`}
                 </div>
                 {(!user || (!testDetails.studentsEnrolled.includes(user?._id) && testDetails.price !== 0)) && (
