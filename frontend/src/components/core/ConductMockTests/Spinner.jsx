@@ -20,7 +20,7 @@ const LoadingSpinner = ({ title }) => {
 
   return (
     <>
-    <div className="flex flex-col mt-0 items-center h-screen bg-black text-gray-200 p-4">
+    <div className="flex flex-col mt-10 items-center h-screen bg-black text-gray-200 p-4">
       <div className="flex flex-col items-center">
         <motion.div
           animate={{ rotate: 360 }}

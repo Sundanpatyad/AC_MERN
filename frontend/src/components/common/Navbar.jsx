@@ -12,6 +12,7 @@ import { MdKeyboardArrowDown } from "react-icons/md"
 import rzpLogo from "../../assets/Logo/rzp_logo.png"
 import { PlaceholdersAndVanishInputDemo } from '../ui/Search'
 import { RxCross1 } from "react-icons/rx"
+import { AnimatePresence } from 'framer-motion';
 
 const SCROLL_THRESHOLD = 50
 
@@ -78,17 +79,17 @@ const Navbar = () => {
     }
 
     const navVariants = {
-        visible: { 
+        visible: {
             y: 0,
             backgroundColor: scrollY.get() > SCROLL_THRESHOLD ? "rgba(0, 0, 0, 0.8)" : "transparent",
-            transition: { 
+            transition: {
                 y: { type: "spring", stiffness: 300, damping: 30 },
                 backgroundColor: { duration: 0.2 }
             }
         },
-        hidden: { 
+        hidden: {
             y: "-100%",
-            transition: { 
+            transition: {
                 y: { type: "spring", stiffness: 300, damping: 30 },
             }
         }
@@ -138,9 +139,8 @@ const Navbar = () => {
                                 ) : (
                                     <Link
                                         to={link?.path}
-                                        className={`text-white hover:text-blue-200 transition-colors duration-200 ${
-                                            matchRoute(link?.path) ? 'font-semibold' : ''
-                                        }`}
+                                        className={`text-white hover:text-blue-200 transition-colors duration-200 ${matchRoute(link?.path) ? 'font-semibold' : ''
+                                            }`}
                                     >
                                         {link.title}
                                     </Link>
@@ -174,31 +174,45 @@ const Navbar = () => {
                                 >
                                     <HiBars2 className={`transition-transform duration-200 ${isAuthDropdownOpen ? 'rotate-180' : ''} text-xl`} />
                                 </button>
-                                {isAuthDropdownOpen && (
-                                    <div className="absolute z-10 right-0 mt-2 w-64 rounded-md shadow-lg bg-black ring-1 border border-slate-700 ring-black ring-opacity-5 overflow-hidden">
-                                        <div className="py-1">
-                                            {[
-                                                { to: "/", icon: AiOutlineHome, text: "Home" },
-                                                { to: "/catalog/mock-tests", icon: AiOutlineBook, text: "Courses" },
-                                                { to: "/mocktest", icon: AiOutlineFileDone, text: "Mock Tests" },
-                                                { to: "/about", icon: AiOutlineInfoCircle, text: "About Us" },
-                                                { to: "/contact", icon: AiOutlineContacts, text: "Contact Us" },
-                                                { to: "/login", icon: AiOutlineLogin, text: "Log in" },
-                                                { to: "/signup", icon: AiOutlineUserAdd, text: "Sign Up" }
-                                            ].map((item, index) => (
-                                                <Link
-                                                    key={index}
-                                                    to={item.to}
-                                                    className="flex items-center px-4 py-2 text-sm text-white hover:bg-slate-900 transition-colors duration-150"
-                                                    onClick={() => setIsAuthDropdownOpen(false)}
-                                                >
-                                                    <item.icon className="mr-3 text-lg" />
-                                                    {item.text}
-                                                </Link>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
+                                <AnimatePresence>
+                                    {isAuthDropdownOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -10 }}
+                                            transition={{ duration: 0.2 }}
+                                            className="absolute z-10 py-2 px-2 right-0 mt-2 w-64 rounded-md shadow-lg bg-black ring-1 border border-slate-700 ring-black ring-opacity-5 overflow-hidden"
+                                        >
+                                            <motion.div className="py-1">
+                                                {[
+                                                    { to: "/", icon: AiOutlineHome, text: "Home" },
+                                                    { to: "/catalog/mock-tests", icon: AiOutlineBook, text: "Courses" },
+                                                    { to: "/mocktest", icon: AiOutlineFileDone, text: "Mock Tests" },
+                                                    { to: "/about", icon: AiOutlineInfoCircle, text: "About Us" },
+                                                    { to: "/contact", icon: AiOutlineContacts, text: "Contact Us" },
+                                                    { to: "/login", icon: AiOutlineLogin, text: "Log in" },
+                                                    { to: "/signup", icon: AiOutlineUserAdd, text: "Sign Up" }
+                                                ].map((item, index) => (
+                                                    <motion.div
+                                                        key={index}
+                                                        initial={{ opacity: 0, x: -10 }}
+                                                        animate={{ opacity: 1, x: 0 }}
+                                                        transition={{ duration: 0.2, delay: index * 0.05 }}
+                                                    >
+                                                        <Link
+                                                            to={item.to}
+                                                            className="flex items-center px-4 py-2 text-sm text-white hover:bg-slate-700 transition-colors duration-150"
+                                                            onClick={() => setIsAuthDropdownOpen(false)}
+                                                        >
+                                                            <item.icon className="mr-3 text-lg" />
+                                                            {item.text}
+                                                        </Link>
+                                                    </motion.div>
+                                                ))}
+                                            </motion.div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         ) : (
                             <>
