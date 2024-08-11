@@ -187,9 +187,9 @@ const Courses = ({ catalogPageData, isLoading }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {isLoading ? (
           // Show skeleton loading when isLoading is true
-          Array(4).fill().map((_, index) => (
-            <SkeletonCard key={index} />
-          ))
+          
+            <SkeletonCard />
+         
         ) : (
           courses.map((course) => (
             <CourseCard
