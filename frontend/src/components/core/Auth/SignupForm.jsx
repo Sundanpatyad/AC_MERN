@@ -118,7 +118,7 @@ function SignupForm() {
               value={firstName}
               onChange={handleOnChange}
               placeholder="Enter first name"
-              className="w-full rounded-[0.5rem] bg-richblack-800 p-[12px] text-richblack-5 outline-none"
+              className="w-full rounded-[0.5rem] bg-black p-[12px] text-richblack-5 outline-none"
               style={{
                 boxShadow: "inset 0px -1px 0px rgba(255, 255, 255, 0.18)",
               }}
@@ -137,7 +137,7 @@ function SignupForm() {
               value={lastName}
               onChange={handleOnChange}
               placeholder="Enter last name"
-              className="w-full rounded-[0.5rem] bg-richblack-800 p-[12px] text-richblack-5 outline-none"
+              className="w-full rounded-[0.5rem] bg-black p-[12px] text-richblack-5 outline-none"
               style={{
                 boxShadow: "inset 0px -1px 0px rgba(255, 255, 255, 0.18)",
               }}
@@ -157,7 +157,7 @@ function SignupForm() {
             value={email}
             onChange={handleOnChange}
             placeholder="Enter email address"
-            className="w-full rounded-[0.5rem] bg-richblack-800 p-[12px] text-richblack-5 outline-none"
+            className="w-full rounded-[0.5rem] bg-black p-[12px] text-richblack-5 outline-none"
             style={{
               boxShadow: "inset 0px -1px 0px rgba(255, 255, 255, 0.18)",
             }}
@@ -177,7 +177,7 @@ function SignupForm() {
               value={password}
               onChange={handleOnChange}
               placeholder="Enter Password"
-              className="w-full rounded-[0.5rem] bg-richblack-800 p-[12px] pr-10 text-richblack-5 outline-none"
+              className="w-full rounded-[0.5rem] bg-black p-[12px] pr-10 text-richblack-5 outline-none"
               style={{
                 boxShadow: "inset 0px -1px 0px rgba(255, 255, 255, 0.18)",
               }}
@@ -206,7 +206,7 @@ function SignupForm() {
               value={confirmPassword}
               onChange={handleOnChange}
               placeholder="Confirm Password"
-              className="w-full rounded-[0.5rem] bg-richblack-800 p-[12px] pr-10 text-richblack-5 outline-none"
+              className="w-full rounded-[0.5rem] bg-black p-[12px] pr-10 text-richblack-5 outline-none"
               style={{
                 boxShadow: "inset 0px -1px 0px rgba(255, 255, 255, 0.18)",
               }}
@@ -227,7 +227,7 @@ function SignupForm() {
 
         <button
           type="submit"
-          className="mt-6 rounded-[8px] bg-transparent border border-slate-200 py-[8px] px-[12px] font-medium text-slate-100 text-md"
+          className="mt-6 rounded-[8px] bg-transparent border bg-white py-[8px] px-[12px] font-medium text-black text-md"
         >
           Create Account
         </button>

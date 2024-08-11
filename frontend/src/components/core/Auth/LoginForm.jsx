@@ -98,7 +98,7 @@ function LoginForm() {
         <div>
           <button
             type="submit"
-            className="w-full flex justify-center py-2 px-4 border border-slate-300 rounded-md shadow-sm text-md font-medium text-white bg-black hover:bg-slate-900"
+            className="w-full flex justify-center py-2 px-4 border border-white bg-white text-black rounded-md shadow-sm text-md font-medium hover:bg-slate-900"
           >
             Sign In
           </button>

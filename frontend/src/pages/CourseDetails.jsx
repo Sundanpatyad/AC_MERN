@@ -165,8 +165,8 @@ function CourseDetails() {
               <div className="absolute bottom-0 left-0 h-full w-full shadow-[#161D29_0px_-64px_36px_-28px_inset]"></div>
             </div>
             <div className="mb-5 flex flex-col justify-center gap-4 py-5 text-lg text-richblack-5">
-              <h1 className="text-4xl font-bold text-richblack-5 text-center w-full sm:text-[42px]">{courseName}</h1>
-              <p className='text-richblack-200 text-center text-xs'>{courseDescription}</p>
+              <h1 className="text-4xl font-bold text-richblack-5 w-full sm:text-[42px]">{courseName}</h1>
+              <p className='text-richblack-200 text-xs'>{courseDescription}</p>
               <div className="text-md flex flex-wrap items-center gap-2">
                 <span className="text-white">{avgReviewCount}</span>
                 <RatingStars Review_Count={avgReviewCount} Star_Size={24} />
