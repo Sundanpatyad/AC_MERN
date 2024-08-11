@@ -103,7 +103,7 @@ const Navbar = () => {
                 initial="visible"
                 className="fixed top-0 left-0 right-0 z-50"
             >
-                <div className='flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 max-w-7xl mx-auto'>
+                <div className='flex items-center justify-between px-4 sm:px-6 lg:px-8 py-2 max-w-7xl mx-auto'>
                     <Link to="/" className='flex items-center space-x-2'>
                         <img src={rzpLogo} alt="Logo" className='w-8 h-8 rounded-full' />
                         <h1 className='font-semibold text-sm md:text-xl text-white'>Awakening Classes</h1>
