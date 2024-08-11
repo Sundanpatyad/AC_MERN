@@ -327,8 +327,7 @@ export const googleLogin = (credential, navigate) => {
       localStorage.setItem("token", JSON.stringify(token));
       localStorage.setItem("user", JSON.stringify({ ...userData, image: userImage }));
       toast.dismiss(toastId)
-      toast('Login Successful , Enjoy The Experience', {
-        icon: '👏',
+      toast.success('Login Successful , Enjoy The Experience', {
         style: {
           borderRadius: '10px',
           background: '#333',
