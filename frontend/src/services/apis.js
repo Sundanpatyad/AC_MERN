@@ -1,8 +1,6 @@
 
-// const BASE_URL = 'https://awakening-classes.up.railway.app';
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = 'https://awakening-classes.up.railway.app';
 
-// AUTH ENDPOINTS
 export const endpoints = {
   SENDOTP_API: `${BASE_URL}/api/v1/auth/sendotp`,
   SIGNUP_API: `${BASE_URL}/api/v1/auth/signup`,
@@ -12,7 +10,6 @@ export const endpoints = {
   RESETPASSWORD_API: `${BASE_URL}/api/v1/auth/reset-password`,
 }
 
-// PROFILE ENDPOINTS
 export const profileEndpoints = {
   GET_USER_DETAILS_API: `${BASE_URL}/api/v1/profile/getUserDetails`,
   GET_USER_ENROLLED_COURSES_API: `${BASE_URL}/api/v1/profile/getEnrolledCourses`,
@@ -22,7 +19,6 @@ export const profileEndpoints = {
   UPDATE_MOCKTEST_API:`${BASE_URL}/api/v1/mock/updateMockTestSeries`
 }
 
-// STUDENTS ENDPOINTS
 export const studentEndpoints = {
   COURSE_PAYMENT_API: `${BASE_URL}/api/v1/payment/capturePayment`,
   COURSE_VERIFY_API: `${BASE_URL}/api/v1/payment/verifyPayment`,
