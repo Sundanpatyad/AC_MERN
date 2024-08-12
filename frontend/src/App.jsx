@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Route, Routes, useLocation, Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { Route, Routes, useLocation, Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { motion } from 'framer-motion';
 import ReactTypingEffect from 'react-typing-effect';
 
@@ -45,8 +45,6 @@ import MockTestSeries from "./components/core/ConductMockTests/MockTestSeries";
 import EditMockTestSeries from "./components/core/Dashboard/AddCourse/EditMockTest";
 import RankingsPage from "./components/core/Rankings/Ranking";
 import PageLoader from "./components/ui/PageLoader";
-import { checkPendingPayment } from "./services/operations/studentFeaturesAPI";
-
 
 
 function App() {
@@ -54,21 +52,6 @@ function App() {
   const location = useLocation();
   const [showArrow, setShowArrow] = useState(false)
   const [isPageLoading, setIsPageLoading] = useState(true)
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (user) {
-        const checkPendingPaymentStatus = async () => {
-            const pendingPaymentStatus = await checkPendingPayment(token, navigate, dispatch);
-            if (pendingPaymentStatus) {
-                setIsPageLoading(false);
-            }
-        };
-        checkPendingPaymentStatus();
-        console.log("Processing");
-    }
-}, [user]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
