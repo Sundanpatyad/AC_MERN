@@ -20,6 +20,7 @@ function loadScript(src) {
     return new Promise((resolve) => {
         const script = document.createElement("script");
         script.src = src;
+
         script.onload = () => {
             resolve(true);
         };
@@ -30,10 +31,14 @@ function loadScript(src) {
     });
 }
 
+// ================ buyCourse ================ 
 export async function buyItem(token, itemId, itemTypes, userDetails, navigate, dispatch) {
     const toastId = toast.loading("Loading...", toastOptions);
     
+    console.log("These are the itemTypes: ", itemTypes);
+    
     try {
+        // Load the script
         const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
         
         if (!res) {
@@ -41,8 +46,10 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
             return;
         }
         
+        // Initialize an array to store all order responses
         const orderResponses = [];
         
+        // Iterate through each item type and initiate orders
         for (const itemType of itemTypes) {
             const PAYMENT_API = itemType === 'course' ? COURSE_PAYMENT_API : MOCK_TEST_PAYMENT_API;
             
@@ -62,13 +69,15 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
         
         const RAZORPAY_KEY = import.meta.env.VITE_APP_RAZORPAY_KEY;
         
+        // Calculate total amount
         const totalAmount = orderResponses.reduce((sum, order) => sum + order.amount, 0);
         
+        // Options
         const options = {
             key: RAZORPAY_KEY,
-            currency: orderResponses[0].currency,
+            currency: orderResponses[0].currency, // Assuming all orders use the same currency
             amount: totalAmount,
-            order_id: orderResponses.map(order => order.id).join(','),
+            order_id: orderResponses.map(order => order.id).join(','), // Join all order IDs
             name: "Awakening Classes",
             description: `Thank You for Purchasing ${itemTypes.join(' and ')}`,
             image: rzpLogo,
@@ -77,15 +86,9 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
                 email: userDetails.email
             },
             handler: function (response) {
-                localStorage.setItem('pendingPayment', JSON.stringify({
-                    razorpay_order_id: response.razorpay_order_id,
-                    razorpay_payment_id: response.razorpay_payment_id,
-                    razorpay_signature: response.razorpay_signature,
-                    itemId,
-                    itemTypes
-                }));
-
+                // Send successful mail
                 sendPaymentSuccessEmail(response, totalAmount, token);
+                // Verify payment for each item type
                 itemTypes.forEach((itemType, index) => {
                     verifyPayment({ ...response, itemId, itemType }, token, navigate, dispatch);
                 });
@@ -107,6 +110,7 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
     toast.dismiss(toastId);
 }
 
+// ================ send Payment Success Email ================
 async function sendPaymentSuccessEmail(response, amount, token) {
     try {
         await apiConnector("POST", SEND_PAYMENT_SUCCESS_EMAIL_API, {
@@ -122,16 +126,19 @@ async function sendPaymentSuccessEmail(response, amount, token) {
     }
 }
 
-export async function verifyPayment(bodyData, token, navigate, dispatch) {
+export default async function verifyPayment(bodyData, token, navigate, dispatch) {
     const toastId = toast.loading("Verifying Payment....", toastOptions);
     dispatch(setPaymentLoading(true));
     
     try {
+        // Determine the API endpoint based on the item type
         const VERIFY_API = bodyData.itemType === 'course' ? COURSE_VERIFY_API : MOCK_TEST_VERIFY_API;
         
         const response = await apiConnector("POST", VERIFY_API, bodyData, {
             Authorization: `Bearer ${token}`,
         });
+        
+        console.log("this is verify response", response);
         
         if (!response.data.success) {
             throw new Error(response.data.message);
@@ -140,16 +147,20 @@ export async function verifyPayment(bodyData, token, navigate, dispatch) {
         const itemTypeName = bodyData.itemType === 'course' ? 'course' : 'mock test';
         toast.success(`Payment Successful, you are added to the ${itemTypeName}`, toastOptions);
         
-        if (bodyData.itemType === 'course') {
+        // Reset cart if necessary (you might want to handle this differently for mock tests)
+        if (bodyData) {
             dispatch(resetCart());
         }
 
-        localStorage.removeItem('pendingPayment');
-
-        if (bodyData.itemType === 'course') {
-            navigate("/dashboard/enrolled-courses");
+        if (response.data.success) {
+            window.location.reload();
         } else {
-            navigate("/mocktest");
+            // Navigate to the appropriate dashboard page
+            if (bodyData.itemType === 'course') {
+                navigate("/dashboard/enrolled-courses");
+            } else {
+                navigate("/mocktest"); // Adjust this path as needed
+            }
         }
 
         return response;
@@ -160,23 +171,4 @@ export async function verifyPayment(bodyData, token, navigate, dispatch) {
         toast.dismiss(toastId);
         dispatch(setPaymentLoading(false));
     }
-}
-
-export async function checkPendingPayment(token, navigate, dispatch) {
-    const pendingPayment = localStorage.getItem('pendingPayment');
-    if (pendingPayment) {
-        const paymentData = JSON.parse(pendingPayment);
-        const verificationPromises = paymentData.itemTypes.map(itemType => 
-            verifyPayment({ ...paymentData, itemType }, token, navigate, dispatch)
-        );
-        
-        try {
-            await Promise.all(verificationPromises);
-            return true; // All verifications completed successfully
-        } catch (error) {
-            console.error("Error verifying pending payments:", error);
-            return false; // At least one verification failed
-        }
-    }
-    return true; // No pending payment, consider it as success
 }
