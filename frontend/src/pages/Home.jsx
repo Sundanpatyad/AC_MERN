@@ -31,7 +31,7 @@ const Home = () => {
         <InstructorSection />
          <h1 className="text-center text-3xl lg:text-4xl font-semibold mt-8 flex justify-center items-center gap-x-3">
           Reviews from other learners
-          <MdOutlineRateReview onClick={() => setReviewModal(true)} className='text-white' />
+          {/* <MdOutlineRateReview onClick={() => setReviewModal(true)} className='text-white' /> */}
         </h1>
          <ReviewSlider />
       </div>
