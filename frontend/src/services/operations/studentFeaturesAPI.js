@@ -159,7 +159,7 @@ export default async function verifyPayment(bodyData, token, navigate, dispatch)
             if (bodyData.itemType === 'course') {
                 navigate("/dashboard/enrolled-courses");
             } else {
-                navigate("/mocktest"); // Adjust this path as needed
+                navigate("/dashboard/enrolled-courses"); // Adjust this path as needed
             }
         }
 
