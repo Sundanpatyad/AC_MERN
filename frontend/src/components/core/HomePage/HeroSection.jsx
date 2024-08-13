@@ -74,7 +74,7 @@ const HeroSection = () => {
 
         {token ?
           <div className='flex mt-10 flex-col'>
-            <Link to={"/dashboard"}>
+            <Link to={"/dashboard/enrolled-courses"}>
               <HoverBorderGradientDemo title={"Explore More"} />
             </Link>
             <Link to={"https://www.youtube.com/@awakeningclasses"} className='mt-5'>
