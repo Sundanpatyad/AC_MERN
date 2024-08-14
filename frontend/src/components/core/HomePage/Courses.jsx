@@ -185,7 +185,6 @@ const Courses = ({ catalogPageData, isLoading , setShowLoginModal }) => {
         ))}
       </div>
 
-      {/* Course grid */}
       {isLoading ? (
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
     {Array(4).fill().map((_, index) => (
@@ -209,7 +208,11 @@ const Courses = ({ catalogPageData, isLoading , setShowLoginModal }) => {
   </div>
 )}
       {!isLoading && courses.length === 0 && (
-       <p className="text-center text-lg">No courses found.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {Array(4).fill().map((_, index) => (
+          <SkeletonCard key={index} />
+        ))}
+      </div>
       )}
 
       {/* View all courses link */}
