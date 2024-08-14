@@ -41,103 +41,95 @@ function LoginForm() {
 
   return (
     <GoogleOAuthProvider clientId="217412143147-6l1q2l190t36rp0452f3hl5mtl3nrhjq.apps.googleusercontent.com">
-      <form onSubmit={handleOnSubmit} className="mt-4 space-y-3 w-70 md:w-full max-w-md mx-auto">
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-100">
-            Email Address
-          </label>
+      <form onSubmit={handleOnSubmit} className="flex w-full flex-col gap-y-4">
+        <label className="w-full">
+          <p className="mb-1 text-[0.875rem] leading-[1.375rem] text-richblack-5">
+            Email Address <sup className="text-pink-200">*</sup>
+          </p>
           <input
-            id="email"
-            name="email"
-            type="email"
             required
+            type="email"
+            name="email"
             value={email}
             onChange={handleOnChange}
-            className="block w-full px-3 py-2 bg-transparent text-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-white focus:border-white"
-            placeholder="Enter your email"
+            placeholder="Enter email address"
+            className="w-full rounded-[0.5rem] bg-black p-[12px] text-richblack-5 outline-none"
+            style={{
+              boxShadow: "inset 0px -1px 0px rgba(255, 255, 255, 0.18)",
+            }}
           />
-        </div>
+        </label>
 
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-100">
-            Password
-          </label>
-          <div className="relative">
-            <input
-              id="password"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              required
-              value={password}
-              onChange={handleOnChange}
-              className="block w-full px-3 py-2 bg-transparent text-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-white focus:border-white"
-              placeholder="Enter your password"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center"
-            >
-              {showPassword ? (
-                <AiOutlineEyeInvisible className="h-5 w-5 text-gray-400" />
-              ) : (
-                <AiOutlineEye className="h-5 w-5 text-gray-400" />
-              )}
-            </button>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div className="text-sm">
-            <Link to="/forgot-password" className="font-medium text-slate-300 hover:text-slate-200">
-              Forgot your password?
-            </Link>
-          </div>
-        </div>
-
-        <div>
-          <button
-            type="submit"
-            className="w-full flex justify-center py-2 px-4 border border-white bg-white text-black rounded-md shadow-sm text-md font-medium"
+        <label className="relative w-full">
+          <p className="mb-1 text-[0.875rem] leading-[1.375rem] text-richblack-5">
+            Password <sup className="text-pink-200">*</sup>
+          </p>
+          <input
+            required
+            type={showPassword ? "text" : "password"}
+            name="password"
+            value={password}
+            onChange={handleOnChange}
+            placeholder="Enter Password"
+            className="w-full rounded-[0.5rem] bg-black p-[12px] pr-10 text-richblack-5 outline-none"
+            style={{
+              boxShadow: "inset 0px -1px 0px rgba(255, 255, 255, 0.18)",
+            }}
+          />
+          <span
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute right-3 top-[38px] z-[10] cursor-pointer"
           >
-            Sign In
-          </button>
+            {showPassword ? (
+              <AiOutlineEyeInvisible fontSize={24} fill="#AFB2BF" />
+            ) : (
+              <AiOutlineEye fontSize={24} fill="#AFB2BF" />
+            )}
+          </span>
+        </label>
+
+        <Link to="/forgot-password" className="text-xs text-blue-500 ml-auto">
+          Forgot Password?
+        </Link>
+
+        <button
+          type="submit"
+          className="mt-6 rounded-[8px] bg-transparent border bg-white py-[8px] px-[12px] font-medium text-black text-md"
+        >
+          Sign In
+        </button>
+
+        <div className="flex items-center my-4">
+          <div className="flex-grow border-t border-gray-300"></div>
+          <span className="flex-shrink mx-4 text-gray-300">Or</span>
+          <div className="flex-grow border-t border-gray-300"></div>
+        </div>
+   <div className="flex align-center justify-center">
+        <GoogleLogin 
+          onSuccess={handleGoogleLoginSuccess}
+          onError={handleGoogleLoginError}
+          theme="dark"
+          useOneTap
+          render={({ onClick }) => (
+            <button
+              onClick={onClick}
+              className="w-full text-center flex justify-center items-center py-[8px] px-[12px] border border-slate-300 rounded-[8px] text-md font-medium text-white bg-black hover:bg-slate-900"
+            >
+              <FcGoogle className="mr-2 h-5 w-5" />
+              Sign in with Google
+            </button>
+          )}
+        />
         </div>
 
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-black text-gray-300">Or continue with</span>
-          </div>
-        </div>
-        <div className="flex align-center justify-center">
-          <GoogleLogin 
-            onSuccess={handleGoogleLoginSuccess}
-            onError={handleGoogleLoginError}
-            theme="dark"
-            useOneTap
-            render={({ onClick }) => (
-              <button
-                onClick={onClick}
-                className="w-full flex justify-center items-center py-2 px-4 border border-slate-300 rounded-md shadow-sm text-md font-medium text-white bg-black hover:bg-slate-900"
-              >
-                <FcGoogle className="mr-2 h-5 w-5" />
-                Sign in with Google
-              </button>
-            )}
-          />
-        </div>
         <p className="mt-4 text-center text-richblack-5">
-        Dont't have an account?{" "}
-        <Link to="/signup" className="text-blue-500 hover:underline">
-          Sign up
-        </Link>
-      </p>
+          Don't have an account?{" "}
+          <Link to="/signup" className="text-blue-500 hover:underline">
+            Sign up
+          </Link>
+        </p>
       </form>
     </GoogleOAuthProvider>
-    
   );
 }
 

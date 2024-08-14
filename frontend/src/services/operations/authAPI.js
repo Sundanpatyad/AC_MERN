@@ -293,7 +293,7 @@ export function logout(navigate) {
         color: '#fff',
       },
     });
-    navigate("/")
+    navigate("/login")
   }
 }
 
