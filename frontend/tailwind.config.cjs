@@ -381,6 +381,7 @@ module.exports = {
             transform: "translate(-50%,-40%) scale(1)",
           },
         },
+        
       },
     },
   },

@@ -47,6 +47,7 @@ import RankingsPage from "./components/core/Rankings/Ranking";
 import PageLoader from "./components/ui/PageLoader";
 
 
+
 function App() {
   const { user } = useSelector((state) => state.profile)
   const location = useLocation();

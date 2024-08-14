@@ -6,7 +6,7 @@ import { addToCart, removeFromCart } from '../../../slices/cartSlice'
 import toast from 'react-hot-toast'
 import { buyItem } from '../../../services/operations/studentFeaturesAPI'
 
-const CourseCard = ({ course, handleAddToCart, handleBuyNow, isInCart, isEnrolled, isLoggedIn }) => {
+const CourseCard = ({ course, handleAddToCart, handleBuyNow, isInCart, isEnrolled, isLoggedIn , setShowLoginModal }) => {
   const navigate = useNavigate();
 
   const handleAddToCartClick = (e) => {
@@ -34,12 +34,15 @@ const CourseCard = ({ course, handleAddToCart, handleBuyNow, isInCart, isEnrolle
         </div>
         <div className="flex flex-col space-y-2">
           {!isLoggedIn ? (
-            <Link
-              to="/login"
+            <button
+               onClick={(e) => {
+                e.preventDefault();
+                setShowLoginModal(true);
+            }}
               className="w-full py-2 px-4 bg-white text-black rounded-md hover:bg-gray-200 transition duration-300 text-center"
             >
               Login to {course.price === 0 ? 'Enroll' : 'Purchase'}
-            </Link>
+            </button>
           ) : isEnrolled || course.price === 0 ? (
             <Link
               to={`/dashboard/enrolled-courses`}
@@ -80,24 +83,24 @@ const CourseCard = ({ course, handleAddToCart, handleBuyNow, isInCart, isEnrolle
 }
 
 const SkeletonCard = () => (
-  <div className="bg-black w-[80vw] md:w-[50vw] border border-gray-800 rounded-lg overflow-hidden shadow-lg animate-pulse">
-    <div className="w-full h-48 bg-gray-700"></div>
-    <div className="p-4">
-      <div className="h-6 bg-gray-700 rounded w-3/4 mb-2"></div>
-      <div className="h-4 bg-gray-700 rounded w-full mb-4"></div>
-      <div className="flex justify-between items-center text-gray-400 mb-4">
-        <div className="h-4 bg-gray-700 rounded w-1/4"></div>
-        <div className="h-4 bg-gray-700 rounded w-1/4"></div>
-      </div>
-      <div className="flex flex-col space-y-2">
-        <div className="h-10 bg-gray-700 rounded"></div>
-        <div className="h-10 bg-gray-700 rounded"></div>
-      </div>
+  <div className="bg-richblack-900 w-72 rounded-xl overflow-hidden shadow-lg flex flex-col animate-pulse">
+  <div className="h-36 bg-richblack-700"></div>
+  <div className="p-4 flex-grow flex flex-col justify-between">
+    <div className="h-4 bg-richblack-700 rounded w-3/4 mb-3"></div>
+    <div className="h-4 bg-richblack-700 rounded w-1/2 mb-3"></div>
+    <div className="flex justify-between items-center mb-3">
+      <div className="h-4 bg-richblack-700 rounded w-1/4"></div>
+      <div className="h-4 bg-richblack-700 rounded w-1/4"></div>
+    </div>
+    <div className="space-y-2">
+      <div className="h-8 bg-richblack-700 rounded"></div>
+      <div className="h-8 bg-richblack-700 rounded"></div>
     </div>
   </div>
+</div>
 )
 
-const Courses = ({ catalogPageData, isLoading }) => {
+const Courses = ({ catalogPageData, isLoading , setShowLoginModal }) => {
   const [courses, setCourses] = useState([])
   const [selectedCategory, setSelectedCategory] = useState(null)
   const dispatch = useDispatch()
@@ -169,7 +172,6 @@ const Courses = ({ catalogPageData, isLoading }) => {
       
       {/* Category filter */}
       <div className="mb-3">
-       
         {catalogPageData?.categories?.map((category) => (
           <button
             key={category}
@@ -184,31 +186,30 @@ const Courses = ({ catalogPageData, isLoading }) => {
       </div>
 
       {/* Course grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {isLoading ? (
-          // Show skeleton loading when isLoading is true
-          
-            <SkeletonCard />
-         
-        ) : (
-          courses.map((course) => (
-            <CourseCard
-              key={course._id}
-              course={course}
-              handleAddToCart={handleAddToCart}
-              handleBuyNow={handleBuyNow}
-              isInCart={isInCart(course)}
-              isEnrolled={isEnrolled(course)}
-              isLoggedIn={isLoggedIn}
-            />
-          ))
-        )}
-      </div>
-
+      {isLoading ? (
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    {Array(4).fill().map((_, index) => (
+      <SkeletonCard key={index} />
+    ))}
+  </div>
+) : (
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    {courses.map((course) => (
+      <CourseCard
+        key={course._id}
+        course={course}
+        handleAddToCart={handleAddToCart}
+        handleBuyNow={handleBuyNow}
+        isInCart={isInCart(course)}
+        isEnrolled={isEnrolled(course)}
+        isLoggedIn={isLoggedIn}
+        setShowLoginModal={setShowLoginModal}
+      />
+    ))}
+  </div>
+)}
       {!isLoading && courses.length === 0 && (
-        Array(4).fill().map((_, index) => (
-          <SkeletonCard key={index} />
-        ))
+       <p className="text-center text-lg">No courses found.</p>
       )}
 
       {/* View all courses link */}

@@ -8,7 +8,7 @@ import Courses from './Courses';
 import { getCatalogPageData } from '../../../services/operations/pageAndComponentData';
 import AnimatedText from './AnimatedText';
 
-const CourseSection = () => {
+const CourseSection = ({setShowLoginModal}) => {
   const dispatch = useDispatch();
   const categoryID = "66758c6b75de4ef02cd497d1";
 
@@ -32,7 +32,7 @@ const CourseSection = () => {
         Our courses are designed and taught by experts who have years of experience and are passionate about sharing their knowledge with you.
       </p> */}
       <div>
-        <Courses catalogPageData={catalogPageData} isloading={isCoursesLoading} />
+        <Courses catalogPageData={catalogPageData} isloading={isCoursesLoading} setShowLoginModal={setShowLoginModal} />
       </div>
     </div>
   );

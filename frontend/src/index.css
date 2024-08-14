@@ -7,31 +7,19 @@ body, #root {
   overflow-x: hidden;
 }
 
-/* Webkit-based browsers (Chrome, Safari, etc.) */
-::-webkit-scrollbar {
-  width: 5px;
-  background-color: transparent;
-}
-
-::-webkit-scrollbar-track {
-  background-color: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: rgba(128, 128, 128, 0.5);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(128, 128, 128, 0.8);
-}
-
-/* Firefox */
+/* Hide scrollbar for all elements */
 * {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(128, 128, 128, 0.5) transparent;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+*::-webkit-scrollbar {
+  display: none;
 }
 
 .google-login-button {
-    width: 100% !important;
-  }
+  width: 100% !important;
+}
+
+
