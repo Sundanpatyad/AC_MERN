@@ -51,7 +51,7 @@ function CourseDetails() {
           setIsUserEnrolled(res.data.courseDetails.studentsEnrolled.includes(user._id))
         }
       } catch (error) {
-        console.log("Could not fetch Course Details")
+        // //console.log("Could not fetch Course Details")
       } finally {
         setIsLoading(false)
       }

@@ -27,7 +27,7 @@ exports.sendOTP = async (req, res) => {
 
         // if exist then response
         if (checkUserPresent) {
-            console.log('(when otp generate) User alreay registered')
+            //console.log('(when otp generate) User alreay registered')
             return res.status(401).json({
                 success: false,
                 message: 'User is Already Registered'
@@ -40,17 +40,17 @@ exports.sendOTP = async (req, res) => {
             lowerCaseAlphabets: false,
             specialChars: false
         })
-        // console.log('Your otp - ', otp);
+        // //console.log('Your otp - ', otp);
 
         const name = email.split('@')[0].split('.').map(part => part.replace(/\d+/g, '')).join(' ');
-        console.log(name);
+        //console.log(name);
 
         // send otp in mail
         await mailSender(email, 'OTP Verification Email', otpTemplate(otp, name));
 
         // create an entry for otp in DB
         const otpBody = await OTP.create({ email, otp });
-        // console.log('otpBody - ', otpBody);
+        // //console.log('otpBody - ', otpBody);
 
 
 
@@ -63,7 +63,7 @@ exports.sendOTP = async (req, res) => {
     }
 
     catch (error) {
-        console.log('Error while generating Otp - ', error);
+        //console.log('Error while generating Otp - ', error);
         res.status(200).json({
             success: false,
             message: 'Error while generating Otp',
@@ -109,7 +109,7 @@ exports.signup = async (req, res) => {
 
         // find most recent otp stored for user in DB
         const recentOtp = await OTP.findOne({ email }).sort({ createdAt: -1 }).limit(1);
-        console.log('recentOtp ', recentOtp)
+        //console.log('recentOtp ', recentOtp)
 
         // .sort({ createdAt: -1 }): 
         // It's used to sort the results based on the createdAt field in descending order (-1 means descending). 
@@ -159,8 +159,8 @@ exports.signup = async (req, res) => {
     }
 
     catch (error) {
-        console.log('Error while registering user (signup)');
-        console.log(error)
+        //console.log('Error while registering user (signup)');
+        //console.log(error)
         res.status(401).json({
             success: false,
             error: error.message,
@@ -235,8 +235,8 @@ exports.login = async (req, res) => {
     }
 
     catch (error) {
-        console.log('Error while Login user');
-        console.log(error);
+        //console.log('Error while Login user');
+        //console.log(error);
         res.status(500).json({
             success: false,
             error: error.message,
@@ -304,7 +304,7 @@ exports.changePassword = async (req, res) => {
                     `Password updated successfully for ${updatedUserDetails.firstName} ${updatedUserDetails.lastName}`
                 )
             );
-            // console.log("Email sent successfully:", emailResponse);
+            // //console.log("Email sent successfully:", emailResponse);
         }
         catch (error) {
             console.error("Error occurred while sending email:", error);
@@ -324,8 +324,8 @@ exports.changePassword = async (req, res) => {
     }
 
     catch (error) {
-        console.log('Error while changing passowrd');
-        console.log(error)
+        //console.log('Error while changing passowrd');
+        //console.log(error)
         res.status(500).json({
             success: false,
             error: error.message,
@@ -393,7 +393,7 @@ exports.googleAuth = async (req, res) => {
             message: 'User logged in successfully with Google',
         });
     } catch (error) {
-        console.log('Error in Google Authentication', error);
+        //console.log('Error in Google Authentication', error);
         res.status(500).json({
             success: false,
             error: error.message,

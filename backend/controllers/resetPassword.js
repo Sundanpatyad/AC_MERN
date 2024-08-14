@@ -43,8 +43,8 @@ exports.resetPasswordToken = async (req, res) => {
     }
 
     catch (error) {
-        console.log('Error while creating token for reset password');
-        console.log(error)
+        //console.log('Error while creating token for reset password');
+        //console.log(error)
         res.status(500).json({
             success: false,
             error: error.message,
@@ -92,7 +92,7 @@ exports.resetPassword = async (req, res) => {
             });
         }
 
-        // console.log('userDetails.resetPasswordExpires = ', userDetails.resetPasswordExpires);
+        // //console.log('userDetails.resetPasswordExpires = ', userDetails.resetPasswordExpires);
 
         // check token is expire or not
         if (!(userDetails.resetPasswordTokenExpires > Date.now())) {
@@ -119,8 +119,8 @@ exports.resetPassword = async (req, res) => {
     }
 
     catch (error) {
-        console.log('Error while reseting password');
-        console.log(error);
+        //console.log('Error while reseting password');
+        //console.log(error);
         res.status(500).json({
             success: false,
             error: error.message,

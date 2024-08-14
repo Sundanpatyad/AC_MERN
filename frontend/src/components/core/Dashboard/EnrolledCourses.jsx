@@ -33,7 +33,7 @@ export default function EnrolledCourses() {
           dispatch(setEnrolledCoursesSuccess(res))
         } catch (error) {
           dispatch(setEnrolledCoursesFailure(error.message))
-          console.log("Could not fetch enrolled courses.")
+          // //console.log("Could not fetch enrolled courses.")
         }
       }
 
@@ -44,7 +44,7 @@ export default function EnrolledCourses() {
           dispatch(setEnrolledMockTestsSuccess(res))
         } catch (error) {
           dispatch(setEnrolledMockTestsFailure(error.message))
-          console.log("Could not fetch enrolled mock tests.")
+          // //console.log("Could not fetch enrolled mock tests.")
         }
       }
     }
@@ -60,7 +60,7 @@ export default function EnrolledCourses() {
         dispatch(setMockAttemptsSuccess(res.attempts))
       } catch (error) {
         dispatch(setMockAttemptsFailure(error.message))
-        console.log("Could not fetch mock test attempts.")
+        // //console.log("Could not fetch mock test attempts.")
       }
     }
   }

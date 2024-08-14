@@ -16,14 +16,14 @@ const ViewMockTest = () => {
   useEffect(() => {
     const fetchMockTest = async () => {
       try {
-        console.log('Fetching mock test with ID:', mockId);  // Log mockId
+        // //console.log('Fetching mock test with ID:', mockId);  // Log mockId
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
         const response = await axios.get(`${GET_MOCK_TEST_API}/${mockId}`, { headers });
-        console.log('API response:', response.data);  // Log API response
+        // //console.log('API response:', response.data);  // Log API response
         setMockTest(response.data.data);
         setLoading(false);
       } catch (error) {
-        console.error('Error details:', error);  // Log error details
+        // console.error('Error details:', error);  // Log error details
         setError(error.response?.data?.message || 'Error fetching mock test');
         setLoading(false);
       }

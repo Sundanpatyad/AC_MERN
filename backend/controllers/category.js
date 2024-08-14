@@ -29,8 +29,8 @@ exports.createCategory = async (req, res) => {
         });
     }
     catch (error) {
-        console.log('Error while creating Category');
-        console.log(error);
+        //console.log('Error while creating Category');
+        //console.log(error);
         res.status(500).json({
             success: false,
             message: 'Error while creating Category',
@@ -54,8 +54,8 @@ exports.showAllCategories = async (req, res) => {
         })
     }
     catch (error) {
-        console.log('Error while fetching all allCategories');
-        console.log(error);
+        //console.log('Error while fetching all allCategories');
+        //console.log(error);
         res.status(500).json({
             success: false,
             message: 'Error while fetching all allCategories'

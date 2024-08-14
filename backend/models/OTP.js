@@ -22,18 +22,18 @@ const OTPSchema = new mongoose.Schema({
 async function sendVerificationEmail(email, otp) {
     try {
         const mailResponse = mailSender(email, 'Verification Email from Aawakening Classes', otp);
-        console.log('Email sent successfully to - ', email);
+        //console.log('Email sent successfully to - ', email);
 
     }
     catch (error) {
-        console.log('Error while sending an email to ', email);
+        //console.log('Error while sending an email to ', email);
         throw new error;
     }
 }
 
 // pre middleware
 OTPSchema.pre('save', async (next) => {
-    // console.log("New document saved to database");
+    // //console.log("New document saved to database");
 
     // Only send an email when a new document is created
     if (this.isNew) {

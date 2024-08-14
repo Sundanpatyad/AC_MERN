@@ -22,8 +22,8 @@ exports.createCourse = async (req, res) => {
         const tag = JSON.parse(_tag)
         const instructions = JSON.parse(_instructions)
 
-        // console.log("tag = ", tag)
-        // console.log("instructions = ", instructions)
+        // //console.log("tag = ", tag)
+        // //console.log("instructions = ", instructions)
 
         // get thumbnail of course
         const thumbnail = req.files?.thumbnailImage;
@@ -96,8 +96,8 @@ exports.createCourse = async (req, res) => {
     }
 
     catch (error) {
-        console.log('Error while creating new course');
-        console.log(error);
+        //console.log('Error while creating new course');
+        //console.log(error);
         res.status(500).json({
             success: false,
             error: error.message,
@@ -129,8 +129,8 @@ exports.getAllCourses = async (req, res) => {
     }
 
     catch (error) {
-        console.log('Error while fetching data of all courses');
-        console.log(error);
+        //console.log('Error while fetching data of all courses');
+        //console.log(error);
         res.status(500).json({
             success: false,
             error: error.message,
@@ -185,7 +185,7 @@ exports.getCourseDetails = async (req, res) => {
         //   });
         // }
 
-        // console.log('courseDetails -> ', courseDetails)
+        // //console.log('courseDetails -> ', courseDetails)
         let totalDurationInSeconds = 0
         courseDetails.courseContent.forEach((content) => {
             content.subSection.forEach((subSection) => {
@@ -208,8 +208,8 @@ exports.getCourseDetails = async (req, res) => {
     }
 
     catch (error) {
-        console.log('Error while fetching course details');
-        console.log(error);
+        //console.log('Error while fetching course details');
+        //console.log(error);
         return res.status(500).json({
             success: false,
             error: error.message,
@@ -224,7 +224,7 @@ exports.getFullCourseDetails = async (req, res) => {
     try {
         const { courseId } = req.body
         const userId = req.user.id
-        // console.log('courseId userId  = ', courseId, " == ", userId)
+        // //console.log('courseId userId  = ', courseId, " == ", userId)
 
         const courseDetails = await Course.findOne({
             _id: courseId,
@@ -250,7 +250,7 @@ exports.getFullCourseDetails = async (req, res) => {
             userId: userId,
         })
 
-        //   console.log("courseProgressCount : ", courseProgressCount)
+        //   //console.log("courseProgressCount : ", courseProgressCount)
 
         if (!courseDetails) {
             return res.status(404).json({
@@ -308,7 +308,7 @@ exports.editCourse = async (req, res) => {
 
         // If Thumbnail Image is found, update it
         if (req.files) {
-            // console.log("thumbnail update")
+            // //console.log("thumbnail update")
             const thumbnail = req.files.thumbnailImage
             const thumbnailImage = await uploadImageToCloudinary(
                 thumbnail,

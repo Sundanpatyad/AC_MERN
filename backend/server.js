@@ -41,7 +41,7 @@ app.use(
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-    console.log(`Server Started on PORT ${PORT}`);
+    //console.log(`Server Started on PORT ${PORT}`);
 });
 
 // connections
@@ -60,7 +60,7 @@ app.use('/api/v1/mock', mockRoutes);
 
 // Default Route
 app.get('/', (req, res) => {
-    // console.log('Your server is up and running..!');
+    // //console.log('Your server is up and running..!');
     res.send(`<div>
     This is Default Route  
     <p>Everything is OK</p>

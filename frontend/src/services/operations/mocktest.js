@@ -21,7 +21,7 @@ export const addMockTest = async (data, token) => {
       "Content-Type": "multipart/form-data",
       Authorization: `Bearer ${token}`,
     })
-    console.log("CREATE MOCKTEST API RESPONSE............", response)
+    //console.log("CREATE MOCKTEST API RESPONSE............", response)
 
     if (!response?.data?.success) {
       throw new Error("Could Not Add Mock Test")
@@ -30,7 +30,7 @@ export const addMockTest = async (data, token) => {
     result = response?.data?.data
     toast.success("Course Details Added Successfully", toastOptions)
   } catch (error) {
-    console.log("CREATE COURSE API ERROR............", error)
+    //console.log("CREATE COURSE API ERROR............", error)
     toast.error(error.message, toastOptions)
   }
   toast.dismiss(toastId)
@@ -48,13 +48,13 @@ export const fetchInstructorMockTest = async (token) => {
         Authorization: `Bearer ${token}`,
       }
     )
-    console.log("INSTRUCTOR Mocktest API RESPONSE", response)
+    //console.log("INSTRUCTOR Mocktest API RESPONSE", response)
     if (!response?.data?.success) {
       throw new Error("Could Not Fetch Instructor mocktest")
     }
     result = response?.data?.data
   } catch (error) {
-    console.log("INSTRUCTOR MockTest API ERROR............", error)
+    //console.log("INSTRUCTOR MockTest API ERROR............", error)
     toast.error(error.message, toastOptions)
   }
   return result
@@ -71,15 +71,15 @@ export const fetchAllMockTests = async (token) => {
         Authorization: `Bearer ${token}`
       }
     )
-    console.log("ALL Mocktest API RESPONSE", response)
+    //console.log("ALL Mocktest API RESPONSE", response)
     if (!response?.data?.success) {
       throw new Error("Could Not Fetch Mocktest")
     }
     result = response?.data?.data
-    console.log("ALL Mocktest API RESPONSE", result)
+    //console.log("ALL Mocktest API RESPONSE", result)
     return result
   } catch (error) {
-    console.log("ALL Mocktest API ERROR............", error)
+    //console.log("ALL Mocktest API ERROR............", error)
     toast.error(error.message, toastOptions)
   }
 }
@@ -87,7 +87,7 @@ export const fetchAllMockTests = async (token) => {
 export const fetchMockTestDetails = async (mockTestId, token) => {
   let result = null;
   const toastId = toast.loading("Loading...", toastOptions)
-  console.log(mockTestId)
+  //console.log(mockTestId)
   try {
     const response = await apiConnector(
       "GET",
@@ -97,13 +97,13 @@ export const fetchMockTestDetails = async (mockTestId, token) => {
         Authorization: `Bearer ${token}`,
       }
     )
-    console.log("MockTest Details API RESPONSE", response)
+    //console.log("MockTest Details API RESPONSE", response)
     if (!response?.data?.success) {
       throw new Error("Could Not Fetch Mock Test Details")
     }
     result = response?.data?.data
   } catch (error) {
-    console.log("MockTest Details API ERROR............", error)
+    //console.log("MockTest Details API ERROR............", error)
     toast.error(error.message, toastOptions)
   }
   toast.dismiss(toastId)
@@ -122,14 +122,14 @@ export const enrollInMockTest = async (mockTestId, token) => {
         Authorization: `Bearer ${token}`,
       }
     )
-    console.log("Enroll MockTest API RESPONSE", response)
+    //console.log("Enroll MockTest API RESPONSE", response)
     if (!response?.data?.success) {
       throw new Error("Could Not Enroll in Mock Test")
     }
     result = response?.data?.data
     toast.success("Enrolled in Mock Test Successfully", toastOptions)
   } catch (error) {
-    console.log("Enroll MockTest API ERROR............", error)
+    //console.log("Enroll MockTest API ERROR............", error)
     toast.error(error.message, toastOptions)
   }
   toast.dismiss(toastId)
@@ -151,7 +151,7 @@ export const fetchSeries = async (seriesId, token) => {
       }
     );
 
-    console.log("Fetch Series API RESPONSE", response);
+    //console.log("Fetch Series API RESPONSE", response);
 
     if (!response?.data?.success) {
       throw new Error("Could Not Fetch Mock Test Series");
@@ -160,7 +160,7 @@ export const fetchSeries = async (seriesId, token) => {
     result = response?.data?.data;
     toast.success("Mock Test Series Fetched Successfully", toastOptions);
   } catch (error) {
-    console.log("Fetch Series API ERROR............", error);
+    //console.log("Fetch Series API ERROR............", error);
     toast.error(error.message, toastOptions);
   }
 

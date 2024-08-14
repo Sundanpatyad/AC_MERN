@@ -14,7 +14,7 @@ exports.createSubSection = async (req, res) => {
 
         // extract video file
         const videoFile = req.files.video
-        // console.log('videoFile ', videoFile)
+        // //console.log('videoFile ', videoFile)
 
         // validation
         if (!title || !description || !videoFile || !sectionId) {
@@ -47,8 +47,8 @@ exports.createSubSection = async (req, res) => {
         });
     }
     catch (error) {
-        console.log('Error while creating SubSection');
-        console.log(error);
+        //console.log('Error while creating SubSection');
+        //console.log(error);
         res.status(500).json({
             success: false,
             error: error.message,
@@ -82,8 +82,8 @@ exports.createMockTest = async (req, res) => {
         message: 'Question created successfully'
       });
     } catch (error) {
-      console.log('Error while creating Question');
-      console.log(error);
+      //console.log('Error while creating Question');
+      //console.log(error);
       res.status(500).json({
         success: false,
         error: error.message,

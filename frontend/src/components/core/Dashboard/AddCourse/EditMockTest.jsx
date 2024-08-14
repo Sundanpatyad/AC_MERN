@@ -135,7 +135,7 @@ const EditMockTestSeries = () => {
       attachments: series.attachments
     };
 
-    console.log(seriesData);
+    // //console.log(seriesData);
     const result = await saveSeries(seriesId, seriesData, token);
     
     setIsLoading(false);

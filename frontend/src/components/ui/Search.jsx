@@ -10,7 +10,7 @@ export function PlaceholdersAndVanishInputDemo({ onResultClick }) {
   const [isLoading, setIsLoading] = useState(false);
   const { SEARCH_API } = mocktestEndpoints;
 
-  console.log(searchResults);
+  // //console.log(searchResults);
 
   const placeholders = [
     "Search Mocktests...",

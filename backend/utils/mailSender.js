@@ -22,9 +22,9 @@ const mailSender = async (email, title, body) => {
             subject: title,
             html: body
         });
-        console.log(email, title, body);
+        //console.log(email, title, body);
 
-        console.log('Email sent successfully:', info.messageId);
+        //console.log('Email sent successfully:', info.messageId);
         return info;
     }
     catch (error) {

@@ -19,7 +19,7 @@ export default function ProfileDropdown() {
   useOnClickOutside(ref, () => setOpen(false))
 
   if (!user) return null
-  // console.log('user data from store = ', user )
+  // //console.log('user data from store = ', user )
 
 
 

@@ -49,7 +49,7 @@ export function sendOtp(email, navigate) {
         },
       });
     } catch (error) {
-      console.log("SENDOTP API ERROR --> ", error);
+      //console.log("SENDOTP API ERROR --> ", error);
       toast.error(error.response.data?.message, {
         style: {
           borderRadius: '10px',
@@ -106,7 +106,7 @@ export function signUp(accountType, firstName, lastName, email, password, confir
       });
       navigate("/login");
     } catch (error) {
-      console.log("SIGNUP API ERROR --> ", error);
+      //console.log("SIGNUP API ERROR --> ", error);
       toast.error("Invalid OTP", {
         style: {
           borderRadius: '10px',
@@ -141,7 +141,7 @@ export function login(email, password, navigate) {
         password,
       })
 
-      console.log("LOGIN API RESPONSE............", response);
+      //console.log("LOGIN API RESPONSE............", response);
 
       if (!response.data.success) {
         throw new Error(response.data.message)
@@ -167,7 +167,7 @@ export function login(email, password, navigate) {
 
       navigate("/dashboard/my-profile");
     } catch (error) {
-      console.log("LOGIN API ERROR.......", error)
+      //console.log("LOGIN API ERROR.......", error)
       toast.error(error.response?.data?.message, {
         style: {
           borderRadius: '10px',
@@ -199,7 +199,7 @@ export function getPasswordResetToken(email, setEmailSent) {
         email,
       })
 
-      console.log("RESET PASS TOKEN RESPONSE............", response)
+      //console.log("RESET PASS TOKEN RESPONSE............", response)
 
       if (!response.data.success) {
         throw new Error(response.data.message)
@@ -214,7 +214,7 @@ export function getPasswordResetToken(email, setEmailSent) {
       });
       setEmailSent(true)
     } catch (error) {
-      console.log("RESET PASS TOKEN ERROR............", error)
+      //console.log("RESET PASS TOKEN ERROR............", error)
       toast.error(error.response?.data?.message, {
         style: {
           borderRadius: '10px',
@@ -248,7 +248,7 @@ export function resetPassword(password, confirmPassword, token, navigate) {
         token,
       })
 
-      console.log("RESETPASSWORD RESPONSE............", response)
+      //console.log("RESETPASSWORD RESPONSE............", response)
 
       if (!response.data.success) {
         throw new Error(response.data.message)
@@ -263,7 +263,7 @@ export function resetPassword(password, confirmPassword, token, navigate) {
       });
       navigate("/login")
     } catch (error) {
-      console.log("RESETPASSWORD ERROR............", error)
+      //console.log("RESETPASSWORD ERROR............", error)
       toast.error(error.response?.data?.message, {
         style: {
           borderRadius: '10px',
@@ -314,7 +314,7 @@ export const googleLogin = (credential, navigate) => {
         throw new Error(response.data.message);
       }
 
-      console.log(response.data);
+      //console.log(response.data);
       const { token, user: userData } = response.data;
 
       dispatch(setToken(token));
@@ -338,7 +338,7 @@ export const googleLogin = (credential, navigate) => {
       navigate("/dashboard/my-profile");
 
     } catch (error) {
-      console.log("Error in Google Login", error);
+      //console.log("Error in Google Login", error);
       toast.error("Google Login Failed", {
         style: {
           borderRadius: '10px',

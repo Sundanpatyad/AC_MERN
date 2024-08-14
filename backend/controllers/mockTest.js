@@ -70,7 +70,7 @@ exports.createMockTests = async (req, res) => {
     try {
       // Get mock ID from request parameters
       const mockId = req.params.id;
-      console.log(req.params);
+      //console.log(req.params);
   
       // Validate mock ID (assuming it's a valid object ID)
       if (!mockId) {

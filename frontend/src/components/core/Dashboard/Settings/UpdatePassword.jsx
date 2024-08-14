@@ -23,7 +23,7 @@ export default function UpdatePassword() {
     try {
       await changePassword(token, data);
     } catch (error) {
-      console.log("ERROR MESSAGE - ", error.message);
+      // //console.log("ERROR MESSAGE - ", error.message);
     }
   };
 

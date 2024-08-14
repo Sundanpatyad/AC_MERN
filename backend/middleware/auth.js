@@ -22,7 +22,7 @@ exports.auth = (req, res, next) => {
         // Verify token
         jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
             if (err) {
-                console.log('Error while decoding token:', err.message);
+                //console.log('Error while decoding token:', err.message);
                 return res.status(401).json({
                     success: false,
                     message: 'Error while decoding token',
@@ -32,13 +32,13 @@ exports.auth = (req, res, next) => {
 
             // Attach decoded token to request object
             req.user = decoded;
-            console.log("This is Decode:", decoded);
+            //console.log("This is Decode:", decoded);
 
             // Proceed to the next middleware
             next();
         });
     } catch (error) {
-        console.log('Error while validating token:', error.message);
+        //console.log('Error while validating token:', error.message);
         return res.status(500).json({
             success: false,
             message: 'Error while validating token',
@@ -54,7 +54,7 @@ exports.auth = (req, res, next) => {
 // ================ IS STUDENT ================
 exports.isStudent = (req, res, next) => {
     try {
-        // console.log('User data -> ', req.user)
+        // //console.log('User data -> ', req.user)
         if (req.user?.accountType != 'Student') {
             return res.status(401).json({
                 success: false,
@@ -65,8 +65,8 @@ exports.isStudent = (req, res, next) => {
         next();
     }
     catch (error) {
-        console.log('Error while cheching user validity with student accountType');
-        console.log(error);
+        //console.log('Error while cheching user validity with student accountType');
+        //console.log(error);
         return res.status(500).json({
             success: false,
             error: error.message,
@@ -79,7 +79,7 @@ exports.isStudent = (req, res, next) => {
 // ================ IS INSTRUCTOR ================
 exports.isInstructor = (req, res, next) => {
     try {
-        // console.log('User data -> ', req.user)
+        // //console.log('User data -> ', req.user)
         if (req.user?.accountType != 'Instructor') {
             return res.status(401).json({
                 success: false,
@@ -90,8 +90,8 @@ exports.isInstructor = (req, res, next) => {
         next();
     }
     catch (error) {
-        console.log('Error while cheching user validity with Instructor accountType');
-        console.log(error);
+        //console.log('Error while cheching user validity with Instructor accountType');
+        //console.log(error);
         return res.status(500).json({
             success: false,
             error: error.message,
@@ -104,7 +104,7 @@ exports.isInstructor = (req, res, next) => {
 // ================ IS ADMIN ================
 exports.isAdmin = (req, res, next) => {
     try {
-        // console.log('User data -> ', req.user)
+        // //console.log('User data -> ', req.user)
         if (req.user.accountType != 'Admin') {
             return res.status(401).json({
                 success: false,
@@ -115,8 +115,8 @@ exports.isAdmin = (req, res, next) => {
         next();
     }
     catch (error) {
-        console.log('Error while cheching user validity with Admin accountType');
-        console.log(error);
+        //console.log('Error while cheching user validity with Admin accountType');
+        //console.log(error);
         return res.status(500).json({
             success: false,
             error: error.message,

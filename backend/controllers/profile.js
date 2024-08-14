@@ -25,7 +25,7 @@ exports.updateProfile = async (req, res) => {
         const profileId = userDetails.additionalDetails;
         const profileDetails = await Profile.findById(profileId);
 
-        // console.log('User profileDetails -> ', profileDetails);
+        // //console.log('User profileDetails -> ', profileDetails);
 
         // Update the profile fields
         userDetails.firstName = firstName;
@@ -44,7 +44,7 @@ exports.updateProfile = async (req, res) => {
             .populate({
                 path: 'additionalDetails'
             })
-        // console.log('updatedUserDetails -> ', updatedUserDetails);
+        // //console.log('updatedUserDetails -> ', updatedUserDetails);
 
         // return response
         res.status(200).json({
@@ -54,8 +54,8 @@ exports.updateProfile = async (req, res) => {
         });
     }
     catch (error) {
-        console.log('Error while updating profile');
-        console.log(error);
+        //console.log('Error while updating profile');
+        //console.log(error);
         res.status(500).json({
             success: false,
             error: error.message,
@@ -70,7 +70,7 @@ exports.deleteAccount = async (req, res) => {
     try {
         // extract user id
         const userId = req.user.id;
-        // console.log('userId = ', userId)
+        // //console.log('userId = ', userId)
 
         // validation
         const userDetails = await User.findById(userId);
@@ -88,7 +88,7 @@ exports.deleteAccount = async (req, res) => {
         // student entrolled in particular course sholud be decreae by one
         // user - courses - studentsEnrolled
         const userEnrolledCoursesId = userDetails.courses
-        console.log('userEnrolledCourses ids = ', userEnrolledCoursesId)
+        //console.log('userEnrolledCourses ids = ', userEnrolledCoursesId)
 
         for (const courseId of userEnrolledCoursesId) {
             await Course.findByIdAndUpdate(courseId, {
@@ -112,8 +112,8 @@ exports.deleteAccount = async (req, res) => {
         })
     }
     catch (error) {
-        console.log('Error while updating profile');
-        console.log(error);
+        //console.log('Error while updating profile');
+        //console.log(error);
         res.status(500).json({
             success: false,
             error: error.message,
@@ -128,7 +128,7 @@ exports.getUserDetails = async (req, res) => {
     try {
         // extract userId
         const userId = req.user.id;
-        console.log('id - ', userId);
+        //console.log('id - ', userId);
 
         // get user details
         const userDetails = await User.findById(userId).populate('additionalDetails').exec();
@@ -141,8 +141,8 @@ exports.getUserDetails = async (req, res) => {
         })
     }
     catch (error) {
-        console.log('Error while fetching user details');
-        console.log(error);
+        //console.log('Error while fetching user details');
+        //console.log(error);
         res.status(500).json({
             success: false,
             error: error.message,
@@ -160,13 +160,13 @@ exports.updateUserProfileImage = async (req, res) => {
         const userId = req.user.id;
 
         // validation
-        // console.log('profileImage = ', profileImage)
+        // //console.log('profileImage = ', profileImage)
 
         // upload imga eto cloudinary
         const image = await uploadImageToCloudinary(profileImage,
             process.env.FOLDER_NAME, 1000, 1000);
 
-        // console.log('image url - ', image);
+        // //console.log('image url - ', image);
 
         // update in DB 
         const updatedUserDetails = await User.findByIdAndUpdate(userId,
@@ -186,8 +186,8 @@ exports.updateUserProfileImage = async (req, res) => {
         })
     }
     catch (error) {
-        console.log('Error while updating user profile image');
-        console.log(error);
+        //console.log('Error while updating user profile image');
+        //console.log(error);
         return res.status(500).json({
             success: false,
             error: error.message,

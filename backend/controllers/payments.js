@@ -38,7 +38,7 @@ exports.capturePayment = async (req, res) => {
 
         totalAmount = course.price;
     } catch (error) {
-        console.log(error);
+        //console.log(error);
         return res.status(500).json({ success: false, message: error.message });
     }
 
@@ -56,7 +56,7 @@ exports.capturePayment = async (req, res) => {
             message: paymentResponse,
         })
     } catch (error) {
-        console.log(error);
+        //console.log(error);
         return res.status(500).json({ success: false, message: "Could not Initiate Order" });
     }
 }
@@ -117,7 +117,7 @@ const enrollStudent = async (courseId, userId, res) => {
             courseEnrollmentEmail(enrolledCourse.courseName, `${enrolledStudent.firstName}`)
         )
     } catch (error) {
-        console.log(error);
+        //console.log(error);
         return res.status(500).json({ success: false, message: error.message });
     }
 }
@@ -140,7 +140,7 @@ exports.sendPaymentSuccessEmail = async (req, res) => {
         )
         res.status(200).json({ success: true, message: "Email sent successfully" });
     } catch (error) {
-        console.log("error in sending mail", error)
+        //console.log("error in sending mail", error)
         return res.status(500).json({ success: false, message: "Could not send email" })
     }
 }
@@ -158,7 +158,7 @@ exports.sendPaymentSuccessEmail = async (req, res) => {
 
 
 //     if (signature === digest) {
-//         console.log('Payment is Authorized');
+//         //console.log('Payment is Authorized');
 
 //         const { courseId, userId } = req.body.payload.payment.entity.notes;
 
@@ -191,8 +191,8 @@ exports.sendPaymentSuccessEmail = async (req, res) => {
 //         }
 
 //         catch (error) {
-//             console.log('Error while verifing rajorpay signature');
-//             console.log(error);
+//             //console.log('Error while verifing rajorpay signature');
+//             //console.log(error);
 //             return res.status(500).json({
 //                 success: false,
 //                 error: error.messsage,

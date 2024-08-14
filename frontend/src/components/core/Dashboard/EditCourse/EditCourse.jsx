@@ -15,7 +15,7 @@ export default function EditCourse() {
   const { courseId } = useParams()
   const { token } = useSelector((state) => state.auth)
   const { course } = useSelector((state) => state.course)
-  // console.log('before course data = ', course)
+  // //console.log('before course data = ', course)
 
   const [loading, setLoading] = useState(false)
 
@@ -24,7 +24,7 @@ export default function EditCourse() {
     const fetchFullCourseDetails = async () => {
       setLoading(true)
       const result = await getFullDetailsOfCourse(courseId, token);
-      // console.log('Data from edit course file = ', result)
+      // //console.log('Data from edit course file = ', result)
       if (result?.courseDetails) {
         dispatch(setEditCourse(true))
         dispatch(setCourse(result?.courseDetails))

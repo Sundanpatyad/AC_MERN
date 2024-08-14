@@ -18,6 +18,9 @@ const CourseCard = ({ course, handleAddToCart, handleBuyNow, isInCart, isEnrolle
     e.preventDefault(); // Prevent navigation
     handleBuyNow(course);
   };
+  const handleGoToCart = ()=>{
+    navigate('/cart')
+  }
 
   return (
     <Link to={`/courses/${course._id}`} className="bg-black border border-gray-800 rounded-lg overflow-hidden shadow-lg">
@@ -53,12 +56,12 @@ const CourseCard = ({ course, handleAddToCart, handleBuyNow, isInCart, isEnrolle
           ) : (
             <>
               {isInCart ? (
-                <Link
-                  to="/dashboard/cart"
+                <button
+                onClick={handleGoToCart}
                   className="w-full py-2 px-4 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition duration-300 text-center"
                 >
                   Go to Cart
-                </Link>
+                </button>
               ) : (
                 <button
                   onClick={handleAddToCartClick}

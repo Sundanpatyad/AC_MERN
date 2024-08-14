@@ -13,8 +13,8 @@ const { default: mongoose } = require('mongoose');
 exports.captureMockTestPayment = async (req, res) => {
     const { itemId } = req.body;
     const mockTestIds = Array.isArray(itemId) ? itemId : [itemId];
-    console.log(mockTestIds);
-    console.log(req.body);
+    //console.log(mockTestIds);
+    //console.log(req.body);
     const userId = req.user.id;
 
     if (mockTestIds.length === 0) {
@@ -39,7 +39,7 @@ exports.captureMockTestPayment = async (req, res) => {
             totalAmount += mockTestSeries.price || 0;
         }
         catch (error) {
-            console.log(error);
+            //console.log(error);
             return res.status(500).json({ success: false, message: `Error processing mock test series ${mockTestId}: ${error.message}` });
         }
     }
@@ -59,7 +59,7 @@ exports.captureMockTestPayment = async (req, res) => {
         })
     }
     catch (error) {
-        console.log(error);
+        //console.log(error);
         return res.status(500).json({ success: false, message: "Could not Initiate Order" });
     }
 }
@@ -68,7 +68,7 @@ exports.captureMockTestPayment = async (req, res) => {
 exports.verifyMockTestPayment = async (req, res) => {
     try {
         const { razorpay_order_id, razorpay_payment_id, razorpay_signature, itemId } = req.body;
-        console.log({ razorpay_order_id, razorpay_payment_id, razorpay_signature, itemId })
+        //console.log({ razorpay_order_id, razorpay_payment_id, razorpay_signature, itemId })
         const userId = req.user.id;
 
         if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !itemId || !userId) {
@@ -166,7 +166,7 @@ exports.sendMockTestPaymentSuccessEmail = async (req, res) => {
         res.status(200).json({ success: true, message: "Payment success email sent" });
     }
     catch (error) {
-        console.log("error in sending mail", error)
+        //console.log("error in sending mail", error)
         return res.status(500).json({ success: false, message: "Could not send email" })
     }
 }

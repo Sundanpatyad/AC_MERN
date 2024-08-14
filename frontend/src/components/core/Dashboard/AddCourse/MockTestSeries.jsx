@@ -28,7 +28,7 @@ const AddMockTestSeries = () => {
     try {
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       const response = await axios.post(CREATE_MOCKTESTS_API, seriesData, { headers });
-      console.log('Server response:', response.data);
+      // //console.log('Server response:', response.data);
       setSubmitStatus('success');
       setRedirectId(response.data.data._id);
       // Reset form

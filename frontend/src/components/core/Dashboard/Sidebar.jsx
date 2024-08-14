@@ -32,8 +32,8 @@ export default function Sidebar() {
   // const [screenSize, setScreenSize] = useState(undefined)
 
   const { openSideMenu, screenSize } = useSelector((state) => state.sidebar)
-  // console.log('openSideMenu ======' , openSideMenu)
-  // console.log('screenSize ======' , screenSize)
+  // //console.log('openSideMenu ======' , openSideMenu)
+  // //console.log('screenSize ======' , screenSize)
 
   useEffect(() => {
     const handleResize = () => dispatch(setScreenSize(window.innerWidth))

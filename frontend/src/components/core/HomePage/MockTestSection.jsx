@@ -70,7 +70,7 @@ const MockTestsSection = ({ setShowLoginModal }) => {
 
     try {
       const result =  await buyItem(token, [mockTest._id], ['MOCK_TEST'], user, navigate, dispatch);
-      console.log(result);
+      // //console.log(result);
     } catch (error) {
       console.error("Error purchasing mock test:", error);
       toast.error("Failed to purchase the mock test. Please try again.");

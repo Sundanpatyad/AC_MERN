@@ -62,7 +62,7 @@ export default function CourseBuilderForm() {
       toast.error("Please add at least one section");
       return;
     }
-    console.log("Moving to next step");
+    //console.log("Moving to next step");
     dispatch(setStep(3));
   };
 

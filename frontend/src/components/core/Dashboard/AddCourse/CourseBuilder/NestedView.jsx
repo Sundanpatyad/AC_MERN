@@ -20,7 +20,7 @@ export default function NestedView({ handleChangeEditSectionName }) {
   const { course } = useSelector((state) => state.course)
   const { token } = useSelector((state) => state.auth)
   const dispatch = useDispatch()
-  console.log(course);
+  // //console.log(course);
 
   // States to keep track of mode of modal [add, view, edit]
   const [addSubSection, setAddSubsection] = useState(null)

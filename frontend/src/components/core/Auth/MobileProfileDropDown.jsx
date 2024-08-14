@@ -33,7 +33,6 @@ export default function MobileProfileDropDown() {
             setSubLinks(res);
         }
         catch (error) {
-            console.log("Could not fetch the category list = ", error);
         }
         setLoading(false)
     }

@@ -35,7 +35,7 @@ function loadScript(src) {
 export async function buyItem(token, itemId, itemTypes, userDetails, navigate, dispatch) {
     const toastId = toast.loading("Loading...", toastOptions);
     
-    console.log("These are the itemTypes: ", itemTypes);
+    //console.log("These are the itemTypes: ", itemTypes);
     
     try {
         // Load the script
@@ -99,12 +99,12 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
         paymentObject.open();
         paymentObject.on("payment.failed", function (response) {
             toast.error("Oops, payment failed", toastOptions);
-            console.log("Payment failed: ", response.error);
+            //console.log("Payment failed: ", response.error);
         });
 
     }
     catch (error) {
-        console.log("PAYMENT API ERROR:", error);
+        //console.log("PAYMENT API ERROR:", error);
         toast.error(error.response?.data?.message || "Could not make Payment", toastOptions);
     }
     toast.dismiss(toastId);
@@ -122,7 +122,7 @@ async function sendPaymentSuccessEmail(response, amount, token) {
         });
     }
     catch (error) {
-        console.log("PAYMENT SUCCESS EMAIL ERROR....", error);
+        //console.log("PAYMENT SUCCESS EMAIL ERROR....", error);
     }
 }
 
@@ -138,7 +138,7 @@ export default async function verifyPayment(bodyData, token, navigate, dispatch)
             Authorization: `Bearer ${token}`,
         });
         
-        console.log("this is verify response", response);
+        //console.log("this is verify response", response);
         
         if (!response.data.success) {
             throw new Error(response.data.message);
@@ -165,7 +165,7 @@ export default async function verifyPayment(bodyData, token, navigate, dispatch)
 
         return response;
     } catch (error) {
-        console.log("PAYMENT VERIFY ERROR....", error);
+        //console.log("PAYMENT VERIFY ERROR....", error);
         toast.error("Could not verify Payment", toastOptions);
     } finally {
         toast.dismiss(toastId);

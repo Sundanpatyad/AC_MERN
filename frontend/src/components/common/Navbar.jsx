@@ -47,7 +47,6 @@ const Navbar = () => {
             const res = await fetchCourseCategories()
             setSubLinks(res)
         } catch (error) {
-            console.log("Could not fetch the category list = ", error)
         } finally {
             setLoading(false)
         }

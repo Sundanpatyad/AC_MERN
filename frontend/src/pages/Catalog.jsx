@@ -22,7 +22,7 @@ const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLogged
 
     const handleStartTest = (e) => {
         e.stopPropagation()
-        console.log("Starting test for course:", course.courseName)
+        // //console.log("Starting test for course:", course.courseName)
     }
 
     return (
@@ -167,7 +167,7 @@ function Catalog() {
         }
     )
 
-    console.log("Current Catlog Pge adatd " , currentCatalogData);
+    // //console.log("Current Catlog Pge adatd " , currentCatalogData);
 
     const handleCourseClick = useCallback((course) => {
         dispatch(setCourse(course))
@@ -214,7 +214,7 @@ function Catalog() {
 
         // Sort the courses in descending order based on createdAt
         const sortedCourses = [...(courses || [])].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-          {console.log("sortedcourses ", sortedCourses)}
+        //   {//console.log("sortedcourses ", sortedCourses)}
         return sortedCourses.map((course) => (
             <CourseCard
                 key={course._id}

@@ -17,7 +17,7 @@ const ContactUsForm = () => {
       // Implement your API call here
       // For example:
       // await apiConnector("POST", contactusEndpoint.CONTACT_US_API, data);
-      console.log("Form submitted:", data);
+      // console.log("Form submitted:", data);
     } catch (error) {
       console.error("Error submitting form:", error.message);
     } finally {

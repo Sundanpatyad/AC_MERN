@@ -11,8 +11,8 @@ exports.uploadImageToCloudinary = async (file, folder, height, quality) => {
         return await cloudinary.uploader.upload(file.tempFilePath, options);
     }
     catch (error) {
-        console.log("Error while uploading image");
-        console.log(error);
+        //console.log("Error while uploading image");
+        //console.log(error);
     }
 }
 
@@ -24,8 +24,8 @@ exports.deleteResourceFromCloudinary = async (url) => {
 
     try {
         const result = await cloudinary.uploader.destroy(url);
-        console.log(`Deleted resource with public ID: ${url}`);
-        console.log('Delete Resourse result = ', result)
+        //console.log(`Deleted resource with public ID: ${url}`);
+        //console.log('Delete Resourse result = ', result)
         return result;
     } catch (error) {
         console.error(`Error deleting resource with public ID ${url}:`, error);

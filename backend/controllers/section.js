@@ -6,8 +6,8 @@ exports.createSection = async (req, res) => {
     try {
         // extract data 
         const { sectionName, courseId } = req.body;
-        console.log(sectionName);
-        // console.log('sectionName, courseId = ', sectionName, ",  = ", courseId)
+        //console.log(sectionName);
+        // //console.log('sectionName, courseId = ', sectionName, ",  = ", courseId)
 
         // validation
         if (!sectionName || !courseId) {
@@ -49,8 +49,8 @@ exports.createSection = async (req, res) => {
     }
 
     catch (error) {
-        console.log('Error while creating section');
-        console.log(error);
+        //console.log('Error while creating section');
+        //console.log(error);
         res.status(500).json({
             success: false,
             error: error.message,
@@ -92,8 +92,8 @@ exports.updateSection = async (req, res) => {
         });
     }
     catch (error) {
-        console.log('Error while updating section');
-        console.log(error);
+        //console.log('Error while updating section');
+        //console.log(error);
         res.status(500).json({
             success: false,
             error: error.message,
@@ -108,7 +108,7 @@ exports.updateSection = async (req, res) => {
 exports.deleteSection = async (req, res) => {
     try {
         const { sectionId, courseId } = req.body;
-        // console.log('sectionId = ', sectionId);
+        // //console.log('sectionId = ', sectionId);
 
         // delete section by id from DB
         await Section.findByIdAndDelete(sectionId);
@@ -128,8 +128,8 @@ exports.deleteSection = async (req, res) => {
         })
     }
     catch (error) {
-        console.log('Error while deleting section');
-        console.log(error);
+        //console.log('Error while deleting section');
+        //console.log(error);
         res.status(500).json({
             success: false,
             error: error.message,
