@@ -40,18 +40,17 @@ export default function MyCoursesAndTests() {
     fetchData()
   }, [token])
 
-  // Scroll to the top of the page when the component mounts
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
 
   return (
-    <div>
-      <div className="mb-14 flex justify-between">
-        <h1 className="text-4xl font-medium text-richblack-5 font-boogaloo text-center lg:text-left">
+    <div className="px-4 md:px-6 lg:px-8">
+      <div className="mb-8 md:mb-14 flex flex-col md:flex-row justify-between items-center">
+        <h1 className="text-3xl md:text-4xl font-medium text-richblack-5 font-boogaloo text-center mb-4 md:mb-0">
           My Courses and Tests
         </h1>
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row gap-4">
           <IconBtn
             text="Add Course"
             onclick={() => navigate("/dashboard/add-course")}
@@ -68,8 +67,8 @@ export default function MyCoursesAndTests() {
       </div>
 
       {/* Courses Table */}
-      <div className="mb-10">
-        <h2 className="text-2xl font-medium text-richblack-5 mb-4">My Courses</h2>
+      <div className="mb-8 md:mb-10">
+        <h2 className="text-xl md:text-2xl font-medium text-richblack-5 mb-4">My Courses</h2>
         {courses && (
           <CoursesTable
             courses={courses}
@@ -82,7 +81,7 @@ export default function MyCoursesAndTests() {
 
       {/* Mock Tests Table */}
       <div>
-        <h2 className="text-2xl font-medium text-richblack-5 mb-4">My Mock Tests</h2>
+        <h2 className="text-xl md:text-2xl font-medium text-richblack-5 mb-4">My Mock Tests</h2>
         {mockTests && (
           <MockTestsTable
             mockTests={mockTests}
