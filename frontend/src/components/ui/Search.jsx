@@ -129,7 +129,7 @@ export function PlaceholdersAndVanishInputDemo({ onResultClick }) {
                         <div className="flex-1 min-w-0">
                           <h3 className="text-sm font-medium text-gray-200 truncate">{result.name}</h3>
                           <p className="text-sm text-gray-400">Type: {result.type}</p>
-                          <p className="text-sm text-gray-400">Price: ${result.price}</p>
+                          <p className="text-md text-gray-100">Price: ₹{result.price}</p>
                         </div>
                       </Link>
                     </motion.li>
