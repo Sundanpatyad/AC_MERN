@@ -19,6 +19,7 @@ const {
 
 // Middleware
 const { auth } = require('../middleware/auth');
+const { getUserRanking } = require('../controllers/attemptDetails');
 
 
 // Routes for Login, Signup, and Authentication
@@ -51,6 +52,5 @@ router.post('/reset-password-token', resetPasswordToken);
 
 // Route for resetting user's password after verification
 router.post("/reset-password", resetPassword)
-
 
 module.exports = router

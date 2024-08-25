@@ -86,6 +86,15 @@ const MockTestSeries = () => {
     }
   };
 
+  const handleSkipQuestion = () => {
+    if (currentQuestion + 1 < currentTest.questions.length) {
+      setCurrentQuestion(currentQuestion + 1);
+      setSelectedAnswer(userAnswers[currentQuestion + 1] || '');
+    } else {
+      endTest();
+    }
+  };
+
   const handleQuestionNavigation = (index) => {
     setCurrentQuestion(index);
     setSelectedAnswer(userAnswers[index] || '');
@@ -261,36 +270,34 @@ const MockTestSeries = () => {
                   Start {test.testName}
                 </button>
               ))}
-           
-
-
             </div>
-              {testSeries.attachments &&
-  testSeries.attachments.map((item, index) => (
-    <div
-      key={index}
-      className="py-4 px-6 bg-white text-gray-900 font-bold rounded-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105 shadow-lg flex flex-col items-start space-y-2"
-    >
-      <div className="flex items-center">
-        <span className="mr-2">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </span>
-        {item.name}
-      </div>
-      <a href={item.questionPaper} className="text-blue-500 hover:underline">
-        Download Question Paper
-      </a>
-      <a href={item.answerKey} className="text-blue-500 hover:underline">
-        Download Answer Key
-      </a>
-      <a href={item.omrSheet} className="text-blue-500 hover:underline">
-        Download OMR Sheet
-      </a>
-    </div>
-  ))
-}
+
+            {testSeries.attachments &&
+              testSeries.attachments.map((item, index) => (
+                <div
+                  key={index}
+                  className="py-4 px-6 bg-white text-gray-900 font-bold rounded-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105 shadow-lg flex flex-col items-start space-y-2"
+                >
+                  <div className="flex items-center">
+                    <span className="mr-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </span>
+                    {item.name}
+                  </div>
+                  <a href={item.questionPaper} className="text-blue-500 hover:underline">
+                    Download Question Paper
+                  </a>
+                  <a href={item.answerKey} className="text-blue-500 hover:underline">
+                    Download Answer Key
+                  </a>
+                  <a href={item.omrSheet} className="text-blue-500 hover:underline">
+                    Download OMR Sheet
+                  </a>
+                </div>
+              ))
+            }
 
             <div className="bg-gray-900 p-6 rounded-lg">
               <h2 className="font-semibold text-xl text-white mb-4">Test Instructions:</h2>
@@ -401,7 +408,7 @@ const MockTestSeries = () => {
           ))}
         </div>
         <div className="flex justify-between items-center">
-          <button
+          {/* <button
             onClick={() => currentQuestion > 0 && setCurrentQuestion(currentQuestion - 1)}
             disabled={currentQuestion === 0}
             className={`py-3 px-6 text-sm font-semibold rounded-lg transition duration-300 ${currentQuestion > 0
@@ -410,8 +417,51 @@ const MockTestSeries = () => {
               }`}
           >
             Previous
-          </button>
-          <button
+          </button> */}
+         <div className="flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0 md:space-x-2">
+  <button
+    onClick={() => currentQuestion > 0 && setCurrentQuestion(currentQuestion - 1)}
+    disabled={currentQuestion === 0}
+    className={`py-2 px-4 md:py-3 md:px-6 text-xs md:text-sm font-semibold rounded-lg transition duration-300 w-full md:w-auto ${
+      currentQuestion > 0
+        ? 'bg-white text-gray-900 hover:bg-gray-100'
+        : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+    }`}
+  >
+    Previous
+  </button>
+  
+  <button
+    onClick={handleSkipQuestion}
+    className="py-2 px-4 md:py-3 md:px-6 font-semibold rounded-lg text-xs md:text-sm transition duration-300 bg-white text-black hover:bg-slate-200 w-full md:w-auto"
+  >
+    Skip Question
+  </button>
+  
+  <button
+    onClick={handleNextQuestion}
+    disabled={!selectedAnswer}
+    className={`py-2 px-4 md:py-3 md:px-6 font-semibold rounded-lg text-xs md:text-sm transition duration-300 w-full md:w-auto ${
+      selectedAnswer
+        ? 'bg-white text-black hover:bg-gray-100'
+        : 'bg-gray-700 border border-white text-white cursor-not-allowed'
+    }`}
+  >
+    {currentQuestion + 1 === currentTest.questions.length ? 'Finish Test' : 'Next'}
+  </button>
+</div>
+            {/* <button
+              onClick={handleNextQuestion}
+              disabled={!selectedAnswer}
+              className={`py-3 px-6 font-semibold rounded-lg text-sm transition duration-300 ${
+                selectedAnswer
+                  ? 'bg-white text-black hover:bg-gray-100'
+                  : 'bg-gray-700 border border-white text-white cursor-not-allowed'
+              }`}
+            >
+              {currentQuestion + 1 === currentTest.questions.length ? 'Finish Test' : 'Next'}
+            </button> */}
+          {/* <button
             onClick={handleNextQuestion}
             disabled={!selectedAnswer}
             className={`py-3 px-6 font-semibold rounded-lg text-sm transition duration-300 ${selectedAnswer
@@ -420,7 +470,7 @@ const MockTestSeries = () => {
               }`}
           >
             {currentQuestion + 1 === currentTest.questions.length ? 'Finish Test' : 'Next'}
-          </button>
+          </button> */}
         </div>
         <div className="flex flex-wrap justify-center gap-2 md:gap-3">
           {currentTest.questions.map((_, index) => (

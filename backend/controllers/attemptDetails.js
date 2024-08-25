@@ -1,5 +1,6 @@
 const AttemptDetails = require('../models/attemptDetails'); // Adjust the path as needed
 const User = require('../models/user'); // Adjust the path as needed
+const mongoose = require('mongoose');
 
 exports.createAttempt = async (req, res) => {
   try {
@@ -221,4 +222,6 @@ exports.getRankings = async (req, res) => {
     });
   }
 };
+
+
 
