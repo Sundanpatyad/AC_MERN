@@ -387,8 +387,8 @@ const MockTestSeries = () => {
   return (
     <div className="min-h-screen bg-black flex items-center overflow-hidden justify-center p-4">
       <div className="w-full md:w-[90vw]  bg-black border border-gray-700 shadow-2xl rounded-xl p-6 md:p-10 space-y-6">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-white">{currentTest.testName}</h2>
+        <div className="flex flex-col md:flex-row justify-between items-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-white">{currentTest.testName}</h2> 
           <div className="text-lg md:text-xl font-semibold text-white">
             Time left: <span className="text-blue-400">{formatTime(timeLeft)}</span>
           </div>
