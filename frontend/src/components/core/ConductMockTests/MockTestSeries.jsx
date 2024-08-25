@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import toast from "react-hot-toast";
 import axios from 'axios';
@@ -361,6 +361,12 @@ const MockTestSeries = () => {
               >
                 Back to Test List
               </button>
+              <Link to={"/rankings"}
+               
+                className="py-3 px-6 bg-slate-200 text-black font-bold rounded-lg hover:bg-gray-700 transition duration-300 shadow-md"
+              >
+                See My Rank 
+              </Link>
             </div>
 
 
