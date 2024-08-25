@@ -363,7 +363,7 @@ const MockTestSeries = () => {
               </button>
               <Link to={"/rankings"}
                
-                className="py-3 px-6 bg-slate-200 text-black font-bold rounded-lg hover:bg-gray-700 transition duration-300 shadow-md"
+                className="py-3 px-6 text-center bg-slate-200 text-black font-bold rounded-lg hover:bg-gray-700 transition duration-300 shadow-md"
               >
                 See My Rank 
               </Link>
