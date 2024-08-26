@@ -153,7 +153,7 @@ const MockTestSeries = () => {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-      
+
     } catch (error) {
       console.error('Error submitting score:', error);
       toast.error("Failed to submit score");
@@ -357,10 +357,10 @@ const MockTestSeries = () => {
                 Back to Test List
               </button>
               <Link to={"/rankings"}
-               
+
                 className="py-3 px-6 text-center bg-slate-200 text-black font-bold rounded-lg hover:bg-gray-700 transition duration-300 shadow-md"
               >
-                See My Rank 
+                See My Rank
               </Link>
             </div>
 
@@ -383,7 +383,7 @@ const MockTestSeries = () => {
     <div className="min-h-screen bg-black flex items-center overflow-hidden justify-center p-4">
       <div className="w-full md:w-[90vw]  bg-black border border-gray-700 shadow-2xl rounded-xl p-6 md:p-10 space-y-6">
         <div className="flex flex-col md:flex-row justify-between items-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-white">{currentTest.testName}</h2> 
+          <h2 className="text-2xl md:text-3xl font-bold text-white">{currentTest.testName}</h2>
           <div className="text-lg md:text-xl font-semibold text-white">
             Time left: <span className="text-blue-400">{formatTime(timeLeft)}</span>
           </div>
@@ -400,8 +400,8 @@ const MockTestSeries = () => {
               key={index}
               onClick={() => handleAnswerSelect(option)}
               className={`w-full py-3 px-6  text-sm text-left rounded-lg transition duration-300 ${selectedAnswer === option
-                  ? 'bg-white text-gray-900 font-semibold'
-                  : 'bg-black border border-white text-white hover:bg-gray-600'
+                ? 'bg-white text-gray-900 font-semibold'
+                : 'bg-black border border-white text-white hover:bg-gray-600'
                 }`}
             >
               {option}
@@ -419,39 +419,37 @@ const MockTestSeries = () => {
           >
             Previous
           </button> */}
-         <div className="flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0 md:space-x-2">
-  <button
-    onClick={() => currentQuestion > 0 && setCurrentQuestion(currentQuestion - 1)}
-    disabled={currentQuestion === 0}
-    className={`py-2 px-4 md:py-3 md:px-6 text-xs md:text-sm font-semibold rounded-lg transition duration-300 w-full md:w-auto ${
-      currentQuestion > 0
-        ? 'bg-white text-gray-900 hover:bg-gray-100'
-        : 'bg-gray-700 text-gray-400 cursor-not-allowed'
-    }`}
-  >
-    Previous
-  </button>
-  
-  <button
-    onClick={handleSkipQuestion}
-    className="py-2 px-4 md:py-3 md:px-6 font-semibold rounded-lg text-xs md:text-sm transition duration-300 bg-white text-black hover:bg-slate-200 w-full md:w-auto"
-  >
-    Skip Question
-  </button>
-  
-  <button
-    onClick={handleNextQuestion}
-    disabled={!selectedAnswer}
-    className={`py-2 px-4 md:py-3 md:px-6 font-semibold rounded-lg text-xs md:text-sm transition duration-300 w-full md:w-auto ${
-      selectedAnswer
-        ? 'bg-white text-black hover:bg-gray-100'
-        : 'bg-gray-700 border border-white text-white cursor-not-allowed'
-    }`}
-  >
-    {currentQuestion + 1 === currentTest.questions.length ? 'Finish Test' : 'Next'}
-  </button>
-</div>
-            {/* <button
+          <div className="flex gap-4 justify-between w-full">
+            <button
+              onClick={() => currentQuestion > 0 && setCurrentQuestion(currentQuestion - 1)}
+              disabled={currentQuestion === 0}
+              className={`py-2 px-4 md:py-3 md:px-6 text-xs md:text-sm font-semibold rounded-lg transition duration-300 w-full md:w-auto ${currentQuestion > 0
+                  ? 'bg-white text-gray-900 hover:bg-gray-100'
+                  : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                }`}
+            >
+              Previous
+            </button>
+
+            <button
+              onClick={handleSkipQuestion}
+              className="py-2 px-4 md:py-3 md:px-6 font-semibold rounded-lg text-xs md:text-sm transition duration-300 bg-white text-black hover:bg-slate-200 w-full md:w-auto"
+            >
+              Skip
+            </button>
+
+            <button
+              onClick={handleNextQuestion}
+              disabled={!selectedAnswer}
+              className={`py-2 px-4 md:py-3 md:px-6 font-semibold rounded-lg text-xs md:text-sm transition duration-300 w-full md:w-auto ${selectedAnswer
+                  ? 'bg-white text-black hover:bg-gray-100'
+                  : 'bg-gray-700 border border-white text-white cursor-not-allowed'
+                }`}
+            >
+              {currentQuestion + 1 === currentTest.questions.length ? 'Finish Test' : 'Next'}
+            </button>
+          </div>
+          {/* <button
               onClick={handleNextQuestion}
               disabled={!selectedAnswer}
               className={`py-3 px-6 font-semibold rounded-lg text-sm transition duration-300 ${
@@ -478,10 +476,10 @@ const MockTestSeries = () => {
             <button
               key={index}
               onClick={() => handleQuestionNavigation(index)} className={`w-8 h-8 md:w-10 md:h-10 rounded-full font-semibold text-sm transition duration-300 ${index === currentQuestion
-                  ? 'bg-white text-gray-900'
-                  : answeredQuestions[index]
-                    ? 'bg-gray-600 text-white'
-                    : 'bg-gray-700 text-white hover:bg-gray-600'
+                ? 'bg-white text-gray-900'
+                : answeredQuestions[index]
+                  ? 'bg-gray-600 text-white'
+                  : 'bg-gray-700 text-white hover:bg-gray-600'
                 }`}
             >
               {index + 1}
