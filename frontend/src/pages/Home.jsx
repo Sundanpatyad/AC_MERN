@@ -38,8 +38,8 @@ const Home = () => {
         Don't just take our word for it. Here's what real people are saying about Awakening Classes!.
 
           </p>
-         <ReviewSlider />
       </div>
+         <ReviewSlider />
       <Footer />
       {token && reviewModal && <CourseReviewModal setReviewModal={setReviewModal} />}
       {showLoginModal && (
