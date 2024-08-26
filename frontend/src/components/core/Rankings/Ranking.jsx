@@ -4,6 +4,8 @@ import RankingTable from "./RankingTable";
 import Footer from '../../common/Footer';
 import { studentEndpoints } from '../../../services/apis';
 import RankingsGraph from './RankingGraph';
+import LoadingSpinner from '../ConductMockTests/Spinner';
+
 
 const RankingsPage = () => {
   const [rankings, setRankings] = useState({});
@@ -14,9 +16,11 @@ const RankingsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const testsPerPage = 5;
+  const [isLoading, setIsLoading] = useState(true); // New state for loading
 
   useEffect(() => {
     const fetchRankings = async () => {
+      setIsLoading(true); // Start loading
       try {
         const response = await fetch(RANKINGS_API, {
           headers: {
@@ -45,12 +49,15 @@ const RankingsPage = () => {
       } catch (error) {
         console.error('Error fetching rankings:', error);
         setError('Failed to fetch rankings. Please try again later.');
+      } finally {
+        setIsLoading(false); // End loading
       }
     };
     if (token) {
       fetchRankings();
     } else {
       setError('Authentication token is missing');
+      setIsLoading(false); // End loading if there's no token
     }
   }, [token, RANKINGS_API]);
 
@@ -64,6 +71,10 @@ const RankingsPage = () => {
   const totalPages = Math.ceil(filteredTests.length / testsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  if (isLoading) {
+    return <LoadingSpinner />; // Show spinner while loading
+  }
 
   if (error) {
     return <div className="text-center text-red-400 mt-8 font-semibold text-xl">{error}</div>;
