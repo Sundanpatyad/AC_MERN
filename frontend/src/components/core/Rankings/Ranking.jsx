@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import RankingTable from "./RankingTable"
+import RankingTable from "./RankingTable";
 import Footer from '../../common/Footer';
 import { studentEndpoints } from '../../../services/apis';
+import RankingsGraph from './RankingGraph';
 
 const RankingsPage = () => {
   const [rankings, setRankings] = useState({});
-  const [testNames, setTestNames] = useState([]);
   const [selectedTest, setSelectedTest] = useState(null);
   const { token } = useSelector((state) => state.auth);
   const [error, setError] = useState(null);
   const { RANKINGS_API } = studentEndpoints;
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const testsPerPage = 5;
 
   useEffect(() => {
     const fetchRankings = async () => {
@@ -25,7 +28,6 @@ const RankingsPage = () => {
         }
         const data = await response.json();
         if (data.success) {
-          // Group rankings by testName
           const groupedRankings = data.data.reduce((acc, ranking) => {
             if (!acc[ranking.testName]) {
               acc[ranking.testName] = [];
@@ -34,7 +36,9 @@ const RankingsPage = () => {
             return acc;
           }, {});
           setRankings(groupedRankings);
-          setTestNames(Object.keys(groupedRankings));
+          if (Object.keys(groupedRankings).length > 0) {
+            setSelectedTest(Object.keys(groupedRankings)[0]);
+          }
         } else {
           setError(data.message || 'Failed to fetch rankings');
         }
@@ -50,31 +54,47 @@ const RankingsPage = () => {
     }
   }, [token, RANKINGS_API]);
 
-  const handleTestSelect = (testName) => {
-    setSelectedTest(testName === selectedTest ? null : testName);
-  };
+  const filteredTests = Object.keys(rankings).filter(testName =>
+    testName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const indexOfLastTest = currentPage * testsPerPage;
+  const indexOfFirstTest = indexOfLastTest - testsPerPage;
+  const currentTests = filteredTests.slice(indexOfFirstTest, indexOfLastTest);
+  const totalPages = Math.ceil(filteredTests.length / testsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   if (error) {
     return <div className="text-center text-red-400 mt-8 font-semibold text-xl">{error}</div>;
   }
 
   return (
-    <div className="bg-black min-h-screen py-12 text-gray-100">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-4xl font-extrabold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-300">
+    <div className="bg-black w-screen text-gray-100">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-3xl font-extrabold text-center mb-12 text-transparent bg-clip-text mt-20 bg-white">
           Student Rankings
         </h1>
-        
-        <div className="bg-transparent border border-slate-500 rounded-lg shadow-xl p-6 mb-8">
-          <h2 className="text-2xl font-bold mb-4 text-center text-gray-100">Select a Mock Test</h2>
-          <div className="flex flex-wrap justify-center gap-4 mb-6">
-            {testNames.map((testName) => (
+
+        <div className="mb-8">
+          <input
+            type="text"
+            placeholder="Search mock tests..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-4 py-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div className="mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {currentTests.map((testName) => (
               <button
                 key={testName}
-                onClick={() => handleTestSelect(testName)}
-                className={`px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 ${
+                onClick={() => setSelectedTest(testName)}
+                className={`px-4 py-2 w-full rounded-sm text-sm transition-colors duration-200 ${
                   selectedTest === testName
-                    ? 'bg-gradient-to-r from-slate-700 to-slate-900 text-white shadow-md'
+                    ? 'bg-slate-200 text-black'
                     : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                 }`}
               >
@@ -84,25 +104,48 @@ const RankingsPage = () => {
           </div>
         </div>
 
-        <div className="bg-black rounded-lg shadow-xl p-6">
-          {selectedTest ? (
-            rankings[selectedTest] && rankings[selectedTest].length > 0 ? (
-              <div className="overflow-x-auto">
-                <RankingTable rankings={rankings[selectedTest]} />
+        {/* Pagination */}
+        <div className="flex justify-center mt-4 mb-8">
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+            <button
+              key={number}
+              onClick={() => paginate(number)}
+              className={`mx-1 px-3 py-1 rounded ${
+                currentPage === number
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              }`}
+            >
+              {number}
+            </button>
+          ))}
+        </div>
+
+        <div className="bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl">
+          {selectedTest && rankings[selectedTest] ? (
+            <>
+              <h2 className="text-3xl font-bold mb-6 text-center pt-8 text-gray-100">{selectedTest}</h2>
+              <div className="">
+                <div>
+                  <h3 className="text-2xl rounded-md w-full font-bold mt-10 text-center mb-4">Rankings Table</h3>
+                  <div className="overflow-x-auto ">
+                    <RankingTable rankings={rankings[selectedTest]} />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-2xl rounded font-bold text-center my-4">Rankings Graph</h3>
+                  <RankingsGraph rankings={rankings[selectedTest]} />
+                </div>
               </div>
-            ) : (
-              <p className="text-center text-gray-400 font-medium text-lg">
-                No rankings available for the selected test.
-              </p>
-            )
+            </>
           ) : (
             <p className="text-center text-gray-400 font-medium text-lg">
-              Click on a mock test name to view rankings.
+              {filteredTests.length === 0 ? 'No matching mock tests found.' : 'Select a mock test from above to view rankings.'}
             </p>
           )}
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 };
