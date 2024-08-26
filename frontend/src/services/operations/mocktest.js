@@ -86,7 +86,6 @@ export const fetchAllMockTests = async (token) => {
 
 export const fetchMockTestDetails = async (mockTestId, token) => {
   let result = null;
-  const toastId = toast.loading("Loading...", toastOptions)
   //console.log(mockTestId)
   try {
     const response = await apiConnector(
@@ -106,7 +105,6 @@ export const fetchMockTestDetails = async (mockTestId, token) => {
     //console.log("MockTest Details API ERROR............", error)
     toast.error(error.message, toastOptions)
   }
-  toast.dismiss(toastId)
   return result
 }
 

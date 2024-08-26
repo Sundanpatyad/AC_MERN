@@ -153,12 +153,7 @@ const MockTestSeries = () => {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-
-      if (response.data.success) {
-        toast.success("Score submitted successfully");
-      } else {
-        toast.error("Failed to submit score");
-      }
+      
     } catch (error) {
       console.error('Error submitting score:', error);
       toast.error("Failed to submit score");

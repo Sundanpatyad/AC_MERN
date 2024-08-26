@@ -28,7 +28,7 @@ const MockTestCardSkeleton = () => (
   </div>
 )
 
-const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, handleStartTest, isLoggedIn, isEnrolled }) => {
+const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, handleStartTest, isLoggedIn, isEnrolled, isInCart }) => {
   const navigate = useNavigate()
 
   return (
@@ -68,16 +68,28 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
               </button>
             ) : (
               <>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleAddToCart(mockTest)
-                  }}
-                  className="w-full py-2 px-3 bg-richblack-700 text-white font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-600 text-xs sm:text-sm"
-                >
-                  <FaShoppingCart className="inline mr-1" />
-                  Add to Cart
-                </button>
+                {isInCart ? (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      navigate("/dashboard/cart")
+                    }}
+                    className="w-full py-2 px-3 bg-richblack-700 text-white font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-600 text-xs sm:text-sm"
+                  >
+                    Go to Cart
+                  </button>
+                ) : (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleAddToCart(mockTest)
+                    }}
+                    className="w-full py-2 px-3 bg-richblack-700 text-white font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-600 text-xs sm:text-sm"
+                  >
+                    <FaShoppingCart className="inline mr-1" />
+                    Add to Cart
+                  </button>
+                )}
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
@@ -109,6 +121,7 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
 const MockTestComponent = () => {
   const { token } = useSelector((state) => state.auth)
   const { user } = useSelector((state) => state.profile)
+  const { cart } = useSelector((state) => state.cart)
   const [confirmationModal, setConfirmationModal] = useState(null)
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -143,6 +156,7 @@ const MockTestComponent = () => {
     }
 
     dispatch(addToCart(mockTest))
+    toast.success("Added to cart")
   }, [isLoggedIn, user, navigate, dispatch])
 
   const handleBuyNow = useCallback(async (mockTest) => {
@@ -164,8 +178,7 @@ const MockTestComponent = () => {
     }
 
     try {
-      const data =  await buyItem(token, [mockTest._id], ['MOCK_TEST'], user, navigate, dispatch);
-      // //console.log(data);
+      await buyItem(token, [mockTest._id], ['MOCK_TEST'], user, navigate, dispatch)
       toast.success("Mock test purchased successfully!")
     } catch (error) {
       console.error("Error purchasing mock test:", error)
@@ -196,34 +209,17 @@ const MockTestComponent = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-    <div className="flex-grow align-center justify-center mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
-      <h2 className="text-3xl h-[20vh] sm:text-3xl md:text-5xl text-center my-10 text-richblack-5 mb-4">
-        Test Your Knowledge with <i className="text-slate-300">Confidence</i>
-      </h2>
-  
-      {memoizedMockTests.length > 0 ? (
-        <div>
-          {/* Display the latest mock test first */}
-          {memoizedMockTests
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-            .slice(0, 1)
-            .map((mockTest) => (
-              <MockTestCard
-                key={mockTest._id}
-                mockTest={mockTest}
-                handleAddToCart={handleAddToCart}
-                handleBuyNow={handleBuyNow}
-                handleStartTest={handleStartTest}
-                isLoggedIn={isLoggedIn}
-                isEnrolled={mockTest.studentsEnrolled?.includes(user?._id)}
-              />
-            ))}
-  
-          {/* Display the rest of the mock tests in descending order */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8">
+      <div className="flex-grow align-center justify-center mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
+        <h2 className="text-3xl h-[20vh] sm:text-3xl md:text-5xl text-center my-10 text-richblack-5 mb-4">
+          Test Your Knowledge with <i className="text-slate-300">Confidence</i>
+        </h2>
+    
+        {memoizedMockTests.length > 0 ? (
+          <div>
+            {/* Display the latest mock test first */}
             {memoizedMockTests
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .slice(1)
+              .slice(0, 1)
               .map((mockTest) => (
                 <MockTestCard
                   key={mockTest._id}
@@ -233,20 +229,39 @@ const MockTestComponent = () => {
                   handleStartTest={handleStartTest}
                   isLoggedIn={isLoggedIn}
                   isEnrolled={mockTest.studentsEnrolled?.includes(user?._id)}
+                  isInCart={cart.some(item => item._id === mockTest._id)}
                 />
               ))}
+    
+            {/* Display the rest of the mock tests in descending order */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8">
+              {memoizedMockTests
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                .slice(1)
+                .map((mockTest) => (
+                  <MockTestCard
+                    key={mockTest._id}
+                    mockTest={mockTest}
+                    handleAddToCart={handleAddToCart}
+                    handleBuyNow={handleBuyNow}
+                    handleStartTest={handleStartTest}
+                    isLoggedIn={isLoggedIn}
+                    isEnrolled={mockTest.studentsEnrolled?.includes(user?._id)}
+                    isInCart={cart.some(item => item._id === mockTest._id)}
+                  />
+                ))}
+            </div>
           </div>
-        </div>
-      ) : (
-        <p className="text-center text-xl text-richblack-5 bg-richblack-800 rounded-lg p-8 shadow-lg mt-8">
-          No published mock tests available at the moment. Check back soon!
-        </p>
-      )}
+        ) : (
+          <p className="text-center text-xl text-richblack-5 bg-richblack-800 rounded-lg p-8 shadow-lg mt-8">
+            No published mock tests available at the moment. Check back soon!
+          </p>
+        )}
+      </div>
+    
+      <Footer />
+      {confirmationModal && <ConfirmationModal modalData={confirmationModal} />}
     </div>
-  
-    <Footer />
-    {confirmationModal && <ConfirmationModal modalData={confirmationModal} />}
-  </div>
   )
 }
 

@@ -1,21 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import { BiArrowBack, BiTimeFive, BiUser, BiCalendar } from "react-icons/bi";
-import { FaShoppingCart } from "react-icons/fa";
+import { useNavigate, useParams, Link } from "react-router-dom";
+import { BiCalendar } from "react-icons/bi";
+import { FaShoppingCart, FaBookOpen } from "react-icons/fa";
 import toast from "react-hot-toast";
 
-import { buyItem } from "../services/operations/studentFeaturesAPI";
 import { ACCOUNT_TYPE } from "../utils/constants";
 import { addToCart } from "../slices/cartSlice";
 import { fetchMockTestDetails } from "../services/operations/mocktest";
 import LoadingSpinner from "../components/core/ConductMockTests/Spinner";
 import ConfirmationModal from "../components/common/ConfirmationModal";
 import Footer from "../components/common/Footer";
+import { buyItem } from "../services/operations/studentFeaturesAPI";
 
 const MockTestDetails = () => {
   const { user } = useSelector((state) => state.profile);
   const { token } = useSelector((state) => state.auth);
+  const { cart } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { mockId } = useParams();
@@ -23,24 +24,49 @@ const MockTestDetails = () => {
   const [testDetails, setTestDetails] = useState(null);
   const [confirmationModal, setConfirmationModal] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInCart, setIsInCart] = useState(false);
 
-  useEffect(() => {
-    const fetchTestDetails = async () => {
-      try {
-        setIsLoading(true);
-        const res = await fetchMockTestDetails(mockId);
-        setTestDetails(res);
-      } catch (error) {
-        console.error("Could not fetch Mock Test Details:", error);
-        toast.error("Failed to load mock test details");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchTestDetails();
+  const fetchTestDetails = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const res = await fetchMockTestDetails(mockId);
+      setTestDetails(res);
+    } catch (error) {
+      console.error("Could not fetch Mock Test Details:", error);
+      toast.error("Failed to load mock test details");
+    } finally {
+      setIsLoading(false);
+    }
   }, [mockId]);
 
-  const handleBuyTest = async () => {
+  useEffect(() => {
+    fetchTestDetails();
+  }, [fetchTestDetails]);
+
+  useEffect(() => {
+    if (testDetails) {
+      setIsInCart(cart.some(item => item._id === testDetails._id));
+    }
+  }, [cart, testDetails]);
+
+  const isEnrolled = testDetails?.studentsEnrolled?.includes(user?._id);
+  const isLoggedIn = !!token;
+
+  const handleAddToCart = () => {
+    if (user?.accountType === ACCOUNT_TYPE.INSTRUCTOR) {
+      toast.error("Instructors can't add mock tests to cart.");
+      return;
+    }
+
+    if (isEnrolled || testDetails.price === 0) {
+      toast.error("This mock test is already available to you.");
+      return;
+    }
+
+    dispatch(addToCart(testDetails));
+  };
+
+  const handleBuyNow = async () => {
     if (!token) {
       setConfirmationModal({
         text1: "You are not logged in!",
@@ -71,30 +97,19 @@ const MockTestDetails = () => {
     }
   };
 
-  const handleAddToCart = () => {
-    if (!token) {
-      setConfirmationModal({
-        text1: "You are not logged in!",
-        text2: "Please login to add to cart",
-        btn1Text: "Login",
-        btn2Text: "Cancel",
-        btn1Handler: () => navigate("/login"),
-        btn2Handler: () => setConfirmationModal(null),
-      });
-      return;
-    }
+  const handleStartTest = () => {
+    navigate(`/view-mock/${mockId}`);
+  };
 
-    if (user?.accountType === ACCOUNT_TYPE.INSTRUCTOR) {
-      toast.error("Instructors can't add mock tests to cart.");
-      return;
-    }
-
-    if (testDetails.studentsEnrolled.includes(user?._id) || testDetails.price === 0) {
-      toast.error("This mock test is already available to you.");
-      return;
-    }
-
-    dispatch(addToCart(testDetails));
+  const setShowLoginModal = () => {
+    setConfirmationModal({
+      text1: "You are not logged in!",
+      text2: "Please login to access this mock test.",
+      btn1Text: "Login",
+      btn2Text: "Cancel",
+      btn1Handler: () => navigate("/login"),
+      btn2Handler: () => setConfirmationModal(null),
+    });
   };
 
   if (isLoading) {
@@ -109,15 +124,22 @@ const MockTestDetails = () => {
     <div className="min-h-screen bg-black text-gray-100">
       <div className="container mx-auto px-4 py-4 sm:py-6">
         <div className="bg-black rounded-lg shadow-lg overflow-hidden">
+          <div className="relative h-36 bg-gradient-to-br from-gray-800 to-black">
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-80 p-3">
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-white text-center">
+                {testDetails.seriesName}
+              </h1>
+            </div>
+          </div>
           <div className="p-4">
-            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-100 mb-2 sm:mb-4 break-words">
-              {testDetails.seriesName}
-            </h1>
             <p className="text-sm sm:text-base text-gray-300 mb-4 sm:mb-6">{testDetails.description}</p>
 
             <div className="flex flex-wrap gap-2 sm:gap-4 mb-4 sm:mb-6">
               <div className="flex items-center text-xs sm:text-sm text-gray-300">
                 <BiCalendar className="mr-1 sm:mr-2" /> Created: {new Date(testDetails.createdAt).toLocaleDateString()}
+              </div>
+              <div className="flex items-center text-xs sm:text-sm text-gray-300">
+                <FaBookOpen className="mr-1 sm:mr-2" /> {testDetails.mockTests?.length || 0} Tests
               </div>
             </div>
 
@@ -126,23 +148,51 @@ const MockTestDetails = () => {
                 <div className="text-lg sm:text-md font-bold text-black bg-white px-2 sm:px-3 py-1 rounded-md">
                   {testDetails.price === 0 ? "Free" : `₹${testDetails.price}`}
                 </div>
-                {(!user || (!testDetails.studentsEnrolled.includes(user?._id) && testDetails.price !== 0)) && (
-                  <button
-                    onClick={handleAddToCart}
-                    className="bg-gray-600 text-gray-50 px-3 sm:px-4 py-1 sm:py-2 rounded-md hover:bg-gray-500 transition-colors flex items-center justify-center text-sm sm:text-base"
-                  >
-                    <FaShoppingCart className="mr-1 sm:mr-2" /> Add to Cart
-                  </button>
-                )}
               </div>
-              <button
-                onClick={handleBuyTest}
-                className="bg-white text-black px-4 py-2 rounded-md transition-colors w-full text-sm sm:text-base"
-              >
-                {testDetails.studentsEnrolled.includes(user?._id) || testDetails.price === 0
-                  ? "Start Test"
-                  : "Buy Now"}
-              </button>
+              {isLoggedIn ? (
+                isEnrolled || testDetails.price === 0 ? (
+                  <button
+                    onClick={handleStartTest}
+                    className="w-full py-2 px-4 bg-white text-black rounded-md hover:bg-gray-200 transition duration-300 text-center"
+                  >
+                    Start Test
+                  </button>
+                ) : (
+                  <>
+                    {isInCart ? (
+                      <Link
+                        to="/dashboard/cart"
+                        className="w-full py-2 px-4 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition duration-300 text-center mb-2"
+                      >
+                        Go to Cart
+                      </Link>
+                    ) : (
+                      <button
+                        onClick={handleAddToCart}
+                        className="w-full py-2 px-4 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition duration-300 mb-2"
+                      >
+                        <FaShoppingCart className="inline-block mr-2" />
+                        Add to Cart
+                      </button>
+                    )}
+                    <button
+                      onClick={handleBuyNow}
+                      className="bg-white text-black px-4 py-2 rounded-md transition-colors w-full text-sm sm:text-base"
+                    >
+                      {testDetails.studentsEnrolled.includes(user?._id) || testDetails.price === 0
+                        ? "Start Test"
+                        : "Buy Now"}
+                    </button>
+                  </>
+                )
+              ) : (
+                <button
+                  onClick={setShowLoginModal}
+                  className="w-full py-2 px-4 bg-white text-black rounded-md hover:bg-gray-200 transition duration-300 text-center"
+                >
+                  Login to {testDetails.price === 0 ? 'Start' : 'Purchase'}
+                </button>
+              )}
             </div>
           </div>
         </div>

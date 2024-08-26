@@ -54,7 +54,6 @@ const MockTestsSection = ({ setShowLoginModal }) => {
     }
 
     dispatch(addToCart(mockTest));
-    toast.success("Added to cart successfully!");
   }, [user, dispatch]);
 
   const handleRemoveFromCart = useCallback(async (mockTest) => {
