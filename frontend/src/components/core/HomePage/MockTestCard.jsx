@@ -64,12 +64,12 @@ const MockTestCard = React.memo(({
                                 Start Test
                             </button>
                         ) : (
-                            <>
+                            <div className="flex gap-2">
                                 {isInCart ? (
                                     <Link
                                         to="/dashboard/cart"
                                         onClick={(e) => e.stopPropagation()}
-                                        className="w-full py-2 px-4 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition duration-300 text-center"
+                                        className="w-full py-2 px-4 bg-gray-800 text-white rounded-lg text-sm font-semibold hover:bg-gray-700 transition duration-300 text-center"
                                     >
                                         Go to Cart
                                     </Link>
@@ -79,22 +79,21 @@ const MockTestCard = React.memo(({
                                             e.preventDefault();
                                             handleButtonClick(handleAddToCart);
                                         }}
-                                        className="w-full py-2 px-4 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition duration-300"
+                                        className=" py-2 px-4 bg-gray-800 text-white rounded-lg text-sm font-semibold hover:bg-gray-700 transition duration-300"
                                     >
                                         <FaShoppingCart className="inline-block mr-2" />
-                                        Add to Cart
-                                    </button>
+                                     </button>
                                 )}
                                 <button
                                     onClick={(e) => {
                                         e.preventDefault();
                                         handleButtonClick(handleBuyNow);
                                     }}
-                                    className="w-full py-2 px-4 bg-white text-black rounded-md hover:bg-gray-200 transition duration-300"
+                                    className="w-full py-2 px-4 bg-white text-black rounded-lg text-sm font-semibold hover:bg-gray-200 transition duration-300"
                                 >
                                     Buy Now
                                 </button>
-                            </>
+                            </div>
                         )
                     ) : (
                         <button

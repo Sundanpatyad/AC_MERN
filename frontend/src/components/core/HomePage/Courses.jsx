@@ -18,9 +18,7 @@ const CourseCard = ({ course, handleAddToCart, handleBuyNow, isInCart, isEnrolle
     e.preventDefault(); // Prevent navigation
     handleBuyNow(course);
   };
-  const handleGoToCart = ()=>{
-    navigate('/cart')
-  }
+
 
   return (
     <Link to={`/courses/${course._id}`} className="bg-black border border-gray-800 rounded-lg overflow-hidden shadow-lg">
@@ -54,30 +52,28 @@ const CourseCard = ({ course, handleAddToCart, handleBuyNow, isInCart, isEnrolle
               {isEnrolled ? 'Go to Course' : 'Start Course'}
             </Link>
           ) : (
-            <>
+            <div className='flex gap-2'>
               {isInCart ? (
-                <button
-                onClick={handleGoToCart}
-                  className="w-full py-2 px-4 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition duration-300 text-center"
+                <Link to={"/dashboard/cart"}
+                  className="w-full py-2 px-4 bg-gray-800 text-white text-sm rounded-lg font-semibold hover:bg-gray-700 transition duration-300 text-center"
                 >
                   Go to Cart
-                </button>
+                </Link>
               ) : (
                 <button
                   onClick={handleAddToCartClick}
-                  className="w-full py-2 px-4 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition duration-300"
+                  className="py-2 px-4 bg-gray-800 text-white text-sm rounded-md font-semibold hover:bg-gray-700 transition duration-300"
                 >
                   <FaShoppingCart className="inline-block mr-2" />
-                  Add to Cart
-                </button>
+                  </button>
               )}
               <button
                 onClick={handleBuyNowClick}
-                className="w-full py-2 px-4 bg-white text-black rounded-md hover:bg-gray-200 transition duration-300"
+                className="w-full py-2 px-4 bg-white text-black rounded-lg text-sm font-semibold hover:bg-gray-200 transition duration-300"
               >
                 Buy Now
               </button>
-            </>
+            </div>
           )}
         </div>
       </div>

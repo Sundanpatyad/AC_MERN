@@ -57,7 +57,7 @@ function CourseDetails() {
 
   const handleBuyCourse = () => {
     if (token) {
-      buyItem(token, [courseId], user, navigate, dispatch);
+      buyItem(token, [course._id], ['course'], user, navigate, dispatch)
       return;
     }
     setConfirmationModal({
@@ -77,7 +77,6 @@ function CourseDetails() {
     }
     if (token) {
       dispatch(addToCart(course));
-      toast.success("Course added to cart");
       return;
     }
     setConfirmationModal({
