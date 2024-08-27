@@ -86,7 +86,7 @@ function App() {
     const timer = setTimeout(() => {
 
       setIsPageLoading(false)
-    }, 1500) // Adjust this time as needed
+    }, 1500)
 
     return () => clearTimeout(timer)
   }, [])

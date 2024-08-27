@@ -97,7 +97,7 @@ const Navbar = () => {
     const navVariants = {
         visible: {
             y: 0,
-            backgroundColor: scrollY.get() > SCROLL_THRESHOLD ? 'rgba(0, 0, 0, 0.8)' : 'transparent',
+            backgroundColor: scrollY.get() > SCROLL_THRESHOLD ? 'transparent' : 'transparent',
             transition: {
                 y: { type: 'spring', stiffness: 300, damping: 30 },
                 backgroundColor: { duration: 0.2 },
@@ -117,9 +117,9 @@ const Navbar = () => {
                 variants={navVariants}
                 animate={hidden ? 'hidden' : 'visible'}
                 initial="visible"
-                className="fixed top-0 left-0 right-0 z-50"
+                className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-md "
             >
-                <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 max-w-7xl mx-auto">
+                <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-2 md:py-4 max-w-7xl mx-auto">
                     <Link to="/" className="flex items-center space-x-2">
                         <img src={rzpLogo} alt="Logo" className="w-8 h-8 rounded-full" />
                         <h1 className="font-semibold text-sm md:text-xl text-white">Awakening Classes</h1>

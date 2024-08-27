@@ -7,6 +7,7 @@ import { MdOutlineContactPhone } from 'react-icons/md';
 import { FaRegUser } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 import { HiAcademicCap } from "react-icons/hi2";
+import { CgShoppingCart } from "react-icons/cg";
 
 const BottomBar = () => {
   return (
@@ -15,6 +16,7 @@ const BottomBar = () => {
         <NavItem to="/" icon={AiOutlineHome} label="Home" />
         <NavItem to="/catalog/mock-tests" icon={PiNotebook} label="Courses" />
         <NavItem to="/mocktest" icon={HiAcademicCap} label="Mock Tests" />
+        <NavItem to="/dashboard/cart" icon={CgShoppingCart} label="Mock Tests" />
         <NavItem to="/dashboard/my-profile" icon={FaRegUser} label="Profile" />
       </nav>
     </div>
