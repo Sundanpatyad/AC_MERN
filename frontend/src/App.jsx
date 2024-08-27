@@ -45,6 +45,7 @@ import MockTestSeries from "./components/core/ConductMockTests/MockTestSeries";
 import EditMockTestSeries from "./components/core/Dashboard/AddCourse/EditMockTest";
 import RankingsPage from "./components/core/Rankings/Ranking";
 import PageLoader from "./components/ui/PageLoader";
+import BottomBar from "./components/common/ButtomBar";
 
 
 
@@ -53,6 +54,8 @@ function App() {
   const location = useLocation();
   const [showArrow, setShowArrow] = useState(false)
   const [isPageLoading, setIsPageLoading] = useState(true)
+  const { token } = useSelector((state) => state.auth)
+  
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -95,12 +98,12 @@ function App() {
   return (
     <div className="w-screen min-h-screen bg-black flex flex-col font-inter">
       <Navbar />
-
+       
       <button onClick={() => window.scrollTo(0, 0)}
-        className={`bg-white hover:bg-white hover:scale-110 p-3 text-lg text-black rounded-2xl fixed right-3 z-10 duration-500 ease-in-out ${showArrow ? 'bottom-6' : '-bottom-24'} `} >
+        className={`bg-white hover:bg-white hover:scale-110 p-3 text-lg text-black rounded-2xl fixed right-3 z-10 duration-500 ease-in-out ${showArrow ? 'bottom-20' : '-bottom-24'} `} >
         <HiArrowNarrowUp />
       </button>
-
+      {token && <BottomBar/> }
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/contact" element={<Contact />} />

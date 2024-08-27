@@ -5,12 +5,11 @@ import InstructorSection from '../components/core/HomePage/InstructorSection'
 import Footer from '../components/common/Footer'
 import ReviewSlider from '../components/common/ReviewSlider'
 import ConfirmationModal from "../components/common/ConfirmationModal"
-import { MdOutlineRateReview } from 'react-icons/md'
 import CourseReviewModal from '../components/core/ViewCourse/CourseReviewModal'
-import Marquee from '../components/core/HomePage/Marquee'
 import MockTestSection from '../components/core/HomePage/MockTestSection'
 import CourseSection from '../components/core/HomePage/CourseSection'
 import HeroSection from '../components/core/HomePage/HeroSection'
+import { WavyBackgroundDemo } from '../components/ui/wave'
 
 
 const Home = () => {

@@ -1,18 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import ReactStars from "react-rating-stars-component";
 import Img from './Img';
 import { motion } from "framer-motion";
 import { FaStar } from "react-icons/fa";
 import { apiConnector } from "../../services/apiConnector";
 import { ratingsEndpoints } from "../../services/apis";
+import { useSelector } from "react-redux";
 
 function ReviewCarousel() {
   const [reviews, setReviews] = useState([]);
   const [isScrolling, setIsScrolling] = useState(true);
+  const { token } = useSelector((state) => state.auth);
+
   const truncateWords = 15;
 
-  useEffect(() => {
-    (async () => {
+  // Memoized fetch function
+  const fetchReviews = useMemo(() => {
+    return async () => {
       const { data } = await apiConnector(
         "GET",
         ratingsEndpoints.REVIEWS_DETAILS_API
@@ -20,8 +24,12 @@ function ReviewCarousel() {
       if (data?.success) {
         setReviews(data?.data);
       }
-    })();
+    };
   }, []);
+
+  useEffect(() => {
+    fetchReviews();
+  }, [fetchReviews]);
 
   const toggleScroll = () => {
     setIsScrolling(!isScrolling);
