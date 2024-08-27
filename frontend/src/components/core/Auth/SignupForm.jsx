@@ -1,13 +1,13 @@
 import { useState } from "react"
 import { toast } from "react-hot-toast"
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"
+import { FcGoogle } from "react-icons/fc"
 import { useDispatch } from "react-redux"
 import { useNavigate, Link } from "react-router-dom"
-
-import { sendOtp } from "../../../services/operations/authAPI"
+import { googleLogin, sendOtp } from "../../../services/operations/authAPI"
 import { setSignupData } from "../../../slices/authSlice"
 import { ACCOUNT_TYPE } from "../../../utils/constants"
-import Tab from "../../common/Tab"
+import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google'
 
 function SignupForm() {
   const navigate = useNavigate();
@@ -88,18 +88,14 @@ function SignupForm() {
     setAccountType(ACCOUNT_TYPE.STUDENT);
   };
 
-  const tabData = [
-    {
-      id: 1,
-      tabName: "Student",
-      type: ACCOUNT_TYPE.STUDENT,
-    },
-    {
-      id: 2,
-      tabName: "Instructor",
-      type: ACCOUNT_TYPE.INSTRUCTOR,
-    },
-  ];
+  const handleGoogleSignUpSuccess = (credentialResponse) => {
+    console.log("Google sign-up successful", credentialResponse);
+    dispatch(googleLogin(credentialResponse.credential, navigate));
+  };
+
+  const handleGoogleSignUpError = () => {
+    console.error("Google Sign-Up Failed");
+  };
 
   return (
     <div>
@@ -118,7 +114,7 @@ function SignupForm() {
               value={firstName}
               onChange={handleOnChange}
               placeholder="Enter first name"
-              className="w-full rounded-[0.5rem] bg-black p-[12px] text-richblack-5 outline-none"
+              className="w-full rounded-[0.5rem] bg-zinc-900 p-[12px] text-richblack-5 outline-none"
               style={{
                 boxShadow: "inset 0px -1px 0px rgba(255, 255, 255, 0.18)",
               }}
@@ -137,7 +133,7 @@ function SignupForm() {
               value={lastName}
               onChange={handleOnChange}
               placeholder="Enter last name"
-              className="w-full rounded-[0.5rem] bg-black p-[12px] text-richblack-5 outline-none"
+              className="w-full rounded-[0.5rem] bg-zinc-900 p-[12px] text-richblack-5 outline-none"
               style={{
                 boxShadow: "inset 0px -1px 0px rgba(255, 255, 255, 0.18)",
               }}
@@ -157,7 +153,7 @@ function SignupForm() {
             value={email}
             onChange={handleOnChange}
             placeholder="Enter email address"
-            className="w-full rounded-[0.5rem] bg-black p-[12px] text-richblack-5 outline-none"
+            className="w-full rounded-[0.5rem] bg-zinc-900 p-[12px] text-richblack-5 outline-none"
             style={{
               boxShadow: "inset 0px -1px 0px rgba(255, 255, 255, 0.18)",
             }}
@@ -177,7 +173,7 @@ function SignupForm() {
               value={password}
               onChange={handleOnChange}
               placeholder="Enter Password"
-              className="w-full rounded-[0.5rem] bg-black p-[12px] pr-10 text-richblack-5 outline-none"
+              className="w-full rounded-[0.5rem] bg-zinc-900 p-[12px] pr-10 text-richblack-5 outline-none"
               style={{
                 boxShadow: "inset 0px -1px 0px rgba(255, 255, 255, 0.18)",
               }}
@@ -206,7 +202,7 @@ function SignupForm() {
               value={confirmPassword}
               onChange={handleOnChange}
               placeholder="Confirm Password"
-              className="w-full rounded-[0.5rem] bg-black p-[12px] pr-10 text-richblack-5 outline-none"
+              className="w-full rounded-[0.5rem] bg-zinc-900 p-[12px] pr-10 text-richblack-5 outline-none"
               style={{
                 boxShadow: "inset 0px -1px 0px rgba(255, 255, 255, 0.18)",
               }}
@@ -232,6 +228,17 @@ function SignupForm() {
           Create Account
         </button>
       </form>
+      <div className="mt-6 flex align-center justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleSignUpSuccess}
+                onError={handleGoogleSignUpError}
+                theme="filled_black"
+                shape="pill"
+                size="large"
+                text="signin_with"
+                useOneTap
+              />
+            </div>
 
       <p className="mt-4 text-center text-richblack-5">
         Already have an account?{" "}

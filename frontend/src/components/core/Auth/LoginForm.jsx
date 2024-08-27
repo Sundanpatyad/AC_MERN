@@ -53,7 +53,7 @@ function LoginForm() {
             value={email}
             onChange={handleOnChange}
             placeholder="Enter email address"
-            className="w-full rounded-[0.5rem] bg-black p-[12px] text-richblack-5 outline-none"
+            className="w-full rounded-[0.5rem] bg-zinc-900 p-[12px] text-richblack-5 outline-none"
             style={{
               boxShadow: "inset 0px -1px 0px rgba(255, 255, 255, 0.18)",
             }}
@@ -71,7 +71,7 @@ function LoginForm() {
             value={password}
             onChange={handleOnChange}
             placeholder="Enter Password"
-            className="w-full rounded-[0.5rem] bg-black p-[12px] pr-10 text-richblack-5 outline-none"
+            className="w-full rounded-[0.5rem] bg-zinc-900 p-[12px] pr-10 text-richblack-5 outline-none"
             style={{
               boxShadow: "inset 0px -1px 0px rgba(255, 255, 255, 0.18)",
             }}
@@ -105,21 +105,17 @@ function LoginForm() {
           <div className="flex-grow border-t border-gray-300"></div>
         </div>
    <div className="flex align-center justify-center">
-        <GoogleLogin 
-          onSuccess={handleGoogleLoginSuccess}
-          onError={handleGoogleLoginError}
-          theme="dark"
-          useOneTap
-          render={({ onClick }) => (
-            <button
-              onClick={onClick}
-              className="w-full text-center flex justify-center items-center py-[8px] px-[12px] border border-slate-300 rounded-[8px] text-md font-medium text-white bg-black hover:bg-slate-900"
-            >
-              <FcGoogle className="mr-2 h-5 w-5" />
-              Sign in with Google
-            </button>
-          )}
-        />
+   <div className="mt-6 flex align-center justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleLoginSuccess}
+                onError={handleGoogleLoginError}
+                theme="filled_black"
+                shape="pill"
+                size="large"
+                text="signin_with"
+                useOneTap
+              />
+            </div>
         </div>
 
         <p className="mt-4 text-center text-richblack-5">

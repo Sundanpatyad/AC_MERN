@@ -5,7 +5,7 @@ import SignupForm from "./SignupForm";
 function Template({ title,title1,  description1, description2, formType }) {
   return (
     <>
-    <div className="relative flex items-center justify-center bg-black">
+    <div className="dark:bg-dot-white/[0.2] bg-dot-black/[0.2] relative flex items-center justify-center bg-black">
       <div className="flex flex-col items-center justify-center w-full max-w-xl p-8 md:p-10 lg:p-14  rounded-lg">
         <div className="text-center mb-5 lg:text-left">
           <h1 className="text-xl mb-5 text-center font-bold text-white">{title}</h1>
