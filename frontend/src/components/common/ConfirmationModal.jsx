@@ -12,7 +12,7 @@ export default function ConfirmationModal({ modalData }) {
                     {modalData?.text2}
                 </p>
                 
-                <div className="flex items-center gap-x-4">
+                <div className="flex align-center  gap-x-4">
                     <IconBtn
                         onclick={modalData?.btn1Handler}
                         text={modalData?.btn1Text}
@@ -20,7 +20,7 @@ export default function ConfirmationModal({ modalData }) {
                     />
                     <button
                         className="cursor-pointer rounded-lg bg-black text-white border border-white
-                                   py-3 px-6 font-semibold hover:bg-white hover:text-black
+                                   py-2 px-4 font-semibold hover:bg-white hover:text-black
                                    transition-all duration-300 ease-in-out"
                         onClick={modalData?.btn2Handler}
                     >
