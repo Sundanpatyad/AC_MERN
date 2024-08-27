@@ -24,7 +24,7 @@ const BottomBar = () => {
 };
 
 const NavItem = ({ to, icon: Icon, label }) => (
-  <Link to={to} className="flex flex-col text-xs items-center  text-white hover:text-gray-900">
+  <Link to={to} className="flex flex-col text-xs items-center  text-white hover:text-slate-300 hover:bg-slate-300 ">
     <Icon className="text-xl mb-1" />
   </Link>
 );
