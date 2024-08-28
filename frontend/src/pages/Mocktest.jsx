@@ -156,7 +156,6 @@ const MockTestComponent = () => {
     }
 
     dispatch(addToCart(mockTest))
-    toast.success("Added to cart")
   }, [isLoggedIn, user, navigate, dispatch])
 
   const handleBuyNow = useCallback(async (mockTest) => {
