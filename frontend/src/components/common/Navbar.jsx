@@ -257,7 +257,7 @@ const Navbar = () => {
 
             {/* Search Modal */}
             {isSearchModalOpen && (
-                <div className="fixed inset-0 z-50 flex py-10 justify-center align-top bg-black bg-opacity-75">
+                <div className="fixed inset-0 z-50 flex py-10 justify-center align-top bg-transparent backdrop-blur-md ">
                     <div
                         className="bg-transparent rounded-lg p-6 mb-40  w-full max-w-lg"
                         ref={searchModalRef}

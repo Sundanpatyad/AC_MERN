@@ -103,7 +103,7 @@ export function PlaceholdersAndVanishInputDemo({ onResultClick }) {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="absolute w-full left-0 right-0 z-50 bg-black border border-gray-700 rounded text-gray-200 shadow-lg overflow-hidden max-h-96 overflow-y-auto"
+            className="absolute w-full left-0 right-0 z-50 bg-transparent rounded text-gray-200 shadow-lg overflow-hidden max-h-96 overflow-y-auto"
           >
             <div className="container mx-auto px-4 py-4">
               {isLoading && <p className="text-center text-gray-400">Loading...</p>}
