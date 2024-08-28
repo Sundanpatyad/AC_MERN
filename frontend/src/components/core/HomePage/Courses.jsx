@@ -46,7 +46,8 @@ const CourseCard = ({ course, handleAddToCart, handleBuyNow, isInCart, isEnrolle
             </button>
           ) : isEnrolled || course.price === 0 ? (
             <Link
-              to={`/dashboard/enrolled-courses`}
+            to={`view-course/${course._id}/section/${course.courseContent[0]._id}/sub-section/${course.courseContent[0].subSection[0]}`}
+              // "view-course/:courseId/section/:sectionId/sub-section/:subSectionId"
               className="w-full py-2 px-4 bg-white text-black rounded-md hover:bg-gray-200 transition duration-300 text-center"
             >
               {isEnrolled ? 'Go to Course' : 'Start Course'}

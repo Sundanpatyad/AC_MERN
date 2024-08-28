@@ -173,6 +173,8 @@ function Catalog() {
         dispatch(setCourse(course))
         dispatch(setStep(1))
         navigate(`/courses/${course._id}`)
+        console.log(course)
+        // "view-course/:courseId/section/:sectionId/sub-section/:subSectionId"
     }, [dispatch, navigate])
 
     const handleAddToCart = useCallback(async (course) => {
