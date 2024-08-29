@@ -86,7 +86,7 @@ export default function EnrolledCourses() {
 
         {/* Enrolled Courses Section */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold mb-6 text-gray-100">Enrolled Courses</h2>
+          <h2 className="text-3xl text-center font-bold mb-6 text-gray-100">Enrolled Courses</h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {loading.courses ? (
               <p className="col-span-full text-center text-gray-400 py-8">Loading enrolled courses...</p>
@@ -115,7 +115,7 @@ export default function EnrolledCourses() {
 
         {/* Enrolled Mock Tests Section */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold mb-6 text-gray-100">Enrolled Mock Tests</h2>
+          <h2 className="text-3xl text-center font-bold mb-6 text-gray-100">Enrolled Mock Tests</h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {loading.mockTests ? (
               <p className="col-span-full text-center text-gray-400 py-8">Loading enrolled mock tests...</p>
