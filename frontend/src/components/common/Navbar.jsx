@@ -225,7 +225,7 @@ const Navbar = () => {
                                                     >
                                                         <Link
                                                             to={item.to}
-                                                            className="flex items-center px-4 py-2 text-sm my-2 text-white hover:bg-white/20 transition-colors duration-200 ease-in-out rounded-lg"
+                                                            className="flex items-center px-4 py-2 text-sm my-2 font-semibold text-white hover:bg-white/20 transition-colors duration-200 ease-in-out rounded-lg"
                                                             onClick={() => setIsAuthDropdownOpen(false)}
                                                         >
                                                             <item.icon className="mr-3 text-lg" />

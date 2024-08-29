@@ -84,22 +84,23 @@ export default function MobileProfileDropDown() {
                         ].map((item, index) => (
                             <motion.div key={index} variants={itemVariants} transition={{ delay: index * 0.1 }}>
                                 <Link to={item.to} onClick={() => setOpen(false)}>
-                                    <div className="flex w-full items-center gap-x-2 py-3 px-4 text-sm text-white hover:bg-white/20 transition-colors duration-300 rounded-lg">
+                                    <div className="flex w-full items-center gap-x-2 py-3 px-4 text-sm font-semibold text-white hover:bg-white/20 transition-colors duration-300 rounded-lg">
                                         <item.icon className="text-lg text-white" />
                                         {item.label}
                                     </div>
                                 </Link>
                             </motion.div>
                         ))}
-                        <motion.div variants={itemVariants} transition={{ delay: 0.6 }}>
+                        {/* Separate logout link with red text */}
+                        <motion.div variants={itemVariants} transition={{ delay: 0.7 }}>
                             <div
                                 onClick={() => {
                                     dispatch(logout(navigate));
                                     setOpen(false);
                                 }}
-                                className="flex w-full items-center gap-x-2 py-3 px-4 text-sm text-white hover:bg-white/20 transition-colors duration-300 cursor-pointer rounded-lg"
+                                className="flex w-full items-center gap-x-2 py-3 px-4 text-sm text-red-500 font-semibold bg-white/20 transition-colors duration-300 cursor-pointer rounded-lg"
                             >
-                                <VscSignOut className="text-lg text-white" />
+                                <VscSignOut className="text-lg text-red-500" />
                                 Logout
                             </div>
                         </motion.div>
