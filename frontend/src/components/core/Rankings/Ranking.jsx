@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { motion, AnimatePresence } from 'framer-motion';
 import RankingTable from "./RankingTable";
 import Footer from '../../common/Footer';
 import { studentEndpoints } from '../../../services/apis';
 import RankingsGraph from './RankingGraph';
 import LoadingSpinner from '../ConductMockTests/Spinner';
-
+import { Menu, Search } from 'lucide-react';
 
 const RankingsPage = () => {
   const [rankings, setRankings] = useState({});
@@ -14,13 +15,12 @@ const RankingsPage = () => {
   const [error, setError] = useState(null);
   const { RANKINGS_API } = studentEndpoints;
   const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const testsPerPage = 5;
-  const [isLoading, setIsLoading] = useState(true); // New state for loading
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchRankings = async () => {
-      setIsLoading(true); // Start loading
+      setIsLoading(true);
       try {
         const response = await fetch(RANKINGS_API, {
           headers: {
@@ -39,6 +39,14 @@ const RankingsPage = () => {
             acc[ranking.testName].push(ranking);
             return acc;
           }, {});
+
+          Object.keys(groupedRankings).forEach(testName => {
+            groupedRankings[testName].sort((a, b) => b.score - a.score);
+            groupedRankings[testName].forEach((ranking, index) => {
+              ranking.rank = index + 1;
+            });
+          });
+
           setRankings(groupedRankings);
           if (Object.keys(groupedRankings).length > 0) {
             setSelectedTest(Object.keys(groupedRankings)[0]);
@@ -50,14 +58,14 @@ const RankingsPage = () => {
         console.error('Error fetching rankings:', error);
         setError('Failed to fetch rankings. Please try again later.');
       } finally {
-        setIsLoading(false); // End loading
+        setIsLoading(false);
       }
     };
     if (token) {
       fetchRankings();
     } else {
       setError('Authentication token is missing');
-      setIsLoading(false); // End loading if there's no token
+      setIsLoading(false);
     }
   }, [token, RANKINGS_API]);
 
@@ -65,15 +73,10 @@ const RankingsPage = () => {
     testName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const indexOfLastTest = currentPage * testsPerPage;
-  const indexOfFirstTest = indexOfLastTest - testsPerPage;
-  const currentTests = filteredTests.slice(indexOfFirstTest, indexOfLastTest);
-  const totalPages = Math.ceil(filteredTests.length / testsPerPage);
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
   if (isLoading) {
-    return <LoadingSpinner />; // Show spinner while loading
+    return <LoadingSpinner />;
   }
 
   if (error) {
@@ -81,77 +84,82 @@ const RankingsPage = () => {
   }
 
   return (
-    <div className="bg-black w-screen text-gray-100">
-      <div className="mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-extrabold text-center mb-12 text-transparent bg-clip-text mt-20 bg-white">
-          Student Rankings
-        </h1>
+    <div className="bg-black w-screen text-gray-100 min-h-screen">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 mt-5">
+      
 
-        <div className="mb-8">
-          <input
-            type="text"
-            placeholder="Search mock tests..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <div className="mb-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {currentTests.map((testName) => (
-              <button
-                key={testName}
-                onClick={() => setSelectedTest(testName)}
-                className={`px-4 py-2 w-full rounded-sm text-sm transition-colors duration-200 ${
-                  selectedTest === testName
-                    ? 'bg-slate-200 text-black'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
+        <div className="relative mb-8">
+          <button
+            onClick={toggleDropdown}
+            className="flex items-center text-sm justify-between w-full px-4 py-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <span>{selectedTest || "Select a mock test"}</span>
+            <Menu size={24} />
+          </button>
+          <AnimatePresence>
+            {isDropdownOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="absolute z-10 py-4 px-2 left-0 mt-2 w-full rounded-lg shadow-lg bg-slate-400 bg-opacity-10 border border-white/20 backdrop-blur-lg"
               >
-                {testName}
-              </button>
-            ))}
-          </div>
+                <div className="relative mb-4">
+                  <input
+                    type="text"
+                    placeholder="Search mock tests..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full px-3 py-2 pl-10 bg-transparent border border-slate-200 text-white rounded-md focus:outline-none"
+                  />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                </div>
+
+                <motion.div className="max-h-60 overflow-y-auto">
+                  {filteredTests.map((testName, index) => (
+                    <motion.div
+                      key={testName}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: index * 0.05 }}
+                    >
+                      <button
+                        onClick={() => {
+                          setSelectedTest(testName);
+                          setIsDropdownOpen(false);
+                        }}
+                        className="block w-full text-left px-4 py-2 text-sm my-2 text-white hover:bg-white/20 transition-colors duration-200 ease-in-out rounded-lg"
+                      >
+                        {testName}
+                      </button>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        {/* Pagination */}
-        <div className="flex justify-center mt-4 mb-8">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
-            <button
-              key={number}
-              onClick={() => paginate(number)}
-              className={`mx-1 px-3 py-1 rounded ${
-                currentPage === number
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-              }`}
-            >
-              {number}
-            </button>
-          ))}
-        </div>
-
-        <div className="bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl">
+        <div className="bg-transparent bg-opacity-50 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl">
           {selectedTest && rankings[selectedTest] ? (
             <>
-              <h2 className="text-3xl font-bold mb-6 text-center pt-8 text-gray-100">{selectedTest}</h2>
-              <div className="">
+              <h2 className="text-3xl font-bold mb-6 text-center text-gray-100">{selectedTest}</h2>
+              <div className="space-y-8">
                 <div>
-                  <h3 className="text-2xl rounded-md w-full font-bold mt-10 text-center mb-4">Rankings Table</h3>
-                  <div className="overflow-x-auto ">
+                  <div className="overflow-x-auto">
                     <RankingTable rankings={rankings[selectedTest]} />
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-2xl rounded font-bold text-center my-4">Rankings Graph</h3>
+                  <h3 className="text-2xl font-bold text-center mb-4">Rankings Graph</h3>
                   <RankingsGraph rankings={rankings[selectedTest]} />
                 </div>
               </div>
             </>
           ) : (
             <p className="text-center text-gray-400 font-medium text-lg">
-              {filteredTests.length === 0 ? 'No matching mock tests found.' : 'Select a mock test from above to view rankings.'}
+              {filteredTests.length === 0 ? 'No matching mock tests found.' : 'Select a mock test to view rankings.'}
             </p>
           )}
         </div>

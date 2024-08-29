@@ -21,7 +21,7 @@ const RankingsGraph = ({ rankings }) => {
   }));
 
   const chartConfigs = {
-    type: 'doughnut3d', // Updated to 3D Donut chart
+    type: 'pie3d', // Updated to 3D Donut chart
     width: '100%',
     height: '400',
     dataFormat: 'json',
@@ -48,7 +48,7 @@ const RankingsGraph = ({ rankings }) => {
         legendShadow: '0',
         legendItemFontColor: '#E5E7EB',
         legendCaptionFontColor: '#F9FAFB',
-        paletteColors: '#3B82F6',
+        paletteColors: '#3B82F6,#34D399,#F59E0B,#EF4444,#8B5CF6,#EC4899,#10B981', // Array of colors for each part
         showValues: '1',
         valueFontColor: '#D1D5DB',
         showBorder: '0',
