@@ -173,7 +173,7 @@ const Navbar = () => {
                             <AiOutlineSearch className="text-xl sm:text-2xl" />
                         </button>
 
-                        {user && user?.accountType !== 'Instructor' && (
+                        {/* {user && user?.accountType !== 'Instructor' && (
                             <Link
                                 to="/dashboard/cart"
                                 className="relative text-white hover:text-blue-200 transition-colors duration-200"
@@ -185,7 +185,7 @@ const Navbar = () => {
                                     </span>
                                 )}
                             </Link>
-                        )}
+                        )} */}
                         {token === null ? (
                             <div className="relative group" ref={dropdownRef}>
                                 <button

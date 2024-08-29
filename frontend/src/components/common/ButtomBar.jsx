@@ -3,6 +3,7 @@ import { AiOutlineHome } from 'react-icons/ai';
 import { PiNotebook } from 'react-icons/pi';
 import { HiAcademicCap } from "react-icons/hi2";
 import { CgShoppingCart } from "react-icons/cg";
+import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
@@ -16,7 +17,11 @@ const BottomBar = () => {
         <NavItem to="/" icon={AiOutlineHome} label="Home" />
         <NavItem to="/catalog/mock-tests" icon={PiNotebook} label="Courses" />
         <NavItem to="/mocktest" icon={HiAcademicCap} label="Mocktests" />
-        <NavItem to="/dashboard/cart" icon={CgShoppingCart} label="Cart" badge={totalItems} />
+        {user && user.accountType !== 'Instructor' ? (
+          <NavItem to="/dashboard/cart" icon={CgShoppingCart} label="Cart" badge={totalItems} />
+        ) : (
+          <NavItem to="/dashboard/my-courses" icon={MdOutlineAdminPanelSettings} label="Admin" />
+        )}
         <Link to="/dashboard/my-profile" className="flex items-center flex-col justify-center">
           <div className="flex items-center gap-x-1">
             <img

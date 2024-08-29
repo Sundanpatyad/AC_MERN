@@ -8,6 +8,7 @@ import IconBtn from "../../common/IconBtn"
 import CoursesTable from "./InstructorCourses/CoursesTable"
 import { fetchInstructorMockTest } from "../../../services/operations/mocktest"
 import MockTestsTable from "./InstructorCourses/MockTestTable"
+import Footer from "../../common/Footer"
 
 export default function MyCoursesAndTests() {
   const { token } = useSelector((state) => state.auth)
@@ -59,7 +60,7 @@ export default function MyCoursesAndTests() {
           </IconBtn>
           <IconBtn
             text="Add Mock Test"
-            onclick={() => navigate("/dashboard/add-mock-test")}
+            onclick={() => navigate("/dashboard/add-mocktest")}
           >
             <VscAdd />
           </IconBtn>
@@ -91,6 +92,7 @@ export default function MyCoursesAndTests() {
           />
         )}
       </div>
+      <Footer/>
     </div>
   )
 }

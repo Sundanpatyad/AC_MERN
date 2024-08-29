@@ -42,13 +42,19 @@ export default function MyProfile() {
                 >
                   <RiEditLine className="mr-2" />
                 </IconBtn>
-                <IconBtn
+                {user && user.accountType !== 'Instructor' ? <IconBtn
                   text="Dashboard"
                   onclick={() => navigate("/dashboard/enrolled-courses")}
                   className=" text-black px-4 sm:px-6 py-2 rounded-full transition duration-300 flex items-center text-sm "
                 >
                   <RiEditLine className="mr-2" />
-                </IconBtn>
+                </IconBtn> : <IconBtn
+                  text="Dashboard"
+                  onclick={() => navigate("/dashboard/instructor")}
+                  className=" text-black px-4 sm:px-6 py-2 rounded-full transition duration-300 flex items-center text-sm "
+                >
+                  <RiEditLine className="mr-2" />
+                </IconBtn>}
               </div>
               </div>
             </div>

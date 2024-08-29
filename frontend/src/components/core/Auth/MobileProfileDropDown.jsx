@@ -59,7 +59,7 @@ export default function MobileProfileDropDown() {
                 <Img
                     src={user?.image}
                     alt={`profile-${user?.firstName}`}
-                    className="aspect-square w-[30px] rounded-full object-cover"
+                    className="aspect-square w-[22px] rounded-full object-cover"
                 />
                 <AiOutlineCaretDown className={`text-sm text-white transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />
             </button>
