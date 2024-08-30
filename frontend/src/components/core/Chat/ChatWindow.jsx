@@ -69,7 +69,7 @@ const ChatWindow = () => {
   };
 
   return (
-    <div className="bg-black  h-[100vh] pt-16 fixed w-full flex flex-col">
+    <div className="bg-black h-[100vh] pt-16 fixed w-full flex flex-col">
       <h2 className="text-xl font-semibold p-4 bg-zinc-900">Chat</h2>
       <div className="flex-grow flex flex-col overflow-hidden">
         <div className="flex-grow overflow-y-auto p-4 space-y-4">
@@ -98,7 +98,7 @@ const ChatWindow = () => {
             onChange={(e) => setMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Type your message..."
-            className="flex-grow bg-transparent text-gray-100 resize-none focus:outline-none text-sm"
+            className="flex-grow bg-transparent text-gray-100 resize-none focus:outline-none text-sm text-size-adjust-none"
             rows="1"
           />
           <button
