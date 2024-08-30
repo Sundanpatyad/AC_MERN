@@ -91,7 +91,7 @@ const ChatWindow = () => {
           <div ref={messageEndRef} />
         </div>
       </div>
-      <div className="bg-zinc-900 pb-16 md:pb-2 p-4">
+      <div className="bg-zinc-900 pb-16 lg:pb-2 p-4">
         <div className="flex items-center space-x-2 bg-zinc-700 rounded-lg p-2">
           <textarea
             value={message}
