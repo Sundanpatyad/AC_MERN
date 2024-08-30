@@ -28,6 +28,7 @@
     "locomotive-scroll": "^4.1.4",
     "lucide-react": "^0.414.0",
     "mini-svg-data-uri": "^1.4.4",
+    "moment": "^2.30.1",
     "razorpay": "^2.9.2",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",

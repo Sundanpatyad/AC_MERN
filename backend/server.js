@@ -19,6 +19,7 @@ const profileRoutes = require('./routes/profile');
 const paymentRoutes = require('./routes/payments');
 const courseRoutes = require('./routes/course');
 const mockRoutes = require("./routes/mocktest")
+const chatRoutes = require("./routes/chatRoutes")
 
 // middleware 
 app.use(express.json()); // to parse json body
@@ -54,6 +55,7 @@ app.use('/api/v1/profile', profileRoutes);
 app.use('/api/v1/payment', paymentRoutes);
 app.use('/api/v1/course', courseRoutes);
 app.use('/api/v1/mock', mockRoutes);
+app.use('/api/v1/chats', chatRoutes);
 
 
 

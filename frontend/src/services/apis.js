@@ -1,5 +1,6 @@
 
 const BASE_URL = 'https://awakening-classes.up.railway.app';
+// const BASE_URL = 'http://localhost:8000';
 
 export const endpoints = {
   SENDOTP_API: `${BASE_URL}/api/v1/auth/sendotp`,
@@ -94,4 +95,12 @@ export const mocktestEndpoints = {
   SEARCH_API:`${BASE_URL}/api/v1/course/search`
   // http://localhost:8000/api/v1/mock/getMockTestSeriesById
 
+}
+
+export const chatEndPoints = {
+ CREATE_CHAT: `${BASE_URL}/api/v1/chats/chat/create`,
+ GET_CHATS: `${BASE_URL}/api/v1/chats/chat/userChats`,
+ SEARCH_USERS: `${BASE_URL}/api/v1/chats`,
+ SEND_MESSAGES: `${BASE_URL}/api/v1/chats/chat/message`,
+ FETCH_MESSAGES: `${BASE_URL}/api/v1/chats/chat`,
 }

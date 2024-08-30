@@ -6,6 +6,7 @@ import { NavbarLinks } from '../../../data/navbar-links';
 import { fetchCourseCategories } from './../../services/operations/courseDetailsAPI';
 import ProfileDropDown from '../core/Auth/ProfileDropDown';
 import MobileProfileDropDown from '../core/Auth/MobileProfileDropDown';
+import { IoChatbubblesOutline } from "react-icons/io5";
 import {
     AiOutlineShoppingCart,
     AiOutlineSearch,
@@ -173,19 +174,15 @@ const Navbar = () => {
                             <AiOutlineSearch className="text-xl sm:text-2xl" />
                         </button>
 
-                        {/* {user && user?.accountType !== 'Instructor' && (
+                        {user && (
                             <Link
-                                to="/dashboard/cart"
+                                to="/chat"
                                 className="relative text-white hover:text-blue-200 transition-colors duration-200"
                             >
-                                <AiOutlineShoppingCart className="text-xl sm:text-2xl" />
-                                {totalItems > 0 && (
-                                    <span className="absolute -top-1 -right-1 bg-white text-richblack-900 rounded-full w-3 h-3 sm:w-4 sm:h-4 flex items-center justify-center text-[10px] sm:text-xs font-bold">
-                                        {totalItems}
-                                    </span>
-                                )}
+                                <IoChatbubblesOutline className="text-xl sm:text-2xl" />
+                            
                             </Link>
-                        )} */}
+                        )}
                         {token === null ? (
                             <div className="relative group" ref={dropdownRef}>
                                 <button
