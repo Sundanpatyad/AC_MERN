@@ -17,7 +17,7 @@ const ChatWindow = () => {
   const { chatId } = useParams();
   const { token } = useSelector((state) => state.auth);
   const { user } = useSelector((state) => state.profile);
-  const userId = user._id;
+  const userId = user.id;
   const messageEndRef = useRef(null);
 
   useEffect(() => {
