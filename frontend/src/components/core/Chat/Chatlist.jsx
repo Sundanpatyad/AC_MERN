@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import moment from 'moment';
 import { Search, Send, Menu } from 'lucide-react';
 import { chatEndPoints } from '../../../services/apis';
+import LoadingSpinner from '../ConductMockTests/Spinner';
 
 const ChatList = () => {
   const [chats, setChats] = useState([]);
@@ -86,9 +87,9 @@ const ChatList = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-900">
-        <div className="text-lg text-gray-300">Loading...</div>
-      </div>
+    <>
+    <LoadingSpinner/>
+    </>
     );
   }
 
