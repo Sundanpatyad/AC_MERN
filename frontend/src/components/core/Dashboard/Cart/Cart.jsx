@@ -51,14 +51,14 @@ export default function Cart() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="text-center py-16 px-6 sm:px-8"
+              className="text-center py-10 px-6 sm:px-8"
             >
               <FiShoppingCart className="mx-auto h-24 w-24 text-gray-500" />
               <h2 className="mt-6 text-3xl font-bold text-white">Your cart is empty</h2>
-              <p className="mt-3 text-xl text-gray-400">Looks like you haven't added any courses yet.</p>
+              <p className="mt-3 text-md text-gray-400">Looks like you haven't added any courses yet.</p>
               <Link
                 to="/"
-                className="mt-8 inline-flex items-center px-8 py-3 border border-transparent text-lg font-medium rounded-lg text-black bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg"
+                className="mt-8 inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-lg text-black bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg"
               >
                 Browse Courses
               </Link>

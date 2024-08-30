@@ -46,6 +46,7 @@ import EditMockTestSeries from "./components/core/Dashboard/AddCourse/EditMockTe
 import RankingsPage from "./components/core/Rankings/Ranking";
 import PageLoader from "./components/ui/PageLoader";
 import BottomBar from "./components/common/ButtomBar";
+import MockTestSeriesTest from "./components/core/ConductMockTests/MockTestsSeriesTest";
 
 
 

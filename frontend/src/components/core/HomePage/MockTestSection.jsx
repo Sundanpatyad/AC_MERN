@@ -85,29 +85,32 @@ const MockTestsSection = ({ setShowLoginModal }) => {
   return (
     <div className="container w-11/12 mx-auto">
       <h2 className="text-4xl text-center text-richblack-5 mb-6">Popular Mock Tests</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {isMockTestsLoading
-          ? Array(4).fill().map((_, index) => (
-            <MockTestSkeleton key={index} />
-          ))
-          : mockTests
-            ?.slice(0, 4)
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-            .reverse()
-            .map((mockTest) => (
-              <MemoizedMockTestCard
-                key={mockTest._id}
-                mockTest={mockTest}
-                handleAddToCart={handleAddToCart}
-                handleRemoveFromCart={handleRemoveFromCart}
-                handleBuyNow={handleBuyNow}
-                handleStartTest={handleStartTest}
-                setShowLoginModal={setShowLoginModal}
-                isLoggedIn={isLoggedIn}
-                userId={user?._id}
-              />
-            ))}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-center items-center">
+  {isMockTestsLoading
+    ? Array(4).fill().map((_, index) => (
+      <div key={index} className="flex justify-center">
+        <MockTestSkeleton />
       </div>
+    ))
+    : mockTests
+        ?.slice(0, 4)
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .reverse()
+        .map((mockTest) => (
+          <MemoizedMockTestCard
+            key={mockTest._id}
+            mockTest={mockTest}
+            handleAddToCart={handleAddToCart}
+            handleRemoveFromCart={handleRemoveFromCart}
+            handleBuyNow={handleBuyNow}
+            handleStartTest={handleStartTest}
+            setShowLoginModal={setShowLoginModal}
+            isLoggedIn={isLoggedIn}
+            userId={user?._id}
+          />
+        ))}
+</div>
+
       <div className="text-center mt-12">
         <Link
           to="/mocktest"
