@@ -202,7 +202,7 @@ const Navbar = () => {
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, y: -10 }}
                                             transition={{ duration: 0.3 }}
-                                            className="absolute z-10 py-4 px-2 right-0 mt-2 w-60 rounded-lg shadow-lg bg-slate-400 bg-opacity-10 border border-white/20 backdrop-blur-lg"
+                                            className="absolute z-10 py-4 px-2 right-0 mt-2 w-60 rounded-lg shadow-lg bg-black bg-opacity-96 border border-white/20 backdrop-blur-lg"
                                         >
                                             <motion.div className="py-1">
                                                 {[
