@@ -213,7 +213,7 @@ const Navbar = () => {
                         </button>
 
                         {/* Download Button */}
-                        {deferredPrompt && (
+                      
                             <button
                                 onClick={handleInstallClick}
                                 className="text-white hover:text-blue-200 transition-colors duration-200"
@@ -221,7 +221,7 @@ const Navbar = () => {
                             >
                                 <CiSaveDown1 className="text-xl sm:text-2xl" />
                             </button>
-                        )}
+                      
 
                         {token === null ? (
                             <div className="relative group" ref={dropdownRef}>
