@@ -38,6 +38,8 @@ const Navbar = () => {
     const [isAuthDropdownOpen, setIsAuthDropdownOpen] = useState(false);
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
     const [hidden, setHidden] = useState(false);
+    const [deferredPrompt, setDeferredPrompt] = useState(null);
+
     const searchModalRef = useRef(null);
     const lastScrollY = useRef(0);
     const dropdownRef = useRef(null);
@@ -91,8 +93,38 @@ const Navbar = () => {
         };
     }, []);
 
+    useEffect(() => {
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            setDeferredPrompt(e);
+        });
+
+        window.addEventListener('appinstalled', () => {
+            setDeferredPrompt(null);
+        });
+
+        return () => {
+            window.removeEventListener('beforeinstallprompt', () => {});
+            window.removeEventListener('appinstalled', () => {});
+        };
+    }, []);
+
     const handleSearchResultClick = () => {
         setIsSearchModalOpen(false);
+    };
+
+    const handleInstallClick = () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the A2HS prompt');
+                } else {
+                    console.log('User dismissed the A2HS prompt');
+                }
+                setDeferredPrompt(null);
+            });
+        }
     };
 
     const navVariants = {
@@ -174,15 +206,17 @@ const Navbar = () => {
                             <AiOutlineSearch className="text-xl sm:text-2xl" />
                         </button>
 
-                        {/* {user && (
-                            <Link
-                                to="/chat"
-                                className="relative text-white hover:text-blue-200 transition-colors duration-200"
+                        {/* Download Button */}
+                        {deferredPrompt && (
+                            <button
+                                onClick={handleInstallClick}
+                                className="text-white hover:text-blue-200 transition-colors duration-200"
+                                aria-label="Install App"
                             >
-                                <IoChatbubblesOutline className="text-xl sm:text-2xl" />
-                            
-                            </Link>
-                        )} */}
+                                <AiOutlineShoppingCart className="text-xl sm:text-2xl" />
+                            </button>
+                        )}
+
                         {token === null ? (
                             <div className="relative group" ref={dropdownRef}>
                                 <button
