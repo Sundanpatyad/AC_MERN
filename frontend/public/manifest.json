@@ -1,6 +1,6 @@
 {
     "name": "Awakening Classes",
-    "short_name": "AC",
+    "short_name": "Awakwening Classes",
     "theme_color": "#000000",
     "background_color": "#000000",
     "display": "standalone",
@@ -12,7 +12,7 @@
             "src":"masmaskable.png",
             "sizes": "384x384",
             "type": "image/png",
-            "purpose": "any maskable"
+            "purpose": "maskable any"
         },
         {
             "src": "title192.png",
