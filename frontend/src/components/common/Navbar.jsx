@@ -7,6 +7,7 @@ import { fetchCourseCategories } from './../../services/operations/courseDetails
 import ProfileDropDown from '../core/Auth/ProfileDropDown';
 import MobileProfileDropDown from '../core/Auth/MobileProfileDropDown';
 import { IoChatbubblesOutline } from "react-icons/io5";
+import { CiSaveDown1 } from "react-icons/ci";
 import {
     AiOutlineShoppingCart,
     AiOutlineSearch,
@@ -94,18 +95,21 @@ const Navbar = () => {
     }, []);
 
     useEffect(() => {
-        window.addEventListener('beforeinstallprompt', (e) => {
+        const handleBeforeInstallPrompt = (e) => {
             e.preventDefault();
             setDeferredPrompt(e);
-        });
+        };
 
-        window.addEventListener('appinstalled', () => {
+        const handleAppInstalled = () => {
             setDeferredPrompt(null);
-        });
+        };
+
+        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        window.addEventListener('appinstalled', handleAppInstalled);
 
         return () => {
-            window.removeEventListener('beforeinstallprompt', () => {});
-            window.removeEventListener('appinstalled', () => {});
+            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+            window.removeEventListener('appinstalled', handleAppInstalled);
         };
     }, []);
 
@@ -124,6 +128,8 @@ const Navbar = () => {
                 }
                 setDeferredPrompt(null);
             });
+        } else {
+            console.log('Deferred prompt is null');
         }
     };
 
@@ -213,7 +219,7 @@ const Navbar = () => {
                                 className="text-white hover:text-blue-200 transition-colors duration-200"
                                 aria-label="Install App"
                             >
-                                <AiOutlineShoppingCart className="text-xl sm:text-2xl" />
+                                <CiSaveDown1 className="text-xl sm:text-2xl" />
                             </button>
                         )}
 
