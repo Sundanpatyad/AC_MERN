@@ -214,13 +214,13 @@ const Navbar = () => {
 
                         {/* Download Button */}
                       
-                            <button
+                            {/* <button
                                 onClick={handleInstallClick}
                                 className="text-white hover:text-blue-200 transition-colors duration-200"
                                 aria-label="Install App"
                             >
                                 <CiSaveDown1 className="text-xl sm:text-2xl" />
-                            </button>
+                            </button> */}
                       
 
                         {token === null ? (
