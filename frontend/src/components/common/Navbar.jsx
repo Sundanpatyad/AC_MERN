@@ -174,7 +174,7 @@ const Navbar = () => {
                             <AiOutlineSearch className="text-xl sm:text-2xl" />
                         </button>
 
-                        {user && (
+                        {/* {user && (
                             <Link
                                 to="/chat"
                                 className="relative text-white hover:text-blue-200 transition-colors duration-200"
@@ -182,7 +182,7 @@ const Navbar = () => {
                                 <IoChatbubblesOutline className="text-xl sm:text-2xl" />
                             
                             </Link>
-                        )}
+                        )} */}
                         {token === null ? (
                             <div className="relative group" ref={dropdownRef}>
                                 <button

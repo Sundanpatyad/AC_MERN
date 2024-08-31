@@ -11,12 +11,32 @@ import { Menu, Search } from 'lucide-react';
 const RankingsPage = () => {
   const [rankings, setRankings] = useState({});
   const [selectedTest, setSelectedTest] = useState(null);
+  const [userRanks, setUserRanks] = useState({});
   const { token } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.profile);
   const [error, setError] = useState(null);
   const { RANKINGS_API } = studentEndpoints;
   const [searchTerm, setSearchTerm] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const userId = user._id;
+
+  const calculateRanks = (testResults) => {
+    // Sort results by score in descending order
+    const sortedResults = testResults.sort((a, b) => b.score - a.score);
+    
+    let currentRank = 1;
+    let prevScore = null;
+    let rankedResults = sortedResults.map((result, index) => {
+      if (result.score !== prevScore) {
+        currentRank = index + 1;
+      }
+      prevScore = result.score;
+      return { ...result, rank: currentRank };
+    });
+
+    return rankedResults;
+  };
 
   useEffect(() => {
     const fetchRankings = async () => {
@@ -32,25 +52,36 @@ const RankingsPage = () => {
         }
         const data = await response.json();
         if (data.success) {
-          const groupedRankings = data.data.reduce((acc, ranking) => {
-            if (!acc[ranking.testName]) {
-              acc[ranking.testName] = [];
-            }
-            acc[ranking.testName].push(ranking);
-            return acc;
-          }, {});
+          const groupedRankings = {};
+          const userRanks = {};
 
+          // Group rankings by test name
+          data.data.forEach(ranking => {
+            if (!groupedRankings[ranking.testName]) {
+              groupedRankings[ranking.testName] = [];
+            }
+            groupedRankings[ranking.testName].push(ranking);
+          });
+
+          // Calculate correct ranks for each test
           Object.keys(groupedRankings).forEach(testName => {
-            groupedRankings[testName].sort((a, b) => b.score - a.score);
-            groupedRankings[testName].forEach((ranking, index) => {
-              ranking.rank = index + 1;
-            });
+            groupedRankings[testName] = calculateRanks(groupedRankings[testName]);
+            
+            // Find user's rank for this test
+            const userRanking = groupedRankings[testName].find(r => r.userId === userId);
+            if (userRanking) {
+              userRanks[testName] = userRanking.rank;
+            }
           });
 
           setRankings(groupedRankings);
+          setUserRanks(userRanks);
+
           if (Object.keys(groupedRankings).length > 0) {
             setSelectedTest(Object.keys(groupedRankings)[0]);
           }
+
+          console.log("User's ranks:", userRanks);
         } else {
           setError(data.message || 'Failed to fetch rankings');
         }
@@ -67,7 +98,7 @@ const RankingsPage = () => {
       setError('Authentication token is missing');
       setIsLoading(false);
     }
-  }, [token, RANKINGS_API]);
+  }, [token, RANKINGS_API, userId]);
 
   const filteredTests = Object.keys(rankings).filter(testName =>
     testName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -82,12 +113,10 @@ const RankingsPage = () => {
   if (error) {
     return <div className="text-center text-red-400 mt-8 font-semibold text-xl">{error}</div>;
   }
-
+  console.log(rankings[selectedTest].length , "/////////////////////////////////ssssssssssssssssssssssssss")
   return (
     <div className="bg-black w-screen text-gray-100 min-h-screen">
       <div className="mx-auto px-4 sm:px-6 lg:px-8 mt-5">
-      
-
         <div className="relative mb-8">
           <button
             onClick={toggleDropdown}
@@ -131,7 +160,7 @@ const RankingsPage = () => {
                         }}
                         className="block w-full text-left px-4 py-2 text-sm my-2 text-white hover:bg-white/20 transition-colors duration-200 ease-in-out rounded-lg"
                       >
-                        {testName}
+                        {testName} (Your Rank: {userRanks[testName] || 'N/A'})
                       </button>
                     </motion.div>
                   ))}
@@ -145,6 +174,10 @@ const RankingsPage = () => {
           {selectedTest && rankings[selectedTest] ? (
             <>
               <h2 className="text-3xl font-bold mb-6 text-center text-gray-100">{selectedTest}</h2>
+              <div className='flex justify-center align-center'>
+              <div className="text-xl font-semibold mb-4 text-center w-80  bg-slate-200 py-2 rounded-md text-zinc-800">Your Rank: {userRanks[selectedTest] || 'N/A'} / {rankings[selectedTest].length}</div>
+
+              </div>
               <div className="space-y-8">
                 <div>
                   <div className="overflow-x-auto">

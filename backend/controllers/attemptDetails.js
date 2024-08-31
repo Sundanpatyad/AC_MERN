@@ -196,6 +196,7 @@ exports.getRankings = async (req, res) => {
       {
         $project: {
           rank: 1,
+          userId: '$user', // Include the user's ID
           userName: {
             $concat: ['$userDetails.firstName', ' ', '$userDetails.lastName']
           },
