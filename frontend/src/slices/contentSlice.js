@@ -1,21 +1,24 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { studyMaterialEndPoints } from '../services/apis';
+
+const { FETCH_EXAMS , STUDY_MATERIALS , CREATE_EXAM ,CREATE_STUDY_MATERIAL , DELETE_EXAM ,DELETE_STUDY_MATERIALS } = studyMaterialEndPoints;
 
 const API_BASE_URL = 'http://localhost:8000/api/v1/materials';
 
 export const fetchExams = createAsyncThunk('content/fetchExams', async () => {
-    const response = await axios.get(`${API_BASE_URL}/getExam`);
+    const response = await axios.get(FETCH_EXAMS);
     return response.data;
 });
 
 export const fetchStudyMaterials = createAsyncThunk('content/fetchStudyMaterials', async () => {
-    const response = await axios.get(`${API_BASE_URL}/getAllStudyMaterials`);
+    const response = await axios.get(STUDY_MATERIALS);
     return response.data;
 });
 
 export const createExam = createAsyncThunk('content/createExam', async ({ name, description, token }) => {
-    const response = await axios.post(`${API_BASE_URL}/createExam`, { name, description }, {
+    const response = await axios.post(CREATE_EXAM, { name, description }, {
         headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
@@ -25,7 +28,7 @@ export const createStudyMaterial = createAsyncThunk(
     'content/createStudyMaterial',
     async ({ title, content, exam, token }) => {
         const response = await axios.post(
-            `${API_BASE_URL}/createStudyMaterial`,
+            `${CREATE_STUDY_MATERIAL}`,
             { title, content, exam },
             {
                 headers: { Authorization: `Bearer ${token}` },
@@ -64,15 +67,14 @@ export const updateStudyMaterial = createAsyncThunk(
 );
 
 export const deleteExam = createAsyncThunk('content/deleteExam', async ({ id, token }) => {
-    console.log(id , "dddddddddddddddddddddddddddddddddddddddddddddd")
-    await axios.delete(`${API_BASE_URL}/deleteExam/${id}`, {
+    await axios.delete(`${DELETE_EXAM}/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
     });
     return id;
 });
 
 export const deleteStudyMaterial = createAsyncThunk('content/deleteStudyMaterial', async ({ id, token }) => {
-    await axios.delete(`${API_BASE_URL}/deleteStudyMaterial/${id}`, {
+    await axios.delete(`${DELETE_STUDY_MATERIALS}/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
     });
     return id;

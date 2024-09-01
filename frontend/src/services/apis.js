@@ -3,6 +3,15 @@
 // const BASE_URL = 'http://localhost:8000';
 const BASE_URL = 'https://ac-mern.onrender.com';
 
+export const studyMaterialEndPoints = {
+    FETCH_EXAMS : `${BASE_URL}/api/v1/materials/getExam`,
+    STUDY_MATERIALS : `${BASE_URL}/api/v1/materials/getAllStudyMaterials`,
+    CREATE_EXAM : `${BASE_URL}/api/v1/materials/createExam`,
+    CREATE_STUDY_MATERIAL : `${BASE_URL}/api/v1/materials/createStudyMaterial`,
+    DELETE_EXAM : `${BASE_URL}/api/v1/materials/deleteExam`,
+    DELETE_STUDY_MATERIALS : `${BASE_URL}/api/v1/materials/deleteStudyMaterial`,
+ }
+
 
 export const endpoints = {
   SENDOTP_API: `${BASE_URL}/api/v1/auth/sendotp`,
