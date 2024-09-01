@@ -7,6 +7,8 @@ import { fetchCourseCategories } from './../../services/operations/courseDetails
 import ProfileDropDown from '../core/Auth/ProfileDropDown';
 import MobileProfileDropDown from '../core/Auth/MobileProfileDropDown';
 import { FaRegFilePdf } from "react-icons/fa6";
+import { BsFiletypePdf } from "react-icons/bs";
+
 import {
     AiOutlineSearch,
     AiOutlineHome,
@@ -245,6 +247,7 @@ const Navbar = () => {
                                                     { to: '/', icon: AiOutlineHome, text: 'Home' },
                                                     { to: '/catalog/mock-tests', icon: AiOutlineBook, text: 'Courses' },
                                                     { to: '/mocktest', icon: AiOutlineFileDone, text: 'Mock Tests' },
+                                                    { to: "/exams", icon: BsFiletypePdf, text: "Free Pdf" },
                                                     { to: '/about', icon: AiOutlineInfoCircle, text: 'About Us' },
                                                     { to: '/contact', icon: AiOutlineContacts, text: 'Contact Us' },
                                                     { to: '/login', icon: AiOutlineLogin, text: 'Log in' },

@@ -11,6 +11,10 @@ export const NavbarLinks = [
     path: "/mocktest",
   },
   {
+    title: "Free Pdf",
+    path: "/exams",
+  },
+  {
     title: "About Us",
     path: "/about",
   },

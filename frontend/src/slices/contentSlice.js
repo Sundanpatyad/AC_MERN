@@ -129,13 +129,10 @@ const contentSlice = createSlice({
             .addCase(fetchExams.fulfilled, (state, action) => {
                 state.status = 'succeeded';
                 state.exams = action.payload;
-                toast.success('Exams loaded successfully');
             })
             .addCase(fetchExams.rejected, (state, action) => {
                 state.status = 'failed';
-                state.error = action.error.message;
-                toast.error(`Failed to load exams: ${action.error.message}`);
-            })
+                state.error = action.error.message;            })
             .addCase(fetchStudyMaterials.fulfilled, (state, action) => {
                 state.studyMaterials = action.payload;
                 toast.success('Study materials loaded successfully');

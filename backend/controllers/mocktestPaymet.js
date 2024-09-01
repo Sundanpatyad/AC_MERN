@@ -104,16 +104,22 @@ const grantMockTestAccess = async (itemId, userId) => {
     }
 
     const mockTestIdArray = Array.isArray(itemId) ? itemId : [itemId];
+    
+    // Start a session for transaction
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
     try {
         for (const mockTestId of mockTestIdArray) {
             const updatedMockTestSeries = await MockTestSeries.findOneAndUpdate(
                 { _id: mockTestId },
                 { $addToSet: { studentsEnrolled: userId } },
-                { new: true }
+                { new: true, session } // Pass session here
             );
 
             if (!updatedMockTestSeries) {
+                await session.abortTransaction();
+                session.endSession();
                 return { success: false, message: `Mock Test Series with ID ${mockTestId} not found.` };
             }
 
@@ -124,12 +130,12 @@ const grantMockTestAccess = async (itemId, userId) => {
                         mocktests: mockTestId,
                     },
                 },
-                { new: true }
+                { new: true, session } // Pass session here
             );
 
             // Send email notification
             try {
-                const user = await User.findById(userId);
+                const user = await User.findById(userId).session(session);
                 await mailSender(
                     user.email,
                     `Successfully Purchased ${updatedMockTestSeries.seriesName}`,
@@ -141,12 +147,17 @@ const grantMockTestAccess = async (itemId, userId) => {
             }
         }
 
+        await session.commitTransaction();
+        session.endSession();
+
         return { success: true, message: "Access granted successfully to all mock test series." };
     } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
         console.error("Error in grantMockTestAccess:", error);
         return { success: false, message: "Error granting access to mock test series: " + error.message };
     }
-}
+};
 
 exports.sendMockTestPaymentSuccessEmail = async (req, res) => {
     const { orderId, paymentId, amount } = req.body;

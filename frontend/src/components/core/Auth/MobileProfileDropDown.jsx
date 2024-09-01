@@ -80,8 +80,8 @@ export default function MobileProfileDropDown() {
                             { to: "/", icon: AiOutlineHome, label: "Home" },
                             { to: "/catalog/mock-tests", icon: PiNotebook, label: "Courses" },
                             { to: "/mocktest", icon: PiNotebook, label: "Mock Tests" },
-                            { to: "/about", icon: TbMessage2Plus, label: "About Us" },
                             { to: "/exams", icon: BsFiletypePdf, label: "Free Pdf" },
+                            { to: "/about", icon: TbMessage2Plus, label: "About Us" },
                             { to: "/contact", icon: MdOutlineContactPhone, label: "Contact Us" },
                         ].map((item, index) => (
                             <motion.div key={index} variants={itemVariants} transition={{ delay: index * 0.1 }}>
