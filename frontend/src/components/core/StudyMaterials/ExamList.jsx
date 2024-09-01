@@ -2,7 +2,9 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchExams } from '../../../slices/contentSlice'; // Update the import path accordingly
 import { Link } from 'react-router-dom';
-import { FaFilePdf, FaExternalLinkAlt } from 'react-icons/fa';
+import { FaFilePdf } from 'react-icons/fa';
+import LoadingSpinner from '../ConductMockTests/Spinner';
+
 
 function ExamList() {
   const dispatch = useDispatch();
@@ -17,7 +19,7 @@ function ExamList() {
   }, [dispatch, status]);
 
   if (status === 'loading') {
-    return <p className="text-white">Loading exams...</p>;
+    return <LoadingSpinner/>;
   }
 
   if (status === 'failed') {

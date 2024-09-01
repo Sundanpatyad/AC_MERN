@@ -6,6 +6,7 @@ const BASE_URL = 'https://ac-mern.onrender.com';
 export const studyMaterialEndPoints = {
     FETCH_EXAMS : `${BASE_URL}/api/v1/materials/getExam`,
     STUDY_MATERIALS : `${BASE_URL}/api/v1/materials/getAllStudyMaterials`,
+    FETCH_STUDY_MATERIALS : `${BASE_URL}/api/v1/materials/getStudyMaterials`,
     CREATE_EXAM : `${BASE_URL}/api/v1/materials/createExam`,
     CREATE_STUDY_MATERIAL : `${BASE_URL}/api/v1/materials/createStudyMaterial`,
     DELETE_EXAM : `${BASE_URL}/api/v1/materials/deleteExam`,
