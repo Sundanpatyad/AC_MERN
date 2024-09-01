@@ -6,10 +6,8 @@ import { NavbarLinks } from '../../../data/navbar-links';
 import { fetchCourseCategories } from './../../services/operations/courseDetailsAPI';
 import ProfileDropDown from '../core/Auth/ProfileDropDown';
 import MobileProfileDropDown from '../core/Auth/MobileProfileDropDown';
-import { IoChatbubblesOutline } from "react-icons/io5";
-import { CiSaveDown1 } from "react-icons/ci";
+import { FaRegFilePdf } from "react-icons/fa6";
 import {
-    AiOutlineShoppingCart,
     AiOutlineSearch,
     AiOutlineHome,
     AiOutlineBook,
@@ -30,8 +28,6 @@ const SCROLL_THRESHOLD = 50;
 
 const Navbar = () => {
     const { token } = useSelector((state) => state.auth);
-    const { user } = useSelector((state) => state.profile);
-    const { totalItems } = useSelector((state) => state.cart);
     const location = useLocation();
 
     const [subLinks, setSubLinks] = useState([]);
@@ -214,13 +210,13 @@ const Navbar = () => {
 
                         {/* Download Button */}
                       
-                            {/* <button
-                                onClick={handleInstallClick}
+                            {/* <Link to={"/exams"}
+                           
                                 className="text-white hover:text-blue-200 transition-colors duration-200"
-                                aria-label="Install App"
+                                
                             >
-                                <CiSaveDown1 className="text-xl sm:text-2xl" />
-                            </button> */}
+                                <FaRegFilePdf className="text-xl sm:text-2xl" />
+                            </Link> */}
                       
 
                         {token === null ? (

@@ -11,6 +11,7 @@ import { TbMessage2Plus } from "react-icons/tb";
 import { PiNotebook } from "react-icons/pi";
 import { fetchCourseCategories } from "./../../../services/operations/courseDetailsAPI";
 import { motion, AnimatePresence } from "framer-motion";
+import { BsFiletypePdf } from "react-icons/bs";
 
 export default function MobileProfileDropDown() {
     const { user } = useSelector((state) => state.profile);
@@ -80,6 +81,7 @@ export default function MobileProfileDropDown() {
                             { to: "/catalog/mock-tests", icon: PiNotebook, label: "Courses" },
                             { to: "/mocktest", icon: PiNotebook, label: "Mock Tests" },
                             { to: "/about", icon: TbMessage2Plus, label: "About Us" },
+                            { to: "/exams", icon: BsFiletypePdf, label: "Free Pdf" },
                             { to: "/contact", icon: MdOutlineContactPhone, label: "Contact Us" },
                         ].map((item, index) => (
                             <motion.div key={index} variants={itemVariants} transition={{ delay: index * 0.1 }}>

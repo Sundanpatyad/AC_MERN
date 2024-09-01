@@ -33,7 +33,7 @@ const MockTestCard = React.memo(({
 
     return (
         <Link to={`/mock-test/${mockTest._id}`}
-            className="bg-black border border-gray-800 rounded-lg overflow-hidden shadow-lg cursor-pointer flex flex-col"
+            className="bg-zinc-900 border-2 border-gray-800 rounded-lg overflow-hidden shadow-lg cursor-pointer flex flex-col"
         >
             <div className="relative h-36 bg-gradient-to-br from-gray-800 to-black">
                 <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-80 p-3">

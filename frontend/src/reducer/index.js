@@ -10,6 +10,7 @@ import catalogReducer from "../slices/catlogSlice";
 import sidebarSlice from "../slices/sidebarSlice";
 import mockTestSeriesReducer from "../slices/editmockSlice";
 import editMockReducer from "../slices/editmockSlice"
+import contentReducer from '../slices/contentSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -21,7 +22,8 @@ const rootReducer = combineReducers({
   catalog: catalogReducer,
   enrolledContent: enrolledContentReducer,
   mockTestSeries: mockTestSeriesReducer,
-  editmock : editMockReducer
+  editmock : editMockReducer,
+  content: contentReducer,
 })
 
 export default rootReducer

@@ -20,7 +20,7 @@ const paymentRoutes = require('./routes/payments');
 const courseRoutes = require('./routes/course');
 const mockRoutes = require("./routes/mocktest")
 const chatRoutes = require("./routes/chatRoutes")
-const MaterialRoutes = require('./routes/studyMaterials')
+const materialRoutes = require('./routes/studyMaterialsRoutes')
 
 // middleware 
 app.use(express.json()); // to parse json body
@@ -58,7 +58,7 @@ app.use('/api/v1/payment', paymentRoutes);
 app.use('/api/v1/course', courseRoutes);
 app.use('/api/v1/mock', mockRoutes);
 app.use('/api/v1/chats', chatRoutes);
-app.use('/api/v1/material', MaterialRoutes);
+app.use('/api/v1/materials', materialRoutes);
 
 
 if (process.env.NODE_ENV === "production") {

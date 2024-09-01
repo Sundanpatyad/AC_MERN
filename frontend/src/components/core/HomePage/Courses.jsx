@@ -21,7 +21,7 @@ const CourseCard = ({ course, handleAddToCart, handleBuyNow, isInCart, isEnrolle
 
 
   return (
-    <Link to={`/courses/${course._id}`} className="bg-black border border-gray-800 rounded-lg overflow-hidden shadow-lg">
+    <Link to={`/courses/${course._id}`} className="bg-zinc-900 border-2 border-gray-800 rounded-lg overflow-hidden shadow-lg">
       <img src={course.thumbnail} alt={course.courseName} className="w-full h-48 object-cover" />
       <div className="p-4">
         <h3 className="text-xl font-semibold text-white mb-2">{course.courseName}</h3>

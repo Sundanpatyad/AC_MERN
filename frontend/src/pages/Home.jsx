@@ -27,7 +27,7 @@ const Home = () => {
       <MockTestSection setShowLoginModal={setShowLoginModal} />
       <CourseSection  setShowLoginModal={setShowLoginModal}/>
 
-       <div className='mt-14 w-11/12 mx-auto max-w-full flex-col items-center justify-between gap-8 first-letter bg-black text-white'>
+       <div className='mt-14 w-11/12 mx-auto max-w-full flex-col items-center justify-between gap-8 first-letter bg-transparent text-white'>
         <InstructorSection />
          <h1 className="text-center text-4xl lg:text-6xl mt-20 font-semibold flex justify-center items-center gap-x-3">
          What People Are Saying

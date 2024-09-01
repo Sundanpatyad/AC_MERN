@@ -6,6 +6,8 @@ import { CgShoppingCart } from "react-icons/cg";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { CiCirclePlus } from "react-icons/ci";
+
 
 const BottomBar = () => {
   const { totalItems } = useSelector((state) => state.cart);
@@ -15,8 +17,13 @@ const BottomBar = () => {
     <div className="fixed bottom-0 md:hidden left-0 right-0 z-50 bg-transparent backdrop-blur-md shadow-lg">
       <nav className="flex justify-around py-2">
         <NavItem to="/" icon={AiOutlineHome} label="Home" />
-        <NavItem to="/catalog/mock-tests" icon={PiNotebook} label="Courses" />
         <NavItem to="/mocktest" icon={HiAcademicCap} label="Mocktests" />
+
+        {user && user.accountType !== 'Instructor' ? (
+          <NavItem to="/" icon={PiNotebook} label="Courses" />
+        ) : (
+          <NavItem to="/createStudyMaterial" icon={CiCirclePlus} label="Add Pdf" />
+        )}
         {user && user.accountType !== 'Instructor' ? (
           <NavItem to="/dashboard/cart" icon={CgShoppingCart} label="Cart" badge={totalItems} />
         ) : (

@@ -45,6 +45,9 @@ import VideoDetails from './components/core/ViewCourse/VideoDetails';
 import { ACCOUNT_TYPE } from './utils/constants';
 import ChatList from "./components/core/Chat/Chatlist";
 import ChatWindow from "./components/core/Chat/ChatWindow";
+import ExamList from "./components/core/StudyMaterials/ExamList";
+import StudyMaterialList from "./components/core/StudyMaterials/StudyMaterials";
+import CreateContent from "./components/core/StudyMaterials/CreateContent";
 
 function App() {
   const { user } = useSelector((state) => state.profile);
@@ -102,6 +105,8 @@ function App() {
         <Route path="catalog/:catalogName" element={<Catalog />} />
         <Route path="courses/:courseId" element={<CourseDetails />} />
         <Route path="/mock-test/:mockId" element={<MockTestDetails />} />
+        <Route path="/exams" element={<ExamList />} />
+        <Route path="/study-materials/:examId" element={<StudyMaterialList />} />
         
         {/* Chat Routes */}
         <Route path="/chat" element={<ProtectedRoute><ChatList /></ProtectedRoute>} />
@@ -130,6 +135,7 @@ function App() {
               <Route path="dashboard/my-courses" element={<MyCourses />} />
               <Route path="dashboard/edit-course/:courseId" element={<EditCourse />} />
               <Route path="dashboard/edit-mock-test-series/:seriesId" element={<EditMockTestSeries />} />
+              <Route path="/createStudyMaterial" element={<CreateContent />} />
             </>
           )}
         </Route>
