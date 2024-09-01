@@ -17,7 +17,7 @@ const BottomBar = () => {
     <div className="fixed bottom-0 md:hidden left-0 right-0 z-50 bg-transparent backdrop-blur-md shadow-lg">
       <nav className="flex justify-around py-2">
         <NavItem to="/" icon={AiOutlineHome} label="Home" />
-        <NavItem to="/mocktest" icon={HiAcademicCap} label="Mocktests" />
+        <NavItem to="/mocktest" icon={HiAcademicCap} label="Tests" />
 
         {user && user.accountType !== 'Instructor' ? (
           <NavItem to="/" icon={PiNotebook} label="Courses" />
@@ -45,6 +45,7 @@ const BottomBar = () => {
 };
 
 const NavItem = ({ to, icon: Icon, label, badge }) => (
+  < div className='flex flex-row justify-evenly'>
   <Link to={to} className="relative flex flex-col text-xs items-center text-slate-300 p-1 rounded-full hover:text-white">
     <Icon className="text-xl mb-1" />
     {badge > 0 && (
@@ -54,6 +55,7 @@ const NavItem = ({ to, icon: Icon, label, badge }) => (
     )}
     <span className="text-xs">{label}</span>
   </Link>
+  </div>
 );
 
 export default BottomBar;
