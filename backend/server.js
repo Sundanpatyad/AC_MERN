@@ -8,7 +8,6 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 require('dotenv').config();
 
-
 // connection to DB and cloudinary
 const { connectDB } = require('./config/database');
 const { cloudinaryConnect } = require('./config/cloudinary');
@@ -25,13 +24,7 @@ const materialRoutes = require('./routes/studyMaterialsRoutes')
 // middleware 
 app.use(express.json()); // to parse json body
 app.use(cookieParser());
-app.use(
-    cors({
-        // origin: 'http://localhost:5173', // frontend link
-        origin: "*",
-        credentials: true
-    })
-);
+app.use(cors());
 app.use(
     fileUpload({
         useTempFiles: true,
@@ -39,9 +32,7 @@ app.use(
     })
 )
 
-
 const PORT = process.env.PORT || 5000;
-
 
 app.listen(PORT, () => {
     console.log(`Server Started on PORT ${PORT}`);
@@ -60,22 +51,21 @@ app.use('/api/v1/mock', mockRoutes);
 app.use('/api/v1/chats', chatRoutes);
 app.use('/api/v1/materials', materialRoutes);
 
-
 if (process.env.NODE_ENV === "production") {
     // Serve static files from the frontend/dist directory
     app.use(express.static(path.join(__dirname, "../frontend/dist")));
-  
+
     // For all other requests, serve the React app's index.html
     app.get("*", (req, res) => {
-        res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+        res.sendFile(path.resolve(__dirname, "../frontend/dist", "index.html"));
     });
-  }
+}
 
 // Default Route
 app.get('/', (req, res) => {
-    // console.log('Your server is up and running..!');
-    res.send(`<div>
-    This is Default Route  
-    <p>Everything is OK</p>
+    res.send(`
+    <div>
+        This is Default Route  
+        <p>Everything is OK</p>
     </div>`);
-})
+});
