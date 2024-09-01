@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { FaDownload, FaExternalLinkAlt } from 'react-icons/fa';
 import { studyMaterialEndPoints } from '../../../services/apis';
 
@@ -34,11 +34,17 @@ function StudyMaterialList() {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <p className="text-xl">Please log in to view and download study materials.</p>
+      <div className="pt-40 bg-black text-zinc-100 flex flex-col items-center justify-center p-6 sm:p-4">
+        <p className="text-2xl sm:text-xl font-semibold mb-6 text-center">
+          Please log in to view and download study materials.
+        </p>
+        <Link to={'/login'} className="w-full sm:w-auto px-8 py-3 text-center bg-zinc-700 hover:bg-zinc-600 text-zinc-100 font-bold rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300">
+          Log In
+        </Link>
       </div>
     );
   }
+  
 
   return (
     <div className="min-h-screen bg-black text-white p-6">

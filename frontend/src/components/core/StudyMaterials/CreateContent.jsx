@@ -71,8 +71,7 @@ function CreateContent() {
   return (
     <div className="min-h-screen bg-transparent text-zinc-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-4xl font-bold text-white text-center mb-12">Content Management</h2>
-        
+       
         {/* Create/Edit Form */}
         <div className="bg-zinc-800 shadow-lg rounded-lg overflow-hidden mb-12">
           <div className="bg-gradient-to-r bg-zinc-900  py-8 px-6 sm:px-10">

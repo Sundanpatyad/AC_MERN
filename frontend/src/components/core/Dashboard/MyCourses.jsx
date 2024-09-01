@@ -52,6 +52,12 @@ export default function MyCoursesAndTests() {
           My Courses and Tests
         </h1>
         <div className="flex flex-col sm:flex-row gap-4">
+        <IconBtn
+            text="Add Pdf"
+            onclick={() => navigate("/createStudyMaterial")}
+          >
+            <VscAdd />
+          </IconBtn>
           <IconBtn
             text="Add Course"
             onclick={() => navigate("/dashboard/add-course")}

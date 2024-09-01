@@ -27,7 +27,7 @@ const CourseCard = React.memo(({ course, handleAddToCart, handleBuyNow, isLogged
 
     return (
         <div 
-            className="bg-black border border-slate-500 w-full rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer flex flex-col"
+            className="bg-zinc-900 border border-slate-500 w-full rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer flex flex-col"
             onClick={() => handleCourseClick(course)}
         >
             <div className="relative h-28 sm:h-32 md:h-40">
