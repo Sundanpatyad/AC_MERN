@@ -37,19 +37,19 @@ function ExamList() {
           >
             <Link
               to={`/study-materials/${exam._id}`}
-              className="block p-6"
+              className="block p-3"
             >
-              <h3 className="text-xl font-semibold mb-2">{exam.name}</h3>
-              <p className="text-gray-400 mb-4">{exam.description}</p>
+              <h3 className="text-md font-semibold mb-2">{exam.name}</h3>
+              <p className="text-gray-400 mb-2 text-sm">{exam.description}</p>
             </Link>
             <div className="flex items-center justify-between p-4 border-t border-gray-700">
               <a 
                 href={exam.pdfUrl} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="flex items-center text-slate-400 hover:text-blue-300"
+                className="flex items-center text-sm text-slate-400 hover:text-blue-300"
               >
-                <FaFilePdf className="mr-2" />
+                <FaFilePdf className="mr-2 " />
                 PDF
               </a>
               

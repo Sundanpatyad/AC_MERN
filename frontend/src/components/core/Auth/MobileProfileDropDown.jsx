@@ -72,7 +72,7 @@ export default function MobileProfileDropDown() {
                         animate="visible"
                         exit="exit"
                         variants={dropdownVariants}
-                        className="absolute min-w-[200px] top-[118%] py-4 px-2 right-0 mt-2 w-60 z-[1000] overflow-hidden rounded-lg border-[1px] border-white/20 bg-black"
+                        className="absolute min-w-[200px] top-[118%] py-4 px-2 right-0 mt-2 w-60 z-[1000] overflow-hidden rounded-lg border-[1px] border-white/20 bg-transparent backdrop-blur-md"
                         ref={ref}
                     >
                         {[

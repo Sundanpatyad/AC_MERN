@@ -135,7 +135,7 @@ const Navbar = () => {
     const navVariants = {
         visible: {
             y: 0,
-            backgroundColor: scrollY.get() > SCROLL_THRESHOLD ? 'transparent' : 'transparent',
+            backgroundColor: scrollY.get() > SCROLL_THRESHOLD ? 'rgba(0, 0, 0, 0.85)' : 'transparent',
             transition: {
                 y: { type: 'spring', stiffness: 300, damping: 30 },
                 backgroundColor: { duration: 0.2 },
@@ -148,14 +148,14 @@ const Navbar = () => {
             },
         },
     };
-
+    
     return (
         <>
             <motion.nav
                 variants={navVariants}
                 animate={hidden ? 'hidden' : 'visible'}
                 initial="visible"
-                className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-md "
+                className="fixed top-0 left-0 right-0 z-50 bg-opacity-85  "
             >
                 <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-2 md:py-4 max-w-7xl mx-auto">
                     <Link to="/" className="flex items-center space-x-2">
@@ -238,7 +238,7 @@ const Navbar = () => {
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, y: -10 }}
                                             transition={{ duration: 0.3 }}
-                                            className="absolute z-10 py-4 px-2 right-0 mt-2 w-60 rounded-lg shadow-lg bg-black bg-opacity-96 border border-white/20 backdrop-blur-lg"
+                                            className="absolute z-10 py-4 px-2 right-0 mt-2 w-60 rounded-lg shadow-lg bg-transparent backdrop-blur-md border border-white/20"
                                         >
                                             <motion.div className="py-1">
                                                 {[

@@ -55,13 +55,13 @@ function StudyMaterialList() {
           Array(8).fill().map((_, index) => <SkeletonCard key={index} />)
         ) : (
           studyMaterials.map((material) => (
-            <div key={material._id} className="bg-zinc-900 p-6 rounded-lg shadow-lg flex flex-col">
-              <h3 className="text-xl font-semibold mb-4">{material.title}</h3>
-              <p className="text-sm text-gray-400 mb-4">Created by: @awakeningclasses</p>
+            <div key={material._id} className="bg-zinc-900 p-3 rounded-lg shadow-lg flex flex-col">
+              <h3 className="text-md font-semibold mb-4">{material.title}</h3>
+              <p className="text-xs text-gray-400 mb-4">Created by: @awakeningclasses</p>
               <div className="flex-1">
                 {/* Placeholder for content preview, if needed */}
               </div>
-              <div className="flex justify-between mt-4">
+              <div className="flex justify-between mt-4 text-sm">
                 <a href={material.content} download className="flex items-center text-slate-400 hover:text-blue-300">
                   <FaDownload className="mr-2" />
                   Download
