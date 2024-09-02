@@ -9,7 +9,6 @@ import CourseReviewModal from '../components/core/ViewCourse/CourseReviewModal'
 import MockTestSection from '../components/core/HomePage/MockTestSection'
 import CourseSection from '../components/core/HomePage/CourseSection'
 import HeroSection from '../components/core/HomePage/HeroSection'
-import { WavyBackgroundDemo } from '../components/ui/wave'
 
 
 const Home = () => {
