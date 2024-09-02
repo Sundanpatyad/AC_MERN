@@ -75,7 +75,7 @@ function App() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsPageLoading(false);
-    }, 1500);
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -94,7 +94,7 @@ function App() {
         <HiArrowNarrowUp />
       </button>
       {token && <BottomBar />}
-      <Suspense fallback={<PageLoader />}>
+      <Suspense fallback={""}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/contact" element={<Contact />} />

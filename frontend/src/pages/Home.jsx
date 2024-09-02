@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux';
 import Footer from '../components/common/Footer';
 import ReviewSlider from '../components/common/ReviewSlider';
 import ConfirmationModal from "../components/common/ConfirmationModal";
-import PageLoader from '../components/ui/PageLoader';
 import HeroSection from '../components/core/HomePage/HeroSection'
 const MockTestSection = lazy(() => import('../components/core/HomePage/MockTestSection'));
 const CourseSection = lazy(() => import('../components/core/HomePage/CourseSection'));
@@ -20,12 +19,12 @@ const Home = () => {
   return (
     <div className='overflow-hidden w-[100vw]'>
         <HeroSection />
-      <Suspense fallback={<PageLoader/>}>
+      <Suspense fallback={""}>
         <MockTestSection setShowLoginModal={setShowLoginModal} />
         <CourseSection setShowLoginModal={setShowLoginModal} />
       </Suspense>
       <div className='mt-14 w-11/12 mx-auto max-w-full flex-col items-center justify-between gap-8 first-letter bg-transparent text-white'>
-        <Suspense fallback={<PageLoader/>}>
+        <Suspense fallback={""}>
           <InstructorSection />
         </Suspense>
        
@@ -33,7 +32,7 @@ const Home = () => {
       <ReviewSlider />
       <Footer />
       {token && reviewModal && (
-        <Suspense fallback={<PageLoader/>}>
+        <Suspense fallback={""}>
           <CourseReviewModal setReviewModal={setReviewModal} />
         </Suspense>
       )}
