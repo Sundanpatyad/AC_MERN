@@ -75,17 +75,17 @@ function App() {
     };
   }, [showArrow]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsPageLoading(false);
-    }, 1500);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setIsPageLoading(false);
+  //   }, 1500);
 
-    return () => clearTimeout(timer);
-  }, []);
+  //   return () => clearTimeout(timer);
+  // }, []);
 
-  if (isPageLoading) {
-    return <PageLoader />;
-  }
+  // if (isPageLoading) {
+  //   return <PageLoader />;
+  // }
 
   return (
     <div className="w-screen min-h-screen bg-black text-white flex flex-col font-inter">
