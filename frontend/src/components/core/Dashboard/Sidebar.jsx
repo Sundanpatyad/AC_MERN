@@ -55,7 +55,7 @@ export default function Sidebar() {
 
   if (profileLoading || authLoading) {
     return (
-      <div className="grid h-[calc(100vh-3.5rem)] min-w-[220px] items-center border-r-[1px] border-r-richblack-700 bg-richblack-900">
+      <div className="grid h-[calc(100vh-3.5rem)] min-w-[220px] items-center border-r-[1px] border-r-richblack-700 bg-zinc-900">
         <Loading />
       </div>
     )
@@ -72,7 +72,7 @@ export default function Sidebar() {
 
       {
         openSideMenu &&
-        <div className="flex h-[calc(100vh-3.5rem)] min-w-[220px] flex-col border-r-[1px] border-r-richblack-700 bg-richblack-800 py-10 ">
+        <div className="flex h-[calc(100vh-3.5rem)] min-w-[220px] flex-col border-r-[1px] border-r-richblack-700 bg-zinc-900 py-10 ">
           <div className="flex flex-col mt-6">
             {sidebarLinks.map((link) => {
               if (link.type && user?.accountType !== link.type) return null
@@ -82,7 +82,7 @@ export default function Sidebar() {
             })}
           </div>
 
-          <div className="mx-auto mt-6 mb-6 h-[1px] w-10/12 bg-richblack-700" />
+          <div className="mx-auto mt-6 mb-6 h-[1px] w-10/12 bg-zinc-700" />
 
           <div className="flex flex-col">
             <SidebarLink
@@ -104,7 +104,7 @@ export default function Sidebar() {
               }
               className=" "
             >
-              <div className="flex items-center gap-x-2 px-8 py-2 text-sm font-medium text-richblack-300 hover:bg-richblack-700 relative">
+              <div className="flex items-center gap-x-2 px-8 py-2 text-sm font-medium text-richblack-300 hover:bg-zinc-700 relative">
                 <VscSignOut className="text-lg" />
                 <span>Logout</span>
               </div>
