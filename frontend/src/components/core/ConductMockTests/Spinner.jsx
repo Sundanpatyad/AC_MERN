@@ -38,9 +38,7 @@ const LoadingSpinner = ({ title }) => {
           {title || 'Awakening Classes 😉'}
         </div>
 
-        <div className="mt-4 text-base md:text-lg text-gray-500 text-center font-mono">
-          {progress}%
-        </div>
+    
       </div>
     </div>
   );
