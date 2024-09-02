@@ -211,12 +211,12 @@ const Navbar = () => {
                         </button>
 
                         {/* Download Button */}
-                        <button
+                      {deferredPrompt &&  <button
                             onClick={handleInstallClick}
                             className="text-white hover:text-blue-200 transition-colors duration-200"
                         >
-                            <FaDownload className="text-md sm:text-xl" /> 
-                        </button>
+                            <FaDownload className="text-md sm:text-xl" />
+                        </button>}
 
                         {token === null ? (
                             <div className="relative group" ref={dropdownRef}>
