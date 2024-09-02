@@ -6,7 +6,6 @@ import { NavbarLinks } from '../../../data/navbar-links';
 import { fetchCourseCategories } from './../../services/operations/courseDetailsAPI';
 import ProfileDropDown from '../core/Auth/ProfileDropDown';
 import MobileProfileDropDown from '../core/Auth/MobileProfileDropDown';
-import { FaRegFilePdf } from "react-icons/fa6";
 import { BsFiletypePdf } from "react-icons/bs";
 import { FaDownload } from "react-icons/fa6";
 
