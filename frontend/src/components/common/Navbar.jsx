@@ -8,6 +8,7 @@ import ProfileDropDown from '../core/Auth/ProfileDropDown';
 import MobileProfileDropDown from '../core/Auth/MobileProfileDropDown';
 import { FaRegFilePdf } from "react-icons/fa6";
 import { BsFiletypePdf } from "react-icons/bs";
+import { FaDownload } from "react-icons/fa6";
 
 import {
     AiOutlineSearch,
@@ -211,15 +212,12 @@ const Navbar = () => {
                         </button>
 
                         {/* Download Button */}
-                      
-                            {/* <Link to={"/exams"}
-                           
-                                className="text-white hover:text-blue-200 transition-colors duration-200"
-                                
-                            >
-                                <FaRegFilePdf className="text-xl sm:text-2xl" />
-                            </Link> */}
-                      
+                        <button
+                            onClick={handleInstallClick}
+                            className="text-white hover:text-blue-200 transition-colors duration-200"
+                        >
+                            <FaDownload className="text-md sm:text-xl" />
+                        </button>
 
                         {token === null ? (
                             <div className="relative group" ref={dropdownRef}>
