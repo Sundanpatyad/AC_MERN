@@ -1,46 +1,42 @@
-import React, { useState } from 'react'
-import { useNavigate } from "react-router-dom"
-import { useSelector } from 'react-redux'
-import InstructorSection from '../components/core/HomePage/InstructorSection'
-import Footer from '../components/common/Footer'
-import ReviewSlider from '../components/common/ReviewSlider'
-import ConfirmationModal from "../components/common/ConfirmationModal"
-import CourseReviewModal from '../components/core/ViewCourse/CourseReviewModal'
-import MockTestSection from '../components/core/HomePage/MockTestSection'
-import CourseSection from '../components/core/HomePage/CourseSection'
+import React, { useState, lazy, Suspense } from 'react';
+import { useNavigate } from "react-router-dom";
+import { useSelector } from 'react-redux';
+import Footer from '../components/common/Footer';
+import ReviewSlider from '../components/common/ReviewSlider';
+import ConfirmationModal from "../components/common/ConfirmationModal";
+import PageLoader from '../components/ui/PageLoader';
 import HeroSection from '../components/core/HomePage/HeroSection'
-
+const MockTestSection = lazy(() => import('../components/core/HomePage/MockTestSection'));
+const CourseSection = lazy(() => import('../components/core/HomePage/CourseSection'));
+const InstructorSection = lazy(() => import('../components/core/HomePage/InstructorSection'));
+const CourseReviewModal = lazy(() => import('../components/core/ViewCourse/CourseReviewModal'));
 
 const Home = () => {
-  const navigate = useNavigate()
-  const { token } = useSelector((state) => state.auth)
-  const [showLoginModal, setShowLoginModal] = useState(false)
-  const [reviewModal, setReviewModal] = useState(false)
-
-
-
+  const navigate = useNavigate();
+  const { token } = useSelector((state) => state.auth);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [reviewModal, setReviewModal] = useState(false);
 
   return (
     <div className='overflow-hidden w-[100vw]'>
-     <HeroSection/>
-      <MockTestSection setShowLoginModal={setShowLoginModal} />
-      <CourseSection  setShowLoginModal={setShowLoginModal}/>
-
-       <div className='mt-14 w-11/12 mx-auto max-w-full flex-col items-center justify-between gap-8 first-letter bg-transparent text-white'>
-        <InstructorSection />
-         <h1 className="text-center text-4xl lg:text-6xl mt-20 font-semibold flex justify-center items-center gap-x-3">
-         What People Are Saying
-          {/* <MdOutlineRateReview onClick={() => setReviewModal(true)} className='text-white' /> */}
-          
-        </h1>
-        <p className='font-medium text-[16px] mt-4 text-center text-richblack-300 '>
-        Don't just take our word for it. Here's what real people are saying about Awakening Classes!.
-
-          </p>
+        <HeroSection />
+      <Suspense fallback={<PageLoader/>}>
+        <MockTestSection setShowLoginModal={setShowLoginModal} />
+        <CourseSection setShowLoginModal={setShowLoginModal} />
+      </Suspense>
+      <div className='mt-14 w-11/12 mx-auto max-w-full flex-col items-center justify-between gap-8 first-letter bg-transparent text-white'>
+        <Suspense fallback={<PageLoader/>}>
+          <InstructorSection />
+        </Suspense>
+       
       </div>
-         <ReviewSlider />
+      <ReviewSlider />
       <Footer />
-      {token && reviewModal && <CourseReviewModal setReviewModal={setReviewModal} />}
+      {token && reviewModal && (
+        <Suspense fallback={<PageLoader/>}>
+          <CourseReviewModal setReviewModal={setReviewModal} />
+        </Suspense>
+      )}
       {showLoginModal && (
         <ConfirmationModal
           modalData={{
@@ -54,7 +50,7 @@ const Home = () => {
         />
       )}
     </div>
-  )
-}
+  );
+};
 
-export default React.memo(Home)
+export default React.memo(Home);

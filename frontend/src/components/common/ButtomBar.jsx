@@ -20,7 +20,7 @@ const BottomBar = () => {
         <NavItem to="/mocktest" icon={HiAcademicCap} label="Tests" />
 
         {user && user.accountType !== 'Instructor' ? (
-          <NavItem to="/catlog/mock-test" icon={PiNotebook} label="Courses" />
+          <NavItem to="/catalog/mock-tests" icon={PiNotebook} label="Courses" />
         ) : (
           <NavItem to="/createStudyMaterial" icon={CiCirclePlus} label="Add Pdf" />
         )}

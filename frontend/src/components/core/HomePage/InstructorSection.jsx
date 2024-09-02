@@ -12,9 +12,12 @@ import { scaleUp } from './../../common/motionFrameVarients';
 
 const InstructorSection = () => {
   return (
+    <div className=''>
+    
     <div>
+      
       <div className='flex flex-col-reverse lg:flex-row gap-10 lg:gap-20 items-center'>
-
+  
         <motion.div
          
           className='lg:w-[50%] '>
@@ -22,6 +25,7 @@ const InstructorSection = () => {
             src={Instructor}
             alt="Instructor"
             className='shadow-white rounded-3xl'
+            loading="lazy"
           />
         </motion.div>
 
@@ -46,6 +50,13 @@ const InstructorSection = () => {
         </div>
 
       </div>
+    </div>
+    <h1 className="text-center text-4xl lg:text-6xl mt-20 font-semibold flex justify-center items-center gap-x-3">
+          What People Are Saying
+        </h1>
+        <p className='font-medium text-[16px] mt-4 text-center text-richblack-300 '>
+          Don't just take our word for it. Here's what real people are saying about Awakening Classes!.
+        </p>
     </div>
   )
 }
