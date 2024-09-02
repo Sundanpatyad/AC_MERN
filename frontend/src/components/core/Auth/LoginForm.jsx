@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { FcGoogle } from "react-icons/fc";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { login, googleLogin } from "../../../services/operations/authAPI";
