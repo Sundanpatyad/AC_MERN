@@ -5,6 +5,7 @@ import { FaDownload, FaExternalLinkAlt } from 'react-icons/fa';
 import axios from 'axios';
 import { studyMaterialEndPoints } from '../../../services/apis';
 import LoadingSpinner from '../ConductMockTests/Spinner';
+import { Link } from 'react-router-dom';
 
 function ExamList() {
   const dispatch = useDispatch();
@@ -77,7 +78,7 @@ function ExamList() {
       </div>
 
       {/* Exam List displayed in a horizontal row */}
-      <div className="flex overflow-x-auto space-x-4 mb-6">
+      <div className="flex overflow-x-auto space-x-4 mb-6 border-b border-zinc-400 pb-5">
         {filteredExams.map((exam) => (
           <button
             key={exam._id}

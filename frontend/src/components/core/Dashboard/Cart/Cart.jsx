@@ -6,7 +6,7 @@ import RenderCartCourses from "./RenderCartCourses";
 import RenderTotalAmount from "./RenderTotalAmount";
 
 export default function Cart() {
-  const { total, totalItems } = useSelector((state) => state.cart);
+  const { totalItems } = useSelector((state) => state.cart);
 
   return (
     <motion.div
@@ -20,9 +20,9 @@ export default function Cart() {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="bg-black border border-slate-500 rounded-2xl overflow-hidden shadow-2xl"
+          className="bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl"
         >
-          <div className="px-6 sm:px-8 py-6 bg-black flex justify-between items-center">
+          <div className="px-6 sm:px-8 py-6 bg-zinc-800 flex justify-between items-center">
             <h1 className="text-2xl sm:text-3xl font-bold">Your Cart</h1>
             <span className="bg-white text-black rounded-full px-4 py-2 text-sm font-semibold">
               {totalItems} {totalItems === 1 ? 'Item' : 'Items'}

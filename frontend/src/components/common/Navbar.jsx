@@ -25,6 +25,7 @@ import { MdKeyboardArrowDown } from 'react-icons/md';
 import rzpLogo from '../../assets/Logo/rzp_logo.png';
 import { PlaceholdersAndVanishInputDemo } from '../ui/Search';
 import { RxCross1 } from 'react-icons/rx';
+import { CgShoppingCart } from 'react-icons/cg';
 
 const SCROLL_THRESHOLD = 50;
 
@@ -36,6 +37,8 @@ const Navbar = () => {
     const [loading, setLoading] = useState(false);
     const [isAuthDropdownOpen, setIsAuthDropdownOpen] = useState(false);
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+    const { totalItems } = useSelector((state) => state.cart);
+    const { user } = useSelector((state) => state.profile);
     const [hidden, setHidden] = useState(false);
     const [deferredPrompt, setDeferredPrompt] = useState(null);
 
@@ -147,7 +150,7 @@ const Navbar = () => {
             },
         },
     };
-    
+
     return (
         <>
             <motion.nav
@@ -192,9 +195,8 @@ const Navbar = () => {
                                 ) : (
                                     <Link
                                         to={link?.path}
-                                        className={`text-white hover:text-blue-200 transition-colors duration-200 ${
-                                            matchRoute(link?.path) ? 'font-semibold' : ''
-                                        }`}
+                                        className={`text-white hover:text-blue-200 transition-colors duration-200 ${matchRoute(link?.path) ? 'font-semibold' : ''
+                                            }`}
                                     >
                                         {link.title}
                                     </Link>
@@ -211,12 +213,21 @@ const Navbar = () => {
                         </button>
 
                         {/* Download Button */}
-                      {deferredPrompt &&  <button
+                        {deferredPrompt && <button
                             onClick={handleInstallClick}
                             className="text-white hover:text-blue-200 transition-colors duration-200"
                         >
                             <FaDownload className="text-md sm:text-xl" />
                         </button>}
+                        {user && user.accountType !== 'Instructor' &&
+                            <Link to={'dashboard/cart'} className='relative hidden md:block'>
+
+                                <CgShoppingCart className=" relative text-xl sm:text-2xl" label="Cart" />
+                                <span className="absolute -top-2 -right-2 bg-white text-zinc-900 font-semibold text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                                    {totalItems}
+                                </span>
+                            </Link>
+                        }
 
                         {token === null ? (
                             <div className="relative group" ref={dropdownRef}>
