@@ -87,7 +87,7 @@ const MockTestsSection = ({ setShowLoginModal }) => {
       <h2 className="text-4xl text-center text-richblack-5 mb-6">Popular Mock Tests</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-center items-center">
   {isMockTestsLoading
-    ? Array(4).fill().map((_, index) => (
+    ? Array(1).fill().map((_, index) => (
       <div key={index} className="flex justify-center">
         <MockTestSkeleton />
       </div>

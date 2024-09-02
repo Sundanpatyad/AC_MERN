@@ -187,7 +187,7 @@ const Courses = ({ catalogPageData, isLoading , setShowLoginModal }) => {
 
       {isLoading ? (
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-    {Array(4).fill().map((_, index) => (
+    {Array(1).fill().map((_, index) => (
       <SkeletonCard key={index} />
     ))}
   </div>
@@ -209,7 +209,7 @@ const Courses = ({ catalogPageData, isLoading , setShowLoginModal }) => {
 )}
       {!isLoading && courses.length === 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {Array(4).fill().map((_, index) => (
+        {Array(1).fill().map((_, index) => (
           <SkeletonCard key={index} />
         ))}
       </div>
