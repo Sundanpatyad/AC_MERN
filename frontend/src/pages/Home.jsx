@@ -5,6 +5,10 @@ import Footer from '../components/common/Footer';
 import ReviewSlider from '../components/common/ReviewSlider';
 import ConfirmationModal from "../components/common/ConfirmationModal";
 import HeroSection from '../components/core/HomePage/HeroSection'
+
+
+
+
 const MockTestSection = lazy(() => import('../components/core/HomePage/MockTestSection'));
 const CourseSection = lazy(() => import('../components/core/HomePage/CourseSection'));
 const InstructorSection = lazy(() => import('../components/core/HomePage/InstructorSection'));
