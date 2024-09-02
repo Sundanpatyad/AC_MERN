@@ -42,7 +42,6 @@ const VideoDetails = lazy(() => import('./components/core/ViewCourse/VideoDetail
 const ChatList = lazy(() => import("./components/core/Chat/Chatlist"));
 const ChatWindow = lazy(() => import("./components/core/Chat/ChatWindow"));
 const ExamList = lazy(() => import("./components/core/StudyMaterials/ExamList"));
-const StudyMaterialList = lazy(() => import("./components/core/StudyMaterials/StudyMaterials"));
 const CreateContent = lazy(() => import("./components/core/StudyMaterials/CreateContent"));
 
 
@@ -104,7 +103,6 @@ function App() {
           <Route path="courses/:courseId" element={<CourseDetails />} />
           <Route path="/mock-test/:mockId" element={<MockTestDetails />} />
           <Route path="/exams" element={<ExamList />} />
-          <Route path="/study-materials/:examId" element={<StudyMaterialList />} />
           
           {/* Chat Routes */}
           <Route path="/chat" element={<ProtectedRoute><ChatList /></ProtectedRoute>} />

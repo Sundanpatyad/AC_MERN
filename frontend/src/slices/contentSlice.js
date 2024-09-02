@@ -5,7 +5,6 @@ import { studyMaterialEndPoints } from '../services/apis';
 
 const { FETCH_EXAMS , STUDY_MATERIALS , CREATE_EXAM ,CREATE_STUDY_MATERIAL , DELETE_EXAM ,DELETE_STUDY_MATERIALS } = studyMaterialEndPoints;
 
-const API_BASE_URL = 'http://localhost:8000/api/v1/materials';
 
 export const fetchExams = createAsyncThunk('content/fetchExams', async () => {
     const response = await axios.get(FETCH_EXAMS);
