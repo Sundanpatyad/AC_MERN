@@ -13,18 +13,18 @@ import { ACCOUNT_TYPE } from '../../../utils/constants';
 import MockTestCard from './MockTestCard';
 
 const MockTestSkeleton = () => (
-  <div className="bg-richblack-900 w-72 rounded-xl overflow-hidden shadow-lg flex flex-col animate-pulse">
-    <div className="h-36 bg-richblack-700"></div>
+  <div className="bg-zinc-900 w-72 rounded-xl overflow-hidden shadow-lg flex flex-col animate-pulse">
+    <div className="h-36 bg-zinc-700"></div>
     <div className="p-4 flex-grow flex flex-col justify-between">
-      <div className="h-4 bg-richblack-700 rounded w-3/4 mb-3"></div>
-      <div className="h-4 bg-richblack-700 rounded w-1/2 mb-3"></div>
+      <div className="h-4 bg-zinc-700 rounded w-3/4 mb-3"></div>
+      <div className="h-4 bg-zinc-700 rounded w-1/2 mb-3"></div>
       <div className="flex justify-between items-center mb-3">
-        <div className="h-4 bg-richblack-700 rounded w-1/4"></div>
-        <div className="h-4 bg-richblack-700 rounded w-1/4"></div>
+        <div className="h-4 bg-zinc-700 rounded w-1/4"></div>
+        <div className="h-4 bg-zinc-700 rounded w-1/4"></div>
       </div>
       <div className="space-y-2">
-        <div className="h-8 bg-richblack-700 rounded"></div>
-        <div className="h-8 bg-richblack-700 rounded"></div>
+        <div className="h-8 bg-zinc-700 rounded"></div>
+        <div className="h-8 bg-zinc-700 rounded"></div>
       </div>
     </div>
   </div>
