@@ -6,7 +6,7 @@ import { fetchAllMockTests } from '../services/operations/mocktest'
 import { buyItem } from '../services/operations/studentFeaturesAPI'
 import { addToCart } from '../slices/cartSlice'
 import toast from 'react-hot-toast'
-import { FaBookOpen, FaShoppingCart } from 'react-icons/fa'
+import { FaBookOpen, FaSearch, FaShoppingCart } from 'react-icons/fa'
 import Footer from "../components/common/Footer"
 import ConfirmationModal from "../components/common/ConfirmationModal"
 import { ACCOUNT_TYPE } from "../utils/constants"
@@ -123,6 +123,7 @@ const MockTestComponent = () => {
   const { user } = useSelector((state) => state.profile)
   const { cart } = useSelector((state) => state.cart)
   const [confirmationModal, setConfirmationModal] = useState(null)
+  const [searchTerm, setSearchTerm] = useState('')
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
@@ -200,6 +201,12 @@ const MockTestComponent = () => {
     navigate(`/view-mock/${mockTestId}`)
   }, [isLoggedIn, navigate])
 
+  const filteredMockTests = useMemo(() => {
+    return mockTests?.filter(mockTest =>
+      mockTest.seriesName.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  }, [mockTests, searchTerm])
+
   const memoizedMockTests = useMemo(() => mockTests || [], [mockTests])
 
   if (isLoading) {
@@ -208,15 +215,29 @@ const MockTestComponent = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <div className="flex-grow align-center justify-center mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
-        <h2 className="text-3xl h-[20vh] sm:text-3xl md:text-5xl text-center my-10 text-richblack-5 mb-4">
-          Test Your Knowledge with <i className="text-slate-300">Confidence</i>
+      <div className="flex-grow align-center justify-center mx-auto w-full max-w-maxContent px-4 pt-8 sm:pt-20">
+        <h2 className="text-7xl tracking-wide sm:text-3xl md:text-[90px] font-inter text-center mt-10 text-slate-200 pb-4">
+         Explore Tests
         </h2>
-    
+        <div className="relative md:mt-8 text-center">
+          <input
+            type="text"
+            placeholder="Search Tests..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-80 py-3 px-8 rounded-2xl border border-slate-500 bg-transparent text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400"
+          />
+        </div>
+        <div className='text-sm md:text-xl text-center text-slate-300 pt-3 pb-20'>
+          <p>
+          Challenge yourself with our latest mock tests and elevate your skills to the next level!
+          </p>
+        </div>
+         
         {memoizedMockTests.length > 0 ? (
           <div>
             {/* Display the latest mock test first */}
-            {memoizedMockTests
+            {filteredMockTests
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
               .slice(0, 1)
               .map((mockTest) => (

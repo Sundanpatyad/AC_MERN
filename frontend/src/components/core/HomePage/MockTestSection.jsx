@@ -85,6 +85,7 @@ const MockTestsSection = ({ setShowLoginModal }) => {
   return (
     <div className="container w-11/12 mx-auto">
       <h2 className="text-4xl text-center text-richblack-5 mb-6">Popular Mock Tests</h2>
+      
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-center items-center">
   {isMockTestsLoading
     ? Array(1).fill().map((_, index) => (

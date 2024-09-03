@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Awakwning Classes</string>
+    <string name="title_activity_main">Awakwning Classes</string>
+    <string name="package_name">awakeningclasses.vercel.app</string>
+    <string name="custom_url_scheme">awakeningclasses.vercel.app</string>
+</resources>
