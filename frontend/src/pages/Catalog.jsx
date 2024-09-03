@@ -294,7 +294,7 @@ function Catalog() {
         <div className="relative md:mt-8 text-center">
           <input
             type="text"
-            placeholder="Search Tests..."
+            placeholder="Search Courses..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-80 py-3 px-8 rounded-2xl border border-slate-500 bg-transparent text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400"

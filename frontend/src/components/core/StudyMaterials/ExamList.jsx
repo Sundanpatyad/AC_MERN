@@ -64,19 +64,25 @@ function ExamList() {
 
   return (
     <div className="min-h-screen bg-black text-white p-6">
-      <h2 className="text-3xl text-center font-bold mb-6">Exams & Study Materials</h2>
+        <h2 className="text-7xl tracking-wide sm:text-3xl md:text-[90px] font-inter text-center mt-20 text-slate-200 pb-4">
+         Study Materials 
+        </h2>
 
-      {/* Search Input */}
-      <div className="mb-6">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search exams..."
-          className="w-full p-3 rounded-lg bg-zinc-900 text-white focus:outline-none focus:ring-2 focus:ring-slate-600"
-        />
-      </div>
-
+        <div className="relative md:mt-8 text-center">
+          <input
+            type="text"
+            placeholder="Search Exam..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-80 py-3 px-8 rounded-2xl border border-slate-500 bg-transparent text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400"
+          />
+        </div>
+        <div className='text-sm md:text-xl text-center text-slate-300 pt-3 pb-10'>
+          <p>
+          Explore our collection of free study materials to boost your learning and excel in your studies.
+          </p>
+        </div>
+       
       {/* Exam List displayed in a horizontal row */}
       <div className="flex overflow-x-auto space-x-4 mb-6 border-b border-zinc-400 pb-5">
         {filteredExams.map((exam) => (
