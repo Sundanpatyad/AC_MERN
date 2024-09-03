@@ -274,7 +274,6 @@ function Catalog() {
   const renderLoader = () => {
     return (
       <>
-        <SectionSkeleton title="Courses" />
         <LoadingSpinner />
       </>
     );
