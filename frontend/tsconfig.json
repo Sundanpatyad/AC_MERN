@@ -24,6 +24,6 @@
       "noUnusedParameters": true,
       "noFallthroughCasesInSwitch": true
     },
-    "include": ["src", "src/components/core/ConductMockTests/MockTestSeries.jsx", "serviceWorker.js", "serviceWorkerRegistration.js"],
+    "include": ["src", "src/components/core/ConductMockTests/MockTestSeries.jsx", "public/serviceWorker.js", "serviceWorkerRegistration.js"],
     "references": [{ "path": "./tsconfig.json" }]
   }
