@@ -69,7 +69,7 @@ function App() {
 
   useEffect(() => {
     const timer = setTimeout(() => setShowHome(true), 2300);
-    const pageLoadTimer = setTimeout(() => setIsPageLoading(false), 2800);
+    const pageLoadTimer = setTimeout(() => setIsPageLoading(false), 2500);
 
     return () => {
       clearTimeout(timer);
@@ -101,7 +101,7 @@ function App() {
       >
         <Navbar />
         <main className="flex-grow">
-          <Suspense fallback={<PageLoader />}>
+          <Suspense fallback={""}>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/contact" element={<Contact />} />
