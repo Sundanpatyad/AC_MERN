@@ -5,7 +5,7 @@ import "./design.css";
 const YourComponent = () => {
   return (
     <>
-      <div className="content w-[100vw] h-[80vh] p-10 flex flex-row align-center justify-center">
+      <div className="content w-[100vw] h-[90vh] p-10 flex flex-row align-center justify-center">
         <div className="flex justify-center">
           <div className="A-del1 del"></div>
           <div className="A-del2 del"></div>
@@ -26,7 +26,7 @@ const YourComponent = () => {
         </div>
       </div>
       <motion.div
-        className="text-white text-center"
+        className="text-white text-center text-md"
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, ease: "easeOut" }}
