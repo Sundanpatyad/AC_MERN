@@ -67,8 +67,8 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowHome(true), 2300);
-    const pageLoadTimer = setTimeout(() => setIsPageLoading(false), 2500);
+    const timer = setTimeout(() => setShowHome(true), 1000);
+    const pageLoadTimer = setTimeout(() => setIsPageLoading(false), 2300);
 
     return () => {
       clearTimeout(timer);
@@ -82,8 +82,8 @@ function App() {
         {isPageLoading && (
           <motion.div
             key="loader"
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ y:'0%'}}
+            exit={{ y: "-100%", }}
             transition={{ duration: 0.5 }}
             className="fixed"
           >
@@ -93,9 +93,9 @@ function App() {
       </AnimatePresence>
 
       <motion.div
-        initial={{ y: "100%", opacity: 0 }} // Start from below the viewport
-        animate={{ y: isPageLoading ? "100%" : "0%", opacity: isPageLoading ? 0 : 1 }} // Slide to top
-        transition={{ duration: 1, ease: "easeInOut" }} // Increase duration and add easing
+        initial={{ opacity: 0 }} // Start from below the viewport
+        animate={{ opacity: isPageLoading ? 0 : 1 }} // Slide to top
+        transition={{ duration: 0.4, ease: "easeInOut" }} // Increase duration and add easing
         className="flex flex-col min-h-screen"
       >
         <Navbar />
@@ -159,8 +159,8 @@ function App() {
 
       {!isPageLoading && token && (
         <motion.div
-          initial={{ y: "100%", opacity: 0 }} // Start from below the viewport
-          animate={{ y: "0%", opacity: 1 }} // Slide up and fade in
+          initial={{ y: "100%"}} // Start from below the viewport
+          animate={{ y: "0%"}} // Slide up and fade in
           transition={{ duration: 0.7, ease: "easeInOut" }} // Smooth animation
           className="fixed bottom-0 w-full"
         >
