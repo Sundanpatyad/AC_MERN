@@ -156,7 +156,18 @@ function App() {
         </main>
       </motion.div>
 
-        {token && <BottomBar />}
+
+      {!isPageLoading && token && (
+        <motion.div
+          initial={{ y: "100%", opacity: 0 }} // Start from below the viewport
+          animate={{ y: "0%", opacity: 1 }} // Slide up and fade in
+          transition={{ duration: 0.7, ease: "easeInOut" }} // Smooth animation
+          className="fixed bottom-0 w-full"
+        >
+          <BottomBar />
+        </motion.div>
+      )}
+
       <button
         onClick={() => window.scrollTo(0, 0)}
         className={`bg-white hover:bg-gray-200 p-3 text-lg text-black rounded-2xl fixed right-3 z-10 transition-transform duration-500 ease-in-out ${showArrow ? 'bottom-20' : '-bottom-24'
