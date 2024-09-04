@@ -95,7 +95,7 @@ function App() {
       <motion.div
         initial={{ y: "100%", opacity: 0 }} // Start from below the viewport
         animate={{ y: isPageLoading ? "100%" : "0%", opacity: isPageLoading ? 0 : 1 }} // Slide to top
-        transition={{ duration: 0.7, ease: "easeInOut" }} // Increase duration and add easing
+        transition={{ duration: 1, ease: "easeInOut" }} // Increase duration and add easing
         className="flex flex-col min-h-screen"
       >
         <Navbar />
@@ -154,9 +154,9 @@ function App() {
             </Routes>
           </Suspense>
         </main>
-        {token && <BottomBar />}
       </motion.div>
 
+        {token && <BottomBar />}
       <button
         onClick={() => window.scrollTo(0, 0)}
         className={`bg-white hover:bg-gray-200 p-3 text-lg text-black rounded-2xl fixed right-3 z-10 transition-transform duration-500 ease-in-out ${showArrow ? 'bottom-20' : '-bottom-24'

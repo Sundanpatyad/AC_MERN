@@ -1,7 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
 import "./design.css";
-import { Spotlight } from "./Spotlight";
 
 const YourComponent = () => {
   return (
