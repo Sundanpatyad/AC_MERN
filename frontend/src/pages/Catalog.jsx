@@ -287,23 +287,23 @@ function Catalog() {
     <div className="bg-black min-h-screen text-white">
       <div className="mx-auto w-full max-w-maxContent px-4 py-8 sm:py-20">
         <div className="flex flex-col justify-between items-center">
-        <h2 className="text-7xl tracking-wide sm:text-3xl md:text-[90px] font-inter text-center mt-10 text-slate-200 pb-4">
-         Explore Courses
-        </h2>
-        <div className="relative md:mt-8 text-center">
-          <input
-            type="text"
-            placeholder="Search Courses..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-80 py-3 px-8 rounded-2xl border border-slate-500 bg-transparent text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400"
-          />
-        </div>
-        <div className='text-sm md:text-xl text-center text-slate-300 pt-3 pb-20'>
-          <p>
-          Unlock your potential with our expertly crafted courses designed to help you excel!
-          </p>
-        </div>
+          <h2 className="text-7xl tracking-wide sm:text-3xl md:text-[90px] font-inter text-center mt-10 text-slate-200 pb-4">
+            Explore Courses
+          </h2>
+          <div className="relative md:mt-8 text-center">
+            <input
+              type="text"
+              placeholder="Search Courses..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-80 py-3 px-8 rounded-2xl border border-slate-500 bg-transparent text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400 touch-action-manipulation select-none"
+            />
+          </div>
+          <div className='text-sm md:text-xl text-center text-slate-300 pt-3 pb-20'>
+            <p>
+              Unlock your potential with our expertly crafted courses designed to help you excel!
+            </p>
+          </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8">
           {renderCourseCards()}
