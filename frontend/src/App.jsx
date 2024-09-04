@@ -93,9 +93,9 @@ function App() {
       </AnimatePresence>
 
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: isPageLoading ? 0 : 1 }}
-        transition={{ duration: 0.5 }}
+        initial={{ y: "100%", opacity: 0 }} // Start from below the viewport
+        animate={{ y: isPageLoading ? "100%" : "0%", opacity: isPageLoading ? 0 : 1 }} // Slide to top
+        transition={{ duration: 0.7, ease: "easeInOut" }} // Increase duration and add easing
         className="flex flex-col min-h-screen"
       >
         <Navbar />
@@ -110,10 +110,10 @@ function App() {
               <Route path="courses/:courseId" element={<CourseDetails />} />
               <Route path="/mock-test/:mockId" element={<MockTestDetails />} />
               <Route path="/exams" element={<ExamList />} />
-              
+
               <Route path="/chat" element={<ProtectedRoute><ChatList /></ProtectedRoute>} />
               <Route path="/chat/:chatId" element={<ProtectedRoute><ChatWindow /></ProtectedRoute>} />
-              
+
               <Route path="signup" element={<OpenRoute><Signup /></OpenRoute>} />
               <Route path="login" element={<OpenRoute><Login /></OpenRoute>} />
               <Route path="forgot-password" element={<OpenRoute><ForgotPassword /></OpenRoute>} />
@@ -159,9 +159,8 @@ function App() {
 
       <button
         onClick={() => window.scrollTo(0, 0)}
-        className={`bg-white hover:bg-gray-200 p-3 text-lg text-black rounded-2xl fixed right-3 z-10 transition-transform duration-500 ease-in-out ${
-          showArrow ? 'bottom-20' : '-bottom-24'
-        }`}
+        className={`bg-white hover:bg-gray-200 p-3 text-lg text-black rounded-2xl fixed right-3 z-10 transition-transform duration-500 ease-in-out ${showArrow ? 'bottom-20' : '-bottom-24'
+          }`}
       >
         <HiArrowNarrowUp />
       </button>
