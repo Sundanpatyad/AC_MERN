@@ -1,5 +1,5 @@
 body {
-    background: black;
+    
     align-items: center;
 }
 .content {
@@ -8,7 +8,7 @@ body {
     padding: 20%;
 }
 .del {
-    background: #a5a5a5;
+    background: #797979;
 }
 .A-del1 {
     width: 60px;
