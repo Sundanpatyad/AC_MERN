@@ -3,7 +3,7 @@ import "./design.css";
 
 const YourComponent = () => {
   return (
-    <div className="content w-screen h-screen mt-40 p-10 flex flex-row align-center justify-center">
+    <div className="content w-[100vw] h-[100vh] p-10 flex flex-row align-center justify-center">
       <div className="flex justify-center">
         <div className="A-del1 del"></div>
         <div className="A-del2 del"></div>

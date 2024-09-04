@@ -1,121 +1,130 @@
 body {
-    background: black; 
+    background: black;
     align-items: center;
 }
 .content {
-    margin: auto; 
-    width: 750px; 
-    height: 300px; 
-    display: flex; 
-    padding: 10%;
+    margin: auto;
+    display: flex;
+    padding: 20%;
 }
-
 .del {
-    background: #808080; 
+    background: #a5a5a5;
 }
-
 .A-del1 {
-    width: 60px; 
-    height: 300px; 
+    width: 60px;
+    height: 300px;
     transform: skewX(-5deg);
-    animation: A-del1 3s linear; 
-    box-shadow: 2px 0 30px 1px black; 
-    z-index: 2; 
+    animation: A-del1 2s cubic-bezier(0.25, 0.1, 0.25, 1);
+    box-shadow: 2px 0 30px 1px black;
+    z-index: 2;
 }
 .A-del2 {
-    width: 40px; 
-    height: 60px; 
-    margin: 170px 0 0 -10px; 
+    width: 40px;
+    height: 60px;
+    margin: 170px 0 0 -10px;
     transform: skewY(-3deg);
-    animation: A-del2 1s linear;
+    animation: A-del2 2s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 .A-del3 {
-    width: 60px; 
-    height: 295px; 
-    margin: 0 0 0 -20px; 
+    width: 60px;
+    height: 295px;
+    margin: 0 0 0 -20px;
     transform: skewX(5deg);
-    animation: A-del3 1s linear;
+    animation: A-del3 2s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
-
 .C-del1-1 {
-    width: 60px; 
-    height: 82.5px; 
-    margin: 60px 0 0 20px; 
-    animation: C-del1-1 3s linear; 
+    width: 60px;
+    height: 82.5px;
+    margin: 60px 0 0 20px;
+    animation: C-del1-1 2s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 .C-del1-2 {
-    width: 60px; 
-    height: 82.5px; 
-    margin: 142.5px 0 0 -60px; 
-    animation: C-del1-2 3s linear; 
+    width: 60px;
+    height: 82.5px;
+    margin: 142.5px 0 0 -60px;
+    animation: C-del1-2 2s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 .C-del2 {
-    width: 60px; 
-    height: 60px; 
-    margin: 225px 0 0 -49px; 
-    transform: skewX(20deg); 
-    animation: C-del2 3s linear; 
-    box-shadow: 0 2px 30px 1px black; 
-    
+    width: 60px;
+    height: 60px;
+    margin: 225px 0 0 -49px;
+    transform: skewX(20deg);
+    animation: C-del2 2s cubic-bezier(0.25, 0.1, 0.25, 1);
+    box-shadow: 0 2px 30px 1px black;
 }
 .C-del3 {
-    width: 60px; 
-    height: 60px; 
-    margin: 0 0 0 -60px; 
+    width: 60px;
+    height: 60px;
+    margin: 0 0 0 -60px;
     transform: skewX(-20deg);
-    animation: C-del3 3s linear;
+    animation: C-del3 2s cubic-bezier(0.25, 0.1, 0.25, 1);
     box-shadow: 0 -2px 30px 1px black;
 }
 .C-del4 {
-    width: 65px; 
-    height: 60px; 
-    margin: 227px 0 0 -10px; 
+    width: 65px;
+    height: 60px;
+    margin: 227px 0 0 -10px;
     transform: skewY(3deg);
-    animation: C-del4 3s linear; 
-    z-index: 2; 
+    animation: C-del4 2s cubic-bezier(0.25, 0.1, 0.25, 1);
+    z-index: 2;
 }
 .C-del5 {
-    width: 65px; 
-    height: 60px; 
-    margin: 0 0 0 -65px; 
-    animation: C-del5 3s linear; 
-    z-index: 2; 
+    width: 65px;
+    height: 60px;
+    margin: 0 0 0 -65px;
+    animation: C-del5 2s cubic-bezier(0.25, 0.1, 0.25, 1);
+    z-index: 2;
 }
 .C-del6 {
-    width: 60px; 
-    height: 60px; 
-    margin: 228px 0 0 -30px; 
+    width: 60px;
+    height: 60px;
+    margin: 228px 0 0 -30px;
     transform: skewX(-20deg);
-    animation: C-del6 3s linear; 
-    box-shadow: 0 2px 30px 1px black; 
+    animation: C-del6 2s cubic-bezier(0.25, 0.1, 0.25, 1);
+    box-shadow: 0 2px 30px 1px black;
 }
 .C-del7 {
-    width: 60px; 
-    height: 60px; 
-    margin: 0 0 0 -60px; 
+    width: 60px;
+    height: 60px;
+    margin: 0 0 0 -60px;
     transform: skewX(20deg);
-    animation: C-del7 3s linear; 
-    box-shadow: 0 -2px 30px 1px black; 
+    animation: C-del7 2s cubic-bezier(0.25, 0.1, 0.25, 1);
+    box-shadow: 0 -2px 30px 1px black;
 }
 .C-del8 {
-    width: 60px; 
-    height: 50px; 
-    margin: 60px 0 0 -48px; 
-    animation: C-del8 3s linear;
+    width: 60px;
+    height: 50px;
+    margin: 60px 0 0 -48px;
+    animation: C-del8 2s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 .C-del9 {
-    width: 60px; 
-    height: 50px; 
-    margin: 184px 0 0 -61px; 
-    animation: C-del9 3s linear; 
+    width: 60px;
+    height: 50px;
+    margin: 184px 0 0 -61px;
+    animation: C-del9 2s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
+@media screen and (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
 
+    .content {
+        transform: scale(0.7);
+    }
+}
 
+@media screen and (max-width: 480px) {
+    body {
+        font-size: 12px;
+    }
 
+    .content {
+        transform: scale(0.5);
+    }
+}
 
-/* ANIMATIONER */
-
+/* Animations remain the same */
 @keyframes A-del1 {
     0% {
         height: 0;
@@ -129,6 +138,20 @@ body {
     }
 }
 
+
+/* ANIMATIONS */
+@keyframes A-del1 {
+    0% {
+        height: 0;
+        margin-top: 300px;
+        box-shadow: 0;
+    }
+    100% {
+        height: 300px;
+        margin-top: 0;
+        box-shadow: 2px 0 30px 1px black;
+    }
+}
 @keyframes A-del2 {
     0% {
         width: 0;
@@ -137,7 +160,6 @@ body {
         width: 40px;
     }
 }
-
 @keyframes A-del3 {
     0% {
         height: 0;
@@ -146,7 +168,6 @@ body {
         height: 295px;
     }
 }
-
 @keyframes C-del1-1 {
     0% {
         height: 0;
@@ -157,7 +178,6 @@ body {
         margin-top: 60px;
     }
 }
-
 @keyframes C-del1-2 {
     0% {
         height: 0;
@@ -166,7 +186,6 @@ body {
         height: 82.5px;
     }
 }
-
 @keyframes C-del2 {
     0% {
         height: 0;
@@ -175,7 +194,6 @@ body {
         height: 60px;
     }
 }
-
 @keyframes C-del3 {
     0% {
         height: 0;
@@ -186,7 +204,6 @@ body {
         margin-top: 0;
     }
 }
-
 @keyframes C-del4 {
     0% {
         width: 0;
@@ -195,7 +212,6 @@ body {
         width: 65px;
     }
 }
-
 @keyframes C-del5 {
     0% {
         width: 0;
@@ -204,7 +220,6 @@ body {
         width: 65px;
     }
 }
-
 @keyframes C-del6 {
     0% {
         width: 0;
@@ -213,7 +228,6 @@ body {
         width: 60px;
     }
 }
-
 @keyframes C-del7 {
     0% {
         width: 0;
@@ -222,7 +236,6 @@ body {
         width: 60px;
     }
 }
-
 @keyframes C-del8 {
     0% {
         height: 0;
@@ -231,7 +244,6 @@ body {
         height: 50px;
     }
 }
-
 @keyframes C-del9 {
     0% {
         height: 0;
