@@ -4,7 +4,7 @@ import "./design.css";
 
 const YourComponent = () => {
   return (
-    <div className="h-screen">
+    <div className="h-screen overflow-hidden">
       <div className="content w-[100vw] h-[80vh] p-10 flex flex-row align-center justify-center">
         <div className="flex justify-center">
           <div className="A-del1 del"></div>
