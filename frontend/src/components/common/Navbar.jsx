@@ -261,12 +261,7 @@ const Navbar = () => {
                                                     { to: '/login', icon: AiOutlineLogin, text: 'Log in' },
                                                     { to: '/signup', icon: AiOutlineUserAdd, text: 'Sign Up' },
                                                 ].map((item, index) => (
-                                                    <motion.div
-                                                        key={index}
-                                                        initial={{ opacity: 0, x: -10 }}
-                                                        animate={{ opacity: 1, x: 0 }}
-                                                        transition={{ duration: 0.3, delay: index * 0.05 }}
-                                                    >
+                                                    <div>
                                                         <Link
                                                             to={item.to}
                                                             className="flex items-center px-4 py-2 text-sm my-2 font-semibold text-white hover:bg-white/20 transition-colors duration-200 ease-in-out rounded-lg"
@@ -275,7 +270,7 @@ const Navbar = () => {
                                                             <item.icon className="mr-3 text-lg" />
                                                             {item.text}
                                                         </Link>
-                                                    </motion.div>
+                                                    </div>
                                                 ))}
                                             </motion.div>
                                         </motion.div>

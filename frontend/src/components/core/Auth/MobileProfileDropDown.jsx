@@ -84,14 +84,14 @@ export default function MobileProfileDropDown() {
                             { to: "/about", icon: TbMessage2Plus, label: "About Us" },
                             { to: "/contact", icon: MdOutlineContactPhone, label: "Contact Us" },
                         ].map((item, index) => (
-                            <motion.div key={index} variants={itemVariants} transition={{ delay: index * 0.1 }}>
+                            <div>
                                 <Link to={item.to} onClick={() => setOpen(false)}>
                                     <div className="flex w-full items-center gap-x-2 py-3 px-4 text-sm font-semibold text-white hover:bg-white/20 transition-colors duration-300 rounded-lg">
                                         <item.icon className="text-lg text-white" />
                                         {item.label}
                                     </div>
                                 </Link>
-                            </motion.div>
+                            </div>
                         ))}
                         {/* Separate logout link with red text */}
                         <motion.div variants={itemVariants} transition={{ delay: 0.7 }}>
