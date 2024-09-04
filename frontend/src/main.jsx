@@ -9,7 +9,7 @@ import rootReducer from './reducer/index';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Toaster } from 'react-hot-toast';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import * as serviceWorkerRegistration from './serviceWorkerRegistration.js';
+import * as serviceWorkerRegistration from '../serviceWorkerRegistration.js';
 
 const CLIENT_ID = '217412143147-6l1q2l190t36rp0452f3hl5mtl3nrhjq.apps.googleusercontent.com';
 
