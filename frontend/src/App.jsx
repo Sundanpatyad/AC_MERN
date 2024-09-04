@@ -7,6 +7,7 @@ import ProtectedRoute from './components/core/Auth/ProtectedRoute';
 import OpenRoute from './components/core/Auth/OpenRoute'; // <-- Import OpenRoute here
 import { ACCOUNT_TYPE } from '../src/utils/constants';
 import BottomBar from './components/common/ButtomBar';
+import YourComponent from './components/ui/InitialLoader';
 
 const Navbar = lazy(() => import("./components/common/Navbar"));
 const Home = lazy(() => import("./pages/Home"));
@@ -74,13 +75,13 @@ function App() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsPageLoading(false);
-    }, 1000);
+    }, 3500);
 
     return () => clearTimeout(timer);
   }, []);
 
   if (isPageLoading) {
-    return <PageLoader />;
+    return <YourComponent/>;
   }
 
   return (
