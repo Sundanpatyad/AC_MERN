@@ -7,7 +7,6 @@ const YourComponent = () => {
   return (
     <div className="h-screen overflow-hidden">
       <div className="content w-[100vw] h-[80vh] p-10 md:mt-40 flex flex-row align-center justify-center">
-      <Spotlight/>
         <div className="flex justify-center">
           <div className="A-del1 del"></div>
           <div className="A-del2 del"></div>

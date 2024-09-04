@@ -94,7 +94,7 @@ export default function MobileProfileDropDown() {
                             </div>
                         ))}
                         {/* Separate logout link with red text */}
-                        <motion.div variants={itemVariants} transition={{ delay: 0.7 }}>
+                        <div >
                             <div
                                 onClick={() => {
                                     dispatch(logout(navigate));
@@ -105,7 +105,7 @@ export default function MobileProfileDropDown() {
                                 <VscSignOut className="text-lg text-red-500" />
                                 Logout
                             </div>
-                        </motion.div>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
