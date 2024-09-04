@@ -4,7 +4,6 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiArrowNarrowUp } from 'react-icons/hi';
 
-import PageLoader from './components/ui/PageLoader';
 import ProtectedRoute from './components/core/Auth/ProtectedRoute';
 import OpenRoute from './components/core/Auth/OpenRoute';
 import { ACCOUNT_TYPE } from '../src/utils/constants';
