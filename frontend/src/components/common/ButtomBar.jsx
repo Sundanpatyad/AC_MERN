@@ -14,7 +14,7 @@ const BottomBar = () => {
   const { user } = useSelector((state) => state.profile);
 
   return (
-    <div className="fixed bottom-0 md:hidden left-0 right-0 z-50 bg-transparent backdrop-blur-md shadow-lg">
+    <div className="fixed bottom-0 md:hidden left-0 right-0 z-999 bg-transparent backdrop-blur-md shadow-lg">
       <nav className="flex justify-around py-2">
         <NavItem to="/" icon={AiOutlineHome} label="Home" />
         <NavItem to="/mocktest" icon={HiAcademicCap} label="Tests" />
