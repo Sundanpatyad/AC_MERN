@@ -31,7 +31,6 @@ const Home = () => {
         <Suspense fallback={""}>
           <InstructorSection />
         </Suspense>
-       
       </div>
       <ReviewSlider />
       <Footer />
