@@ -8,19 +8,19 @@ body, #root {
   background-color: #000; /* Set this to match your app's background color */
 }
 
-/* Hide scrollbar for all elements */
+/* Hide scrollbar for all devices and browsers */
 * {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
+  overflow: -moz-scrollbars-none;  /* Older Firefox versions */
 }
 
-/* Hide scrollbar for Chrome, Safari and Opera */
+/* Hide scrollbar for Chrome, Safari, Opera, and Webkit-based browsers */
 *::-webkit-scrollbar {
   display: none;
 }
 
-.google-login-button {
-  width: 100% !important;
+/* For iOS devices */
+html, body {
+  -webkit-overflow-scrolling: touch;  /* Enable smooth scrolling on iOS */
 }
-
-
