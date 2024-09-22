@@ -1,5 +1,5 @@
 import React from 'react'
-import Instructor from '../../../assets/Images/teacher.png'
+import Instructor from '../../../assets/Images/1img.png'
 import HighlightText from './HighlightText'
 import CTAButton from "../HomePage/Button"
 import { FaArrowRight } from 'react-icons/fa'
@@ -20,7 +20,7 @@ const InstructorSection = () => {
   
         <motion.div
          
-          className='lg:w-[50%] '>
+          className='lg:w-[50%]'>
           <Img
             src={Instructor}
             alt="Instructor"

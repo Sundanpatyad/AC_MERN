@@ -220,27 +220,7 @@ export default function NestedView({ handleChangeEditSectionName }) {
         <></>
       )}
 
-      {addMockTest ? (
-        <MockTestModal
-          modalData={addMockTest}
-          setModalData={setAddMockTest}
-          add={true}
-        />
-      ) : viewSubSection ? (
-        <MockTestModal
-          modalData={viewSubSection}
-          setModalData={setViewSubSection}
-          view={true}
-        />
-      ) : editSubSection ? (
-        <MockTestModal
-          modalData={editSubSection}
-          setModalData={setEditSubSection}
-          edit={true}
-        />
-      ) : (
-        <></>
-      )}
+    
       {/* Confirmation Modal */}
       {confirmationModal ? (
         <ConfirmationModal modalData={confirmationModal} />
