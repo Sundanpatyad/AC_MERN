@@ -64,10 +64,9 @@ function ExamList() {
 
   return (
     <div className="min-h-screen bg-black text-white p-6">
-     <h2 className="text-7xl tracking-wide sm:text-3xl md:text-[90px] font-inter text-center mt-20 text-slate-200 pb-4" style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.7), 0 0 20px rgba(255, 255, 255, 0.5)' }}>
-    Study Materials
-</h2>
-
+        <h2 className="text-7xl tracking-wide sm:text-3xl md:text-[90px] font-inter text-center mt-20 text-slate-200 pb-4">
+         Study Materials 
+        </h2>
 
         <div className="relative md:mt-8 text-center">
           <input
