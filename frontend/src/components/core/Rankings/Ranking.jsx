@@ -111,7 +111,6 @@ const RankingsPage = () => {
   }
 
   // Safely log the length, providing a default value if undefined
-  console.log((rankings[selectedTest] || []).length, "/////////////////////////////////ssssssssssssssssssssssssss");
 
   return (
     <div className="bg-black w-screen text-gray-100 min-h-screen">
