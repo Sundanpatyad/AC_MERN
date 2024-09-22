@@ -123,7 +123,7 @@ export default function MobileProfileDropDown() {
             </AnimatePresence>
 
 
-            <AnimatePresence>
+
                 {showLogoutConfirmation && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-80">
                     <motion.div
@@ -166,7 +166,6 @@ export default function MobileProfileDropDown() {
                     </motion.div>
                     </div>
                 )}
-            </AnimatePresence>
         </div>
     );
 }
