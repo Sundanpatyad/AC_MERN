@@ -122,50 +122,50 @@ export default function MobileProfileDropDown() {
                 )}
             </AnimatePresence>
 
-
-
+            <AnimatePresence>
                 {showLogoutConfirmation && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-80">
-                    <motion.div
-                        initial="hidden"
-                        animate="visible"
-                        exit="exit"
-                        variants={modalVariants}
-                        
-                    >
-                        <div 
-                            ref={modalRef}
-                            className="bg-zinc-900 rounded-lg shadow-xl max-w-md w-full p-6"
+                    <div className="fixed inset-0 z-50 h-screen w-screen flex items-center justify-center p-4 bg-black bg-opacity-80">
+                        <motion.div
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                            variants={modalVariants}
+                            className="relative"  // Add relative positioning
                         >
-                            <div className="flex items-center mb-4">
-                                <BsExclamationTriangle className="text-yellow-500 text-2xl mr-3" />
-                                <h3 className="text-lg font-semibold text-slate-300">
-                                    Confirm Logout
-                                </h3>
+                            <div 
+                                ref={modalRef}
+                                className="bg-zinc-900 rounded-lg shadow-xl max-w-md w-full p-6"
+                            >
+                                <div className="flex items-center mb-4">
+                                    <BsExclamationTriangle className="text-yellow-500 text-2xl mr-3" />
+                                    <h3 className="text-lg font-semibold text-slate-300">
+                                        Confirm Logout
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-slate-300 mb-4">
+                                    Are you sure you want to logout? This action will end your current session.
+                                </p>
+                                <div className="flex justify-end space-x-2">
+                                    <button
+                                        onClick={() => setShowLogoutConfirmation(false)}
+                                        className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-300"
+                                    >
+                                        <AiOutlineHome className="mr-2" />
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={confirmLogout}
+                                        className="flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-300"
+                                    >
+                                        <FiLogOut className="mr-2" />
+                                        Logout
+                                    </button>
+                                </div>
                             </div>
-                            <p className="text-sm text-slate-300 mb-4">
-                                Are you sure you want to logout? This action will end your current session.
-                            </p>
-                            <div className="flex justify-end space-x-2">
-                                <button
-                                    onClick={() => setShowLogoutConfirmation(false)}
-                                    className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-300"
-                                >
-                                    <AiOutlineHome className="mr-2" />
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={confirmLogout}
-                                    className="flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-300"
-                                >
-                                    <FiLogOut className="mr-2" />
-                                    Logout
-                                </button>
-                            </div>
-                        </div>
-                    </motion.div>
+                        </motion.div>
                     </div>
                 )}
+            </AnimatePresence>
         </div>
     );
 }
