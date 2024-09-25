@@ -1,7 +1,7 @@
 
-// const BASE_URL = 'https://awakening-classes.up.railway.app';
+const BASE_URL = 'https://awakening-classes.up.railway.app';
 // const BASE_URL = 'http://localhost:8000';
-const BASE_URL = 'https://acbackend-lfsbx.ondigitalocean.app';
+// const BASE_URL = 'https://acbackend-lfsbx.ondigitalocean.app';
 
 export const studyMaterialEndPoints = {
     FETCH_EXAMS : `${BASE_URL}/api/v1/materials/getExam`,
