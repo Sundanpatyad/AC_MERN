@@ -1,5 +1,5 @@
 
-const BASE_URL = 'https://awakening-classes.up.railway.app';
+const BASE_URL = 'https://acbackend-production.up.railway.app';
 // const BASE_URL = 'http://localhost:8000';
 // const BASE_URL = 'https://acbackend-lfsbx.ondigitalocean.app';
 
