@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import axios from 'axios';
 import { mocktestEndpoints } from '../../../services/apis';
 import LoadingSpinner from './Spinner';
+import Footer from '../../common/Footer';
 
 const MockTestSeries = () => {
   const { mockId } = useParams();
@@ -24,7 +25,7 @@ const MockTestSeries = () => {
   const [showAttemptDetails, setShowAttemptDetails] = useState(false);
   const [userAnswers, setUserAnswers] = useState([]);
   const [skippedQuestions, setSkippedQuestions] = useState([]);
-  const { GET_MCOKTEST_SERIES_BY_ID, CREATE_ATTEMPT_DETAILS } = mocktestEndpoints
+  const { GET_MCOKTEST_SERIES_BY_ID, CREATE_ATTEMPT_DETAILS } = mocktestEndpoints;
 
   useEffect(() => {
     fetchTestSeries();
@@ -468,7 +469,9 @@ const MockTestSeries = () => {
             </button>
           ))}
         </div>
+      <Footer/>
       </div>
+
     </div>
   );
 };
