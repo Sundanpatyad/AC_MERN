@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import { X, Download } from 'lucide-react';
+import { X } from 'lucide-react';
 import { ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import rzpLogo from '../../../assets/Logo/rzp_logo.png';
 
-export default function InstallApp() {
+export default function InstallApp({handleInstall}) {
     const [isVisible, setIsVisible] = useState(true);
-    const [deferredPrompt, setDeferredPrompt] = useState(null);
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
@@ -29,41 +28,8 @@ export default function InstallApp() {
         setIsVisible(false);
     };
 
-    useEffect(() => {
-        const handleBeforeInstallPrompt = (e) => {
-            e.preventDefault();
-            setDeferredPrompt(e);
-        };
 
-        const handleAppInstalled = () => {
-            setDeferredPrompt(null);
-        };
 
-        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-        window.addEventListener('appinstalled', handleAppInstalled);
-
-        return () => {
-            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-            window.removeEventListener('appinstalled', handleAppInstalled);
-        };
-    }, []);
-
-    const handleInstall = () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    console.log('User accepted the A2HS prompt');
-                } else {
-                    console.log('User dismissed the A2HS prompt');
-                }
-                setDeferredPrompt(null);
-                setIsVisible(false);
-            });
-        } else {
-            console.log('Deferred prompt is null');
-        }
-    };
 
     if (!isVisible) return null;
 

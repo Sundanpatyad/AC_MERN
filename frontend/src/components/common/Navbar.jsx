@@ -297,7 +297,7 @@ const Navbar = () => {
             {/* Spacer to prevent content from being hidden behind the navbar */}
             <div className="h-[64px] md:h-[72px]"></div>
             {deferredPrompt && 
-            <InstallApp/>
+            <InstallApp handleInstall={handleInstallClick}/>
              } 
               
             {/* Search Modal */}
