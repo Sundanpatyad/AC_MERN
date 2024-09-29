@@ -170,11 +170,13 @@ function App() {
 
       <button
         onClick={() => window.scrollTo(0, 0)}
-        className={`bg-white hover:bg-gray-200 p-3 text-lg text-black rounded-2xl fixed right-3 z-10 transition-transform duration-500 ease-in-out ${showArrow ? 'bottom-20' : '-bottom-24'
+        className={`bg-white hover:bg-gray-200 p-2 text-lg text-black rounded-2xl fixed left-3 z-10 transition-transform duration-500 ease-in-out ${showArrow ? 'bottom-20' : '-bottom-24'
           }`}
       >
         <HiArrowNarrowUp />
       </button>
+    
+
     </div>
   );
 }
