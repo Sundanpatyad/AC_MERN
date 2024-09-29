@@ -41,7 +41,7 @@ export default function InstallApp({handleInstall}) {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 50 }}
                     transition={{ duration: 0.3 }}
-                    className={`fixed z-40 bg-zinc-900 md:left-6 rounded-xl shadow-lg bottom-14 md:bottom-6 overflow-hidden border border-gray-800 ${isMobile ? 'bottom-0 left-0 right-0 m-4' : 'bottom-4 right-4 w-full max-w-sm'}`}
+                    className={`fixed z-40 bg-zinc-900 md:left-6 rounded-xl shadow-lg bottom-14 md:bottom-6 overflow-hidden border border-zinc-800 ${isMobile ? 'bottom-0 left-0 right-0 m-4' : 'bottom-4 right-4 w-full max-w-sm'}`}
                 >
                     <div className="relative p-4 sm:p-6">
                         <div className="absolute top-2 right-2">
