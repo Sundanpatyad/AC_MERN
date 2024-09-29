@@ -123,7 +123,7 @@ export default function VideoDetailsSidebar({ setReviewModal }) {
                   {section.subSection.map((topic, i) => (
                     <div
                       className={`flex gap-3  px-5 py-2 ${videoBarActive === topic._id
-                        ? "bg-yellow-200 font-semibold text-richblack-800"
+                        ? "bg-white-200 font-semibold text-richblack-800"
                         : "hover:bg-richblack-900"
                         } `}
                       key={i}

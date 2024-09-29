@@ -114,9 +114,6 @@ const Navbar = () => {
         };
     }, []);
 
-    const handleSearchResultClick = () => {
-        setIsSearchModalOpen(false);
-    };
 
     const handleInstallClick = () => {
         if (deferredPrompt) {
@@ -132,6 +129,11 @@ const Navbar = () => {
         } else {
             console.log('Deferred prompt is null');
         }
+    };
+
+    
+    const handleSearchResultClick = () => {
+        setIsSearchModalOpen(false);
     };
 
     const navVariants = {

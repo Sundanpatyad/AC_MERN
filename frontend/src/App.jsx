@@ -9,6 +9,7 @@ import OpenRoute from './components/core/Auth/OpenRoute';
 import { ACCOUNT_TYPE } from '../src/utils/constants';
 import BottomBar from './components/common/ButtomBar';
 import YourComponent from './components/ui/InitialLoader';
+import InstallApp from './components/core/HomePage/installApp';
 
 // Lazy-loaded components
 const Navbar = lazy(() => import("./components/common/Navbar"));
@@ -176,7 +177,7 @@ function App() {
         <HiArrowNarrowUp />
       </button>
     
-
+<InstallApp/>
     </div>
   );
 }
