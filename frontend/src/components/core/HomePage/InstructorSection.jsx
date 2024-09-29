@@ -51,11 +51,17 @@ const InstructorSection = () => {
 
       </div>
     </div>
-    <h1 className="text-center text-4xl lg:text-6xl mt-20 font-semibold flex justify-center items-center gap-x-3">
+    {/* <h1 className="text-center text-4xl lg:text-6xl mt-20 font-semibold flex justify-center items-center gap-x-3">
           What People Are Saying
+        </h1>   */}
+        <h1 className="text-center text-5xl lg:text-8xl mt-20 font-semibold flex justify-center items-center gap-x-3">
+          Awakening Classes
         </h1>
-        <p className='font-medium text-[16px] mt-4 text-center text-richblack-300 '>
+        {/* <p className='font-medium text-[16px] mt-4 text-center text-richblack-300 '>
           Don't just take our word for it. Here's what real people are saying about Awakening Classes!.
+        </p>  */}
+        <p className='font-medium text-[16px] mt-4 text-center text-richblack-300 '>
+        Awakening Classes offers top-tier coaching for government exam preparation with a focus on success and quality education.
         </p>
     </div>
   )
