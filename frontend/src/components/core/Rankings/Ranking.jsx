@@ -107,10 +107,10 @@ const RankingsPage = () => {
   }
 
   if (error) {
-    return <div className="text-center text-red-400 mt-8 font-semibold text-xl">{error}</div>;
+    return <div className="text-center text-red-500 mt-8 font-semibold text-xl">An error occurred. Please try again later.</div>;
   }
+  
 
-  // Safely log the length, providing a default value if undefined
 
   return (
     <div className="bg-black w-screen text-gray-100 min-h-screen">
