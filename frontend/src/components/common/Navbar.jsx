@@ -7,7 +7,7 @@ import { fetchCourseCategories } from './../../services/operations/courseDetails
 import ProfileDropDown from '../core/Auth/ProfileDropDown';
 import MobileProfileDropDown from '../core/Auth/MobileProfileDropDown';
 import { BsFiletypePdf } from "react-icons/bs";
-import { FaDownload } from "react-icons/fa6";
+import { MdDownloadForOffline } from "react-icons/md";
 
 import {
     AiOutlineSearch,
@@ -26,6 +26,7 @@ import rzpLogo from '../../assets/Logo/rzp_logo.png';
 import { PlaceholdersAndVanishInputDemo } from '../ui/Search';
 import { RxCross1 } from 'react-icons/rx';
 import { CgShoppingCart } from 'react-icons/cg';
+import InstallApp from '../core/HomePage/installApp';
 
 const SCROLL_THRESHOLD = 50;
 
@@ -219,7 +220,7 @@ const Navbar = () => {
                             onClick={handleInstallClick}
                             className="text-white hover:text-blue-200 transition-colors duration-200"
                         >
-                            <FaDownload className="text-md sm:text-xl" />
+                            <MdDownloadForOffline className="text-md sm:text-xl" />
                         </button>}
                         {user && user.accountType !== 'Instructor' &&
                             <Link to={'dashboard/cart'} className='relative hidden md:block'>
@@ -295,7 +296,10 @@ const Navbar = () => {
 
             {/* Spacer to prevent content from being hidden behind the navbar */}
             <div className="h-[64px] md:h-[72px]"></div>
-
+            {deferredPrompt && 
+            <InstallApp/>
+             } 
+              
             {/* Search Modal */}
             {isSearchModalOpen && (
                 <div className="fixed inset-0 z-50 flex py-10 justify-center align-top bg-transparent backdrop-blur-md ">

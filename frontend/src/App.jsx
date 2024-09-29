@@ -177,7 +177,6 @@ function App() {
         <HiArrowNarrowUp />
       </button>
     
-<InstallApp/>
     </div>
   );
 }

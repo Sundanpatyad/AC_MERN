@@ -1,88 +1,114 @@
-import { useState, useEffect } from 'react'
-import { X, Download } from 'lucide-react'
+import { useState, useEffect } from 'react';
+import { X, Download } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import rzpLogo from '../../../assets/Logo/rzp_logo.png';
 
 export default function InstallApp() {
-  const [isVisible, setIsVisible] = useState(true)
-  const [deferredPrompt, setDeferredPrompt] = useState(null);
+    const [isVisible, setIsVisible] = useState(true);
+    const [deferredPrompt, setDeferredPrompt] = useState(null);
+    const [isMobile, setIsMobile] = useState(false);
 
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 640);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVisible(false)
-    }, 50000) // Auto dismiss after 5 seconds
-    return () => clearTimeout(timer)
-  }, [])
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsVisible(false);
+        }, 50000); 
+        return () => clearTimeout(timer);
+    }, []);
 
-
-  const handleClose = () => {
-    setIsVisible(false)
-  }
-
-
-  
-  useEffect(() => {
-    const handleBeforeInstallPrompt = (e) => {
-        e.preventDefault();
-        setDeferredPrompt(e);
+    const handleClose = () => {
+        setIsVisible(false);
     };
 
-    const handleAppInstalled = () => {
-        setDeferredPrompt(null);
-    };
+    useEffect(() => {
+        const handleBeforeInstallPrompt = (e) => {
+            e.preventDefault();
+            setDeferredPrompt(e);
+        };
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    window.addEventListener('appinstalled', handleAppInstalled);
-
-    return () => {
-        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-        window.removeEventListener('appinstalled', handleAppInstalled);
-    };
-}, []);
-
-
-const handleInstall = () => {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-                console.log('User accepted the A2HS prompt');
-            } else {
-                console.log('User dismissed the A2HS prompt');
-            }
+        const handleAppInstalled = () => {
             setDeferredPrompt(null);
-            setIsVisible(false)
-        });
-    } else {
-        console.log('Deferred prompt is null');
-    }
-};
+        };
 
+        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        window.addEventListener('appinstalled', handleAppInstalled);
 
-  if (!isVisible) return null
+        return () => {
+            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+            window.removeEventListener('appinstalled', handleAppInstalled);
+        };
+    }, []);
 
-  return (
-    <div className="fixed bottom-16 lg:bottom-4 lg:left-4 z-40 w-full max-w-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg p-4 flex items-start space-x-4">
-      <div className="flex-shrink-0">
-        <Download className="w-6 h-6 text-zinc-500 dark:text-zinc-400" />
-      </div>
-      <div className="flex-1">
-        <h3 className="text-zinc-900 dark:text-white font-medium">Install Our App</h3>
-        <p className="text-zinc-500 dark:text-zinc-400 mt-1">Get the best experience on your device!</p>
-      </div>
-      <div className="flex-shrink-0 flex space-x-2">
-        <button
-          onClick={handleInstall}
-          className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-1 px-3 rounded-lg"
-        >
-          Install
-        </button>
-        <button
-          onClick={handleClose}
-          className="flex items-center justify-center p-1 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-700"
-        >
-          <X className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
-        </button>
-      </div>
-    </div>
-  )
+    const handleInstall = () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the A2HS prompt');
+                } else {
+                    console.log('User dismissed the A2HS prompt');
+                }
+                setDeferredPrompt(null);
+                setIsVisible(false);
+            });
+        } else {
+            console.log('Deferred prompt is null');
+        }
+    };
+
+    if (!isVisible) return null;
+
+    return (
+        <AnimatePresence>
+            {isVisible && (
+                <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 50 }}
+                    transition={{ duration: 0.3 }}
+                    className={`fixed z-40 bg-zinc-900 md:left-6 rounded-xl shadow-lg bottom-14 md:bottom-6 overflow-hidden border border-gray-800 ${isMobile ? 'bottom-0 left-0 right-0 m-4' : 'bottom-4 right-4 w-full max-w-sm'}`}
+                >
+                    <div className="relative p-4 sm:p-6">
+                        <div className="absolute top-2 right-2">
+                            <button
+                                onClick={handleClose}
+                                className="text-gray-400 hover:text-gray-200 transition-colors duration-200"
+                            >
+                                <X className="w-3 h-3" />
+                            </button>
+                        </div>
+                        <div className='flex md:flex-col justify-evenly align-center'>
+                            <div className="flex items-center space-x-2 md:space-x-4">
+                                <div className="flex-shrink-0 bg-gray-800 p-2 sm:p-3 rounded-full">
+                                <img src={rzpLogo} alt="Logo" className="w-4 h-4 rounded-full" />
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="text-gray-100 font-bold text-sm sm:text-lg">Get Our App</h3>
+                                    <p className="text-gray-400 hidden md:block text-xs sm:text-sm mt-1">Experience the full power of our platform</p>
+                                </div>
+                            </div>
+                            <div className="mt-1 sm:mt-6">
+                                <button
+                                    onClick={handleInstall}
+                                    className="w-full bg-white text-black font-semibold py-1 px-3 md:px-2 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center justify-center space-x-2 group text-xs sm:text-base"
+                                >
+                                    <span>Install Now</span>
+                                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </motion.div>
+            )}
+        </AnimatePresence>
+    );
 }
