@@ -215,13 +215,13 @@ const Navbar = () => {
                             <AiOutlineSearch className="text-xl sm:text-2xl" />
                         </button>
 
-                        {/* Download Button */}
+                        {/* Download Button
                         {deferredPrompt && <button
                             onClick={handleInstallClick}
                             className="text-white hover:text-blue-200 transition-colors duration-200"
                         >
                             <MdDownloadForOffline className="text-md sm:text-xl" />
-                        </button>}
+                        </button>} */}
                         {user && user.accountType !== 'Instructor' &&
                             <Link to={'dashboard/cart'} className='relative hidden md:block'>
 
