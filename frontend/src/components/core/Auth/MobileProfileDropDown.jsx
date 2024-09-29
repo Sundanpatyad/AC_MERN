@@ -11,7 +11,8 @@ import { TbMessage2Plus } from "react-icons/tb";
 import { PiNotebook } from "react-icons/pi";
 import { fetchCourseCategories } from "./../../../services/operations/courseDetailsAPI";
 import { motion, AnimatePresence } from "framer-motion";
-import { BsFiletypePdf } from "react-icons/bs";
+import { BsFiletypePdf, BsExclamationTriangle } from "react-icons/bs";
+import { FiLogOut } from "react-icons/fi";
 
 export default function MobileProfileDropDown() {
     const { user } = useSelector((state) => state.profile);
@@ -20,12 +21,15 @@ export default function MobileProfileDropDown() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const ref = useRef(null);
+    const modalRef = useRef(null);
 
     useOnClickOutside(ref, () => setOpen(false));
+    useOnClickOutside(modalRef, () => setShowLogoutConfirmation(false));
 
     const [open, setOpen] = useState(false);
     const [subLinks, setSubLinks] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
 
     const fetchSublinks = async () => {
         try {
@@ -40,15 +44,26 @@ export default function MobileProfileDropDown() {
         fetchSublinks();
     }, []);
 
+    const handleLogout = () => {
+        setShowLogoutConfirmation(true);
+        setOpen(false);
+    };
+
+    const confirmLogout = () => {
+        dispatch(logout(navigate));
+        setShowLogoutConfirmation(false);
+    };
+
     const dropdownVariants = {
         hidden: { opacity: 0, y: -20 },
         visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
         exit: { opacity: 0, y: -20, transition: { duration: 0.2 } },
     };
 
-    const itemVariants = {
-        hidden: { opacity: 0, x: -20 },
-        visible: { opacity: 1, x: 0 },
+    const modalVariants = {
+        hidden: { opacity: 0, scale: 0.8 },
+        visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
+        exit: { opacity: 0, scale: 0.8, transition: { duration: 0.2 } },
     };
 
     return (
@@ -84,7 +99,7 @@ export default function MobileProfileDropDown() {
                             { to: "/about", icon: TbMessage2Plus, label: "About Us" },
                             { to: "/contact", icon: MdOutlineContactPhone, label: "Contact Us" },
                         ].map((item, index) => (
-                            <div>
+                            <div key={index}>
                                 <Link to={item.to} onClick={() => setOpen(false)}>
                                     <div className="flex w-full items-center gap-x-2 py-3 px-4 text-sm font-semibold text-white hover:bg-white/20 transition-colors duration-300 rounded-lg">
                                         <item.icon className="text-lg text-white" />
@@ -93,13 +108,10 @@ export default function MobileProfileDropDown() {
                                 </Link>
                             </div>
                         ))}
-                        {/* Separate logout link with red text */}
-                        <div >
+                        {/* Logout button */}
+                        <div>
                             <div
-                                onClick={() => {
-                                    dispatch(logout(navigate));
-                                    setOpen(false);
-                                }}
+                                onClick={handleLogout}
                                 className="flex w-full items-center gap-x-2 py-3 px-4 text-sm text-red-500 font-semibold bg-white/20 transition-colors duration-300 cursor-pointer rounded-lg"
                             >
                                 <VscSignOut className="text-lg text-red-500" />
@@ -107,6 +119,51 @@ export default function MobileProfileDropDown() {
                             </div>
                         </div>
                     </motion.div>
+                )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+                {showLogoutConfirmation && (
+                    <div className="fixed inset-0 z-50 h-screen w-screen flex items-center justify-center p-4 bg-black bg-opacity-80">
+                        <motion.div
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                            variants={modalVariants}
+                            className="relative"  // Add relative positioning
+                        >
+                            <div 
+                                ref={modalRef}
+                                className="bg-zinc-900 rounded-lg shadow-xl max-w-md w-full p-6"
+                            >
+                                <div className="flex items-center mb-4">
+                                    <BsExclamationTriangle className="text-yellow-500 text-2xl mr-3" />
+                                    <h3 className="text-lg font-semibold text-slate-300">
+                                        Confirm Logout
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-slate-300 mb-4">
+                                    Are you sure you want to logout? This action will end your current session.
+                                </p>
+                                <div className="flex justify-end space-x-2">
+                                    <button
+                                        onClick={() => setShowLogoutConfirmation(false)}
+                                        className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-300"
+                                    >
+                                        <AiOutlineHome className="mr-2" />
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={confirmLogout}
+                                        className="flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-300"
+                                    >
+                                        <FiLogOut className="mr-2" />
+                                        Logout
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
                 )}
             </AnimatePresence>
         </div>

@@ -3,7 +3,7 @@ import { BiInfoCircle, BiTime } from "react-icons/bi";
 import { HiOutlineGlobeAlt, HiOutlineUsers } from "react-icons/hi";
 import { MdOutlineVerified } from 'react-icons/md';
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 
 import ConfirmationModal from "../components/common/ConfirmationModal";
@@ -90,8 +90,8 @@ function CourseDetails() {
   };
 
   const toggleSection = (sectionId) => {
-    setExpandedSections(prev => 
-      prev.includes(sectionId) 
+    setExpandedSections(prev =>
+      prev.includes(sectionId)
         ? prev.filter(id => id !== sectionId)
         : [...prev, sectionId]
     );
@@ -127,26 +127,39 @@ function CourseDetails() {
                 <span className="flex items-center"><HiOutlineGlobeAlt className="mr-2" />English</span>
               </div>
             </div>
-            <div className="md:w-1/3">
+            <div className="md:w-1/3 p-4">
               <div className="bg-richblack-700 rounded-lg p-6">
-                <Img src={course.thumbnail} alt={course.courseName} className="w-full h-48 object-cover rounded-lg mb-4" />
-                <p className="text-3xl font-bold mb-4">{course.price === 0 ? "Free" : `₹${course.price}`}</p>
-                {isUserEnrolled ? (
-                  <button 
-                    onClick={() => navigate("/dashboard/enrolled-courses")}
-                    className="w-full bg-slate-50 text-richblack-900 rounded-md py-3 font-semibold hover:bg-slate-100 transition duration-300"
+                <Img
+                  src={course.thumbnail}
+                  alt={course.courseName}
+                  className="w-full h-48 object-cover rounded-lg mb-4"
+                />
+                <p className="text-3xl font-bold mb-4">
+                  {course.price === 0 ? "Free" : `₹${course.price}`}
+                </p>
+                {course.price === 0 ? (
+                  <Link
+                    to={`/view-course/${course._id}/section/${course.courseContent[0]._id}/sub-section/${course.courseContent[0].subSection[0]._id}`}
+                    className="block w-full text-black bg-white rounded-md py-3 font-semibold text-center  transition duration-300 mb-4"
+                  >
+                    Start
+                  </Link>
+                ) : isUserEnrolled ? (
+                  <button
+                    onClick={() => navigate(`/view-course/${course._id}/section/${course.courseContent[0]._id}/sub-section/${course.courseContent[0].subSection[0]._id}`)}
+                    className="w-full text-black bg-white rounded-md py-3 font-semibold transition duration-300"
                   >
                     Go to Course
                   </button>
                 ) : (
                   <>
-                    <button 
+                    <button
                       onClick={handleBuyCourse}
-                      className="w-full bg-slate-50 text-richblack-900 rounded-md py-3 font-semibold hover:bg-slate-100 transition duration-300 mb-4"
+                      className="w-full bg-slate-50 text-richblack-900 rounded-md py-3 font-semibold hover:bg-slate-100 transition duration-300 mb-2"
                     >
                       Buy Now
                     </button>
-                    <button 
+                    <button
                       onClick={handleAddToCart}
                       className="w-full bg-richblack-800 text-richblack-5 rounded-md py-3 font-semibold hover:bg-richblack-700 transition duration-300"
                     >
@@ -156,6 +169,7 @@ function CourseDetails() {
                 )}
               </div>
             </div>
+
           </div>
         </div>
       </section>
@@ -179,7 +193,7 @@ function CourseDetails() {
           </div>
           {course.courseContent.map((section, index) => (
             <div key={index} className="border border-richblack-600 rounded-md mb-4">
-              <button 
+              <button
                 className="flex justify-between items-center w-full p-4 text-left"
                 onClick={() => toggleSection(section._id)}
               >

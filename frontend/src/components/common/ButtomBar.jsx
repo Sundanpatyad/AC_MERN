@@ -8,13 +8,12 @@ import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { CiCirclePlus } from "react-icons/ci";
 
-
 const BottomBar = () => {
   const { totalItems } = useSelector((state) => state.cart);
   const { user } = useSelector((state) => state.profile);
 
   return (
-    <div className="fixed bottom-0 md:hidden left-0 right-0 z-50 bg-transparent backdrop-blur-md shadow-lg">
+    <div className="fixed bottom-0 md:hidden left-0 right-0 bg-transparent backdrop-blur-md shadow-lg">
       <nav className="flex justify-around py-2">
         <NavItem to="/" icon={AiOutlineHome} label="Home" />
         <NavItem to="/mocktest" icon={HiAcademicCap} label="Tests" />
@@ -45,16 +44,16 @@ const BottomBar = () => {
 };
 
 const NavItem = ({ to, icon: Icon, label, badge }) => (
-  < div className='flex flex-row justify-evenly'>
-  <Link to={to} className="relative flex flex-col text-xs items-center text-slate-300 p-1 rounded-full hover:text-white">
-    <Icon className="text-xl mb-1" />
-    {badge > 0 && (
-      <span className="absolute -top-2 -right-2 bg-white text-zinc-900 font-semibold text-xs rounded-full h-4 w-4 flex items-center justify-center">
-        {badge}
-      </span>
-    )}
-    <span className="text-xs">{label}</span>
-  </Link>
+  <div className='flex flex-row justify-evenly'>
+    <Link to={to} className="relative flex flex-col text-xs items-center text-slate-300 p-1 rounded-full hover:text-white">
+      <Icon className="text-xl mb-1" />
+      {badge > 0 && (
+        <span className="absolute -top-2 -right-2 bg-white text-zinc-900 font-semibold text-xs rounded-full h-4 w-4 flex items-center justify-center">
+          {badge}
+        </span>
+      )}
+      <span className="text-xs">{label}</span>
+    </Link>
   </div>
 );
 

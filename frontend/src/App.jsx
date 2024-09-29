@@ -162,7 +162,7 @@ function App() {
           initial={{ y: "100%"}} // Start from below the viewport
           animate={{ y: "0%"}} // Slide up and fade in
           transition={{ duration: 0.7, ease: "easeInOut" }} // Smooth animation
-          className="fixed bottom-0 w-full"
+          className="fixed bottom-0 w-full z-[9999]"
         >
           <BottomBar />
         </motion.div>

@@ -22,7 +22,6 @@ const RankingsPage = () => {
   const userId = user._id;
 
   const calculateRanks = (testResults) => {
-    // Sort results by score in descending order
     const sortedResults = testResults.sort((a, b) => b.score - a.score);
     
     let currentRank = 1;
@@ -55,7 +54,6 @@ const RankingsPage = () => {
           const groupedRankings = {};
           const userRanks = {};
 
-          // Group rankings by test name
           data.data.forEach(ranking => {
             if (!groupedRankings[ranking.testName]) {
               groupedRankings[ranking.testName] = [];
@@ -63,11 +61,9 @@ const RankingsPage = () => {
             groupedRankings[ranking.testName].push(ranking);
           });
 
-          // Calculate correct ranks for each test
           Object.keys(groupedRankings).forEach(testName => {
             groupedRankings[testName] = calculateRanks(groupedRankings[testName]);
             
-            // Find user's rank for this test
             const userRanking = groupedRankings[testName].find(r => r.userId === userId);
             if (userRanking) {
               userRanks[testName] = userRanking.rank;
@@ -113,7 +109,9 @@ const RankingsPage = () => {
   if (error) {
     return <div className="text-center text-red-400 mt-8 font-semibold text-xl">{error}</div>;
   }
-  console.log(rankings[selectedTest].length , "/////////////////////////////////ssssssssssssssssssssssssss")
+
+  // Safely log the length, providing a default value if undefined
+
   return (
     <div className="bg-black w-screen text-gray-100 min-h-screen">
       <div className="mx-auto px-4 sm:px-6 lg:px-8 mt-5">
@@ -175,24 +173,26 @@ const RankingsPage = () => {
             <>
               <h2 className="text-3xl font-bold mb-6 text-center text-gray-100">{selectedTest}</h2>
               <div className='flex justify-center align-center'>
-              <div className="text-xl font-semibold mb-4 text-center w-80  bg-slate-200 py-2 rounded-md text-zinc-800">Your Rank: {userRanks[selectedTest] || 'N/A'} / {rankings[selectedTest].length}</div>
-
+                <div className="text-xl font-semibold mb-4 text-center w-80 bg-slate-200 py-2 rounded-md text-zinc-800">
+                  Your Rank: {userRanks[selectedTest] || 'N/A'} / {(rankings[selectedTest] || []).length}
+                </div>
               </div>
               <div className="space-y-8">
                 <div>
                   <div className="overflow-x-auto">
-                    <RankingTable rankings={rankings[selectedTest]} />
+                    <RankingTable rankings={rankings[selectedTest] || []} />
                   </div>
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-center mb-4">Rankings Graph</h3>
-                  <RankingsGraph rankings={rankings[selectedTest]} />
+                  <RankingsGraph rankings={rankings[selectedTest] || []} />
                 </div>
               </div>
             </>
           ) : (
             <p className="text-center text-gray-400 font-medium text-lg">
-              {filteredTests.length === 0 ? 'No matching mock tests found.' : 'Select a mock test to view rankings.'}
+              {Object.keys(rankings).length === 0 ? 'No rankings data available.' : 
+               filteredTests.length === 0 ? 'No matching mock tests found.' : 'Select a mock test to view rankings.'}
             </p>
           )}
         </div>

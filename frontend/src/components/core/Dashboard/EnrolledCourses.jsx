@@ -33,7 +33,6 @@ export default function EnrolledCourses() {
           dispatch(setEnrolledCoursesSuccess(res))
         } catch (error) {
           dispatch(setEnrolledCoursesFailure(error.message))
-          // //console.log("Could not fetch enrolled courses.")
         }
       }
 
@@ -44,7 +43,6 @@ export default function EnrolledCourses() {
           dispatch(setEnrolledMockTestsSuccess(res))
         } catch (error) {
           dispatch(setEnrolledMockTestsFailure(error.message))
-          // //console.log("Could not fetch enrolled mock tests.")
         }
       }
     }
@@ -60,7 +58,6 @@ export default function EnrolledCourses() {
         dispatch(setMockAttemptsSuccess(res.attempts))
       } catch (error) {
         dispatch(setMockAttemptsFailure(error.message))
-        // //console.log("Could not fetch mock test attempts.")
       }
     }
   }
@@ -78,7 +75,7 @@ export default function EnrolledCourses() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen rounded-md bg-zinc-900 text-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl md:text-5xl font-extrabold text-center mb-12 bg-gradient-to-r from-white to-slate-400 text-transparent bg-clip-text">
           Your Learning Dashboard
@@ -86,8 +83,8 @@ export default function EnrolledCourses() {
 
         {/* Enrolled Courses Section */}
         <section className="mb-16">
-          <h2 className="text-3xl text-center font-bold mb-6 text-gray-100">Enrolled Courses</h2>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <h2 className="text-3xl text-center font-semibold mb-8 text-white">Enrolled Courses</h2>
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {loading.courses ? (
               <p className="col-span-full text-center text-gray-400 py-8">Loading enrolled courses...</p>
             ) : error.courses ? (
@@ -96,10 +93,10 @@ export default function EnrolledCourses() {
               <p className="col-span-full text-center text-gray-400 py-8">You haven't enrolled in any courses yet.</p>
             ) : (
               enrolledCourses.map((course, i) => (
-                <div key={i} className="bg-black rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300">
+                <div key={i} className="bg-zinc-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300">
                   <div className="p-6 cursor-pointer" onClick={() => navigate(`/view-course/${course?._id}/section/${course.courseContent?.[0]?._id}/sub-section/${course.courseContent?.[0]?.subSection?.[0]?._id}`)}>
-                    <Img src={ course.thumbnail && course.thumbnail} alt="course_img" className="h-48 w-full rounded-lg object-cover mb-4" />
-                    <h3 className="font-bold text-xl mb-2 text-gray-100">{course.courseName}</h3>
+                    <Img src={course.thumbnail && course.thumbnail} alt="course_img" className="h-48 w-full rounded-lg object-cover mb-4" />
+                    <h3 className="font-bold text-xl mb-2 text-white">{course.courseName}</h3>
                     <p className="text-gray-400 mb-4">{course.courseDescription.slice(0, 100)}...</p>
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-sm text-gray-400">Duration: {course?.totalDuration}</span>
@@ -115,8 +112,8 @@ export default function EnrolledCourses() {
 
         {/* Enrolled Mock Tests Section */}
         <section className="mb-16">
-          <h2 className="text-3xl text-center font-bold mb-6 text-gray-100">Enrolled Mock Tests</h2>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <h2 className="text-3xl text-center font-semibold mb-8 text-white">Enrolled Mock Tests</h2>
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {loading.mockTests ? (
               <p className="col-span-full text-center text-gray-400 py-8">Loading enrolled mock tests...</p>
             ) : error.mockTests ? (
@@ -126,10 +123,10 @@ export default function EnrolledCourses() {
             ) : (
               enrolledMockTests.map((mockTest, i) => (
                 <div
-                onClick={() => navigate(`/mock-test/${mockTest._id}`)}
-                key={i} className="bg-black rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300">
+                  onClick={() => navigate(`/mock-test/${mockTest._id}`)}
+                  key={i} className="bg-zinc-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300">
                   <div className="p-6">
-                    <h3 className="font-bold text-xl mb-2 text-slate-100">{mockTest.seriesName}</h3>
+                    <h3 className="font-bold text-xl flex flex-wrap mb-2 text-white">{mockTest.seriesName}</h3>
                     <p className="text-gray-400 mb-4">{mockTest.description.slice(0, 100)}...</p>
                     <div className="flex justify-between items-center">
                       <span className="text-lg font-semibold text-green-400">Rs. {mockTest.price}</span>
@@ -151,15 +148,14 @@ export default function EnrolledCourses() {
               setShowMockAttempts(!showMockAttempts)
               if (!mockAttempts) getMockAttempts()
             }}
-            className="bg-gradient-to-r from-slate-400 to-white text-black font-bold py-3 px-8 rounded-full hover:from-slate-400 hover:to-white transition-all duration-300 shadow-lg text-lg"
+            className="bg-gradient-to-r from-slate-400 to-white text-black font-bold py-3 px-8 rounded-full hover:from-slate-500 hover:to-white transition-all duration-300 shadow-lg text-lg"
           >
             {showMockAttempts ? "Hide Mock Test Attempts" : "Show Mock Test Attempts"}
           </button>
-          
 
           {showMockAttempts && (
             <div className="mt-12">
-              <h2 className="text-3xl font-bold mb-6 text-gray-100">Mock Test Attempts</h2>
+              <h2 className="text-3xl font-semibold mb-6 text-white">Mock Test Attempts</h2>
               {loading.attempts ? (
                 <p className="text-center text-gray-400 py-8">Loading mock test attempts...</p>
               ) : error.attempts ? (
@@ -169,11 +165,11 @@ export default function EnrolledCourses() {
               ) : (
                 Object.entries(groupAttemptsBySeriesName(mockAttempts)).map(([seriesName, attempts]) => (
                   <div key={seriesName} className="mt-8 bg-gray-800 rounded-xl p-6 shadow-lg">
-                    <h3 className="text-2xl text-gray-100 font-semibold mb-4">{seriesName}</h3>
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <h3 className="text-2xl text-white font-semibold mb-4">{seriesName}</h3>
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                       {attempts.map((attempt, index) => (
                         <div key={index} className="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition-all duration-300">
-                          <h4 className="text-lg text-gray-100 font-semibold mb-2">{attempt.testName}</h4>
+                          <h4 className="text-lg text-white font-semibold mb-2">{attempt.testName}</h4>
                           <p className="text-gray-400 text-sm mb-3">{new Date(attempt.createdAt).toLocaleDateString()}</p>
                           <div className="flex justify-between items-center mb-2">
                             <span className="text-blue-400 font-medium">Score: {attempt.score} / {attempt.totalQuestions}</span>

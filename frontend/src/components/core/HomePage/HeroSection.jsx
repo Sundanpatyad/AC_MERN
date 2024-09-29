@@ -76,13 +76,13 @@ const HeroSection = () => {
 
         {token ?
           <div className='flex mt-10 flex-col md:flex-row w-72 md:w-full align-center justify-center gap-4 z-10'>
-            <Link to={"/dashboard/enrolled-courses"} className='text-md text-sm border  border-slate-600 rounded-xl px-3 py-2 text-center'>
+            <Link to={"/dashboard/enrolled-courses"} className='text-md text-sm border  border-slate-600 rounded-xl px-6 py-2 text-center'>
               Explore More
               {/* <HoverBorderGradientDemo title={"Explore More"} /> */}
             </Link>
             <Link
               to={"https://www.youtube.com/@awakeningclasses"}
-              className='text-md flex items-center justify-center bg-slate-100 text-zinc-900 text-center rounded-xl px-3 py-2'
+              className='text-md flex items-center justify-center bg-slate-100 text-zinc-900 text-center rounded-xl px-6 py-2'
             >
               <FaYoutube className="mr-2 text-md" />
               Free Youtube Lectures
@@ -99,7 +99,7 @@ const HeroSection = () => {
             </Link>
             <Link
               to={"/signup"}
-              className='text-md flex items-center font-semibold justify-center bg-slate-100 text-zinc-900 text-center rounded-xl px-3 py-2'
+              className='text-md flex items-center font-semibold justify-center bg-slate-100 text-zinc-900 text-center rounded-xl px-4 py-2'
             >
               <CiLogin className="mr-2 text-md" />
               Signup for free

@@ -59,14 +59,14 @@ export default function MyProfile() {
               </div>
             </div>
 
-            <div className="mb-8 sm:mb-12">
+            <div className="mb-8 z-1  sm:mb-12">
               <h3 className="text-xl sm:text-2xl font-semibold text-white mb-3 sm:mb-4">About Me</h3>
               <p className="text-gray-300 text-base sm:text-lg leading-relaxed">
                 {user?.additionalDetails?.about || "Tell us about yourself..."}
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid z-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               <InfoCard
                 icon={<RiUserLine />}
                 label="Full Name"

@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useQuery } from "react-query";
 import Footer from "../components/common/Footer";
@@ -75,12 +75,12 @@ const CourseCard = React.memo(
                 Go to Course
               </button>
             ) : course.price === 0 ? (
-              <button
-                onClick={handleStartTest}
+              <Link
+                to={`/courses/${course._id}`}
                 className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-xs sm:text-sm"
               >
-                Start Test
-              </button>
+                View Course 
+              </Link>
             ) : isLoggedIn ? (
               <>
                 <button

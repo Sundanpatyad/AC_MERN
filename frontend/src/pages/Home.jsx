@@ -25,13 +25,13 @@ const Home = () => {
         <HeroSection />
       <Suspense fallback={""}>
         <MockTestSection setShowLoginModal={setShowLoginModal} />
+        
         <CourseSection setShowLoginModal={setShowLoginModal} />
       </Suspense>
       <div className='mt-14 w-11/12 mx-auto max-w-full flex-col items-center justify-between gap-8 first-letter bg-transparent text-white'>
         <Suspense fallback={""}>
           <InstructorSection />
         </Suspense>
-       
       </div>
       <ReviewSlider />
       <Footer />
