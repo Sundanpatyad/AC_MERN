@@ -111,7 +111,6 @@ const RankingsPage = () => {
   }
   
 
-
   return (
     <div className="bg-black w-screen text-gray-100 min-h-screen">
       <div className="mx-auto px-4 sm:px-6 lg:px-8 mt-5">
