@@ -1,7 +1,7 @@
 
 // const BASE_URL = 'https://awakening-classes.up.railway.app';
-const BASE_URL = 'http://localhost:8000';
-// const BASE_URL = 'https://sea-lion-app-wbqi8.ondigitalocean.app';
+// const BASE_URL = 'http://localhost:8000';
+const BASE_URL = 'https://sea-lion-app-wbqi8.ondigitalocean.app';
 
 export const studyMaterialEndPoints = {
     FETCH_EXAMS : `${BASE_URL}/api/v1/materials/getExam`,
