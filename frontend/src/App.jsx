@@ -10,6 +10,7 @@ import { ACCOUNT_TYPE } from '../src/utils/constants';
 import BottomBar from './components/common/ButtomBar';
 import YourComponent from './components/ui/InitialLoader';
 import InstallApp from './components/core/HomePage/installApp';
+import PhoneWizardPage from './components/core/HomePage/Phone';
 
 // Lazy-loaded components
 const Navbar = lazy(() => import("./components/common/Navbar"));
@@ -152,6 +153,7 @@ function App() {
               <Route path="/mocktest" element={<Mocktest />} />
               <Route path="view-mock/:mockId" element={<MockTestSeries />} />
               <Route path="*" element={<PageNotFound />} />
+
             </Routes>
           </Suspense>
         </main>
@@ -163,7 +165,7 @@ function App() {
           initial={{ y: "100%"}} // Start from below the viewport
           animate={{ y: "0%"}} // Slide up and fade in
           transition={{ duration: 0.7, ease: "easeInOut" }} // Smooth animation
-          className="fixed bottom-0 w-full z-[9999]"
+          className="fixed bottom-0 w-full z-[999]"
         >
           <BottomBar />
         </motion.div>

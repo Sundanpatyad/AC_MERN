@@ -9,4 +9,8 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    host: true, // This allows you to access the app from your phone using your local network IP
+    port: 5173, // You can specify a port number here (optional)
+  },
 });

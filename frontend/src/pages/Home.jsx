@@ -6,6 +6,9 @@ import ReviewSlider from '../components/common/ReviewSlider';
 import ConfirmationModal from "../components/common/ConfirmationModal";
 import HeroSection from '../components/core/HomePage/HeroSection'
 import { FaTelegram } from "react-icons/fa";
+import Phone from '../components/core/HomePage/Phone';
+import MobileInput from '../components/core/HomePage/Phone';
+import MobileNumberDrawer from '../components/core/HomePage/Phone';
 
 
 
@@ -20,6 +23,9 @@ const Home = () => {
   const { token } = useSelector((state) => state.auth);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [reviewModal, setReviewModal] = useState(false);
+  const { user } = useSelector((state) => state.profile);
+  console.log(user)
+
 
   return (
     <div className='overflow-hidden w-[100vw]'>
@@ -85,6 +91,7 @@ const Home = () => {
     <path fill="url(#instagram-gradient)" d="M84.532 41.164c-23.928 0-43.369 19.442-43.369 43.369 0 23.927 19.441 43.369 43.369 43.369 23.927 0 43.369-19.442 43.369-43.369 0-23.927-19.442-43.369-43.369-43.369zm0 71.473c-15.544 0-28.104-12.56-28.104-28.104 0-15.544 12.56-28.104 28.104-28.104 15.544 0 28.104 12.56 28.104 28.104 0 15.544-12.56 28.104-28.104 28.104zM129.921 27.773a10.202 10.202 0 0 0-10.197 10.197 10.202 10.202 0 0 0 10.197 10.197 10.203 10.203 0 0 0 10.197-10.197 10.201 10.201 0 0 0-10.197-10.197z" />
   </svg>
 </a>
+{token && user.mobileNumber === null && <MobileNumberDrawer/> }
 
     </div>
   );

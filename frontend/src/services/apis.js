@@ -1,7 +1,7 @@
 
 // const BASE_URL = 'https://awakening-classes.up.railway.app';
-// const BASE_URL = 'http://localhost:8000';
-const BASE_URL = 'https://sea-lion-app-wbqi8.ondigitalocean.app';
+const BASE_URL = 'http://localhost:8000';
+// const BASE_URL = 'https://sea-lion-app-wbqi8.ondigitalocean.app';
 
 export const studyMaterialEndPoints = {
     FETCH_EXAMS : `${BASE_URL}/api/v1/materials/getExam`,
@@ -21,6 +21,7 @@ export const endpoints = {
   GOOGLE_API:`${BASE_URL}/api/v1/auth/google`,
   RESETPASSTOKEN_API: `${BASE_URL}/api/v1/auth/reset-password-token`,
   RESETPASSWORD_API: `${BASE_URL}/api/v1/auth/reset-password`,
+  MOBILE_NUMBER: `${BASE_URL}/api/v1/auth/confirm-mobile`,
 }
 
 export const profileEndpoints = {
