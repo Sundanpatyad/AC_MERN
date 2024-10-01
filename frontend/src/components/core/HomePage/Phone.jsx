@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUserMobileNumber } from '../../../slices/profileSlice';
-import { X, Phone, Info, Check } from 'lucide-react';
+import { X, Phone, Info, Check, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const MobileNumberDrawer = () => {
@@ -9,6 +9,7 @@ const MobileNumberDrawer = () => {
     const [mobileNumber, setMobileNumber] = useState('');
     const [isValidNumber, setIsValidNumber] = useState(false);
     const [showInfo, setShowInfo] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
     const drawerRef = useRef(null);
     const dispatch = useDispatch();
     const { user, loading, error } = useSelector(state => state.profile);
@@ -19,8 +20,6 @@ const MobileNumberDrawer = () => {
     }, []);
 
     const validateMobileNumber = (number) => {
-        // This regex allows for various international formats
-        // It's a basic validation and might need to be adjusted based on your specific requirements
         const regex = /^(\+\d{1,3}[- ]?)?\d{10}$/;
         return regex.test(number);
     };
@@ -31,18 +30,20 @@ const MobileNumberDrawer = () => {
         setIsValidNumber(validateMobileNumber(number));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (isValidNumber) {
-            dispatch(updateUserMobileNumber(user._id, mobileNumber, token));
-            if (!error) {
-                setIsOpen(false);
+            try {
+                await dispatch(updateUserMobileNumber(user._id, mobileNumber, token));
+
+            } catch (err) {
+                // Error is handled by the redux slice
             }
         }
     };
 
     const handleClose = () => {
-        // setIsOpen(false);
+        // Implement close functionality if needed
     };
 
     const handleOutsideClick = (e) => {
@@ -61,6 +62,11 @@ const MobileNumberDrawer = () => {
     const drawerVariants = {
         hidden: { y: "100%" },
         visible: { y: 0, transition: { type: "spring", stiffness: 300, damping: 30 } },
+    };
+
+    const successVariants = {
+        hidden: { opacity: 0, scale: 0.8 },
+        visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
     };
 
     return (
@@ -82,9 +88,6 @@ const MobileNumberDrawer = () => {
                         <div className="p-6 space-y-6">
                             <div className="flex justify-between items-center">
                                 <h2 className="text-3xl font-bold text-white">Awakening Classes</h2>
-                                {/* <button onClick={handleClose} className="text-white hover:text-gray-300 transition-colors">
-                  <X size={28} />
-                </button> */}
                             </div>
 
                             <div className="space-y-4">
@@ -116,12 +119,10 @@ const MobileNumberDrawer = () => {
                                                 <li>GEOGRAPHY</li>
                                                 <li>ECONOMICS</li>
                                                 <li>GENERAL SCIENCE</li>
-                                              
                                             </ol>
                                             <p className="text-gray-300 mt-4">
                                                 And many more... The way of communication is Hindi + English. LEARN TO EMPOWER.
                                             </p>
-
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
@@ -151,7 +152,21 @@ const MobileNumberDrawer = () => {
                                         <p className="text-red-500 text-sm mt-1">Please enter a valid mobile number.</p>
                                     )}
                                 </div>
-                                {error && <p className="text-red-500">{error}</p>}
+
+                                <AnimatePresence>
+                                    {error && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -10 }}
+                                            className="bg-red-500 bg-opacity-20 border border-red-500 rounded-lg p-4 flex items-start"
+                                        >
+                                            <AlertCircle className="text-red-500 mr-3 flex-shrink-0 mt-1" size={20} />
+                                            <p className="text-red-100 text-sm">{error}</p>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+
                                 <div className="flex space-x-4">
                                     <button
                                         type="submit"
@@ -160,15 +175,24 @@ const MobileNumberDrawer = () => {
                                     >
                                         {loading ? 'Updating...' : 'Join Now'}
                                     </button>
-                                    {/* <button
-                    type="button"
-                    onClick={handleClose}
-                    className="flex-1 p-4 rounded-md bg-gray-700 hover:bg-gray-600 text-white font-semibold transition-colors duration-200"
-                  >
-                    Maybe Later
-                  </button> */}
                                 </div>
                             </form>
+
+                            <AnimatePresence>
+                                {showSuccess && (
+                                    <motion.div
+                                        variants={successVariants}
+                                        initial="hidden"
+                                        animate="visible"
+                                        exit="hidden"
+                                        className="fixed inset-0 flex items-center justify-center z-50"
+                                    >
+                                        <div className="bg-green-500 bg-opacity-90 rounded-full p-8">
+                                            <Check size={48} className="text-white" />
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
                     </motion.div>
                 </motion.div>

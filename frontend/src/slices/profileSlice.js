@@ -7,11 +7,11 @@ const { MOBILE_NUMBER } = endpoints;
 
 const toastOptions = {
     style: {
-      borderRadius: '10px',
-      background: '#333',
-      color: '#fff',
+        borderRadius: '10px',
+        background: '#333',
+        color: '#fff',
     },
-  };
+};
 
 const initialState = {
     user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null,
@@ -32,15 +32,7 @@ export const updateMobileNumber = createAsyncThunk(
         };
 
         try {
-            const response = await toast.promise(
-                axios.put(MOBILE_NUMBER, { userId, mobileNumber }, config),
-                {
-                    loading: 'Updating mobile number...',
-                    success: 'Mobile number updated successfully',
-                    error: (err) => `Mobile number already exists`,
-                }
-                , toastOptions
-            );
+            const response = await axios.put(MOBILE_NUMBER, { userId, mobileNumber }, config);
             return response.data.user.mobileNumber;
         } catch (error) {
             return rejectWithValue(error.response?.data || { message: 'An unknown error occurred' });
@@ -83,11 +75,11 @@ const profileSlice = createSlice({
                 state.loading = false;
                 state.user.mobileNumber = action.payload;
                 localStorage.setItem('user', JSON.stringify(state.user));
+                toast.success('Mobile number updated successfully', toastOptions);
             })
             .addCase(updateMobileNumber.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload.message || 'Failed to update mobile number';
-                // We don't need to call toast.error here as it's already handled in the thunk
             });
     },
 });
@@ -101,6 +93,5 @@ export const updateUserMobileNumber = (userId, mobileNumber, token) => async (di
         await dispatch(updateMobileNumber({ userId, mobileNumber, token }));
     } catch (error) {
         console.error('Failed to update mobile number:', error);
-        // No need to show a toast here as it's already handled in the thunk
     }
 };
