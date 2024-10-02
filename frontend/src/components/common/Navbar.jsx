@@ -7,7 +7,6 @@ import { fetchCourseCategories } from './../../services/operations/courseDetails
 import ProfileDropDown from '../core/Auth/ProfileDropDown';
 import MobileProfileDropDown from '../core/Auth/MobileProfileDropDown';
 import { BsFiletypePdf } from "react-icons/bs";
-import { MdDownloadForOffline } from "react-icons/md";
 
 import {
     AiOutlineSearch,
@@ -298,7 +297,7 @@ const Navbar = () => {
             <div className="h-[64px] md:h-[72px]"></div>
             {deferredPrompt && 
             <InstallApp handleInstall={handleInstallClick}/>
-             }  
+             } 
               
             {/* Search Modal */}
             {isSearchModalOpen && (
