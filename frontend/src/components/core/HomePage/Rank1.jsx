@@ -18,7 +18,7 @@ export default function RankOneStoryBlack() {
           transition={{ duration: 0.6 }}
           className="text-center mb-10"
         >
-          <h2 className="text-3xl font-bold text-white mb-2">Success Story</h2>
+          <h2 className="text-3xl md:text-5xl text-center mt-10 font-bold text-white mb-2">Success Story</h2>
           <p className="text-xl text-gray-400">Discover the journey of our top performer</p>
         </motion.div>
 

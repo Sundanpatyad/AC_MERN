@@ -20,7 +20,7 @@ const CourseSection = ({setShowLoginModal}) => {
 
   return (
     <div className='relative mx-auto flex flex-col w-11/12 max-w-full mt-10 items-center text-white justify-between'>
-      <div className='text-4xl leading-11 text-center lg:text-5xl '>
+      <div className='text-3xl md:text-5xl text-center mt-10 font-bold text-white mb-2'>
         Courses That Makes <br />
         {/* <HighlightText text={"Impact "} /> */}
         <AnimatedText
