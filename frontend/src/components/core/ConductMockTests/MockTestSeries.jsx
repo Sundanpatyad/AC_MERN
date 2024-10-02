@@ -123,7 +123,7 @@ const MockTestSeries = () => {
         newScore += 1;
         newCorrectAnswers.push(index);
       } else if (userAnswers[index] !== '') {
-        newScore -= 0.25;
+        newScore -= 0;
         newIncorrectAnswers.push({
           questionIndex: index,
           userAnswer: userAnswers[index],
