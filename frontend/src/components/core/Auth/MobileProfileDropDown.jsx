@@ -13,6 +13,7 @@ import { fetchCourseCategories } from "./../../../services/operations/courseDeta
 import { motion, AnimatePresence } from "framer-motion";
 import { BsFiletypePdf, BsExclamationTriangle } from "react-icons/bs";
 import { FiLogOut } from "react-icons/fi";
+import { FaRankingStar } from "react-icons/fa6";
 
 export default function MobileProfileDropDown() {
     const { user } = useSelector((state) => state.profile);
@@ -95,6 +96,7 @@ export default function MobileProfileDropDown() {
                             { to: "/", icon: AiOutlineHome, label: "Home" },
                             { to: "/catalog/mock-tests", icon: PiNotebook, label: "Courses" },
                             { to: "/mocktest", icon: PiNotebook, label: "Mock Tests" },
+                            { to: "/rankings", icon: FaRankingStar, label: "Rankings" },
                             { to: "/exams", icon: BsFiletypePdf, label: "Free Pdf" },
                             { to: "/about", icon: TbMessage2Plus, label: "About Us" },
                             { to: "/contact", icon: MdOutlineContactPhone, label: "Contact Us" },

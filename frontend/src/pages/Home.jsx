@@ -9,6 +9,7 @@ import { FaTelegram } from "react-icons/fa";
 import Phone from '../components/core/HomePage/Phone';
 import MobileInput from '../components/core/HomePage/Phone';
 import MobileNumberDrawer from '../components/core/HomePage/Phone';
+import RankOneStoryBlack from '../components/core/HomePage/Rank1';
 
 
 
@@ -35,6 +36,8 @@ const Home = () => {
 
         <CourseSection setShowLoginModal={setShowLoginModal} />
       </Suspense>
+      <RankOneStoryBlack/>
+
       <div className='mt-14 w-11/12 mx-auto max-w-full flex-col items-center justify-between gap-8 first-letter bg-transparent text-white'>
         <Suspense fallback={""}>
           <InstructorSection />
