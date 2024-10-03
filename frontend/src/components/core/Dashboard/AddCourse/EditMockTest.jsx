@@ -297,6 +297,17 @@ const EditMockTestSeries = () => {
                     className="mt-1 block w-full bg-richblack-700 border border-richblack-600 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2 "
                   />
                 </div>
+                {/* <div>
+                  <label htmlFor={`negative-${testIndex}`} className="block text-sm font-medium text-richblack-5">Negative Marking</label>
+                  <input
+                    type="number"
+                    id={`negative-${testIndex}`}
+                    name="negative"
+                    value={test.duration}
+                    onChange={(e) => handleTestChange(e, testIndex)}
+                    className="mt-1 block w-full bg-richblack-700 border border-richblack-600 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2 "
+                  />
+                </div> */}
                 <div>
                   <label htmlFor={`testStatus-${testIndex}`} className="block text-sm font-medium text-richblack-5">Test Status</label>
                   <select

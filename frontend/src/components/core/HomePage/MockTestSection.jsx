@@ -84,7 +84,7 @@ const MockTestsSection = ({ setShowLoginModal }) => {
 
   return (
     <div className="container w-11/12 mx-auto">
-      <h2 className="text-3xl md:text-5xl text-center mt-10 font-bold text-white mb-2">Popular Mock Tests</h2>
+      <h2 className="text-3xl md:text-5xl text-center mt-10 font-bold text-white mb-10">Popular Mock Tests</h2>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-center items-center">
   {isMockTestsLoading
