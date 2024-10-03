@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Play } from 'lucide-react'
+import rank from '../../../assets/Logo/rank1.png'
 
 export default function RankOneStoryBlack() {
   const [isHovered, setIsHovered] = useState(false)
@@ -10,7 +11,7 @@ export default function RankOneStoryBlack() {
 
 
   return (
-    <section className=" bg-black">
+    <section className="bg-black">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
@@ -31,7 +32,7 @@ export default function RankOneStoryBlack() {
           onHoverEnd={() => setIsHovered(false)}
         >
         <img
-            src="/rank1.png"
+            src={rank}
             alt="Rank 1 JKSSB Patwari Exam 2024"
             className="w-full h-auto"
           />
