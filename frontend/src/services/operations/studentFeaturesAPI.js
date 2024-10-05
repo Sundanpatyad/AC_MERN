@@ -139,7 +139,7 @@ export default async function verifyPayment(bodyData, token, navigate, dispatch)
         toast.success(`Payment Successful, you are added to the ${itemTypeName}`, toastOptions);
         
         // Reset the cart after payment verification
-        if (bodyData.itemType === 'course') {
+        if (bodyData.itemType) {
             dispatch(resetCart());
         }
 
