@@ -31,14 +31,12 @@ function loadScript(src) {
     });
 }
 
-// ================ buyCourse ================ 
+// ================ buyItem ================ 
 export async function buyItem(token, itemId, itemTypes, userDetails, navigate, dispatch) {
     const toastId = toast.loading("Loading...", toastOptions);
     
-    //console.log("These are the itemTypes: ", itemTypes);
-    
     try {
-        // Load the script
+        // Load the Razorpay SDK
         const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
         
         if (!res) {
@@ -46,13 +44,11 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
             return;
         }
         
-        // Initialize an array to store all order responses
-        const orderResponses = [];
-        
-        // Iterate through each item type and initiate orders
+        // Process each item type separately
         for (const itemType of itemTypes) {
             const PAYMENT_API = itemType === 'course' ? COURSE_PAYMENT_API : MOCK_TEST_PAYMENT_API;
             
+            // Create an order for each item type
             const orderResponse = await apiConnector("POST", PAYMENT_API,
                 { itemId },
                 {
@@ -63,54 +59,49 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
             if (!orderResponse.data.success) {
                 throw new Error(orderResponse.data.message);
             }
-            
-            orderResponses.push(orderResponse.data.message);
-        }
-        
-        const RAZORPAY_KEY = import.meta.env.VITE_APP_RAZORPAY_KEY;
-        
-        // Calculate total amount
-        const totalAmount = orderResponses.reduce((sum, order) => sum + order.amount, 0);
-        
-        // Options
-        const options = {
-            key: RAZORPAY_KEY,
-            currency: orderResponses[0].currency, // Assuming all orders use the same currency
-            amount: totalAmount,
-            order_id: orderResponses.map(order => order.id).join(','), // Join all order IDs
-            name: "Awakening Classes",
-            description: `Thank You for Purchasing ${itemTypes.join(' and ')}`,
-            image: rzpLogo,
-            prefill: {
-                name: userDetails.firstName,
-                email: userDetails.email
-            },
-            handler: function (response) {
-                // Send successful mail
-                sendPaymentSuccessEmail(response, totalAmount, token);
-                // Verify payment for each item type
-                itemTypes.forEach((itemType, index) => {
-                    verifyPayment({ ...response, itemId, itemType }, token, navigate, dispatch);
-                });
-            }
-        };
-        
-        const paymentObject = new window.Razorpay(options);
-        paymentObject.open();
-        paymentObject.on("payment.failed", function (response) {
-            toast.error("Oops, payment failed", toastOptions);
-            //console.log("Payment failed: ", response.error);
-        });
 
+            const orderData = orderResponse.data.message;
+            const RAZORPAY_KEY = import.meta.env.VITE_APP_RAZORPAY_KEY;
+
+            // Configure the Razorpay options for this order
+            const options = {
+                key: RAZORPAY_KEY,
+                currency: orderData.currency,
+                amount: orderData.amount,  // Amount is in smallest unit (e.g. paise)
+                order_id: orderData.id,    // Order ID from Razorpay
+                name: "Awakening Classes",
+                description: `Thank You for Purchasing the ${itemType}`,
+                image: rzpLogo,
+                prefill: {
+                    name: userDetails.firstName,
+                    email: userDetails.email
+                },
+                handler: function (response) {
+                    // On successful payment, verify the payment and send confirmation email
+                    verifyPayment({ ...response, itemId, itemType }, token, navigate, dispatch);
+                    sendPaymentSuccessEmail(response, orderData.amount, token);
+                }
+            };
+
+            // Open Razorpay payment window
+            const paymentObject = new window.Razorpay(options);
+            paymentObject.open();
+
+            paymentObject.on("payment.failed", function (response) {
+                toast.error("Oops, payment failed", toastOptions);
+                //console.log("Payment failed: ", response.error);
+            });
+        }
     }
     catch (error) {
-        //console.log("PAYMENT API ERROR:", error);
+        // Handle errors gracefully
         toast.error(error.response?.data?.message || "Could not make Payment", toastOptions);
+    } finally {
+        toast.dismiss(toastId);
     }
-    toast.dismiss(toastId);
 }
 
-// ================ send Payment Success Email ================
+// ================ send Payment Success Email ================ 
 async function sendPaymentSuccessEmail(response, amount, token) {
     try {
         await apiConnector("POST", SEND_PAYMENT_SUCCESS_EMAIL_API, {
@@ -122,23 +113,23 @@ async function sendPaymentSuccessEmail(response, amount, token) {
         });
     }
     catch (error) {
+        // Handle email send error
         //console.log("PAYMENT SUCCESS EMAIL ERROR....", error);
     }
 }
 
+// ================ verifyPayment ================ 
 export default async function verifyPayment(bodyData, token, navigate, dispatch) {
     const toastId = toast.loading("Verifying Payment....", toastOptions);
     dispatch(setPaymentLoading(true));
     
     try {
-        // Determine the API endpoint based on the item type
+        // Determine the correct API based on the item type
         const VERIFY_API = bodyData.itemType === 'course' ? COURSE_VERIFY_API : MOCK_TEST_VERIFY_API;
         
         const response = await apiConnector("POST", VERIFY_API, bodyData, {
             Authorization: `Bearer ${token}`,
         });
-        
-        //console.log("this is verify response", response);
         
         if (!response.data.success) {
             throw new Error(response.data.message);
@@ -147,25 +138,21 @@ export default async function verifyPayment(bodyData, token, navigate, dispatch)
         const itemTypeName = bodyData.itemType === 'course' ? 'course' : 'mock test';
         toast.success(`Payment Successful, you are added to the ${itemTypeName}`, toastOptions);
         
-        // Reset cart if necessary (you might want to handle this differently for mock tests)
-        if (bodyData) {
+        // Reset the cart after payment verification
+        if (bodyData.itemType === 'course') {
             dispatch(resetCart());
         }
 
+        // Redirect the user to the appropriate page
         if (response.data.success) {
             window.location.reload();
         } else {
-            // Navigate to the appropriate dashboard page
-            if (bodyData.itemType === 'course') {
-                navigate("/dashboard/enrolled-courses");
-            } else {
-                navigate("/dashboard/enrolled-courses"); // Adjust this path as needed
-            }
+            navigate("/dashboard/enrolled-courses");  // Adjust this path as necessary
         }
 
         return response;
     } catch (error) {
-        //console.log("PAYMENT VERIFY ERROR....", error);
+        // Handle verification error
         toast.error("Could not verify Payment", toastOptions);
     } finally {
         toast.dismiss(toastId);
