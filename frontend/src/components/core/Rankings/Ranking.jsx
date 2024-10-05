@@ -7,6 +7,8 @@ import { studentEndpoints } from '../../../services/apis';
 import RankingsGraph from './RankingGraph';
 import LoadingSpinner from '../ConductMockTests/Spinner';
 import { Menu, Search } from 'lucide-react';
+import { FaRankingStar } from "react-icons/fa6";
+
 
 const RankingsPage = () => {
   const [rankings, setRankings] = useState({});
@@ -117,7 +119,7 @@ const RankingsPage = () => {
         <div className="relative mb-8">
           <button
             onClick={toggleDropdown}
-            className="flex items-center text-sm justify-between w-full px-4 py-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex items-center text-sm justify-between w-full px-4 py-4 bg-zinc-900 text-white rounded-md "
           >
             <span>{selectedTest || "Select a mock test"}</span>
             <Menu size={24} />
@@ -157,7 +159,7 @@ const RankingsPage = () => {
                         }}
                         className="block w-full text-left px-4 py-2 text-sm my-2 text-white hover:bg-white/20 transition-colors duration-200 ease-in-out rounded-lg"
                       >
-                        {testName} (Your Rank: {userRanks[testName] || 'N/A'})
+                        {testName} (My Rank : {userRanks[testName] || 'N/A'})
                       </button>
                     </motion.div>
                   ))}
@@ -172,8 +174,9 @@ const RankingsPage = () => {
             <>
               <h2 className="text-3xl font-bold mb-6 text-center text-gray-100">{selectedTest}</h2>
               <div className='flex justify-center align-center'>
-                <div className="text-xl font-semibold mb-4 text-center w-80 bg-slate-200 py-2 rounded-md text-zinc-800">
-                  Your Rank: {userRanks[selectedTest] || 'N/A'} / {(rankings[selectedTest] || []).length}
+              
+                <div className="text-xl flex justify-evenly font-semibold mb-4 text-center bg-slate-200 py-2 px-4 w-80 rounded-md text-zinc-800">
+                  <span><FaRankingStar size={"26"}/></span><span>My Rank : {userRanks[selectedTest] || 'N/A'} / {(rankings[selectedTest] || []).length}</span>
                 </div>
               </div>
               <div className="space-y-8">
