@@ -79,7 +79,6 @@ const RankingsPage = () => {
             setSelectedTest(Object.keys(groupedRankings)[0]);
           }
 
-          console.log("User's ranks:", userRanks);
         } else {
           setError(data.message || 'Failed to fetch rankings');
         }

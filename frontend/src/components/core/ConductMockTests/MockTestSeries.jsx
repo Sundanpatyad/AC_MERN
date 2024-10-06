@@ -68,6 +68,7 @@ const MockTestSeries = () => {
     setUserAnswers(new Array(test.questions.length).fill(''));
     setSkippedQuestions([]);
   };
+  
 
   const handleAnswerSelect = (answer) => {
     setSelectedAnswer(answer);
@@ -123,7 +124,7 @@ const MockTestSeries = () => {
         newScore += 1;
         newCorrectAnswers.push(index);
       } else if (userAnswers[index] !== '') {
-        newScore -= 0;
+        newScore -= currentTest.negative;
         newIncorrectAnswers.push({
           questionIndex: index,
           userAnswer: userAnswers[index],

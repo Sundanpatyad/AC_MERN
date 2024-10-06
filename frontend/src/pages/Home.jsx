@@ -25,7 +25,6 @@ const Home = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [reviewModal, setReviewModal] = useState(false);
   const { user } = useSelector((state) => state.profile);
-  console.log(user)
 
 
   return (

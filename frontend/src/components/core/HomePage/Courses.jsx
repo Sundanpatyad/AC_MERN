@@ -18,10 +18,15 @@ const CourseCard = ({ course, handleAddToCart, handleBuyNow, isInCart, isEnrolle
     e.preventDefault(); // Prevent navigation
     handleBuyNow(course);
   };
-
+ 
+  
+  const handleNavigae = () => {
+    navigate(`/courses/${course._id}`)
+  }
+ 
 
   return (
-    <Link to={`/courses/${course._id}`} className="bg-zinc-900 border-2 border-gray-800 rounded-lg overflow-hidden shadow-lg">
+    <div onClick={handleNavigae} className="bg-zinc-900 border-2 border-gray-800 rounded-lg overflow-hidden shadow-lg">
       <img src={course.thumbnail} alt={course.courseName} className="w-full h-48 object-cover" />
       <div className="p-4">
         <h3 className="text-xl font-semibold text-white mb-2">{course.courseName}</h3>
@@ -78,7 +83,7 @@ const CourseCard = ({ course, handleAddToCart, handleBuyNow, isInCart, isEnrolle
           )}
         </div>
       </div>
-    </Link>
+    </div>
   )
 }
 
