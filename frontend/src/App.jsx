@@ -68,19 +68,19 @@ function App() {
     return () => window.removeEventListener('scroll', handleArrow);
   }, []);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setShowHome(true), 1000);
-    const pageLoadTimer = setTimeout(() => setIsPageLoading(false), 2300);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => setShowHome(true), 1000);
+  //   const pageLoadTimer = setTimeout(() => setIsPageLoading(false), 2300);
 
-    return () => {
-      clearTimeout(timer);
-      clearTimeout(pageLoadTimer);
-    };
-  }, []);
+  //   return () => {
+  //     clearTimeout(timer);
+  //     clearTimeout(pageLoadTimer);
+  //   };
+  // }, []);
 
   return (
     <div className="w-screen min-h-screen bg-black text-white flex flex-col font-inter">
-      <AnimatePresence>
+      {/* <AnimatePresence>
         {isPageLoading && (
           <motion.div
             key="loader"
@@ -92,11 +92,11 @@ function App() {
             <YourComponent />
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence> */}
 
       <motion.div
         initial={{ opacity: 0 }} // Start from below the viewport
-        animate={{ opacity: isPageLoading ? 0 : 1 }} // Slide to top
+        animate={{ opacity:  1 }} // Slide to top
         transition={{ duration: 0.4, ease: "easeInOut" }} // Increase duration and add easing
         className="flex flex-col min-h-screen"
       >
