@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import toast from "react-hot-toast";
 import axios from 'axios';
 import { mocktestEndpoints } from '../../../services/apis';
 import LoadingSpinner from './Spinner';
 import Footer from '../../common/Footer';
+import { motion, AnimatePresence } from "framer-motion";
+import { BsFiletypePdf, BsExclamationTriangle } from "react-icons/bs";
+import { AiOutlineCaretDown, AiOutlineHome } from "react-icons/ai";
+import { FiLogOut } from "react-icons/fi";
+import { IoMdTime } from "react-icons/io";
+import { IoChevronBackCircle } from "react-icons/io5";
+
+
 
 const MockTestSeries = () => {
   const { mockId } = useParams();
@@ -26,6 +34,9 @@ const MockTestSeries = () => {
   const [userAnswers, setUserAnswers] = useState([]);
   const [skippedQuestions, setSkippedQuestions] = useState([]);
   const { GET_MCOKTEST_SERIES_BY_ID, CREATE_ATTEMPT_DETAILS } = mocktestEndpoints;
+  const [isOpen, setIsOpen] = useState(false)
+  const[isRankOpen , setIsRankOpen] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     fetchTestSeries();
@@ -68,7 +79,24 @@ const MockTestSeries = () => {
     setUserAnswers(new Array(test.questions.length).fill(''));
     setSkippedQuestions([]);
   };
-  
+
+  const dropdownVariants = {
+    hidden: { opacity: 0, y: -20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+    exit: { opacity: 0, y: -20, transition: { duration: 0.2 } },
+  };
+
+  const modalVariants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
+    exit: { opacity: 0, scale: 0.8, transition: { duration: 0.2 } },
+  };
+
+  const startTestConfirm = (test) => {
+    setIsOpen(true);
+  };
+
+
 
   const handleAnswerSelect = (answer) => {
     setSelectedAnswer(answer);
@@ -186,6 +214,13 @@ const MockTestSeries = () => {
     return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   };
 
+  const rankOpen = () => {
+  setIsRankOpen(true);
+  }
+  const rankClose = () => {
+    navigate('/rankings')
+  }
+
   const renderAttemptDetails = () => {
     return (
       <div className="space-y-8">
@@ -203,7 +238,7 @@ const MockTestSeries = () => {
             const userAnswer = userAnswers[index] || "Not answered";
 
             return (
-              <div key={index} className="bg-gray-700 p-6 rounded-xl shadow-lg border border-gray-600">
+              <div key={index} className="bg-zinc-800 p-6 rounded-xl shadow-lg border border-gray-600">
                 <div className="flex justify-between items-center mb-4">
                   <h4 className="text-lg font-semibold text-white">Question {index + 1}</h4>
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${isCorrect ? "bg-green-900 text-green-300" : "bg-red-900 text-red-300"}`}>
@@ -265,18 +300,64 @@ const MockTestSeries = () => {
           <div className="p-6 md:p-10 space-y-8">
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {publishedTests.map((test, index) => (
-                <button
-                  key={index}
-                  onClick={() => startTest(test)}
-                  className="py-4 px-6 bg-white text-gray-900 font-bold rounded-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center"
-                >
-                  <span className="mr-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </span>
-                  Start {test.testName}
-                </button>
+                <>
+                  <button
+                    key={index}
+                    onClick={() => startTestConfirm(test)}
+                    className="py-2 px-6 bg-white text-gray-900 font-bold rounded-lg hover:bg-gray-100 flex items-center justify-center"
+                  >
+                    <span className="mr-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </span>
+                    Start {test.testName}
+                  </button>
+
+                  <AnimatePresence>
+                    {isOpen && (
+                      <div className="fixed inset-0 z-50 h-screen w-screen flex items-center justify-center p-4 backdrop-blur-md">
+                        <motion.div
+                          initial="hidden"
+                          animate="visible"
+                          exit="exit"
+                          variants={modalVariants}
+                          className="relative"  // Add relative positioning
+                        >
+                          <div
+                            className="bg-zinc-900 rounded-lg shadow-xl max-w-md w-full p-6"
+                          >
+                            <div className="flex items-center mb-4">
+                              <BsExclamationTriangle className="text-yellow-500 text-2xl mr-3" />
+                              <h3 className="text-lg font-semibold text-slate-300">
+                                Confirm Start Test Now
+                              </h3>
+                            </div>
+                            <p className="text-sm text-slate-300 mb-4">
+                              Are you sure you want to Start ?
+                            </p>
+                            <div className="flex justify-end space-x-2">
+                              <button
+                                onClick={() => setIsOpen(false)}
+                                className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-300"
+                              >
+                                <AiOutlineHome className="mr-2" />
+                                Cancel
+                              </button>
+                              <button
+                                onClick={() => startTest(test)}
+                                className="flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-300"
+                              >
+                                <FiLogOut className="mr-2" />
+                                Start Now
+                              </button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      </div>
+                    )}
+                  </AnimatePresence>
+                </>
               ))}
             </div>
 
@@ -307,7 +388,7 @@ const MockTestSeries = () => {
               ))
             }
 
-            <div className="bg-gray-900 p-6 rounded-lg">
+            <div className="bg-zinc-900 p-6 rounded-lg">
               <h2 className="font-semibold text-xl text-white mb-4">Test Instructions:</h2>
               <ol className="list-decimal list-inside space-y-2 text-richblack-100">
                 <li>This is a timed test. Once you start, the timer cannot be paused.</li>
@@ -332,10 +413,71 @@ const MockTestSeries = () => {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center p-4">
         <div className="w-full max-w-4xl bg-black border border-gray-700 shadow-2xl rounded-2xl overflow-hidden">
+        <button
+                onClick={() => {
+                  setCurrentTest(null);
+                  setIsOpen(false);
+                }}
+                className="py-2 px-2 m-2 bg-slate-200 text-black font-bold rounded-full hover:bg-gray-700 transition duration-300 shadow-md"
+              >
+              <IoChevronBackCircle size={"16"} />
+              </button>
           <div className="bg-black p-6 text-center">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
               {currentTest.testName} Completed
             </h2>
+
+          </div>
+          <div className='text-center'>
+            <button onClick={rankOpen}
+              className="py-3 px-6 text-center bg-slate-200 text-black font-bold rounded-lg hover:bg-gray-700 transition duration-300 shadow-md"
+            >
+              See My Rank
+            </button>
+            
+            <AnimatePresence>
+                    {isRankOpen && (
+                      <div className="fixed inset-0 z-50 h-screen w-screen flex items-center justify-center p-4 backdrop-blur-md">
+                        <motion.div
+                          initial="hidden"
+                          animate="visible"
+                          exit="exit"
+                          variants={modalVariants}
+                          className="relative"  // Add relative positioning
+                        >
+                          <div
+                            className="bg-zinc-900 rounded-lg shadow-xl max-w-md w-full p-6"
+                          >
+                            <div className="flex items-center mb-4">
+                              <BsExclamationTriangle className="text-yellow-500 text-2xl mr-3" />
+                              <h3 className="text-lg font-semibold text-slate-300">
+                                Confirm Goto Rankings
+                              </h3>
+                            </div>
+                            <p className="text-sm text-slate-300 mb-4">
+                              Are you sure you want to Navigate to Rankings ? This action will clear you current attempt details!
+                            </p>
+                            <div className="flex justify-end space-x-2">
+                              <button
+                                onClick={() => setIsRankOpen(false)}
+                                className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-300"
+                              >
+                                <IoMdTime className="mr-2" />
+                                Wait
+                              </button>
+                              <button
+                                onClick={rankClose}
+                                className="flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-300"
+                              >
+                                <FiLogOut className="mr-2" />
+                               Yes
+                              </button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      </div>
+                    )}
+                  </AnimatePresence>
           </div>
           <div className="p-6 sm:p-8 space-y-6 sm:space-y-8">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
@@ -362,26 +504,17 @@ const MockTestSeries = () => {
               >
                 {showAttemptDetails ? "Hide Attempt Details" : "Show Attempt Details"}
               </button>
-              <button
-                onClick={() => setCurrentTest(null)}
-                className="py-3 px-6 bg-slate-200 text-black font-bold rounded-lg hover:bg-gray-700 transition duration-300 shadow-md"
-              >
-                Back to Test List
-              </button>
-              <Link to={"/rankings"}
-                className="py-3 px-6 text-center bg-slate-200 text-black font-bold rounded-lg hover:bg-gray-700 transition duration-300 shadow-md"
-              >
-                See My Rank
-              </Link>
+           
+
             </div>
 
             {showAttemptDetails && (
-              <div className="mt-8 bg-gray-700 p-6 rounded-lg">
-                <h3 className="text-xl font-semibold mb-4 text-white">Attempt Details</h3>
+              <div className="mt-8 bg-zinc-900 p-6 rounded-lg">
                 {renderAttemptDetails()}
               </div>
             )}
           </div>
+          <Footer />
         </div>
       </div>
     );
@@ -395,7 +528,7 @@ const MockTestSeries = () => {
         <div className="flex flex-col md:flex-row justify-between items-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white">{currentTest.testName}</h2>
           <div className="text-lg md:text-xl font-semibold text-white">
-            Time left: <span className="text-blue-400">{formatTime(timeLeft)}</span>
+            Time left: <span className="text-red-500">{formatTime(timeLeft)}</span>
           </div>
         </div>
         <div className="space-y-4">
@@ -409,11 +542,10 @@ const MockTestSeries = () => {
             <button
               key={index}
               onClick={() => handleAnswerSelect(option)}
-              className={`w-full py-3 px-6 text-sm text-left rounded-lg transition duration-300 ${
-                selectedAnswer === option
-                  ? 'bg-white text-gray-900 font-semibold'
-                  : 'bg-black border border-white text-white hover:bg-gray-600'
-              }`}
+              className={`w-full py-3 px-6 text-sm text-left rounded-lg transition duration-300 ${selectedAnswer === option
+                ? 'bg-white text-gray-900 font-semibold'
+                : 'bg-black border border-white text-white hover:bg-gray-600'
+                }`}
             >
               {option}
             </button>
@@ -423,11 +555,10 @@ const MockTestSeries = () => {
           <button
             onClick={() => currentQuestion > 0 && setCurrentQuestion(currentQuestion - 1)}
             disabled={currentQuestion === 0}
-            className={`py-2 px-4 md:py-3 md:px-6 text-xs md:text-sm font-semibold rounded-lg transition duration-300 w-full md:w-auto ${
-              currentQuestion > 0
-                ? 'bg-white text-gray-900 hover:bg-gray-100'
-                : 'bg-gray-700 text-gray-400 cursor-not-allowed'
-            }`}
+            className={`py-2 px-4 md:py-3 md:px-6 text-xs md:text-sm font-semibold rounded-lg transition duration-300 w-full md:w-auto ${currentQuestion > 0
+              ? 'bg-white text-gray-900 hover:bg-gray-100'
+              : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+              }`}
           >
             Previous
           </button>
@@ -442,11 +573,10 @@ const MockTestSeries = () => {
           <button
             onClick={handleNextQuestion}
             disabled={!selectedAnswer}
-            className={`py-2 px-4 md:py-3 md:px-6 font-semibold rounded-lg text-xs md:text-sm transition duration-300 w-full md:w-auto ${
-              selectedAnswer
-                ? 'bg-white text-black hover:bg-gray-100'
-                : 'bg-gray-700 border border-white text-white cursor-not-allowed'
-            }`}
+            className={`py-2 px-4 md:py-3 md:px-6 font-semibold rounded-lg text-xs md:text-sm transition duration-300 w-full md:w-auto ${selectedAnswer
+              ? 'bg-white text-black hover:bg-gray-100'
+              : 'bg-gray-700 border border-white text-white cursor-not-allowed'
+              }`}
           >
             {currentQuestion + 1 === currentTest.questions.length ? 'Finish Test' : 'Next'}
           </button>
@@ -455,7 +585,7 @@ const MockTestSeries = () => {
           {currentTest.questions.map((_, index) => (
             <button
               key={index}
-              onClick={() => handleQuestionNavigation(index)} 
+              onClick={() => handleQuestionNavigation(index)}
               className={`w-8 h-8 md:w-10 md:h-10 rounded-full font-semibold text-sm transition duration-300 
                 ${index === currentQuestion
                   ? 'bg-violet-700 text-white'
@@ -470,7 +600,7 @@ const MockTestSeries = () => {
             </button>
           ))}
         </div>
-      <Footer/>
+        <Footer />
       </div>
 
     </div>

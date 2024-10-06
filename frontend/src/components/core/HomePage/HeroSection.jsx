@@ -52,7 +52,7 @@ const HeroSection = () => {
           initial='hidden'
           whileInView={'show'}
           viewport={{ once: false, amount: 0.1 }}
-          className='text-center z-20 text-gray-200 text-4xl mt-6 font-semibold w-80 lg:w-full lg:text-8xl'
+          className='text-center z-20 text-slate-100 text-4xl mt-6 font-semibold w-80 lg:w-full lg:text-8xl'
         >
           We Know That <br />
           Together <i>
@@ -76,13 +76,13 @@ const HeroSection = () => {
 
         {token ?
           <div className='flex mt-10 flex-col md:flex-row w-72 md:w-full align-center justify-center gap-4 z-10'>
-            <Link to={"/dashboard/enrolled-courses"} className='text-md text-sm border  border-slate-600 rounded-xl px-6 py-2 text-center'>
+            <Link to={"/dashboard/enrolled-courses"} className='text-md text-sm border  border-slate-600 rounded-xl px-6 py-4 text-center'>
               Explore More
               {/* <HoverBorderGradientDemo title={"Explore More"} /> */}
             </Link>
             <Link
               to={"https://www.youtube.com/@awakeningclasses"}
-              className='text-md flex items-center justify-center bg-slate-100 text-zinc-900 text-center rounded-xl px-6 py-2'
+              className='text-md flex items-center justify-center bg-slate-100 text-zinc-900 text-center rounded-xl px-6 py-4'
             >
               <FaYoutube className="mr-2 text-md" />
               Free Youtube Lectures
@@ -93,15 +93,15 @@ const HeroSection = () => {
 
 <>
           <div className='flex mt-10 flex-col md:flex-row w-72 md:w-full align-center justify-center gap-4 z-10'>
-            <Link to={"/login"} className='text-md text-sm border font-semibold  border-slate-600 rounded-xl px-6 py-2 text-center'>
+            <Link to={"/login"} className='text-md text-sm border font-semibold  border-slate-600 rounded-xl px-6 py-4 text-center'>
               Login to your account
               {/* <HoverBorderGradientDemo title={"Explore More"} /> */}
             </Link>
             <Link
               to={"/signup"}
-              className='text-md flex items-center font-semibold justify-center bg-slate-100 text-zinc-900 text-center rounded-xl px-4 py-2'
+              className='text-md flex items-center font-semibold justify-center bg-slate-100 text-zinc-900 text-center rounded-xl px-6 py-4'
             >
-              <CiLogin className="mr-2 text-md" />
+              <CiLogin className="mr-2 text-md font-bold" />
               Signup for free
             </Link>
 
