@@ -96,7 +96,6 @@ const MockTestsSection = ({ setShowLoginModal }) => {
     : mockTests
         ?.slice(0, 4)
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .reverse()
         .map((mockTest) => (
           <MemoizedMockTestCard
             key={mockTest._id}
