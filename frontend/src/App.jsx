@@ -108,6 +108,7 @@ function App() {
               <Route path="/contact" element={<Contact />} />
               <Route path="/about" element={<About />} />
               <Route path="/rankings" element={<RankingsPage />} />
+              <Route path="/rankings/:testName" element={<RankingsPage />} />
               <Route path="catalog/:catalogName" element={<Catalog />} />
               <Route path="courses/:courseId" element={<CourseDetails />} />
               <Route path="/mock-test/:mockId" element={<MockTestDetails />} />

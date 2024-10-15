@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useParams, useNavigate } from 'react-router-dom';
 import RankingTable from "./RankingTable";
 import Footer from '../../common/Footer';
 import { studentEndpoints } from '../../../services/apis';
@@ -8,7 +9,6 @@ import RankingsGraph from './RankingGraph';
 import LoadingSpinner from '../ConductMockTests/Spinner';
 import { Menu, Search } from 'lucide-react';
 import { FaRankingStar } from "react-icons/fa6";
-
 
 const RankingsPage = () => {
   const [rankings, setRankings] = useState({});
@@ -22,6 +22,8 @@ const RankingsPage = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const userId = user._id;
+  const { testName } = useParams();
+  const navigate = useNavigate();
 
   const calculateRanks = (testResults) => {
     const sortedResults = testResults.sort((a, b) => b.score - a.score);
@@ -75,8 +77,12 @@ const RankingsPage = () => {
           setRankings(groupedRankings);
           setUserRanks(userRanks);
 
-          if (Object.keys(groupedRankings).length > 0) {
-            setSelectedTest(Object.keys(groupedRankings)[0]);
+          if (testName && groupedRankings[testName]) {
+            setSelectedTest(testName);
+          } else if (Object.keys(groupedRankings).length > 0) {
+            const firstTest = Object.keys(groupedRankings)[0];
+            setSelectedTest(firstTest);
+            navigate(`/rankings/${firstTest}`);
           }
 
         } else {
@@ -95,13 +101,19 @@ const RankingsPage = () => {
       setError('Authentication token is missing');
       setIsLoading(false);
     }
-  }, [token, RANKINGS_API, userId]);
+  }, [token, RANKINGS_API, userId, testName, navigate]);
 
   const filteredTests = Object.keys(rankings).filter(testName =>
     testName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
+
+  const handleTestSelection = (newTestName) => {
+    setSelectedTest(newTestName);
+    setIsDropdownOpen(false);
+    navigate(`/rankings/${newTestName}`);
+  };
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -110,7 +122,6 @@ const RankingsPage = () => {
   if (error) {
     return <div className="text-center text-red-500 mt-8 font-semibold text-xl">An error occurred. Please try again later.</div>;
   }
-  
 
   return (
     <div className="bg-black w-screen text-gray-100 min-h-screen">
@@ -118,7 +129,7 @@ const RankingsPage = () => {
         <div className="relative mb-8">
           <button
             onClick={toggleDropdown}
-            className="flex items-center text-sm justify-between w-full px-4 py-4 bg-zinc-900 text-white rounded-md "
+            className="flex items-center text-sm justify-between w-full px-4 py-4 bg-zinc-900 text-white rounded-md"
           >
             <span>{selectedTest || "Select a mock test"}</span>
             <Menu size={24} />
@@ -152,10 +163,7 @@ const RankingsPage = () => {
                       transition={{ duration: 0.3, delay: index * 0.05 }}
                     >
                       <button
-                        onClick={() => {
-                          setSelectedTest(testName);
-                          setIsDropdownOpen(false);
-                        }}
+                        onClick={() => handleTestSelection(testName)}
                         className="block w-full text-left px-4 py-2 text-sm my-2 text-white hover:bg-white/20 transition-colors duration-200 ease-in-out rounded-lg"
                       >
                         {testName} (My Rank : {userRanks[testName] || 'N/A'})
@@ -173,7 +181,6 @@ const RankingsPage = () => {
             <>
               <h2 className="text-3xl font-bold mb-6 text-center text-gray-100">{selectedTest}</h2>
               <div className='flex justify-center align-center'>
-              
                 <div className="text-xl flex justify-evenly font-semibold mb-4 text-center bg-slate-200 py-2 px-4 w-80 rounded-md text-zinc-800">
                   <span><FaRankingStar size={"26"}/></span><span>My Rank : {userRanks[selectedTest] || 'N/A'} / {(rankings[selectedTest] || []).length}</span>
                 </div>
