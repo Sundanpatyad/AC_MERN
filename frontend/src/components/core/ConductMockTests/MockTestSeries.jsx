@@ -13,8 +13,6 @@ import { FiLogOut } from "react-icons/fi";
 import { IoMdTime } from "react-icons/io";
 import { IoChevronBackCircle } from "react-icons/io5";
 
-
-
 const MockTestSeries = () => {
   const { mockId } = useParams();
   const { token } = useSelector((state) => state.auth);
@@ -34,9 +32,10 @@ const MockTestSeries = () => {
   const [userAnswers, setUserAnswers] = useState([]);
   const [skippedQuestions, setSkippedQuestions] = useState([]);
   const { GET_MCOKTEST_SERIES_BY_ID, CREATE_ATTEMPT_DETAILS } = mocktestEndpoints;
-  const [isOpen, setIsOpen] = useState(false)
-  const[isRankOpen , setIsRankOpen] = useState(false)
-  const navigate = useNavigate()
+  const [openTestIndex, setOpenTestIndex] = useState(null);
+  const [isRankOpen, setIsRankOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchTestSeries();
@@ -78,6 +77,7 @@ const MockTestSeries = () => {
     setIncorrectAnswers([]);
     setUserAnswers(new Array(test.questions.length).fill(''));
     setSkippedQuestions([]);
+    setOpenTestIndex(null);
   };
 
   const dropdownVariants = {
@@ -92,11 +92,9 @@ const MockTestSeries = () => {
     exit: { opacity: 0, scale: 0.8, transition: { duration: 0.2 } },
   };
 
-  const startTestConfirm = (test) => {
-    setIsOpen(true);
+  const startTestConfirm = (index) => {
+    setOpenTestIndex(index);
   };
-
-
 
   const handleAnswerSelect = (answer) => {
     setSelectedAnswer(answer);
@@ -108,7 +106,6 @@ const MockTestSeries = () => {
     newUserAnswers[currentQuestion] = answer;
     setUserAnswers(newUserAnswers);
 
-    // Remove from skipped questions if it was previously skipped
     const newSkippedQuestions = skippedQuestions.filter(q => q !== currentQuestion);
     setSkippedQuestions(newSkippedQuestions);
   };
@@ -150,7 +147,11 @@ const MockTestSeries = () => {
     currentTest.questions.forEach((question, index) => {
       if (userAnswers[index] === question.correctAnswer) {
         newScore += 1;
-        newCorrectAnswers.push(index);
+        newCorrectAnswers.push({
+          questionIndex: index,
+          userAnswer: userAnswers[index],
+          correctAnswer: question.correctAnswer
+        });
       } else if (userAnswers[index] !== '') {
         newScore -= currentTest.negative;
         newIncorrectAnswers.push({
@@ -167,14 +168,16 @@ const MockTestSeries = () => {
 
     return {
       score: newScore,
-      correctAnswers: newCorrectAnswers.length,
+      correctAnswers: newCorrectAnswers,
       incorrectAnswers: newIncorrectAnswers.length,
+      correctAnswerDetails: newCorrectAnswers,
       incorrectAnswerDetails: newIncorrectAnswers
     };
   };
 
   const sendScoreToBackend = async (scoreData) => {
     try {
+      console.log(scoreData, "scoreData");
       const response = await axios.post(
         CREATE_ATTEMPT_DETAILS,
         {
@@ -183,7 +186,11 @@ const MockTestSeries = () => {
           score: scoreData.score,
           totalQuestions: currentTest.questions.length,
           timeTaken: currentTest.duration * 60 - timeLeft,
-          correctAnswers: scoreData.correctAnswers,
+          correctAnswers: scoreData.correctAnswerDetails.map(item => ({
+            questionText: currentTest.questions[item.questionIndex].text,
+            userAnswer: item.userAnswer,
+            correctAnswer: item.correctAnswer
+          })),
           incorrectAnswers: scoreData.incorrectAnswers,
           incorrectAnswerDetails: scoreData.incorrectAnswerDetails.map(item => ({
             questionText: currentTest.questions[item.questionIndex].text,
@@ -195,6 +202,7 @@ const MockTestSeries = () => {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
+      // Handle successful response if needed
     } catch (error) {
       console.error('Error submitting score:', error);
       toast.error("Failed to submit score");
@@ -202,6 +210,8 @@ const MockTestSeries = () => {
   };
 
   const endTest = () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     const scoreData = calculateScore();
     setShowScore(true);
     setTimeLeft(0);
@@ -215,11 +225,12 @@ const MockTestSeries = () => {
   };
 
   const rankOpen = () => {
-  setIsRankOpen(true);
-  }
+    setIsRankOpen(true);
+  };
+
   const rankClose = () => {
-    navigate('/rankings')
-  }
+    navigate('/rankings');
+  };
 
   const renderAttemptDetails = () => {
     return (
@@ -234,7 +245,7 @@ const MockTestSeries = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {currentTest.questions.map((question, index) => {
             const incorrectAnswer = incorrectAnswers.find(item => item.questionIndex === index);
-            const isCorrect = correctAnswers.includes(index);
+            const isCorrect = correctAnswers.some(item => item.questionIndex === index);
             const userAnswer = userAnswers[index] || "Not answered";
 
             return (
@@ -300,10 +311,9 @@ const MockTestSeries = () => {
           <div className="p-6 md:p-10 space-y-8">
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {publishedTests.map((test, index) => (
-                <>
+                <React.Fragment key={index}>
                   <button
-                    key={index}
-                    onClick={() => startTestConfirm(test)}
+                    onClick={() => startTestConfirm(index)}
                     className="py-2 px-6 bg-white text-gray-900 font-bold rounded-lg hover:bg-gray-100 flex items-center justify-center"
                   >
                     <span className="mr-2">
@@ -315,14 +325,14 @@ const MockTestSeries = () => {
                   </button>
 
                   <AnimatePresence>
-                    {isOpen && (
+                    {openTestIndex === index && (
                       <div className="fixed inset-0 z-50 h-screen w-screen flex items-center justify-center p-4 backdrop-blur-md">
                         <motion.div
                           initial="hidden"
                           animate="visible"
                           exit="exit"
                           variants={modalVariants}
-                          className="relative"  // Add relative positioning
+                          className="relative"
                         >
                           <div
                             className="bg-zinc-900 rounded-lg shadow-xl max-w-md w-full p-6"
@@ -338,7 +348,7 @@ const MockTestSeries = () => {
                             </p>
                             <div className="flex justify-end space-x-2">
                               <button
-                                onClick={() => setIsOpen(false)}
+                                onClick={() => setOpenTestIndex(null)}
                                 className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-300"
                               >
                                 <AiOutlineHome className="mr-2" />
@@ -357,7 +367,7 @@ const MockTestSeries = () => {
                       </div>
                     )}
                   </AnimatePresence>
-                </>
+                </React.Fragment>
               ))}
             </div>
 
@@ -409,24 +419,24 @@ const MockTestSeries = () => {
       </div>
     );
   }
+
   if (showScore) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center p-4">
         <div className="w-full max-w-4xl bg-black border border-gray-700 shadow-2xl rounded-2xl overflow-hidden">
-        <button
-                onClick={() => {
-                  setCurrentTest(null);
-                  setIsOpen(false);
-                }}
-                className="py-2 px-2 m-2 bg-slate-200 text-black font-bold rounded-full hover:bg-gray-700 transition duration-300 shadow-md"
-              >
-              <IoChevronBackCircle size={"16"} />
-              </button>
+          <button
+            onClick={() => {
+              setCurrentTest(null);
+              setOpenTestIndex(null);
+            }}
+            className="py-2 px-2 m-2 bg-slate-200 text-black font-bold rounded-full hover:bg-gray-700 transition duration-300 shadow-md"
+          >
+            <IoChevronBackCircle size={"16"} />
+          </button>
           <div className="bg-black p-6 text-center">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
               {currentTest.testName} Completed
             </h2>
-
           </div>
           <div className='text-center'>
             <button onClick={rankOpen}
@@ -436,48 +446,48 @@ const MockTestSeries = () => {
             </button>
             
             <AnimatePresence>
-                    {isRankOpen && (
-                      <div className="fixed inset-0 z-50 h-screen w-screen flex items-center justify-center p-4 backdrop-blur-md">
-                        <motion.div
-                          initial="hidden"
-                          animate="visible"
-                          exit="exit"
-                          variants={modalVariants}
-                          className="relative"  // Add relative positioning
-                        >
-                          <div
-                            className="bg-zinc-900 rounded-lg shadow-xl max-w-md w-full p-6"
-                          >
-                            <div className="flex items-center mb-4">
-                              <BsExclamationTriangle className="text-yellow-500 text-2xl mr-3" />
-                              <h3 className="text-lg font-semibold text-slate-300">
-                                Confirm Goto Rankings
-                              </h3>
-                            </div>
-                            <p className="text-sm text-slate-300 mb-4">
-                              Are you sure you want to Navigate to Rankings ? This action will clear you current attempt details!
-                            </p>
-                            <div className="flex justify-end space-x-2">
-                              <button
-                                onClick={() => setIsRankOpen(false)}
-                                className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-300"
-                              >
-                                <IoMdTime className="mr-2" />
-                                Wait
-                              </button>
-                              <button
-                                onClick={rankClose}
-                                className="flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-300"
-                              >
-                                <FiLogOut className="mr-2" />
-                               Yes
-                              </button>
-                            </div>
-                          </div>
-                        </motion.div>
+              {isRankOpen && (
+                <div className="fixed inset-0 z-50 h-screen w-screen flex items-center justify-center p-4 backdrop-blur-md">
+                  <motion.div
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    variants={modalVariants}
+                    className="relative"
+                  >
+                    <div
+                      className="bg-zinc-900 rounded-lg shadow-xl max-w-md w-full p-6"
+                    >
+                      <div className="flex items-center mb-4">
+                        <BsExclamationTriangle className="text-yellow-500 text-2xl mr-3" />
+                        <h3 className="text-lg font-semibold text-slate-300">
+                          Confirm Goto Rankings
+                        </h3>
                       </div>
-                    )}
-                  </AnimatePresence>
+                      <p className="text-sm text-slate-300 mb-4">
+                        Are you sure you want to Navigate to Rankings ? This action will clear your current attempt details!
+                      </p>
+                      <div className="flex justify-end space-x-2">
+                        <button
+                          onClick={() => setIsRankOpen(false)}
+                          className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-300"
+                        >
+                          <IoMdTime className="mr-2" />
+                          Wait
+                        </button>
+                        <button
+                          onClick={rankClose}
+                          className="flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-300"
+                        >
+                          <FiLogOut className="mr-2" />
+                          Yes
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
+              )}
+            </AnimatePresence>
           </div>
           <div className="p-6 sm:p-8 space-y-6 sm:space-y-8">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
@@ -504,8 +514,6 @@ const MockTestSeries = () => {
               >
                 {showAttemptDetails ? "Hide Attempt Details" : "Show Attempt Details"}
               </button>
-           
-
             </div>
 
             {showAttemptDetails && (
@@ -542,10 +550,11 @@ const MockTestSeries = () => {
             <button
               key={index}
               onClick={() => handleAnswerSelect(option)}
-              className={`w-full py-3 px-6 text-sm text-left rounded-lg transition duration-300 ${selectedAnswer === option
-                ? 'bg-white text-gray-900 font-semibold'
-                : 'bg-black border border-white text-white hover:bg-gray-600'
-                }`}
+              className={`w-full py-3 px-6 text-sm text-left rounded-lg transition duration-300 ${
+                selectedAnswer === option
+                  ? 'bg-white text-gray-900 font-semibold'
+                  : 'bg-black border border-white text-white hover:bg-gray-600'
+              }`}
             >
               {option}
             </button>
@@ -555,10 +564,11 @@ const MockTestSeries = () => {
           <button
             onClick={() => currentQuestion > 0 && setCurrentQuestion(currentQuestion - 1)}
             disabled={currentQuestion === 0}
-            className={`py-2 px-4 md:py-3 md:px-6 text-xs md:text-sm font-semibold rounded-lg transition duration-300 w-full md:w-auto ${currentQuestion > 0
-              ? 'bg-white text-gray-900 hover:bg-gray-100'
-              : 'bg-gray-700 text-gray-400 cursor-not-allowed'
-              }`}
+            className={`py-2 px-4 md:py-3 md:px-6 text-xs md:text-sm font-semibold rounded-lg transition duration-300 w-full md:w-auto ${
+              currentQuestion > 0
+                ? 'bg-white text-gray-900 hover:bg-gray-100'
+                : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+            }`}
           >
             Previous
           </button>
@@ -573,10 +583,11 @@ const MockTestSeries = () => {
           <button
             onClick={handleNextQuestion}
             disabled={!selectedAnswer}
-            className={`py-2 px-4 md:py-3 md:px-6 font-semibold rounded-lg text-xs md:text-sm transition duration-300 w-full md:w-auto ${selectedAnswer
-              ? 'bg-white text-black hover:bg-gray-100'
-              : 'bg-gray-700 border border-white text-white cursor-not-allowed'
-              }`}
+            className={`py-2 px-4 md:py-3 md:px-6 font-semibold rounded-lg text-xs md:text-sm transition duration-300 w-full md:w-auto ${
+              selectedAnswer
+                ? 'bg-white text-black hover:bg-gray-100'
+                : 'bg-gray-700 border border-white text-white cursor-not-allowed'
+            }`}
           >
             {currentQuestion + 1 === currentTest.questions.length ? 'Finish Test' : 'Next'}
           </button>
@@ -587,13 +598,14 @@ const MockTestSeries = () => {
               key={index}
               onClick={() => handleQuestionNavigation(index)}
               className={`w-8 h-8 md:w-10 md:h-10 rounded-full font-semibold text-sm transition duration-300 
-                ${index === currentQuestion
-                  ? 'bg-violet-700 text-white'
-                  : answeredQuestions[index]
+                ${
+                  index === currentQuestion
+                    ? 'bg-violet-700 text-white'
+                    : answeredQuestions[index]
                     ? 'bg-white text-gray-900'
                     : skippedQuestions.includes(index)
-                      ? 'bg-orange-500 text-white'
-                      : 'bg-gray-700 text-white hover:bg-gray-600'
+                    ? 'bg-orange-500 text-white'
+                    : 'bg-gray-700 text-white hover:bg-gray-600'
                 }`}
             >
               {index + 1}
@@ -602,7 +614,6 @@ const MockTestSeries = () => {
         </div>
         <Footer />
       </div>
-
     </div>
   );
 };
