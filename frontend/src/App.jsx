@@ -11,6 +11,7 @@ import BottomBar from './components/common/ButtomBar';
 import YourComponent from './components/ui/InitialLoader';
 import InstallApp from './components/core/HomePage/installApp';
 import PhoneWizardPage from './components/core/HomePage/Phone';
+import AdminCountMock from './components/core/Admin/MockCountAdmin';
 
 // Lazy-loaded components
 const Navbar = lazy(() => import("./components/common/Navbar"));
@@ -153,6 +154,7 @@ function App() {
 
               <Route path="/mocktest" element={<Mocktest />} />
               <Route path="view-mock/:mockId" element={<MockTestSeries />} />
+              <Route path="adminMockTest" element={<AdminCountMock />} />
               <Route path="*" element={<PageNotFound />} />
 
             </Routes>

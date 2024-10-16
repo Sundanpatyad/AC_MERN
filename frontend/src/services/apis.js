@@ -11,6 +11,8 @@ export const studyMaterialEndPoints = {
     CREATE_STUDY_MATERIAL : `${BASE_URL}/api/v1/materials/createStudyMaterial`,
     DELETE_EXAM : `${BASE_URL}/api/v1/materials/deleteExam`,
     DELETE_STUDY_MATERIALS : `${BASE_URL}/api/v1/materials/deleteStudyMaterial`,
+    ADMIN_MOCK_LIST : `${BASE_URL}/api/v1/admin/users-by-mock-test`,
+
  }
 
 
