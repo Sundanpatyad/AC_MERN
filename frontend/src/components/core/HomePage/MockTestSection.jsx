@@ -69,7 +69,6 @@ const MockTestsSection = ({ setShowLoginModal }) => {
 
     try {
       const result =  await buyItem(token, [mockTest._id], ['MOCK_TEST'], user, navigate, dispatch);
-      // //console.log(result);
     } catch (error) {
       console.error("Error purchasing mock test:", error);
       toast.error("Failed to purchase the mock test. Please try again.");
@@ -81,7 +80,6 @@ const MockTestsSection = ({ setShowLoginModal }) => {
   }, [navigate]);
 
   const MemoizedMockTestCard = useMemo(() => MockTestCard, []);
-
   return (
     <div className="container w-11/12 mx-auto">
       <h2 className="text-3xl md:text-5xl text-center mt-10 font-bold text-white mb-10">Popular Mock Tests</h2>

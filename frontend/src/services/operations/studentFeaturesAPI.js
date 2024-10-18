@@ -79,7 +79,6 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
                 handler: function (response) {
                     // On successful payment, verify the payment and send confirmation email
                     verifyPayment({ ...response, itemId, itemType }, token, navigate, dispatch);
-                    sendPaymentSuccessEmail(response, orderData.amount, token);
                 }
             };
 
@@ -145,7 +144,9 @@ export default async function verifyPayment(bodyData, token, navigate, dispatch)
 
         // Redirect the user to the appropriate page
         if (response.data.success) {
+           setTimeout(()=> {
             window.location.reload();
+           },1000)
         } else {
             navigate("/dashboard/enrolled-courses");  // Adjust this path as necessary
         }
