@@ -1,10 +1,7 @@
-// src/components/MockTestsSection.jsx
-
-import React, { useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
-import { useQuery } from 'react-query';
 
 import { fetchAllMockTests } from '../../../services/operations/mocktest';
 import { buyItem } from '../../../services/operations/studentFeaturesAPI';
@@ -36,14 +33,24 @@ const MockTestsSection = ({ setShowLoginModal }) => {
   const { token } = useSelector((state) => state.auth);
   const { user } = useSelector((state) => state.profile);
 
-  const { data: mockTests, isLoading: isMockTestsLoading } = useQuery(
-    ['mockTests', token],
-    () => fetchAllMockTests(token),
-    {
-      staleTime: Infinity,
-      select: (data) => data.filter(test => test.status !== 'draft')
-    }
-  );
+  const [mockTests, setMockTests] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadMockTests = async () => {
+      try {
+        const data = await fetchAllMockTests(token);
+        setMockTests(data.filter(test => test.status !== 'draft'));
+      } catch (error) {
+        console.error("Error fetching mock tests:", error);
+        toast.error("Failed to load mock tests. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMockTests();
+  }, [token]);
 
   const isLoggedIn = !!token;
 
@@ -68,7 +75,7 @@ const MockTestsSection = ({ setShowLoginModal }) => {
     }
 
     try {
-      const result =  await buyItem(token, [mockTest._id], ['MOCK_TEST'], user, navigate, dispatch);
+      await buyItem(token, [mockTest._id], ['MOCK_TEST'], user, navigate, dispatch);
     } catch (error) {
       console.error("Error purchasing mock test:", error);
       toast.error("Failed to purchase the mock test. Please try again.");
@@ -79,35 +86,34 @@ const MockTestsSection = ({ setShowLoginModal }) => {
     navigate(`/view-mock/${mockTestId}`);
   }, [navigate]);
 
-  const MemoizedMockTestCard = useMemo(() => MockTestCard, []);
   return (
     <div className="container w-11/12 mx-auto">
       <h2 className="text-3xl md:text-5xl text-center mt-10 font-bold text-white mb-10">Popular Mock Tests</h2>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-center items-center">
-  {isMockTestsLoading
-    ? Array(1).fill().map((_, index) => (
-      <div key={index} className="flex justify-center">
-        <MockTestSkeleton />
+        {isLoading
+          ? Array(4).fill().map((_, index) => (
+            <div key={index} className="flex justify-center">
+              <MockTestSkeleton />
+            </div>
+          ))
+          : mockTests
+              .slice(0, 4)
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .map((mockTest) => (
+                <MockTestCard
+                  key={mockTest._id}
+                  mockTest={mockTest}
+                  handleAddToCart={handleAddToCart}
+                  handleRemoveFromCart={handleRemoveFromCart}
+                  handleBuyNow={handleBuyNow}
+                  handleStartTest={handleStartTest}
+                  setShowLoginModal={setShowLoginModal}
+                  isLoggedIn={isLoggedIn}
+                  userId={user?._id}
+                />
+              ))}
       </div>
-    ))
-    : mockTests
-        ?.slice(0, 4)
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .map((mockTest) => (
-          <MemoizedMockTestCard
-            key={mockTest._id}
-            mockTest={mockTest}
-            handleAddToCart={handleAddToCart}
-            handleRemoveFromCart={handleRemoveFromCart}
-            handleBuyNow={handleBuyNow}
-            handleStartTest={handleStartTest}
-            setShowLoginModal={setShowLoginModal}
-            isLoggedIn={isLoggedIn}
-            userId={user?._id}
-          />
-        ))}
-</div>
 
       <div className="text-center mt-12">
         <Link
@@ -138,11 +144,11 @@ const MockTestsSection = ({ setShowLoginModal }) => {
           <span className="absolute -bottom-0 left-[1.125rem] h-px w-[calc(100%-2.25rem)] bg-gradient-to-r from-emerald-400/0 via-emerald-400/90 to-emerald-400/0 transition-opacity duration-500 group-hover:opacity-40" />
         </Link>
       </div>
-      {!isMockTestsLoading && mockTests?.length === 0 && (
+      {!isLoading && mockTests.length === 0 && (
         <p className="text-center text-gray-400 mt-8">No mock tests available.</p>
       )}
     </div>
   );
 };
 
-export default React.memo(MockTestsSection);
+export default MockTestsSection;

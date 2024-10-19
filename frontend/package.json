@@ -29,6 +29,7 @@
     "framer-motion": "^10.18.0",
     "fusioncharts": "^4.0.2",
     "gapi-script": "^1.2.0",
+    "js-cookie": "^3.0.5",
     "locomotive-scroll": "^4.1.4",
     "lucide-react": "^0.414.0",
     "mini-svg-data-uri": "^1.4.4",
