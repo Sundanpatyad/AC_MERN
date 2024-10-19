@@ -1,4 +1,6 @@
-import React, { useCallback, useMemo, useEffect } from 'react';
+// src/components/MockTestsSection.jsx
+
+import React, { useCallback, useMemo } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
@@ -34,29 +36,14 @@ const MockTestsSection = ({ setShowLoginModal }) => {
   const { token } = useSelector((state) => state.auth);
   const { user } = useSelector((state) => state.profile);
 
-  const fetchMockTests = useCallback(async () => {
-    try {
-      const data = await fetchAllMockTests(token);
-      return data.filter(test => test.status !== 'draft');
-    } catch (error) {
-      console.error("Error fetching mock tests:", error);
-      toast.error("Failed to fetch mock tests. Please try again.");
-      return [];
-    }
-  }, [token]);
-
-  const { data: mockTests, isLoading: isMockTestsLoading, refetch } = useQuery(
+  const { data: mockTests, isLoading: isMockTestsLoading } = useQuery(
     ['mockTests', token],
-    fetchMockTests,
+    () => fetchAllMockTests(token),
     {
-      staleTime: 0,
-      cacheTime: 0,
+      staleTime: Infinity,
+      select: (data) => data.filter(test => test.status !== 'draft')
     }
   );
-
-  useEffect(() => {
-    refetch();
-  });
 
   const isLoggedIn = !!token;
 
@@ -81,7 +68,7 @@ const MockTestsSection = ({ setShowLoginModal }) => {
     }
 
     try {
-      const result = await buyItem(token, [mockTest._id], ['MOCK_TEST'], user, navigate, dispatch);
+      const result =  await buyItem(token, [mockTest._id], ['MOCK_TEST'], user, navigate, dispatch);
     } catch (error) {
       console.error("Error purchasing mock test:", error);
       toast.error("Failed to purchase the mock test. Please try again.");
@@ -93,35 +80,34 @@ const MockTestsSection = ({ setShowLoginModal }) => {
   }, [navigate]);
 
   const MemoizedMockTestCard = useMemo(() => MockTestCard, []);
-
   return (
     <div className="container w-11/12 mx-auto">
       <h2 className="text-3xl md:text-5xl text-center mt-10 font-bold text-white mb-10">Popular Mock Tests</h2>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-center items-center">
-        {isMockTestsLoading
-          ? Array(4).fill().map((_, index) => (
-              <div key={index} className="flex justify-center">
-                <MockTestSkeleton />
-              </div>
-            ))
-          : mockTests
-              ?.slice(0, 4)
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .map((mockTest) => (
-                <MemoizedMockTestCard
-                  key={mockTest._id}
-                  mockTest={mockTest}
-                  handleAddToCart={handleAddToCart}
-                  handleRemoveFromCart={handleRemoveFromCart}
-                  handleBuyNow={handleBuyNow}
-                  handleStartTest={handleStartTest}
-                  setShowLoginModal={setShowLoginModal}
-                  isLoggedIn={isLoggedIn}
-                  userId={user?._id}
-                />
-              ))}
+  {isMockTestsLoading
+    ? Array(1).fill().map((_, index) => (
+      <div key={index} className="flex justify-center">
+        <MockTestSkeleton />
       </div>
+    ))
+    : mockTests
+        ?.slice(0, 4)
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .map((mockTest) => (
+          <MemoizedMockTestCard
+            key={mockTest._id}
+            mockTest={mockTest}
+            handleAddToCart={handleAddToCart}
+            handleRemoveFromCart={handleRemoveFromCart}
+            handleBuyNow={handleBuyNow}
+            handleStartTest={handleStartTest}
+            setShowLoginModal={setShowLoginModal}
+            isLoggedIn={isLoggedIn}
+            userId={user?._id}
+          />
+        ))}
+</div>
 
       <div className="text-center mt-12">
         <Link
