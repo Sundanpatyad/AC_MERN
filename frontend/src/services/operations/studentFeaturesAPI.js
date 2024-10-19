@@ -142,14 +142,14 @@ export default async function verifyPayment(bodyData, token, navigate, dispatch)
             dispatch(resetCart());
         }
 
-        // Redirect the user to the appropriate page
-        if (response.data.success) {
-           setTimeout(()=> {
-            window.location.reload();
-           },1000)
-        } else {
+        // // Redirect the user to the appropriate page
+        // if (response.data.success) {
+        //    setTimeout(()=> {
+        //     window.location.reload();
+        //    },1000)
+        // } else {
             navigate("/dashboard/enrolled-courses");  // Adjust this path as necessary
-        }
+        // }
 
         return response;
     } catch (error) {
