@@ -92,11 +92,11 @@ function App() {
     return () => window.removeEventListener("scroll", handleArrow);
   }, []);
 
-  useEffect(() => {
-    if (token) {
-      checkAndVerifyPayment(token, navigate, dispatch);
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (token) {
+  //     checkAndVerifyPayment(token, navigate, dispatch);
+  //   }
+  // }, []);
 
   // useEffect(() => {
   //   const timer = setTimeout(() => setShowHome(true), 1000);

@@ -145,11 +145,11 @@ export async function verifyPayment(bodyData, token, navigate, dispatch) {
         }
         console.log(response  ,    "res")
         
-        // if (response.data.success) {
-        //     window.location.reload();
-        // } else {
-        //     navigate("/dashboard/enrolled-courses");  // Adjust this path as necessary
-        // }
+        if (response.data.success) {
+            window.location.reload();
+        } else {
+            navigate("/dashboard/enrolled-courses");  // Adjust this path as necessary
+        }
 
 
 
