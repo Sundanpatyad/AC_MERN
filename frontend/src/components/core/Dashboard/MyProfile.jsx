@@ -1,118 +1,116 @@
-import { useEffect } from "react"
-import { RiEditLine, RiUserLine, RiMailLine, RiPhoneLine, RiCalendarLine, RiGenderlessFill } from "react-icons/ri"
-import { useSelector } from "react-redux"
-import { useNavigate } from "react-router-dom"
-import { formattedDate } from "../../../utils/dateFormatter"
-import IconBtn from "../../common/IconBtn"
-import Img from './../../common/Img'
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { 
+  User, 
+  Mail, 
+  Phone, 
+  Calendar, 
+  Users, 
+  Edit, 
+  LayoutDashboard 
+} from 'lucide-react';
 
-export default function MyProfile() {
-  const { user } = useSelector((state) => state.profile)
-  const navigate = useNavigate()
+const MyProfile = () => {
+  const { user } = useSelector((state) => state.profile);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  const InfoCard = ({ icon, label, value }) => (
+    <div className="flex items-center space-x-4 p-4 bg-zinc-800 rounded-lg hover:bg-slate-700 transition-colors">
+      {icon}
+      <div>
+        <p className="text-sm text-gray-400">{label}</p>
+        <p className="text-white font-medium">{value || `Add ${label}`}</p>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="bg-black pb-6 px-4 sm:py-12 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
-      
-
-        <div className="relative bg-black rounded-3xl overflow-hidden shadow-2xl">
-          <div className="absolute top-0 left-0 w-1/2 h-full bg-white opacity-5 transform -skew-x-12"></div>
-          
-          <div className="relative z-10 p-6 sm:p-8 md:p-12">
-            <div className="flex flex-col items-center mb-8 sm:mb-12">
-              <Img
-                src={user?.image}
-                alt={`profile-${user?.firstName}`}
-                className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-white mb-4 sm:mb-6"
-              />
-              <div className="text-center">
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white capitalize mb-2">
-                  {user?.firstName + " " + user?.lastName}
-                </h2>
-                <p className="text-gray-400 mb-4">{user?.email}</p>
-              <div className="flex justify-between align-center w-full gap-4">
-              <IconBtn
-                  text="Edit Profile"
-                  onclick={() => navigate("/dashboard/settings")}
-                  className=" text-black px-4 sm:px-6 py-2 rounded-full transition duration-300 flex items-center text-sm "
-                >
-                  <RiEditLine className="mr-2" />
-                </IconBtn>
-                {user && user.accountType !== 'Instructor' ? <IconBtn
-                  text="Dashboard"
-                  onclick={() => navigate("/dashboard/enrolled-courses")}
-                  className=" text-black px-4 sm:px-6 py-2 rounded-full transition duration-300 flex items-center text-sm "
-                >
-                  <RiEditLine className="mr-2" />
-                </IconBtn> : <IconBtn
-                  text="Dashboard"
-                  onclick={() => navigate("/dashboard/instructor")}
-                  className=" text-black px-4 sm:px-6 py-2 rounded-full transition duration-300 flex items-center text-sm "
-                >
-                  <RiEditLine className="mr-2" />
-                </IconBtn>}
-              </div>
-              </div>
-            </div>
-
-            <div className="mb-8 z-1  sm:mb-12">
-              <h3 className="text-xl sm:text-2xl font-semibold text-white mb-3 sm:mb-4">About Me</h3>
-              <p className="text-gray-300 text-base sm:text-lg leading-relaxed">
-                {user?.additionalDetails?.about || "Tell us about yourself..."}
-              </p>
-            </div>
-
-            <div className="grid z-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              <InfoCard
-                icon={<RiUserLine />}
-                label="Full Name"
-                value={`${user?.firstName} ${user?.lastName}`}
-              />
-              <InfoCard
-                icon={<RiMailLine />}
-                label="Email"
-                value={user?.email}
-              />
-              <InfoCard
-                icon={<RiPhoneLine />}
-                label="Phone"
-                value={user?.additionalDetails?.contactNumber || "Add Contact Number"}
-              />
-              <InfoCard
-                icon={<RiCalendarLine />}
-                label="Date of Birth"
-                value={formattedDate(user?.additionalDetails?.dateOfBirth) || "Add Date of Birth"}
-              />
-              <InfoCard
-                icon={<RiGenderlessFill />}
-                label="Gender"
-                value={user?.additionalDetails?.gender || "Add Gender"}
-              />
-              <InfoCard
-                icon={<RiUserLine />}
-                label="Account Type"
-                value={user?.accountType}
-              />
+    <div className="min-h-screen bg-zinc-900 rounded-md p-4 md:p-8">
+      <div className="max-w-4xl mx-auto space-y-8">
+        {/* Profile Header */}
+        <div className="bg-zinc-800 rounded-xl p-6 md:p-8">
+          <div className="flex flex-col items-center text-center">
+            <img
+              src={user?.image}
+              alt={`${user?.firstName}'s profile`}
+              className="w-24 h-24 rounded-full object-cover border-4 border-slate-700"
+            />
+            
+            <h1 className="mt-4 text-2xl font-bold text-white">
+              {`${user?.firstName} ${user?.lastName}`}
+            </h1>
+            
+            <p className="text-gray-400 mt-1">{user?.email}</p>
+            
+            <div className="flex gap-4 mt-6">
+              <button
+                onClick={() => navigate("/dashboard/settings")}
+                className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-zinc-900 rounded-lg"
+              >
+                <Edit className="w-4 h-4" />
+                Edit Profile
+              </button>
+              
+              <button
+                onClick={() => navigate(user?.accountType === 'Instructor' ? "/dashboard/instructor" : "/dashboard/enrolled-courses")}
+                className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-zinc-900 rounded-lg"
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                Dashboard
+              </button>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  )
-}
 
-function InfoCard({ icon, label, value }) {
-  return (
-    <div className="bg-black border border-slate-600 rounded-xl p-4 sm:p-6 flex items-start group transition duration-300">
-      <div className="text-xl sm:text-2xl text-white mr-3 sm:mr-4 group-hover:scale-110 transform transition duration-300">{icon}</div>
-      <div>
-        <p className="text-xs sm:text-sm font-medium text-gray-400 mb-1">{label}</p>
-        <p className="text-sm sm:text-base md:text-lg font-semibold text-white capitalize">{value}</p>
+        {/* About Section */}
+        <div className="bg-zinc-800 rounded-xl p-6 md:p-8">
+          <h2 className="text-xl font-semibold text-white mb-4">About Me</h2>
+          <p className="text-gray-300">
+            {user?.additionalDetails?.about || "Tell us about yourself..."}
+          </p>
+        </div>
+
+        {/* Info Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <InfoCard
+            icon={<User className="w-5 h-5 text-blue-400" />}
+            label="Full Name"
+            value={`${user?.firstName} ${user?.lastName}`}
+          />
+          <InfoCard
+            icon={<Mail className="w-5 h-5 text-blue-400" />}
+            label="Email"
+            value={user?.email}
+          />
+          <InfoCard
+            icon={<Phone className="w-5 h-5 text-blue-400" />}
+            label="Phone"
+            value={user?.additionalDetails?.contactNumber}
+          />
+          <InfoCard
+            icon={<Calendar className="w-5 h-5 text-blue-400" />}
+            label="Date of Birth"
+            value={user?.additionalDetails?.dateOfBirth}
+          />
+          <InfoCard
+            icon={<Users className="w-5 h-5 text-blue-400" />}
+            label="Gender"
+            value={user?.additionalDetails?.gender}
+          />
+          <InfoCard
+            icon={<User className="w-5 h-5 text-blue-400" />}
+            label="Account Type"
+            value={user?.accountType}
+          />
+        </div>
       </div>
     </div>
-  )
-}
+  );
+};
+
+export default MyProfile;

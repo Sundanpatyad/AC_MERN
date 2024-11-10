@@ -11,6 +11,7 @@ import sidebarSlice from "../slices/sidebarSlice";
 import mockTestSeriesReducer from "../slices/editmockSlice";
 import editMockReducer from "../slices/editmockSlice"
 import contentReducer from '../slices/contentSlice';
+import mockTestSlice from '../slices/mockSlice'
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -24,6 +25,7 @@ const rootReducer = combineReducers({
   mockTestSeries: mockTestSeriesReducer,
   editmock : editMockReducer,
   content: contentReducer,
+  mockTests : mockTestSlice
 })
 
 export default rootReducer

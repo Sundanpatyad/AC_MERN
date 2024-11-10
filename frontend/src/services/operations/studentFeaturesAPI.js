@@ -38,7 +38,7 @@ function setPaymentInfoCookie(paymentInfo) {
 
     // Set the expiration time to 5 minutes from now
     now.setTime(now.getTime() + (5 * 60 * 1000));
-    Cookies.set('paymentInfo', JSON.stringify(paymentInfo), { expires: now }); // Expires in 1 day
+    Cookies.set('paymentInfo', JSON.stringify(paymentInfo), { expires: now }); 
 }
 
 // Function to get payment info from cookies

@@ -197,7 +197,7 @@ const Navbar = () => {
                                 ) : (
                                     <Link
                                         to={link?.path}
-                                        className={`text-white hover:text-blue-200 transition-colors duration-200 ${matchRoute(link?.path) ? 'font-semibold' : ''
+                                        className={`text-white hover:text-slate-300 transition-colors duration-200 ${matchRoute(link?.path) ? 'font-semibold' : ''
                                             }`}
                                     >
                                         {link.title}
@@ -209,7 +209,7 @@ const Navbar = () => {
                     <div className="flex items-center space-x-2 sm:space-x-4">
                         <button
                             onClick={() => setIsSearchModalOpen(true)}
-                            className="text-white hover:text-blue-200 transition-colors duration-200"
+                            className="text-white hover:text-slate-300 transition-colors duration-200"
                         >
                             <AiOutlineSearch className="text-xl sm:text-2xl" />
                         </button>
