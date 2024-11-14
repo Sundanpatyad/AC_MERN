@@ -46,8 +46,8 @@ import "./design.css";
 
 const YourComponent = () => {
   return (
-    <div className="h-screen overflow-hidden bg-zinc-900">
-      <div className="content w-[100vw] h-[80vh] p-10 md:mt-40 flex flex-row items-center justify-center">
+    <div className=" overflow-hidden bg-transparent">
+      <div className="content   px-10 flex flex-row items-center justify-center">
         <div className="flex justify-center">
           <div className="A-del1 del"></div>
           <div className="A-del2 del"></div>
@@ -67,14 +67,14 @@ const YourComponent = () => {
           <div className="C-del9 del"></div>
         </div>
       </div>
-      <motion.div
+      {/* <motion.div
         className="text-zinc-400 text-center text-2xl font-light"
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut", delay: 0.5 }}
       >
         <h1>Awakening Classes</h1>
-      </motion.div>
+      </motion.div> */}
     </div>
   );
 };

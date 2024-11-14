@@ -27,7 +27,7 @@ const Footer = () => {
           <div className="lg:w-1/3 mb-7">
             <h1 className="text-richblack-50 font-semibold text-[16px] mb-3">Support</h1>
             <div className="text-[14px] hover:text-richblack-50 transition-all duration-200">
-              <Link to="/help-center">Help Center</Link>
+              <Link to="/contact">Help Center</Link>
             </div>
           </div>
         </div>

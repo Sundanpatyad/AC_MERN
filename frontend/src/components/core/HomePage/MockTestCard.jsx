@@ -44,7 +44,7 @@ const MockTestCard = React.memo(({
                 <p className="text-sm text-gray-400 mb-3 line-clamp-3">{mockTest.description}</p>
                 <div className="flex justify-between items-center text-sm text-gray-400 mb-3">
                     <div className="flex items-center">
-                        <p className='text-md bg-white text-black px-5 rounded-full font-semibold'>{mockTest.price === 0 ? 'Free' : `₹${mockTest.price}`}</p>
+                        <p className='text-md bg-white text-black px-5 rounded-full font-semibold'>{mockTest.price === 0 ? 'Free' : `₹  ${mockTest.price}`}</p>
                     </div>
                     <div className="flex items-center">
                         <FaBookOpen className="mr-1 text-gray-400" />
@@ -69,7 +69,7 @@ const MockTestCard = React.memo(({
                                     <Link
                                         to="/dashboard/cart"
                                         onClick={(e) => e.stopPropagation()}
-                                        className="w-full py-2 px-4 bg-gray-800 text-white rounded-lg text-sm font-semibold hover:bg-gray-700 transition duration-300 text-center"
+                                        className="w-full py-2 px-4 bg-gray-800 text-white rounded-lg text-sm font-semibold hover:bg-zinc-700 transition duration-300 text-center"
                                     >
                                         Go to Cart
                                     </Link>
@@ -79,9 +79,9 @@ const MockTestCard = React.memo(({
                                             e.preventDefault();
                                             handleButtonClick(handleAddToCart);
                                         }}
-                                        className=" py-2 px-4 bg-gray-800 text-white rounded-lg text-sm font-semibold hover:bg-gray-700 transition duration-300"
+                                        className=" py-2 px-4 bg-zinc-800 text-white rounded-lg text-sm font-semibold hover:bg-zinc-700 transition duration-300"
                                     >
-                                        <FaShoppingCart className="inline-block mr-2" />
+                                        <FaShoppingCart className="inline-block" />
                                      </button>
                                 )}
                                 <button
@@ -89,7 +89,7 @@ const MockTestCard = React.memo(({
                                         e.preventDefault();
                                         handleButtonClick(handleBuyNow);
                                     }}
-                                    className="w-full py-2 px-4 bg-white text-black rounded-lg text-sm font-semibold hover:bg-gray-200 transition duration-300"
+                                    className="w-full py-2 px-4 bg-slate-200 text-zinc-900 rounded-lg text-sm font-semibold hover:bg-gray-200 transition duration-300"
                                 >
                                     Buy Now
                                 </button>

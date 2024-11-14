@@ -8,6 +8,7 @@ import Img from './../../common/Img';
 
 import { motion } from 'framer-motion'
 import { scaleUp } from './../../common/motionFrameVarients';
+import YourComponent from '../../ui/InitialLoader'
 
 
 const InstructorSection = () => {
@@ -17,7 +18,7 @@ const InstructorSection = () => {
     <div>
       
       <div className='flex flex-col-reverse lg:flex-row gap-10 lg:gap-20 items-center'>
-  
+{/*   
         <motion.div
          
           className='lg:w-[50%]'>
@@ -27,7 +28,10 @@ const InstructorSection = () => {
             className='shadow-white rounded-3xl'
             loading="lazy"
           />
-        </motion.div>
+        </motion.div> */}
+        <div className='lg:w-[50%]'>
+        <YourComponent/>
+        </div>
 
         <div className='lg:w-[50%] flex flex-col'>
           <div className='text-3xl text-center lg:text-4xl font-semobold mb-2'>
