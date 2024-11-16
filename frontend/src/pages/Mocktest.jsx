@@ -51,7 +51,7 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
           </div>
           <div className="flex items-center">
             <FaBookOpen className="mr-1 text-richblack-50" />
-            <p className="font-medium">{mockTest.mockTests?.length || 0} Tests</p>
+            <p className="font-medium">{mockTest.mockTests?.length + mockTest.attachments?.length || 0} Tests</p>
           </div>
         </div>
         <div className="flex flex-col space-y-2">

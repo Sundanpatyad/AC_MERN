@@ -138,9 +138,10 @@ const MockTestDetails = () => {
               <div className="flex items-center text-xs sm:text-sm text-gray-300">
                 <BiCalendar className="mr-1 sm:mr-2" /> Created: {new Date(testDetails.createdAt).toLocaleDateString()}
               </div>
-              <div className="flex items-center text-xs sm:text-sm text-gray-300">
-                <FaBookOpen className="mr-1 sm:mr-2" /> {testDetails.mockTests?.length || 0} Tests
-              </div>
+              {/* <div className="flex items-center text-xs bg sm:text-sm text-gray-300">
+                {console.log(testDetails.mockTests)}
+                <FaBookOpen className="mr-1 sm:mr-2" /> {testDetails.mockTests?.length + testDetails.attachmests?.length  || 0} Tests
+              </div> */}
             </div>
 
             <div className="flex flex-col bg-black border-2 border-slate-300 p-3 sm:p-4 rounded-lg">
