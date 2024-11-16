@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
@@ -27,46 +27,20 @@ const MockTestSkeleton = () => (
   </div>
 );
 
-const CACHE_KEY = 'mockTestsCache';
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
-
 const MockTestsSection = ({ setShowLoginModal }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { token } = useSelector((state) => state.auth);
   const { user } = useSelector((state) => state.profile);
 
-  const [mockTestsData, setMockTestsData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [lastFetchTimestamp, setLastFetchTimestamp] = useState(0);
+  const [mockTests, setMockTests] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadMockTests = async () => {
       try {
-        setIsLoading(true)
-        const cachedData = localStorage.getItem(CACHE_KEY);
-        if (cachedData) {
-          const { data, timestamp } = JSON.parse(cachedData);
-          const isExpired = Date.now() - timestamp > CACHE_DURATION;
-          
-          if (!isExpired) {
-            setMockTestsData(data);
-            setLastFetchTimestamp(timestamp);
-            setIsLoading(false);
-            return;
-          }
-        }
-
-        const freshData = await fetchAllMockTests(token);
-        const currentTimestamp = Date.now();
-        
-        localStorage.setItem(CACHE_KEY, JSON.stringify({
-          data: freshData,
-          timestamp: currentTimestamp
-        }));
-
-        setMockTestsData(freshData);
-        setLastFetchTimestamp(currentTimestamp);
+        const data = await fetchAllMockTests(token);
+        setMockTests(data.filter(test => test.status !== 'draft'));
       } catch (error) {
         console.error("Error fetching mock tests:", error);
         toast.error("Failed to load mock tests. Please try again.");
@@ -76,45 +50,20 @@ const MockTestsSection = ({ setShowLoginModal }) => {
     };
 
     loadMockTests();
-
-    const handleRefresh = () => {
-      localStorage.removeItem(CACHE_KEY);
-    };
-    window.addEventListener('beforeunload', handleRefresh);
-
-    return () => {
-      window.removeEventListener('beforeunload', handleRefresh);
-    };
   }, [token]);
-
-  // Memoize the filtered and sorted mock tests
-  const mockTests = useMemo(() => {
-    return mockTestsData
-      .filter(test => test.status !== 'draft')
-      .slice(0, 4)
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  }, [mockTestsData]);
-
-  // Memoize the loading skeleton
-  const loadingSkeletons = useMemo(() => {
-    return Array(4).fill().map((_, index) => (
-      <div key={index} className="flex justify-center">
-        <MockTestSkeleton />
-      </div>
-    ));
-  }, []);
 
   const isLoggedIn = !!token;
 
-  const handleAddToCart = useCallback((mockTest) => {
+  const handleAddToCart = useCallback(async (mockTest) => {
     if (user?.accountType === ACCOUNT_TYPE.INSTRUCTOR) {
       toast.error("Instructors can't add mock tests to cart.");
       return;
     }
+
     dispatch(addToCart(mockTest));
   }, [user, dispatch]);
 
-  const handleRemoveFromCart = useCallback((mockTest) => {
+  const handleRemoveFromCart = useCallback(async (mockTest) => {
     dispatch(removeFromCart(mockTest));
     toast.success("Removed from cart successfully!");
   }, [dispatch]);
@@ -137,31 +86,33 @@ const MockTestsSection = ({ setShowLoginModal }) => {
     navigate(`/view-mock/${mockTestId}`);
   }, [navigate]);
 
-  // Memoize the MockTestCard components
-  const mockTestCards = useMemo(() => {
-    return mockTests.map((mockTest) => (
-      <MockTestCard
-        key={mockTest._id}
-        mockTest={mockTest}
-        handleAddToCart={handleAddToCart}
-        handleRemoveFromCart={handleRemoveFromCart}
-        handleBuyNow={handleBuyNow}
-        handleStartTest={handleStartTest}
-        setShowLoginModal={setShowLoginModal}
-        isLoggedIn={isLoggedIn}
-        userId={user?._id}
-      />
-    ));
-  }, [mockTests, handleAddToCart, handleRemoveFromCart, handleBuyNow, handleStartTest, setShowLoginModal, isLoggedIn, user?._id]);
-
   return (
     <div className="container w-11/12 mx-auto">
-      <h2 className="text-3xl md:text-5xl text-center mt-10 font-bold text-white mb-10">
-        Popular Mock Tests
-      </h2>
+      <h2 className="text-3xl md:text-5xl text-center mt-10 font-bold text-white mb-10">Popular Mock Tests</h2>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-center items-center">
-        {isLoading ? loadingSkeletons : mockTestCards}
+        {isLoading
+          ? Array(4).fill().map((_, index) => (
+            <div key={index} className="flex justify-center">
+              <MockTestSkeleton />
+            </div>
+          ))
+          : mockTests
+              .slice(0, 4)
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .map((mockTest) => (
+                <MockTestCard
+                  key={mockTest._id}
+                  mockTest={mockTest}
+                  handleAddToCart={handleAddToCart}
+                  handleRemoveFromCart={handleRemoveFromCart}
+                  handleBuyNow={handleBuyNow}
+                  handleStartTest={handleStartTest}
+                  setShowLoginModal={setShowLoginModal}
+                  isLoggedIn={isLoggedIn}
+                  userId={user?._id}
+                />
+              ))}
       </div>
 
       <div className="text-center mt-12">
@@ -193,7 +144,6 @@ const MockTestsSection = ({ setShowLoginModal }) => {
           <span className="absolute -bottom-0 left-[1.125rem] h-px w-[calc(100%-2.25rem)] bg-gradient-to-r from-emerald-400/0 via-emerald-400/90 to-emerald-400/0 transition-opacity duration-500 group-hover:opacity-40" />
         </Link>
       </div>
-      
       {!isLoading && mockTests.length === 0 && (
         <p className="text-center text-gray-400 mt-8">No mock tests available.</p>
       )}
