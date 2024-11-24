@@ -30,7 +30,7 @@ const AddAttachments = ({ seriesId, onClose }) => {
   const [omrSheet, setOmrSheet] = useState('');
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
-  const { ADD_ATTACHMENTS_TO_SERIES } = mocktestEndpoints;
+  const { ATTACHMENTS_API } = mocktestEndpoints;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,7 +38,7 @@ const AddAttachments = ({ seriesId, onClose }) => {
 
     try {
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      await axios.post(`http://localhost:8000/api/v1/mock/series/${seriesId}/attachments`, {
+      await axios.post(`${ATTACHMENTS_API}/${seriesId}/attachments`, {
         questionPaper,
         answerKey,
         omrSheet,

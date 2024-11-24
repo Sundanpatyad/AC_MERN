@@ -108,7 +108,8 @@ export const mocktestEndpoints = {
   GET_MCOKTEST_SERIES_BY_ID:`${BASE_URL}/api/v1/mock/getMockTestSeriesById`,
   CREATE_ATTEMPT_DETAILS:`${BASE_URL}/api/v1/mock/createAttemptDetails`,
   TEXT_EDIT_MOCKTEST:`${BASE_URL}/api/v1/mock/addMocktestToSeries`,
-  SEARCH_API:`${BASE_URL}/api/v1/course/search`
+  SEARCH_API:`${BASE_URL}/api/v1/course/search`,
+  ATTACHMENTS_API: `${BASE_URL}/api/v1/mock/series`
   // http://localhost:8000/api/v1/mock/getMockTestSeriesById
 
 }
