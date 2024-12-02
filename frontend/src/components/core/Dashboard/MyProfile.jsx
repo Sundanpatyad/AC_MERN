@@ -78,32 +78,32 @@ const MyProfile = () => {
         {/* Info Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <InfoCard
-            icon={<User className="w-5 h-5 text-blue-400" />}
+            icon={<User className="w-5 h-5 text-zinc-100" />}
             label="Full Name"
             value={`${user?.firstName} ${user?.lastName}`}
           />
           <InfoCard
-            icon={<Mail className="w-5 h-5 text-blue-400" />}
+            icon={<Mail className="w-5 h-5 text-zinc-100" />}
             label="Email"
             value={user?.email}
           />
           <InfoCard
-            icon={<Phone className="w-5 h-5 text-blue-400" />}
+            icon={<Phone className="w-5 h-5 text-zinc-100" />}
             label="Phone"
             value={user?.additionalDetails?.contactNumber}
           />
           <InfoCard
-            icon={<Calendar className="w-5 h-5 text-blue-400" />}
+            icon={<Calendar className="w-5 h-5 text-zinc-100" />}
             label="Date of Birth"
             value={user?.additionalDetails?.dateOfBirth}
           />
           <InfoCard
-            icon={<Users className="w-5 h-5 text-blue-400" />}
+            icon={<Users className="w-5 h-5 text-zinc-100" />}
             label="Gender"
             value={user?.additionalDetails?.gender}
           />
           <InfoCard
-            icon={<User className="w-5 h-5 text-blue-400" />}
+            icon={<User className="w-5 h-5 text-zinc-100" />}
             label="Account Type"
             value={user?.accountType}
           />
