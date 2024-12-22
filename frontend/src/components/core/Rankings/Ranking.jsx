@@ -25,9 +25,10 @@ const RankingsPage = () => {
   const { testName } = useParams();
   const navigate = useNavigate();
 
+
   const calculateRanks = (testResults) => {
-    const sortedResults = testResults.sort((a, b) => b.score - a.score);
-    
+  const sortedResults = testResults.sort((a, b) => b.score - a.score);
+
     let currentRank = 1;
     let prevScore = null;
     let rankedResults = sortedResults.map((result, index) => {
