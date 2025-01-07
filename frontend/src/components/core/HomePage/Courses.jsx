@@ -74,10 +74,10 @@ const CourseCard = ({ course, handleAddToCart, handleBuyNow, isInCart, isEnrolle
                   </button>
               )}
               <button
-                onClick={handleBuyNowClick}
+                onClick={""}
                 className="w-full py-2 px-4 bg-white text-black rounded-lg text-sm font-semibold hover:bg-gray-200 transition duration-300"
               >
-                Buy Now
+                Not Available
               </button>
             </div>
           )}

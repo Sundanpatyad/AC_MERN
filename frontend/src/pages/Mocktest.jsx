@@ -80,6 +80,7 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
                   </button>
                 ) : (
                   <button
+                  disabled
                     onClick={(e) => {
                       e.stopPropagation()
                       handleAddToCart(mockTest)
@@ -91,13 +92,14 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
                   </button>
                 )}
                 <button
+                disabled
                   onClick={(e) => {
                     e.stopPropagation()
                     handleBuyNow(mockTest)
                   }}
                   className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-xs sm:text-sm"
                 >
-                  Buy Now
+                  Not Available
                 </button>
               </>
             )
