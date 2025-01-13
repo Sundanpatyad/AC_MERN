@@ -2,12 +2,10 @@ import { toast } from "react-hot-toast";
 import { MockTestPaymentEndpoints, studentEndpoints } from "../apis";
 import { apiConnector } from "../apiConnector";
 import rzpLogo from "../../assets/Logo/rzp_logo.png";
-import { setPaymentLoading } from "../../slices/courseSlice";
 import { resetCart } from "../../slices/cartSlice";
-import Cookies from 'js-cookie';
 
-const { MOCK_TEST_PAYMENT_API, MOCK_TEST_VERIFY_API } = MockTestPaymentEndpoints;
-const { COURSE_PAYMENT_API, COURSE_VERIFY_API, SEND_PAYMENT_SUCCESS_EMAIL_API } = studentEndpoints;
+const { MOCK_TEST_PAYMENT_API } = MockTestPaymentEndpoints;
+const { COURSE_PAYMENT_API } = studentEndpoints;
 
 const toastOptions = {
     style: {
@@ -32,27 +30,6 @@ function loadScript(src) {
     });
 }
 
-// Function to set payment info in cookies
-function setPaymentInfoCookie(paymentInfo) {
-    var now = new Date();
-
-    // Set the expiration time to 5 minutes from now
-    now.setTime(now.getTime() + (5 * 60 * 1000));
-    Cookies.set('paymentInfo', JSON.stringify(paymentInfo), { expires: now }); 
-}
-
-// Function to get payment info from cookies
-function getPaymentInfoCookie() {
-    const paymentInfo = Cookies.get('paymentInfo');
-    return paymentInfo ? JSON.parse(paymentInfo) : null;
-}
-
-// Function to clear payment info from cookies
-function clearPaymentInfoCookie() {
-    Cookies.remove('paymentInfo');
-}
-
-// ================ buyItem ================ 
 export async function buyItem(token, itemId, itemTypes, userDetails, navigate, dispatch) {
     const toastId = toast.loading("Loading...", toastOptions);
 
@@ -94,14 +71,14 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
                     email: userDetails.email
                 },
                 handler: function (response) {
-                    // Store payment info in cookies before verification
-                    setPaymentInfoCookie({
-                        ...response,
-                        itemId,
-                        itemType,
-                        amount: orderData.amount
-                    });
-                    verifyPayment({ ...response, itemId, itemType }, token, navigate, dispatch);
+                    const itemTypeName = itemType === 'course' ? 'course' : 'mock test';
+                    toast.success(`Payment Successful, you are added to the ${itemTypeName}`, toastOptions);
+                    
+                    if (itemType === 'course') {
+                        dispatch(resetCart());
+                    }
+                    
+                    window.location.reload();
                 }
             };
 
@@ -110,7 +87,6 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
 
             paymentObject.on("payment.failed", function (response) {
                 toast.error("Oops, payment failed", toastOptions);
-                clearPaymentInfoCookie();
             });
         }
     }
@@ -118,55 +94,5 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
         toast.error(error.response?.data?.message || "Could not make Payment", toastOptions);
     } finally {
         toast.dismiss(toastId);
-    }
-}
-
-// ================ verifyPayment ================ 
-export async function verifyPayment(bodyData, token, navigate, dispatch) {
-    const toastId = toast.loading("Verifying Payment....", toastOptions);
-    // dispatch(setPaymentLoading(true));   
-
-    try {
-        const VERIFY_API = bodyData.itemType === 'course' ? COURSE_VERIFY_API : MOCK_TEST_VERIFY_API;
-
-        const response = await apiConnector("POST", VERIFY_API, bodyData, {
-            Authorization: `Bearer ${token}`,
-        });
-
-        if (!response.data.success) {
-            throw new Error(response.data.message);
-        }
-
-        const itemTypeName = bodyData.itemType === 'course' ? 'course' : 'mock test';
-        toast.success(`Payment Successful, you are added to the ${itemTypeName}`, toastOptions);
-
-        if (bodyData.itemType) {
-            dispatch(resetCart());
-        }
-        console.log(response  ,    "res")
-        
-        if (response.data.success) {
-            window.location.reload();
-        } else {
-            navigate("/dashboard/enrolled-courses");  // Adjust this path as necessary
-        }
-
-
-
-        return response;
-    } catch (error) {
-        toast.error("Could not verify Payment", toastOptions);
-        // Keep payment info in cookies if verification fails
-    } finally {
-        toast.dismiss(toastId);
-        // dispatch(setPaymentLoading(false));  
-    }
-}
-
-// ================ checkAndVerifyPayment ================ 
-export function checkAndVerifyPayment(token, navigate, dispatch) {
-    const paymentInfo = getPaymentInfoCookie();
-    if (paymentInfo) {
-        verifyPayment(paymentInfo, token, navigate, dispatch);
     }
 }

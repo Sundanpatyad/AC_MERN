@@ -12,7 +12,7 @@ import YourComponent from "./components/ui/InitialLoader";
 import InstallApp from "./components/core/HomePage/installApp";
 import PhoneWizardPage from "./components/core/HomePage/Phone";
 import AdminCountMock from "./components/core/Admin/MockCountAdmin";
-import { checkAndVerifyPayment } from "./services/operations/studentFeaturesAPI";
+// import { checkAndVerifyPayment } from "./services/operations/studentFeaturesAPI";
 import PrivacyPolicy from "./pages/PrivicyPolicy";
 import CookiePolicy from "./pages/CookiePolicy";
 import TermsOfService from "./pages/Terms";
