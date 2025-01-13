@@ -169,7 +169,6 @@ const MockTestDetails = () => {
                       </Link>
                     ) : (
                       <button
-                      disabled
                         onClick={handleAddToCart}
                         className="w-full py-2 px-4 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition duration-300 mb-2"
                       >
@@ -178,13 +177,12 @@ const MockTestDetails = () => {
                       </button>
                     )}
                     <button
-                    disabled
                       onClick={handleBuyNow}
                       className="bg-white text-black px-4 py-2 rounded-md transition-colors w-full text-sm sm:text-base"
                     >
                       {testDetails.studentsEnrolled.includes(user?._id) || testDetails.price === 0
                         ? "Start Test"
-                        : "Not Available"}
+                        : "Buy Now"}
                     </button>
                   </>
                 )

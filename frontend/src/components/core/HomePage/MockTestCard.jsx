@@ -75,7 +75,6 @@ const MockTestCard = React.memo(({
                                     </Link>
                                 ) : (
                                     <button
-                                    disabled
                                         onClick={(e) => {
                                             e.preventDefault();
                                             handleButtonClick(handleAddToCart);
@@ -88,11 +87,11 @@ const MockTestCard = React.memo(({
                                 <button
                                     onClick={(e) => {
                                         e.preventDefault();
-                                        handleButtonClick("");
+                                        handleButtonClick(handleBuyNow);
                                     }}
                                     className="w-full py-2 px-4 bg-slate-200 text-zinc-900 rounded-lg text-sm font-semibold hover:bg-gray-200 transition duration-300"
                                 >
-                                   Not Available
+                                Buy Now
                                 </button>
                             </div>
                         )
