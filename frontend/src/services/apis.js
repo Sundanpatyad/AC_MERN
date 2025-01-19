@@ -1,6 +1,6 @@
 
 // const BASE_URL = 'https://awakening-classes.up.railway.app';
-// const BASE_URL = 'http://localhost:8000';
+// const BASE_URL = 'http://localhost:3000';
 // const BASE_URL = 'https://stingray-app-rh7yy.ondigitalocean.app';
 const BASE_URL = 'https://lionfish-app-z8ke8.ondigitalocean.app';
 

@@ -121,56 +121,139 @@ const MockTestDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black text-gray-100">
-      <div className="container mx-auto px-4 py-4 sm:py-6">
-        <div className="bg-black rounded-lg shadow-lg overflow-hidden">
-          <div className="relative h-36 bg-gradient-to-br from-gray-800 to-black">
-            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-80 p-3">
-              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-white text-center">
-                {testDetails.seriesName}
-              </h1>
+    <div className="min-h-screen bg-black mt-10">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+        {/* Mobile Purchase Card - Shows only on small screens */}
+        <div className="lg:hidden mb-6">
+          <div className="bg-zinc-900 rounded-lg p-4 sm:p-6">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-2xl sm:text-3xl font-bold text-white">
+                {testDetails.price === 0 ? "Free" : `₹${testDetails.price}`}
+              </span>
+              {testDetails.price > 0 && (
+                <span className="text-zinc-400 line-through">₹{testDetails.price * 2}</span>
+              )}
+            </div>
+
+            {isLoggedIn ? (
+              isEnrolled || testDetails.price === 0 ? (
+                <button
+                  onClick={handleStartTest}
+                  className="w-full py-3 px-4 bg-white text-black rounded-lg hover:bg-zinc-200 transition duration-300 font-medium"
+                >
+                  Start Test
+                </button>
+              ) : (
+                <div className="space-y-3">
+                  {isInCart ? (
+                    <Link
+                      to="/dashboard/cart"
+                      className="block w-full py-3 px-4 bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition duration-300 text-center font-medium"
+                    >
+                      Go to Cart
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={handleAddToCart}
+                      className="w-full py-3 px-4 bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition duration-300 font-medium"
+                    >
+                      <FaShoppingCart className="inline-block mr-2" />
+                      Add to Cart
+                    </button>
+                  )}
+                  <button
+                    onClick={handleBuyNow}
+                    className="w-full py-3 px-4 bg-white text-black rounded-lg hover:bg-zinc-200 transition duration-300 font-medium"
+                  >
+                    Buy Now
+                  </button>
+                </div>
+              )
+            ) : (
+              <button
+                onClick={setShowLoginModal}
+                className="w-full py-3 px-4 bg-white text-black rounded-lg hover:bg-zinc-200 transition duration-300 font-medium"
+              >
+                Login to {testDetails.price === 0 ? 'Start' : 'Purchase'}
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+          {/* Main Content Section */}
+          <div className="lg:w-8/12">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+              {testDetails.seriesName}
+            </h1>
+
+            <div className="text-zinc-300 mb-6 text-sm sm:text-base">
+              {testDetails.description}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-4 mb-8 text-zinc-300 text-sm sm:text-base">
+              <div className="flex items-center">
+                <BiCalendar className="mr-2" />
+                <span>{new Date(testDetails.createdAt).toLocaleDateString()}</span>
+              </div>
+              <div className="flex items-center">
+                <FaBookOpen className="mr-2" />
+                <span>{testDetails.mockTests?.length || 0} Tests</span>
+              </div>
+            </div>
+
+            {/* Course Content Section */}
+            <div className="bg-zinc-900 rounded-lg p-4 sm:p-6 mb-8">
+              <h2 className="text-lg sm:text-xl font-bold text-white mb-4">Test Content</h2>
+              <div className="space-y-4">
+                {testDetails.mockTests?.map((test, index) => (
+                  <div key={index} className="border-b border-zinc-700 last:border-b-0 pb-4">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-white font-medium">{test.testName}</h3>
+                      <span className="text-zinc-400 text-sm">{test.duration} mins</span>
+                    </div>
+                    <p className="text-zinc-400 text-sm mt-1">
+                      {test.questions.length} questions
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-          <div className="p-4">
-            <p className="text-sm sm:text-base text-gray-300 mb-4 sm:mb-6">{testDetails.description}</p>
 
-            <div className="flex flex-wrap gap-2 sm:gap-4 mb-4 sm:mb-6">
-              <div className="flex items-center text-xs sm:text-sm text-gray-300">
-                <BiCalendar className="mr-1 sm:mr-2" /> Created: {new Date(testDetails.createdAt).toLocaleDateString()}
-              </div>
-              {/* <div className="flex items-center text-xs bg sm:text-sm text-gray-300">
-                {console.log(testDetails.mockTests)}
-                <FaBookOpen className="mr-1 sm:mr-2" /> {testDetails.mockTests?.length + testDetails.attachmests?.length  || 0} Tests
-              </div> */}
-            </div>
-
-            <div className="flex flex-col bg-black border-2 border-slate-300 p-3 sm:p-4 rounded-lg">
-              <div className="flex justify-between items-center mb-3 sm:mb-4">
-                <div className="text-lg sm:text-md font-bold text-black bg-white px-2 sm:px-3 py-1 rounded-md">
+          {/* Desktop Sidebar - Purchase Card */}
+          <div className="hidden lg:block lg:w-4/12">
+            <div className="bg-zinc-900 rounded-lg p-6 sticky top-4">
+              <div className="mb-4">
+                <span className="text-3xl font-bold text-white">
                   {testDetails.price === 0 ? "Free" : `₹${testDetails.price}`}
-                </div>
+                </span>
+                {testDetails.price > 0 && (
+                 "" // <span className="text-zinc-400 line-through ml-2">₹{testDetails.price * 2}</span>
+                )}
               </div>
+
               {isLoggedIn ? (
                 isEnrolled || testDetails.price === 0 ? (
                   <button
                     onClick={handleStartTest}
-                    className="w-full py-2 px-4 bg-white text-black rounded-md hover:bg-gray-200 transition duration-300 text-center"
+                    className="w-full py-3 px-4 bg-white text-black rounded-lg hover:bg-zinc-200 transition duration-300 font-medium"
                   >
                     Start Test
                   </button>
                 ) : (
-                  <>
+                  <div className="space-y-3">
                     {isInCart ? (
                       <Link
                         to="/dashboard/cart"
-                        className="w-full py-2 px-4 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition duration-300 text-center mb-2"
+                        className="block w-full py-3 px-4 bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition duration-300 text-center font-medium"
                       >
                         Go to Cart
                       </Link>
                     ) : (
                       <button
                         onClick={handleAddToCart}
-                        className="w-full py-2 px-4 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition duration-300 mb-2"
+                        className="w-full py-3 px-4 bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition duration-300 font-medium"
                       >
                         <FaShoppingCart className="inline-block mr-2" />
                         Add to Cart
@@ -178,42 +261,42 @@ const MockTestDetails = () => {
                     )}
                     <button
                       onClick={handleBuyNow}
-                      className="bg-white text-black px-4 py-2 rounded-md transition-colors w-full text-sm sm:text-base"
+                      className="w-full py-3 px-4 bg-white text-black rounded-lg hover:bg-zinc-200 transition duration-300 font-medium"
                     >
-                      {testDetails.studentsEnrolled.includes(user?._id) || testDetails.price === 0
-                        ? "Start Test"
-                        : "Buy Now"}
+                      Buy Now
                     </button>
-                  </>
+                  </div>
                 )
               ) : (
                 <button
                   onClick={setShowLoginModal}
-                  className="w-full py-2 px-4 bg-white text-black rounded-md hover:bg-gray-200 transition duration-300 text-center"
+                  className="w-full py-3 px-4 bg-white text-black rounded-lg hover:bg-zinc-200 transition duration-300 font-medium"
                 >
                   Login to {testDetails.price === 0 ? 'Start' : 'Purchase'}
                 </button>
               )}
-            </div>
-          </div>
-        </div>
 
-        {testDetails.mockTests && testDetails.mockTests.length > 0 && (
-          <div className="mt-4 sm:mt-6 bg-black border-2 border-slate-300 rounded-lg shadow-lg overflow-hidden">
-            <div className="p-4">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-100 mb-3 sm:mb-4">Included Tests</h2>
-              <div className="space-y-3 sm:space-y-4">
-                {testDetails.mockTests.map((test, index) => (
-                  <div key={index} className="border-b border-gray-700 pb-3 sm:pb-4 last:border-b-0">
-                    <h3 className="font-semibold text-base sm:text-lg text-gray-100">{test.testName}</h3>
-                    <p className="text-xs sm:text-sm text-gray-300">Duration: {test.duration} minutes</p>
-                    <p className="text-xs sm:text-sm text-gray-300">Questions: {test.questions.length}</p>
-                  </div>
-                ))}
+              <div className="mt-6 space-y-3">
+                <div className="flex items-center text-zinc-300">
+                  <span className="mr-2">✓</span>
+                  <span>Full mock test access</span>
+                </div>
+                <div className="flex items-center text-zinc-300">
+                  <span className="mr-2">✓</span>
+                  <span>Detailed solutions</span>
+                </div>
+                <div className="flex items-center text-zinc-300">
+                  <span className="mr-2">✓</span>
+                  <span>Performance analytics</span>
+                </div>
+                <div className="flex items-center text-zinc-300">
+                  <span className="mr-2">✓</span>
+                  <span>24/7 Support</span>
+                </div>
               </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
 
       {confirmationModal && <ConfirmationModal modalData={confirmationModal} />}
