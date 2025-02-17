@@ -21,7 +21,7 @@ const HeroSection = () => {
       
       <div className="absolute inset-0 bg-black bg-grid-slate-400/[0.2] pointer-events-none"></div>
       
-      <div className="relative z-10 container mx-auto px-4 mt-20 md:mt-0 flex flex-col-reverse md:flex-row gap-20 items-center justify-center min-h-screen">
+      <div className="relative z-10 container mx-auto px-4 flex flex-col-reverse md:flex-row gap-20 items-center justify-center min-h-screen">
         {/* Left Column - Text Content (on desktop) */}
         <div className="text-center lg:text-left space-y-6 order-2 lg:order-1">
           {/* Mock Tests Link */}
