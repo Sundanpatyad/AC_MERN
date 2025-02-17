@@ -1,119 +1,160 @@
 import React from 'react'
 import { Spotlight } from '../../ui/Spotlight'
 import { Link } from 'react-router-dom'
-import HighlightText from './HighlightText'
-import { HoverBorderGradientDemo } from '../../ui/homebutton'
-import AnimatedText from './AnimatedText'
 import { motion } from 'framer-motion'
-import { fadeIn } from '../../common/motionFrameVarients'
 import { useSelector } from 'react-redux'
-import { FaYoutube } from "react-icons/fa";
-import { CiLogin } from "react-icons/ci";
+import { FaYoutube } from "react-icons/fa"
+import { CiLogin } from "react-icons/ci"
+import rank from '../../../assets/Logo/rank1.png'
+
+// Import your custom components and motion variants
+import HighlightText from './HighlightText'
+import AnimatedText from './AnimatedText'
+import { fadeIn } from '../../common/motionFrameVarients'
 
 const HeroSection = () => {
   const { token } = useSelector((state) => state.auth)
 
   return (
-    <>
+    <div className="relative min-h-screen w-full px-16 bg-black overflow-hidden">
       <Spotlight />
-      <div className=' md:h-[100vh] w-full bg-black bg-grid-slate-400/[0.2] relative flex items-center flex-col'>
-        <div className="absolute cursor-pointer inset-0 w-full h-full bg-black [mask-image:radial-gradient(ellipse_at_center,transparent_10%,black)]"></div>
+      
+      <div className="absolute inset-0 bg-black bg-grid-slate-400/[0.2] pointer-events-none"></div>
+      
+      <div className="relative z-10 container mx-auto px-4 mt-20 md:mt-0 flex flex-col-reverse md:flex-row gap-20 items-center justify-center min-h-screen">
+        {/* Left Column - Text Content (on desktop) */}
+        <div className="text-center lg:text-left space-y-6 order-2 lg:order-1">
+          {/* Mock Tests Link */}
+          <Link 
+            to="/mocktest" 
+            className="inline-block group relative mx-auto lg:mx-0"
+          >
+            <div className="relative flex items-center space-x-2 bg-zinc-950 rounded-full px-4 py-2 ring-1 ring-white/10 hover:ring-white/20 transition-all duration-300">
+              <span className="text-white text-sm font-medium">MockTests</span>
+              <svg
+                fill="none"
+                height="16"
+                viewBox="0 0 24 24"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+                className="text-white"
+              >
+                <path
+                  d="M10.75 8.75L14.25 12L10.75 15.25"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.5"
+                />
+              </svg>
+            </div>
+          </Link>
 
-        <Link to={"/mocktest"} className="bg-zinc-900 no-underline mt-20 group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-full p-px text-xs font-semibold leading-6  text-white inline-block">
-          <span className="absolute inset-0 overflow-hidden rounded-full">
-            <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-          </span>
-          <div className="relative flex space-x-2 items-center z-10 rounded-full bg-zinc-950 py-0.5 px-4 ring-1 ring-white/10 ">
-            <span>
-              MockTests
-            </span>
-            <svg
-              fill="none"
-              height="16"
-              viewBox="0 0 24 24"
-              width="16"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M10.75 8.75L14.25 12L10.75 15.25"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.5"
+          {/* Main Heading */}
+          <motion.h1
+            variants={fadeIn('left', 0.1)}
+            initial='hidden'
+            whileInView='show'
+            viewport={{ once: false, amount: 0.1 }}
+            className="text-4xl md:text-6xl lg:text-5xl xl:text-7xl font-bold text-white mb-4"
+          >
+            We Know That <br />
+            Together <i>
+              <AnimatedText
+                texts={['We', 'Yes', 'We']}
+                interval={1500}
               />
-            </svg>
+            </i> Can<br />
+            <HighlightText text="Awakening Classes" />
+          </motion.h1>
+
+          {/* Subheading */}
+          <motion.p
+            variants={fadeIn('right', 0.1)}
+            initial='hidden'
+            whileInView='show'
+            viewport={{ once: false, amount: 0.1 }}
+            className="text-sm md:text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 mb-6"
+          >
+            Transform your learning journey with Awakening Classes. Our innovative platform breaks traditional educational barriers, offering personalized, flexible, and comprehensive learning experiences.
+          </motion.p>
+
+          {/* Additional Description */}
+          <motion.div
+            variants={fadeIn('right', 0.2)}
+            initial='hidden'
+            whileInView='show'
+            viewport={{ once: false, amount: 0.1 }}
+            className="text-xs md:text-sm hidden text-slate-400 max-w-2xl mx-auto lg:mx-0 mb-6"
+          >
+            <ul className="space-y-2 text-left">
+              <li>• Adaptive Learning Paths</li>
+              <li>• Expert-Led Video Courses</li>
+              <li>• Interactive Quizzes & Assessments</li>
+              <li>• 24/7 Doubt Resolution</li>
+            </ul>
+          </motion.div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4 w-full max-w-md mx-auto lg:mx-0">
+            {token ? (
+              <>
+                <Link 
+                  to="/dashboard/enrolled-courses" 
+                  className="w-full sm:w-auto py-3 px-6 text-sm font-medium text-white border border-slate-600 rounded-xl hover:bg-slate-800 transition-colors"
+                >
+                  Explore More
+                </Link>
+                <Link
+                  to="https://www.youtube.com/@awakeningclasses"
+                  target="_blank"
+                  className="w-full sm:w-auto py-3 px-6 text-sm font-medium bg-slate-100 text-zinc-900 rounded-xl flex items-center justify-center space-x-2 hover:bg-slate-200 transition-colors"
+                >
+                  <FaYoutube className="text-lg" />
+                  <span>Free Youtube Lectures</span>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link 
+                  to="/login" 
+                  className="w-full sm:w-auto py-3 px-6 text-sm font-semibold text-white border border-slate-600 rounded-xl hover:bg-slate-800 transition-colors"
+                >
+                  Login to your account
+                </Link>
+                <Link
+                  to="/signup"
+                  className="w-full sm:w-auto py-3 px-6 text-sm font-semibold bg-slate-100 text-zinc-900 rounded-xl flex items-center justify-center space-x-2 hover:bg-slate-200 transition-colors"
+                >
+                  <CiLogin className="text-lg" />
+                  <span>Signup for free</span>
+                </Link>
+              </>
+            )}
           </div>
-          <span className="absolute -bottom-0 left-[1.125rem] h-px w-[calc(100%-2.25rem)] bg-gradient-to-r from-emerald-400/0 via-emerald-400/90 to-emerald-400/0 transition-opacity duration-500 group-hover:opacity-40" />
-        </Link>
+        </div>
 
-        <motion.div
-          id='heading-hero'
-          variants={fadeIn('left', 0.1)}
-          initial='hidden'
-          whileInView={'show'}
-          viewport={{ once: false, amount: 0.1 }}
-          className='text-center z-20 text-slate-100 text-4xl mt-6 font-semibold w-80 lg:w-full lg:text-8xl'
-        >
-          We Know That <br />
-          Together <i>
-            <AnimatedText
-              texts={['We', 'Yes', 'We']}
-              interval={1500}
-            />
-          </i> Can<br />
-          <HighlightText text={"Awakening Classes"} />
-        </motion.div>
-
-        <motion.div
-          variants={fadeIn('right', 0.1)}
-          initial='hidden'
-          whileInView={'show'}
-          viewport={{ once: false, amount: 0.1 }}
-          className='mt-2 w-[80%] text-center text-xs lg:text-lg text-slate-200'
-        >
-          With our online courses, you can learn at your own pace, from anywhere in the world, and get access to a wealth of resources, quizzes, and personalized feedback from instructors.
-        </motion.div>
-
-        {token ?
-          <div className='flex mt-10 flex-col md:flex-row w-72 md:w-full align-center justify-center gap-4 z-10'>
-            <Link to={"/dashboard/enrolled-courses"} className='text-md text-sm border  border-slate-600 rounded-xl px-6 py-4 text-center'>
-              Explore More
-              {/* <HoverBorderGradientDemo title={"Explore More"} /> */}
-            </Link>
-            <Link
-              to={"https://www.youtube.com/@awakeningclasses"}
-              className='text-md flex items-center justify-center bg-slate-100 text-zinc-900 text-center rounded-xl px-6 py-4'
-            >
-              <FaYoutube className="mr-2 text-md" />
-              Free Youtube Lectures
-            </Link>
-
+        {/* Right Column - Image (on desktop) */}
+        <div className="order-1 lg:order-2 mb-8 lg:mb-0 flex items-center justify-center">
+          <div className="relative">
+            <a href="https://youtu.be/zZqPFZo8IUo?si=MbeDgOr_YtO9bH_x" >
+              <img 
+                src={rank} 
+                alt="Awakening Classes" 
+                className="w-full max-w-xl rounded-2xl shadow-2xl transfor transition-transform duration-300"
+              />
+              <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white p-4 rounded-b-2xl text-center">
+                <h3 className="text-sm md:text-base font-semibold">Interactive Learning Platform</h3>
+                <p className="text-xs md:text-sm text-slate-300">
+                  Learn, Grow, and Achieve Your Potential
+                </p>
+              </div>
+            </a>
           </div>
-          :
-
-<>
-          <div className='flex mt-10 flex-col md:flex-row w-72 md:w-full align-center justify-center gap-4 z-10'>
-            <Link to={"/login"} className='text-md text-sm border font-semibold  border-slate-600 rounded-xl px-6 py-4 text-center'>
-              Login to your account
-              {/* <HoverBorderGradientDemo title={"Explore More"} /> */}
-            </Link>
-            <Link
-              to={"/signup"}
-              className='text-md flex items-center font-semibold justify-center bg-slate-100 text-zinc-900 text-center rounded-xl px-6 py-4'
-            >
-              <CiLogin className="mr-2 text-md font-bold" />
-              Signup for free
-            </Link>
-
-          </div>
-         
-          </>
-        }
-        <div className="w-full mt-10 md:mt-20 overflow-hidden">
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
-export default HeroSection;
+export default HeroSection
