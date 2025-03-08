@@ -2,7 +2,7 @@
 // const BASE_URL = 'https://awakening-classes.up.railway.app';
 // const BASE_URL = 'http://localhost:3000';
 // const BASE_URL = 'https://stingray-app-rh7yy.ondigitalocean.app';
-const BASE_URL = 'https://lionfish-app-z8ke8.ondigitalocean.app';
+const BASE_URL = 'https://squid-app-7cn6b.ondigitalocean.app';
 
 export const studyMaterialEndPoints = {
     FETCH_EXAMS : `${BASE_URL}/api/v1/materials/getExam`,
