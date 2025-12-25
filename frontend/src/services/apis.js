@@ -1,27 +1,26 @@
 
-// const BASE_URL = 'https://awakening-classes.up.railway.app';
-// const BASE_URL = 'http://localhost:3000';
-// const BASE_URL = 'https://stingray-app-rh7yy.ondigitalocean.app';
-const BASE_URL = 'https://squid-app-7cn6b.ondigitalocean.app';
+const BASE_URL = 'https://jellyfish-app-gbvm8.ondigitalocean.app';
+// const BASE_URL = 'http://localhost:8000';
+
 
 export const studyMaterialEndPoints = {
-    FETCH_EXAMS : `${BASE_URL}/api/v1/materials/getExam`,
-    STUDY_MATERIALS : `${BASE_URL}/api/v1/materials/getAllStudyMaterials`,
-    FETCH_STUDY_MATERIALS : `${BASE_URL}/api/v1/materials/getStudyMaterials`,
-    CREATE_EXAM : `${BASE_URL}/api/v1/materials/createExam`,
-    CREATE_STUDY_MATERIAL : `${BASE_URL}/api/v1/materials/createStudyMaterial`,
-    DELETE_EXAM : `${BASE_URL}/api/v1/materials/deleteExam`,
-    DELETE_STUDY_MATERIALS : `${BASE_URL}/api/v1/materials/deleteStudyMaterial`,
-    ADMIN_MOCK_LIST : `${BASE_URL}/api/v1/admin/users-by-mock-test`,
+  FETCH_EXAMS: `${BASE_URL}/api/v1/materials/getExam`,
+  STUDY_MATERIALS: `${BASE_URL}/api/v1/materials/getAllStudyMaterials`,
+  FETCH_STUDY_MATERIALS: `${BASE_URL}/api/v1/materials/getStudyMaterials`,
+  CREATE_EXAM: `${BASE_URL}/api/v1/materials/createExam`,
+  CREATE_STUDY_MATERIAL: `${BASE_URL}/api/v1/materials/createStudyMaterial`,
+  DELETE_EXAM: `${BASE_URL}/api/v1/materials/deleteExam`,
+  DELETE_STUDY_MATERIALS: `${BASE_URL}/api/v1/materials/deleteStudyMaterial`,
+  ADMIN_MOCK_LIST: `${BASE_URL}/api/v1/admin/users-by-mock-test`,
 
- }
+}
 
 
 export const endpoints = {
   SENDOTP_API: `${BASE_URL}/api/v1/auth/sendotp`,
   SIGNUP_API: `${BASE_URL}/api/v1/auth/signup`,
   LOGIN_API: `${BASE_URL}/api/v1/auth/login`,
-  GOOGLE_API:`${BASE_URL}/api/v1/auth/google`,
+  GOOGLE_API: `${BASE_URL}/api/v1/auth/google`,
   RESETPASSTOKEN_API: `${BASE_URL}/api/v1/auth/reset-password-token`,
   RESETPASSWORD_API: `${BASE_URL}/api/v1/auth/reset-password`,
   MOBILE_NUMBER: `${BASE_URL}/api/v1/auth/confirm-mobile`,
@@ -33,19 +32,19 @@ export const profileEndpoints = {
   GET_INSTRUCTOR_DATA_API: `${BASE_URL}/api/v1/profile/instructorDashboard`,
   GET_ATTEMPT_DATA_API: `${BASE_URL}/api/v1/mock/getAttemptsByUser`,
   GET_USER_ENROLLED_MOCK_TESTS_API: `${BASE_URL}/api/v1/profile/getEnrolledMockTests`,
-  UPDATE_MOCKTEST_API:`${BASE_URL}/api/v1/mock/updateMockTestSeries`
+  UPDATE_MOCKTEST_API: `${BASE_URL}/api/v1/mock/updateMockTestSeries`
 }
 
 export const studentEndpoints = {
   COURSE_PAYMENT_API: `${BASE_URL}/api/v1/payment/capturePayment`,
   COURSE_VERIFY_API: `${BASE_URL}/api/v1/payment/verifyPayment`,
   SEND_PAYMENT_SUCCESS_EMAIL_API: `${BASE_URL}/api/v1/payment/sendPaymentSuccessEmail`,
-  RANKINGS_API:`${BASE_URL}/api/v1/mock/getRankings`
+  RANKINGS_API: `${BASE_URL}/api/v1/mock/getRankings`
 }
 
 // MOCK TEST PAYMENT ENDPOINTS
 export const MockTestPaymentEndpoints = {
-  MOCK_TEST_PAYMENT_API: `${BASE_URL}/api/v1/payment/captureMockPaymet`,
+  MOCK_TEST_PAYMENT_API: `${BASE_URL}/api/v1/payment/captureMockPayment`,
   MOCK_TEST_VERIFY_API: `${BASE_URL}/api/v1/payment/verifyMockPayment`,
   SEND_PAYMENT_SUCCESS_EMAIL_API: `${BASE_URL}/api/v1/payment/sendPaymentSuccessEmail`,
 }
@@ -100,24 +99,23 @@ export const settingsEndpoints = {
 
 export const mocktestEndpoints = {
   CREATE_MOCKTEST_API: `${BASE_URL}/api/v1/mock/createMockTest`,
-  CREATE_MOCKTESTS_API:`${BASE_URL}/api/v1/mock/createMockTestSeries`,
-  GET_MOCK_TEST_API:`${BASE_URL}/api/v1/mock/getMockTest`,
-  GET_INSTRUCTORS_MOCKTESTS:`${BASE_URL}/api/v1/mock/getMockTests`,
-  FETCH_MOCKTEST_BY_ID:`${BASE_URL}/api/v1/mock/getMockTestSeriesById`,
-  ENORLL_MOCKTEST:`${BASE_URL}/api/v1/mock/enroll`,
-  GET_MCOKTEST_SERIES_BY_ID:`${BASE_URL}/api/v1/mock/getMockTestSeriesById`,
-  CREATE_ATTEMPT_DETAILS:`${BASE_URL}/api/v1/mock/createAttemptDetails`,
-  TEXT_EDIT_MOCKTEST:`${BASE_URL}/api/v1/mock/addMocktestToSeries`,
-  SEARCH_API:`${BASE_URL}/api/v1/course/search`,
-  ATTACHMENTS_API: `${BASE_URL}/api/v1/mock/series`
+  CREATE_MOCKTESTS_API: `${BASE_URL}/api/v1/mock/createMockTestSeries`,
+  GET_MOCK_TEST_API: `${BASE_URL}/api/v1/mock/getMockTest`,
+  GET_INSTRUCTORS_MOCKTESTS: `${BASE_URL}/api/v1/mock/getMockTests`,
+  FETCH_MOCKTEST_BY_ID: `${BASE_URL}/api/v1/mock/getMockTestSeriesById`,
+  ENORLL_MOCKTEST: `${BASE_URL}/api/v1/mock/enroll`,
+  GET_MCOKTEST_SERIES_BY_ID: `${BASE_URL}/api/v1/mock/getMockTestSeriesById`,
+  CREATE_ATTEMPT_DETAILS: `${BASE_URL}/api/v1/mock/createAttemptDetails`,
+  TEXT_EDIT_MOCKTEST: `${BASE_URL}/api/v1/mock/addMocktestToSeries`,
+  SEARCH_API: `${BASE_URL}/api/v1/course/search`
   // http://localhost:8000/api/v1/mock/getMockTestSeriesById
 
 }
 
 export const chatEndPoints = {
- CREATE_CHAT: `${BASE_URL}/api/v1/chats/chat/create`,
- GET_CHATS: `${BASE_URL}/api/v1/chats/chat/userChats`,
- SEARCH_USERS: `${BASE_URL}/api/v1/chats`,
- SEND_MESSAGES: `${BASE_URL}/api/v1/chats/chat/message`,
- FETCH_MESSAGES: `${BASE_URL}/api/v1/chats/chat`,
+  CREATE_CHAT: `${BASE_URL}/api/v1/chats/chat/create`,
+  GET_CHATS: `${BASE_URL}/api/v1/chats/chat/userChats`,
+  SEARCH_USERS: `${BASE_URL}/api/v1/chats`,
+  SEND_MESSAGES: `${BASE_URL}/api/v1/chats/chat/message`,
+  FETCH_MESSAGES: `${BASE_URL}/api/v1/chats/chat`,
 }

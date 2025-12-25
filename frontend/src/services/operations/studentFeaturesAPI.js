@@ -34,16 +34,28 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
     const toastId = toast.loading("Loading...", toastOptions);
 
     try {
+        // Load Razorpay SDK
         const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+        console.log("Razorpay SDK loaded:", res);
 
         if (!res) {
-            toast.error("RazorPay SDK failed to load", toastOptions);
+            toast.error("RazorPay SDK failed to load. Please check your internet connection.", toastOptions);
+            return;
+        }
+
+        // Check if Razorpay is available
+        if (!window.Razorpay) {
+            toast.error("Razorpay is not available. Please refresh the page.", toastOptions);
             return;
         }
 
         for (const itemType of itemTypes) {
             const PAYMENT_API = itemType === 'course' ? COURSE_PAYMENT_API : MOCK_TEST_PAYMENT_API;
+            console.log("Payment API:", PAYMENT_API);
+            console.log("Item Type:", itemType);
+            console.log("Item ID:", itemId);
 
+            // Create order
             const orderResponse = await apiConnector("POST", PAYMENT_API,
                 { itemId },
                 {
@@ -51,47 +63,87 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
                 }
             );
 
+            console.log("Order Response:", orderResponse);
+
             if (!orderResponse.data.success) {
-                throw new Error(orderResponse.data.message);
+                throw new Error(orderResponse.data.message || "Failed to create order");
             }
 
-            const orderData = orderResponse.data.message;
-            const RAZORPAY_KEY = import.meta.env.VITE_APP_RAZORPAY_KEY;
+            // CRITICAL FIX: The order data is in orderResponse.data.data, not orderResponse.data.message
+            const orderData = orderResponse.data.data;
+            console.log("Order Data:", orderData);
+
+            if (!orderData) {
+                throw new Error("Order data is missing from the response");
+            }
+
+            // Get Razorpay key from environment
+            const RAZORPAY_KEY = 'rzp_live_imp33n49GSozfS'
+                ;
+            console.log("Razorpay Key exists:", !!RAZORPAY_KEY);
+
+            if (!RAZORPAY_KEY) {
+                toast.error("Razorpay key is not configured. Please contact support.", toastOptions);
+                return;
+            }
+
+            // Validate required order data fields
+            if (!orderData.orderId && !orderData.id) {
+                throw new Error("Order ID is missing from the response");
+            }
 
             const options = {
                 key: RAZORPAY_KEY,
-                currency: orderData.currency,
+                currency: orderData.currency || "INR",
                 amount: orderData.amount,
-                order_id: orderData.id,
+                order_id: orderData.orderId || orderData.id,
                 name: "Awakening Classes",
                 description: `Thank You for Purchasing the ${itemType}`,
                 image: rzpLogo,
                 prefill: {
-                    name: userDetails.firstName,
+                    name: userDetails.firstName || userDetails.name,
                     email: userDetails.email
                 },
                 handler: function (response) {
+                    console.log("Payment Success Response:", response);
                     const itemTypeName = itemType === 'course' ? 'course' : 'mock test';
                     toast.success(`Payment Successful, you are added to the ${itemTypeName}`, toastOptions);
-                    
+
                     if (itemType === 'course') {
                         dispatch(resetCart());
                     }
-                    
-                    window.location.reload();
+
+                    // Reload after a short delay to show the success message
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                },
+                modal: {
+                    ondismiss: function () {
+                        console.log("Payment modal closed");
+                        toast.error("Payment cancelled", toastOptions);
+                    }
                 }
             };
 
+            console.log("Razorpay Options:", { ...options, key: "***HIDDEN***" });
+
+            // Create and open Razorpay payment modal
             const paymentObject = new window.Razorpay(options);
-            paymentObject.open();
 
             paymentObject.on("payment.failed", function (response) {
-                toast.error("Oops, payment failed", toastOptions);
+                console.error("Payment Failed:", response);
+                toast.error(`Payment failed: ${response.error?.description || "Unknown error"}`, toastOptions);
             });
+
+            paymentObject.open();
+            console.log("Razorpay modal opened");
         }
     }
     catch (error) {
-        toast.error(error.response?.data?.message || "Could not make Payment", toastOptions);
+        console.error("Payment Error:", error);
+        const errorMessage = error.response?.data?.message || error.message || "Could not make Payment";
+        toast.error(errorMessage, toastOptions);
     } finally {
         toast.dismiss(toastId);
     }

@@ -131,7 +131,7 @@ const Navbar = () => {
         }
     };
 
-    
+
     const handleSearchResultClick = () => {
         setIsSearchModalOpen(false);
     };
@@ -263,7 +263,7 @@ const Navbar = () => {
                                                     { to: '/login', icon: AiOutlineLogin, text: 'Log in' },
                                                     { to: '/signup', icon: AiOutlineUserAdd, text: 'Sign Up' },
                                                 ].map((item, index) => (
-                                                    <div>
+                                                    <div key={index}>
                                                         <Link
                                                             to={item.to}
                                                             className="flex items-center px-4 py-2 text-sm my-2 font-semibold text-white hover:bg-white/20 transition-colors duration-200 ease-in-out rounded-lg"
@@ -295,10 +295,10 @@ const Navbar = () => {
 
             {/* Spacer to prevent content from being hidden behind the navbar */}
             <div className="h-[64px] md:h-[72px]"></div>
-            {deferredPrompt && 
-            <InstallApp handleInstall={handleInstallClick}/>
-             } 
-              
+            {deferredPrompt &&
+                <InstallApp handleInstall={handleInstallClick} />
+            }
+
             {/* Search Modal */}
             {isSearchModalOpen && (
                 <div className="fixed inset-0 z-50 flex py-10 justify-center align-top bg-transparent backdrop-blur-md ">

@@ -72,45 +72,45 @@ export default function CourseBuilderForm() {
   };
 
   return (
-    <div className="space-y-8 rounded-2xl border-[1px] border-richblack-700 bg-richblack-800 p-6">
-      <p className="text-2xl font-semibold text-richblack-5">Course Builder</p>
+    <div className="space-y-8 rounded-2xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-8 shadow-2xl">
+      <p className="text-2xl font-bold text-white">Course Builder</p>
 
       {/* Section Form */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Section Name */}
         <div className="flex flex-col space-y-2">
-          <label className="text-sm text-richblack-5" htmlFor="sectionName">
-            Section Name <sup className="text-pink-200">*</sup>
+          <label className="text-sm font-medium text-gray-200" htmlFor="sectionName">
+            Section Name <sup className="text-pink-400">*</sup>
           </label>
           <input
             id="sectionName"
             disabled={loading}
             placeholder="Add a section to build your course"
             {...register("sectionName", { required: true })}
-            className="form-style w-full"
+            className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:opacity-50"
           />
           {errors.sectionName && (
-            <span className="ml-2 text-xs tracking-wide text-pink-200">
-              Section name is required
+            <span className="ml-2 text-xs tracking-wide text-pink-400 flex items-center gap-1">
+              <span>⚠</span> Section name is required
             </span>
           )}
         </div>
 
         {/* Edit Section Name OR Create Section */}
         <div className="flex items-end gap-x-4">
-          <IconBtn
+          <button
             type="submit"
             disabled={loading}
-            text={editSectionName ? "Edit Section Name" : "Create Section"}
-            outline={true}
+            className="flex items-center gap-x-2 rounded-lg px-6 py-3 font-semibold text-white bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
           >
-            <IoAddCircleOutline size={20} className="text-yellow-50" />
-          </IconBtn>
+            <IoAddCircleOutline size={20} />
+            {editSectionName ? "Edit Section Name" : "Create Section"}
+          </button>
           {editSectionName && (
             <button
               type="button"
               onClick={cancelEdit}
-              className="text-sm text-richblack-300 underline"
+              className="text-sm text-gray-400 hover:text-white underline transition-colors duration-200"
             >
               Cancel Edit
             </button>
@@ -123,20 +123,20 @@ export default function CourseBuilderForm() {
       )}
 
       {/* Next and Back Button */}
-      <div className="flex justify-end gap-x-3">
+      <div className="flex justify-end gap-x-3 pt-4 border-t border-zinc-700/50">
         <button
           onClick={goBack}
-          className="rounded-md bg-richblack-300 py-[8px] px-[20px] font-semibold text-richblack-900"
+          className="flex items-center gap-x-2 rounded-lg px-6 py-3 font-semibold text-white bg-zinc-700 hover:bg-zinc-600 transition-all duration-200"
         >
           Back
         </button>
         <button
           disabled={loading}
           onClick={goToNext}
-          className="flex items-center gap-x-2 rounded-md bg-yellow-50 py-[8px] px-[20px] font-semibold text-richblack-900"
+          className="flex items-center gap-x-2 rounded-lg px-6 py-3 font-semibold text-white bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
         >
           Next
-          <MdNavigateNext />
+          <MdNavigateNext className="text-xl" />
         </button>
       </div>
     </div>

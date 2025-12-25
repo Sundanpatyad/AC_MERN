@@ -37,7 +37,7 @@ const Home = () => {
       <Suspense fallback={""}>
         <MockTestSection setShowLoginModal={setShowLoginModal} />
 
-        <CourseSection setShowLoginModal={setShowLoginModal} />
+        {/* <CourseSection setShowLoginModal={setShowLoginModal} /> */}
       </Suspense>
       <RankOneStoryBlack />
 

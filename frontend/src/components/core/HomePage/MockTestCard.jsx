@@ -3,16 +3,16 @@ import { FaBookOpen, FaShoppingCart } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
-const MockTestCard = React.memo(({ 
-  mockTest, 
-  handleAddToCart, 
-  handleRemoveFromCart, 
-  handleBuyNow, 
-  handleStartTest, 
-  setShowLoginModal, 
-  isLoggedIn, 
-  userId,
-  isPurchased 
+const MockTestCard = React.memo(({
+    mockTest,
+    handleAddToCart,
+    handleRemoveFromCart,
+    handleBuyNow,
+    handleStartTest,
+    setShowLoginModal,
+    isLoggedIn,
+    userId,
+    isPurchased
 }) => {
     const { cart } = useSelector((state) => state.cart);
     const [isInCart, setIsInCart] = useState(false);
@@ -32,8 +32,8 @@ const MockTestCard = React.memo(({
     };
 
     return (
-        <Link to={`/mock-test/${mockTest._id}`}
-            className="bg-zinc-900 border-2 border-gray-800 rounded-lg overflow-hidden shadow-lg cursor-pointer flex flex-col"
+        <div
+            className="bg-zinc-900 border-2 border-gray-800 rounded-lg overflow-hidden shadow-lg cursor-pointer flex flex-col hover:border-gray-700 transition-all duration-300"
         >
             <div className="relative h-36 bg-gradient-to-br from-gray-800 to-black">
                 <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-80 p-3">
@@ -54,21 +54,17 @@ const MockTestCard = React.memo(({
                 <div className="flex flex-col space-y-2">
                     {isLoggedIn ? (
                         isEnrolled || mockTest.price === 0 ? (
-                            <button
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    handleStartTest(mockTest._id);
-                                }}
+                            <Link
+                                to={`/view-mock/${mockTest._id}`}
                                 className="w-full py-2 px-4 bg-white text-black rounded-md hover:bg-gray-200 transition duration-300 text-center"
                             >
                                 Start Test
-                            </button>
+                            </Link>
                         ) : (
                             <div className="flex gap-2">
                                 {isInCart ? (
                                     <Link
                                         to="/dashboard/cart"
-                                        onClick={(e) => e.stopPropagation()}
                                         className="w-full py-2 px-4 bg-gray-800 text-white rounded-lg text-sm font-semibold hover:bg-zinc-700 transition duration-300 text-center"
                                     >
                                         Go to Cart
@@ -82,7 +78,7 @@ const MockTestCard = React.memo(({
                                         className=" py-2 px-4 bg-zinc-800 text-white rounded-lg text-sm font-semibold hover:bg-zinc-700 transition duration-300"
                                     >
                                         <FaShoppingCart className="inline-block" />
-                                     </button>
+                                    </button>
                                 )}
                                 <button
                                     onClick={(e) => {
@@ -91,7 +87,7 @@ const MockTestCard = React.memo(({
                                     }}
                                     className="w-full py-2 px-4 bg-slate-200 text-zinc-900 rounded-lg text-sm font-semibold hover:bg-gray-200 transition duration-300"
                                 >
-                                Buy Now
+                                    Buy Now
                                 </button>
                             </div>
                         )
@@ -108,7 +104,7 @@ const MockTestCard = React.memo(({
                     )}
                 </div>
             </div>
-        </Link>
+        </div>
     );
 });
 

@@ -14,7 +14,7 @@ import PhoneWizardPage from "./components/core/HomePage/Phone";
 import AdminCountMock from "./components/core/Admin/MockCountAdmin";
 // import { checkAndVerifyPayment } from "./services/operations/studentFeaturesAPI";
 import PrivacyPolicy from "./pages/PrivicyPolicy";
-import CookiePolicy from "./pages/CookiePolicy";
+// import CookiePolicy from "./pages/CookiePolicy";
 import TermsOfService from "./pages/Terms";
 
 // Lazy-loaded components
@@ -140,7 +140,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/cookie-policy" element={<CookiePolicy />} />
+              {/* <Route path="/cookie-policy" element={<CookiePolicy />} /> */}
               <Route path="/terms" element={<TermsOfService />} />
               <Route path="/about" element={<About />} />
               <Route path="/rankings" element={<RankingsPage />} />
@@ -297,9 +297,8 @@ function App() {
 
       <button
         onClick={() => window.scrollTo(0, 0)}
-        className={`bg-white hover:bg-gray-200 p-2 text-lg text-black rounded-2xl fixed left-3 z-10 transition-transform duration-500 ease-in-out ${
-          showArrow ? "bottom-20" : "-bottom-24"
-        }`}
+        className={`bg-white hover:bg-gray-200 p-2 text-lg text-black rounded-2xl fixed left-3 z-10 transition-transform duration-500 ease-in-out ${showArrow ? "bottom-20" : "-bottom-24"
+          }`}
       >
         <HiArrowNarrowUp />
       </button>

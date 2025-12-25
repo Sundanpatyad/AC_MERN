@@ -50,8 +50,6 @@ export default function CourseInformationForm() {
     getCategories()
   }, [])
 
-
-
   const isFormUpdated = () => {
     const currentValues = getValues()
     // //console.log("changes after editing form values:", currentValues)
@@ -146,48 +144,48 @@ export default function CourseInformationForm() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-8 rounded-md border-[1px] border-richblack-700 bg-richblack-800 p-6 "
+      className="space-y-8 rounded-2xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-8 shadow-2xl"
     >
       {/* Course Title */}
       <div className="flex flex-col space-y-2">
-        <label className="text-sm text-richblack-5" htmlFor="courseTitle">
-          Course Title <sup className="text-pink-200">*</sup>
+        <label className="text-sm font-medium text-gray-200" htmlFor="courseTitle">
+          Course Title <sup className="text-pink-400">*</sup>
         </label>
         <input
           id="courseTitle"
           placeholder="Enter Course Title"
           {...register("courseTitle", { required: true })}
-          className="form-style w-full"
+          className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
         />
         {errors.courseTitle && (
-          <span className="ml-2 text-xs tracking-wide text-pink-200">
-            Course title is required
+          <span className="ml-2 text-xs tracking-wide text-pink-400 flex items-center gap-1">
+            <span>⚠</span> Course title is required
           </span>
         )}
       </div>
 
       {/* Course Short Description */}
       <div className="flex flex-col space-y-2">
-        <label className="text-sm text-richblack-5" htmlFor="courseShortDesc">
-          Course Short Description <sup className="text-pink-200">*</sup>
+        <label className="text-sm font-medium text-gray-200" htmlFor="courseShortDesc">
+          Course Short Description <sup className="text-pink-400">*</sup>
         </label>
         <textarea
           id="courseShortDesc"
           placeholder="Enter Description"
           {...register("courseShortDesc", { required: true })}
-          className="form-style resize-x-none min-h-[130px] w-full ] "
+          className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none min-h-[130px]"
         />
         {errors.courseShortDesc && (
-          <span className="ml-2 text-xs tracking-wide text-pink-200">
-            Course Description is required
+          <span className="ml-2 text-xs tracking-wide text-pink-400 flex items-center gap-1">
+            <span>⚠</span> Course Description is required
           </span>
         )}
       </div>
 
       {/* Course Price */}
       <div className="flex flex-col space-y-2">
-        <label className="text-sm text-richblack-5" htmlFor="coursePrice">
-          Course Price <sup className="text-pink-200">*</sup>
+        <label className="text-sm font-medium text-gray-200" htmlFor="coursePrice">
+          Course Price <sup className="text-pink-400">*</sup>
         </label>
         <div className="relative">
           <input
@@ -200,42 +198,41 @@ export default function CourseInformationForm() {
                 value: /^(0|[1-9]\d*)(\.\d+)?$/,
               },
             })}
-            className="form-style w-full !pl-12"
-
+            className="w-full px-4 py-3 pl-12 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
           />
-          <HiOutlineCurrencyRupee className="absolute left-3 top-1/2 inline-block -translate-y-1/2 text-2xl text-richblack-400" />
+          <HiOutlineCurrencyRupee className="absolute left-3 top-1/2 -translate-y-1/2 text-2xl text-gray-400" />
         </div>
         {errors.coursePrice && (
-          <span className="ml-2 text-xs tracking-wide text-pink-200">
-            Course Price is required
+          <span className="ml-2 text-xs tracking-wide text-pink-400 flex items-center gap-1">
+            <span>⚠</span> Course Price is required
           </span>
         )}
       </div>
 
       {/* Course Category */}
-      <div className="flex flex-col space-y-2 ">
-        <label className="text-sm text-richblack-5" htmlFor="courseCategory">
-          Course Category <sup className="text-pink-200">*</sup>
+      <div className="flex flex-col space-y-2">
+        <label className="text-sm font-medium text-gray-200" htmlFor="courseCategory">
+          Course Category <sup className="text-pink-400">*</sup>
         </label>
         <select
           {...register("courseCategory", { required: true })}
           defaultValue=""
           id="courseCategory"
-          className="form-style w-full cursor-pointer"
+          className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer"
         >
-          <option value="" disabled>
+          <option value="" disabled className="bg-zinc-800">
             Choose a Category
           </option>
           {!loading &&
             courseCategories?.map((category, indx) => (
-              <option key={indx} value={category?._id}>
+              <option key={indx} value={category?._id} className="bg-zinc-800">
                 {category?.name}
               </option>
             ))}
         </select>
         {errors.courseCategory && (
-          <span className="ml-2 text-xs tracking-wide text-pink-200">
-            Course Category is required
+          <span className="ml-2 text-xs tracking-wide text-pink-400 flex items-center gap-1">
+            <span>⚠</span> Course Category is required
           </span>
         )}
       </div>
@@ -262,18 +259,18 @@ export default function CourseInformationForm() {
 
       {/* Benefits of the course */}
       <div className="flex flex-col space-y-2">
-        <label className="text-sm text-richblack-5" htmlFor="courseBenefits">
-          Benefits of the course <sup className="text-pink-200">*</sup>
+        <label className="text-sm font-medium text-gray-200" htmlFor="courseBenefits">
+          Benefits of the course <sup className="text-pink-400">*</sup>
         </label>
         <textarea
           id="courseBenefits"
           placeholder="Enter benefits of the course"
           {...register("courseBenefits", { required: true })}
-          className="form-style resize-x-none min-h-[130px] w-full"
+          className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none min-h-[130px]"
         />
         {errors.courseBenefits && (
-          <span className="ml-2 text-xs tracking-wide text-pink-200">
-            Benefits of the course is required
+          <span className="ml-2 text-xs tracking-wide text-pink-400 flex items-center gap-1">
+            <span>⚠</span> Benefits of the course is required
           </span>
         )}
       </div>
@@ -288,26 +285,26 @@ export default function CourseInformationForm() {
       />
 
       {/* Next Button */}
-      <div className="flex justify-end gap-x-2">
+      <div className="flex justify-end gap-x-3 pt-4">
         {editCourse && (
           <button
             onClick={() => dispatch(setStep(2))}
             disabled={loading}
-            className={`flex cursor-pointer items-center gap-x-2 rounded-md py-[8px] px-[20px] font-semibold
-              text-richblack-900 bg-richblack-300 hover:bg-richblack-900 hover:text-richblack-300 duration-300`}
+            className="flex cursor-pointer items-center gap-x-2 rounded-lg px-6 py-3 font-semibold text-white bg-zinc-700 hover:bg-zinc-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Continue Wihout Saving
+            Continue Without Saving
           </button>
         )}
-        <IconBtn
+        <button
+          type="submit"
           disabled={loading}
-          text={!editCourse ? "Next" : "Save Changes"}
+          className="flex items-center gap-x-2 rounded-lg px-6 py-3 font-semibold text-white bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
         >
-          <MdNavigateNext />
-        </IconBtn>
+          {!editCourse ? "Next" : "Save Changes"}
+          <MdNavigateNext className="text-xl" />
+        </button>
       </div>
     </form>
   )
 }
-
 

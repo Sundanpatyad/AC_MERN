@@ -64,37 +64,50 @@ export default function PublishCourse() {
   }
 
   return (
-    <div className="rounded-md border-[1px] border-richblack-700 bg-richblack-800 p-6">
-      <p className="text-2xl font-semibold text-richblack-5">
+    <div className="rounded-2xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-8 shadow-2xl">
+      <p className="text-2xl font-bold text-white mb-6">
         Publish Settings
       </p>
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* Checkbox */}
         <div className="my-6 mb-8">
-          <label htmlFor="public" className="inline-flex items-center text-lg">
-            <input
-              type="checkbox"
-              id="public"
-              {...register("public")}
-              className="border-gray-300 h-4 w-4 rounded bg-richblack-500 text-richblack-400 focus:ring-2 focus:ring-richblack-5"
-            />
-            <span className="ml-2 text-richblack-400">
+          <label htmlFor="public" className="inline-flex items-center cursor-pointer group">
+            <div className="relative">
+              <input
+                type="checkbox"
+                id="public"
+                {...register("public")}
+                className="sr-only peer"
+              />
+              <div className="w-5 h-5 border-2 border-zinc-600 rounded bg-zinc-800 peer-checked:bg-gradient-to-br peer-checked:from-blue-500 peer-checked:to-purple-500 peer-checked:border-transparent transition-all duration-200 flex items-center justify-center">
+                <svg className="w-3 h-3 text-white hidden peer-checked:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            </div>
+            <span className="ml-3 text-base text-gray-300 group-hover:text-white transition-colors duration-200">
               Make this course as public
             </span>
           </label>
         </div>
 
         {/* Next Prev Button */}
-        <div className="ml-auto flex max-w-max items-center gap-x-4">
+        <div className="ml-auto flex max-w-max items-center gap-x-4 pt-4 border-t border-zinc-700/50">
           <button
             disabled={loading}
             type="button"
             onClick={goBack}
-            className="flex cursor-pointer items-center gap-x-2 rounded-md bg-richblack-300 py-[8px] px-[20px] font-semibold text-richblack-900"
+            className="flex items-center gap-x-2 rounded-lg px-6 py-3 font-semibold text-white bg-zinc-700 hover:bg-zinc-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Back
           </button>
-          <IconBtn disabled={loading} text="Save Changes" />
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex items-center gap-x-2 rounded-lg px-6 py-3 font-semibold text-white bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
+          >
+            Save Changes
+          </button>
         </div>
       </form>
     </div>
