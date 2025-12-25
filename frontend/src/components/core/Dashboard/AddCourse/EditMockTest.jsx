@@ -16,6 +16,9 @@ const EditMockTestSeries = () => {
   const [submitStatus, setSubmitStatus] = useState(null);
   const [isAddMockTestModalOpen, setIsAddMockTestModalOpen] = useState(false);
   const [isAddAttachmentsModalOpen, setIsAddAttachmentsModalOpen] = useState(false);
+  const [isBulkImportModalOpen, setIsBulkImportModalOpen] = useState(false);
+  const [bulkImportText, setBulkImportText] = useState('');
+  const [currentBulkImportTestIndex, setCurrentBulkImportTestIndex] = useState(null);
   const [expandedTests, setExpandedTests] = useState({});
 
   const toggleTest = (testIndex) => {
@@ -30,6 +33,17 @@ const EditMockTestSeries = () => {
 
   const openAddAttachmentsModal = () => setIsAddAttachmentsModalOpen(true);
   const closeAddAttachmentsModal = () => setIsAddAttachmentsModalOpen(false);
+
+  const openBulkImportModal = (testIndex) => {
+    setCurrentBulkImportTestIndex(testIndex);
+    setBulkImportText('');
+    setIsBulkImportModalOpen(true);
+  };
+  const closeBulkImportModal = () => {
+    setIsBulkImportModalOpen(false);
+    setBulkImportText('');
+    setCurrentBulkImportTestIndex(null);
+  };
 
   useEffect(() => {
     const loadSeries = async () => {
@@ -94,7 +108,7 @@ const EditMockTestSeries = () => {
       ...series,
       mockTests: [
         ...series.mockTests,
-        { testName: '', duration: 0, questions: [], status: 'draft' }
+        { testName: '', duration: 0, negative: 0.25, questions: [], status: 'draft' }
       ]
     });
     setExpandedTests(prev => ({
@@ -134,6 +148,65 @@ const EditMockTestSeries = () => {
     setSeries({ ...series, attachments: updatedAttachments });
   };
 
+  const parseBulkQuestions = (text) => {
+    const lines = text.trim().split('\n').filter(line => line.trim());
+    const questions = [];
+    let i = 0;
+
+    while (i < lines.length) {
+      // Question text
+      const questionText = lines[i]?.trim();
+      if (!questionText) {
+        i++;
+        continue;
+      }
+
+      // Options (next 4 lines)
+      const options = [];
+      for (let j = 1; j <= 4; j++) {
+        if (i + j < lines.length) {
+          options.push(lines[i + j].trim());
+        }
+      }
+
+      // Correct answer (5th line after question)
+      const correctAnswer = i + 5 < lines.length ? lines[i + 5].trim() : '';
+
+      if (options.length === 4 && correctAnswer) {
+        questions.push({
+          text: questionText,
+          options: options,
+          correctAnswer: correctAnswer
+        });
+      }
+
+      // Move to next question (question + 4 options + 1 answer = 6 lines)
+      i += 6;
+    }
+
+    return questions;
+  };
+
+  const handleBulkImport = () => {
+    if (currentBulkImportTestIndex === null || !bulkImportText.trim()) return;
+
+    const parsedQuestions = parseBulkQuestions(bulkImportText);
+
+    if (parsedQuestions.length === 0) {
+      alert('No valid questions found. Please check the format.');
+      return;
+    }
+
+    const updatedTests = [...series.mockTests];
+    updatedTests[currentBulkImportTestIndex].questions = [
+      ...updatedTests[currentBulkImportTestIndex].questions,
+      ...parsedQuestions
+    ];
+    setSeries({ ...series, mockTests: updatedTests });
+
+    closeBulkImportModal();
+  };
+
   const handleSaveSeries = async () => {
     setIsLoading(true);
     const seriesData = {
@@ -144,6 +217,7 @@ const EditMockTestSeries = () => {
       mockTests: series.mockTests.map(test => ({
         testName: test.testName,
         duration: test.duration,
+        negative: test.negative || 0,
         status: test.status,
         questions: test.questions.map(question => ({
           text: question.text,
@@ -337,8 +411,8 @@ const EditMockTestSeries = () => {
                       </div>
                       <h3 className="font-semibold text-white text-lg">{test.testName || `Test ${testIndex + 1}`}</h3>
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${test.status === 'published'
-                          ? 'bg-green-500/20 text-green-400'
-                          : 'bg-yellow-500/20 text-yellow-400'
+                        ? 'bg-green-500/20 text-green-400'
+                        : 'bg-yellow-500/20 text-yellow-400'
                         }`}>
                         {test.status}
                       </span>
@@ -357,7 +431,7 @@ const EditMockTestSeries = () => {
 
                   {expandedTests[testIndex] && (
                     <div className="p-6 pt-0 space-y-6 border-t border-zinc-700/50">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
                         <div className="space-y-2">
                           <label className="block text-sm font-medium text-gray-200">
                             Test Name <sup className="text-pink-400">*</sup>
@@ -381,6 +455,21 @@ const EditMockTestSeries = () => {
                             value={test.duration}
                             onChange={(e) => handleTestChange(e, testIndex)}
                             className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="block text-sm font-medium text-gray-200">
+                            Negative Marking <sup className="text-pink-400">*</sup>
+                          </label>
+                          <input
+                            type="number"
+                            name="negative"
+                            step="0.25"
+                            value={test.negative || 0}
+                            onChange={(e) => handleTestChange(e, testIndex)}
+                            className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            placeholder="0.25"
                           />
                         </div>
 
@@ -467,13 +556,22 @@ const EditMockTestSeries = () => {
                           </div>
                         ))}
 
-                        <button
-                          type="button"
-                          onClick={() => addQuestion(testIndex)}
-                          className="w-full py-3 px-4 border-2 border-dashed border-zinc-600 rounded-lg text-gray-400 hover:text-white hover:border-blue-500 transition-all duration-200 font-medium"
-                        >
-                          + Add Question
-                        </button>
+                        <div className="flex gap-3">
+                          <button
+                            type="button"
+                            onClick={() => addQuestion(testIndex)}
+                            className="flex-1 py-3 px-4 border-2 border-dashed border-zinc-600 rounded-lg text-gray-400 hover:text-white hover:border-blue-500 transition-all duration-200 font-medium"
+                          >
+                            + Add Question
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => openBulkImportModal(testIndex)}
+                            className="flex-1 py-3 px-4 border-2 border-dashed border-purple-600 rounded-lg text-purple-400 hover:text-white hover:border-purple-500 transition-all duration-200 font-medium"
+                          >
+                            📋 Bulk Import Questions
+                          </button>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -533,6 +631,45 @@ const EditMockTestSeries = () => {
         </Modal>
         <Modal isOpen={isAddAttachmentsModalOpen} onClose={closeAddAttachmentsModal}>
           <AddAttachments seriesId={seriesId} onClose={closeAddAttachmentsModal} />
+        </Modal>
+        <Modal isOpen={isBulkImportModalOpen} onClose={closeBulkImportModal}>
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-white">Bulk Import Questions</h2>
+            <p className="text-gray-400 text-sm">
+              Paste your questions in the following format (6 lines per question):
+            </p>
+            <div className="bg-zinc-800 p-4 rounded-lg text-xs text-gray-300 font-mono">
+              <div>Question text?</div>
+              <div>Option 1</div>
+              <div>Option 2</div>
+              <div>Option 3</div>
+              <div>Option 4</div>
+              <div>Correct Answer</div>
+            </div>
+            <textarea
+              value={bulkImportText}
+              onChange={(e) => setBulkImportText(e.target.value)}
+              rows="15"
+              placeholder="What is the speed of light in vacuum?&#10;299,792 km/s&#10;300,000 km/s&#10;150,000 km/s&#10;250,000 km/s&#10;299,792 km/s"
+              className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 resize-none font-mono text-sm"
+            />
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={handleBulkImport}
+                className="flex-1 py-3 px-6 rounded-lg font-semibold text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-all duration-200"
+              >
+                Import Questions
+              </button>
+              <button
+                type="button"
+                onClick={closeBulkImportModal}
+                className="flex-1 py-3 px-6 rounded-lg font-semibold text-white bg-zinc-700 hover:bg-zinc-600 transition-all duration-200"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </Modal>
       </div>
 
