@@ -16,6 +16,7 @@ import AdminCountMock from "./components/core/Admin/MockCountAdmin";
 import PrivacyPolicy from "./pages/PrivicyPolicy";
 // import CookiePolicy from "./pages/CookiePolicy";
 import TermsOfService from "./pages/Terms";
+import { useTokenExpiry } from "./hooks/useTokenExpiry";
 
 // Lazy-loaded components
 const Navbar = lazy(() => import("./components/common/Navbar"));
@@ -81,6 +82,9 @@ function App() {
   const [showHome, setShowHome] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  // Check token expiry and auto-logout
+  useTokenExpiry();
 
   useEffect(() => {
     window.scrollTo(0, 0);

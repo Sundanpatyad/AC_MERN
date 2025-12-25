@@ -13,4 +13,15 @@ export default defineConfig({
     host: true, // This allows you to access the app from your phone using your local network IP
     port: 5173, // You can specify a port number here (optional)
   },
+  build: {
+    sourcemap: false, // Disable sourcemaps in production to avoid warnings
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'framer-motion': ['framer-motion'],
+        },
+      },
+    },
+  },
 });

@@ -307,8 +307,8 @@ export const googleLogin = (credential, navigate) => {
           color: '#fff',
         },
       });
-      
-      const response = await apiConnector("POST", GOOGLE_API, { token: credential });
+
+      const response = await apiConnector("POST", GOOGLE_API, { accessToken: credential });
 
       if (!response.data.success) {
         throw new Error(response.data.message);

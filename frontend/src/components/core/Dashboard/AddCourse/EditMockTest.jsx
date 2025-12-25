@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { FaTrash, FaChevronDown, FaChevronRight } from 'react-icons/fa';
+import { FaTrash, FaChevronDown, FaChevronRight, FaPlus } from 'react-icons/fa';
 import { fetchSeries } from '../../../../services/operations/mocktest';
 import { saveSeries } from '../../../../services/operations/profileAPI';
 import AddMockTest from './AddTextQuestions';
@@ -97,7 +97,6 @@ const EditMockTestSeries = () => {
         { testName: '', duration: 0, questions: [], status: 'draft' }
       ]
     });
-    // Expand the newly added test
     setExpandedTests(prev => ({
       ...prev,
       [series.mockTests.length]: true
@@ -108,7 +107,6 @@ const EditMockTestSeries = () => {
     const updatedTests = [...series.mockTests];
     updatedTests.splice(testIndex, 1);
     setSeries({ ...series, mockTests: updatedTests });
-    // Remove the expanded state for the deleted test
     const newExpandedTests = { ...expandedTests };
     delete newExpandedTests[testIndex];
     setExpandedTests(newExpandedTests);
@@ -172,9 +170,12 @@ const EditMockTestSeries = () => {
   const Modal = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null;
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-        <div className="bg-gray-800 rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-          <button onClick={onClose} className="float-right text-gray-300 hover:text-white">
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+        <div className="bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-zinc-700/50 shadow-2xl">
+          <button
+            onClick={onClose}
+            className="float-right text-gray-400 hover:text-white text-3xl font-light transition-colors duration-200"
+          >
             &times;
           </button>
           {children}
@@ -184,264 +185,331 @@ const EditMockTestSeries = () => {
   };
 
   if (isLoading) {
-    return <div className="text-center text-richblack-5">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-white text-lg">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   if (!series) {
-    return <div className="text-center text-richblack-5">No series data found.</div>;
+    return <div className="text-center text-white text-lg mt-20">No series data found.</div>;
   }
 
   return (
-    <div className="flex w-full items-start gap-x-6 bg-richblack-900 min-h-screen p-8">
+    <div className="flex w-full items-start gap-x-8">
       <div className="flex flex-1 flex-col">
-        <h1 className="mb-14 text-3xl font-medium text-richblack-5 font-boogaloo text-center lg:text-left">
+        <h1 className="mb-8 text-4xl font-bold text-white text-center lg:text-left bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
           Edit Mock Test Series
         </h1>
+        <p className="mb-10 text-sm text-gray-400 text-center lg:text-left">
+          Update your mock test series details and manage tests
+        </p>
 
         <div className="flex-1">
           <form onSubmit={(e) => { e.preventDefault(); handleSaveSeries(); }} className="space-y-8">
-            <div>
-              <label htmlFor="seriesName" className="block text-sm font-medium text-richblack-5">Series Name</label>
-              <input
-                type="text"
-                id="seriesName"
-                name="seriesName"
-                value={series.seriesName}
-                onChange={handleSeriesChange}
-                className="mt-1 block w-full bg-richblack-700 border border-richblack-600 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2"
-              />
-            </div>
+            {/* Series Information Card */}
+            <div className="rounded-2xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-8 shadow-2xl space-y-6">
+              <h2 className="text-2xl font-bold text-white mb-6">Series Information</h2>
 
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-richblack-5">Description</label>
-              <textarea
-                id="description"
-                name="description"
-                value={series.description}
-                onChange={handleSeriesChange}
-                className="mt-1 block w-full bg-richblack-700 border border-richblack-600 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="price" className="block text-sm font-medium text-richblack-5">Price</label>
-              <input
-                type="number"
-                id="price"
-                name="price"
-                value={series.price}
-                onChange={handleSeriesChange}
-                className="mt-1 block w-full bg-richblack-700 border border-richblack-600 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="seriesStatus" className="block text-sm font-medium text-richblack-5">Series Status</label>
-              <select
-                id="seriesStatus"
-                name="status"
-                value={series.status}
-                onChange={handleSeriesStatusChange}
-                className="mt-1 block w-full bg-richblack-700 border border-richblack-600 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2"
-              >
-                <option value="draft">Draft</option>
-                <option value="published">Published</option>
-              </select>
-            </div>
-
-            {series.attachments && series.attachments.map((item, index) => (
-              <div key={item._id} className="bg-gray-800 p-6 rounded-lg shadow-md mb-6 relative">
-                <h2 className="text-2xl font-bold text-white mb-4">OMR Based Test</h2>
-                <div className="space-y-4">
-                  {['name', 'answerKey', 'omrSheet', 'questionPaper'].map((field) => (
-                    <div key={field} className="flex flex-col">
-                      <label htmlFor={`${field}-${index}`} className="text-gray-300 mb-1 capitalize">
-                        {field.replace(/([A-Z])/g, ' $1').trim()}:
-                      </label>
-                      <input
-                        type="text"
-                        id={`${field}-${index}`}
-                        value={item[field]}
-                        onChange={(e) => handleAttachmentChange(index, field, e.target.value)}
-                        className="bg-gray-700 text-white px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                  ))}
-                  <div className="flex flex-col">
-                    <label htmlFor={`_id-${index}`} className="text-gray-300 mb-1">ID:</label>
-                    <input
-                      type="text"
-                      id={`_id-${index}`}
-                      value={item._id}
-                      readOnly
-                      className="bg-gray-600 text-gray-300 px-3 py-2 rounded-md cursor-not-allowed"
-                    />
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => deleteAttachment(index)}
-                  className="absolute top-2 right-2 text-red-500 hover:text-red-700 transition-colors duration-200"
-                >
-                  <FaTrash />
-                </button>
+              <div className="space-y-2">
+                <label htmlFor="seriesName" className="block text-sm font-medium text-gray-200">
+                  Series Name <sup className="text-pink-400">*</sup>
+                </label>
+                <input
+                  type="text"
+                  id="seriesName"
+                  name="seriesName"
+                  value={series.seriesName}
+                  onChange={handleSeriesChange}
+                  className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                />
               </div>
-            ))}
 
-            <h2 className="text-xl font-semibold mt-8 mb-4 text-richblack-5">Edit Tests</h2>
-            {series.mockTests && series.mockTests.map((test, testIndex) => (
-              <div key={testIndex} className="space-y-4 bg-richblack-800 p-4 rounded-lg border border-richblack-700 relative mb-6">
-                <div 
-                  className="flex justify-between items-center cursor-pointer p-2 hover:bg-richblack-700 rounded-md"
-                  onClick={() => toggleTest(testIndex)}
-                >
-                  <div className="flex items-center gap-2">
-                    {expandedTests[testIndex] ? <FaChevronDown className="text-richblack-5" /> : <FaChevronRight className="text-richblack-5" />}
-                    <h3 className="font-medium text-richblack-5">{test.testName || `Test ${testIndex + 1}`}</h3>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteTest(testIndex);
-                    }}
-                    className="text-red-500 hover:text-red-700 transition-colors duration-200"
-                  >
-                    <FaTrash />
-                  </button>
+              <div className="space-y-2">
+                <label htmlFor="description" className="block text-sm font-medium text-gray-200">
+                  Description <sup className="text-pink-400">*</sup>
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={series.description}
+                  onChange={handleSeriesChange}
+                  rows="4"
+                  className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label htmlFor="price" className="block text-sm font-medium text-gray-200">
+                    Price (₹) <sup className="text-pink-400">*</sup>
+                  </label>
+                  <input
+                    type="number"
+                    id="price"
+                    name="price"
+                    value={series.price}
+                    onChange={handleSeriesChange}
+                    className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  />
                 </div>
 
-                {expandedTests[testIndex] && (
-                  <div className="mt-4 space-y-4">
-                    <div>
-                      <label htmlFor={`testName-${testIndex}`} className="block text-sm font-medium text-richblack-5">Test Name</label>
-                      <input
-                        type="text"
-                        id={`testName-${testIndex}`}
-                        name="testName"
-                        value={test.testName}
-                        onChange={(e) => handleTestChange(e, testIndex)}
-                        className="mt-1 block w-full bg-richblack-700 border border-richblack-600 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2"
-                      />
-                    </div>
+                <div className="space-y-2">
+                  <label htmlFor="seriesStatus" className="block text-sm font-medium text-gray-200">
+                    Series Status <sup className="text-pink-400">*</sup>
+                  </label>
+                  <select
+                    id="seriesStatus"
+                    name="status"
+                    value={series.status}
+                    onChange={handleSeriesStatusChange}
+                    className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer"
+                  >
+                    <option value="draft">Draft</option>
+                    <option value="published">Published</option>
+                  </select>
+                </div>
+              </div>
+            </div>
 
-                    <div>
-                      <label htmlFor={`duration-${testIndex}`} className="block text-sm font-medium text-richblack-5">Duration (minutes)</label>
-                      <input
-                        type="number"
-                        id={`duration-${testIndex}`}
-                        name="duration"
-                        value={test.duration}
-                        onChange={(e) => handleTestChange(e, testIndex)}
-                        className="mt-1 block w-full bg-richblack-700 border border-richblack-600 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor={`testStatus-${testIndex}`} className="block text-sm font-medium text-richblack-5">Test Status</label>
-                      <select
-                        id={`testStatus-${testIndex}`}
-                        name="status"
-                        value={test.status}
-                        onChange={(e) => handleTestStatusChange(e, testIndex)}
-                        className="mt-1 block w-full bg-richblack-700 border border-richblack-600 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2"
-                      >
-                        <option value="draft">Draft</option>
-                        <option value="published">Published</option>
-                      </select>
-                    </div>
+            {/* OMR Based Tests */}
+            {series.attachments && series.attachments.length > 0 && (
+              <div className="space-y-4">
+                <h2 className="text-2xl font-bold text-white">OMR Based Tests</h2>
+                {series.attachments.map((item, index) => (
+                  <div key={item._id} className="rounded-2xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-6 shadow-2xl relative">
+                    <button
+                      type="button"
+                      onClick={() => deleteAttachment(index)}
+                      className="absolute top-4 right-4 text-red-400 hover:text-red-300 transition-colors duration-200 p-2 hover:bg-red-500/10 rounded-lg"
+                    >
+                      <FaTrash size={18} />
+                    </button>
 
-                    <div className="mt-6">
-                      <h4 className="font-medium text-richblack-5 mb-4">Questions</h4>
-                      {test.questions && test.questions.map((question, questionIndex) => (
-                        <div key={questionIndex} className="space-y-2 bg-richblack-700 p-3 rounded-md relative mb-4">
-                          <div>
-                            <label htmlFor={`question-${testIndex}-${questionIndex}`} className="block text-sm font-medium text-richblack-5">Question Text</label>
-                            <input
-                              type="text"
-                              id={`question-${testIndex}-${questionIndex}`}
-                              name="text"
-                              value={question.text}
-                              onChange={(e) => handleQuestionChange(e, testIndex, questionIndex)}
-                              className="mt-1 block w-full bg-richblack-600 border border-richblack-500 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2"
-                            />
-                          </div>
+                    <h3 className="text-xl font-semibold text-white mb-6">OMR Test #{index + 1}</h3>
 
-                          {question.options && question.options.map((option, optionIndex) => (
-                            <div key={optionIndex}>
-                              <label htmlFor={`option-${testIndex}-${questionIndex}-${optionIndex}`} className="block text-sm font-medium text-richblack-5">
-                                Option {optionIndex + 1}
-                              </label>
-                              <input
-                                type="text"
-                                id={`option-${testIndex}-${questionIndex}-${optionIndex}`}
-                                value={option}
-                                onChange={(e) => handleOptionChange(testIndex, questionIndex, optionIndex, e.target.value)}
-                                className="mt-1 block w-full bg-richblack-600 border border-richblack-500 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-                              />
-                            </div>
-                          ))}
-
-                          <div>
-                            <label htmlFor={`correctAnswer-${testIndex}-${questionIndex}`} className="block text-sm font-medium text-richblack-5">
-                              Correct Answer
-                            </label>
-                            <select
-                              id={`correctAnswer-${testIndex}-${questionIndex}`}
-                              name="correctAnswer"
-                              value={question.correctAnswer}
-                              onChange={(e) => handleQuestionChange(e, testIndex, questionIndex)}
-                              className="mt-1 block w-full bg-richblack-600 border border-richblack-500 rounded-md shadow-sm py-2 px-3 text-richblack-5 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-                            >
-                              <option value="">Select correct answer</option>
-                              {question.options.map((option, optionIndex) => (
-                                <option key={optionIndex} value={option}>
-                                  {option}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-
-                          <button
-                            type="button"
-                            onClick={() => deleteQuestion(testIndex, questionIndex)}
-                            className="absolute top-2 right-2 text-red-500 hover:text-red-700 transition-colors duration-200"
-                          >
-                            <FaTrash />
-                          </button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {['name', 'answerKey', 'omrSheet', 'questionPaper'].map((field) => (
+                        <div key={field} className="space-y-2">
+                          <label className="block text-sm font-medium text-gray-200 capitalize">
+                            {field.replace(/([A-Z])/g, ' $1').trim()}
+                          </label>
+                          <input
+                            type="text"
+                            value={item[field]}
+                            onChange={(e) => handleAttachmentChange(index, field, e.target.value)}
+                            className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                          />
                         </div>
                       ))}
-
-                      <button
-                        type="button"
-                        onClick={() => addQuestion(testIndex)}
-                        className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-richblack-900 bg-white hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200"
-                      >
-                        Add Question
-                      </button>
                     </div>
                   </div>
-                )}
+                ))}
               </div>
-            ))}
+            )}
 
-            <button
-              type="button"
-              onClick={addTest}
-              className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-richblack-900 bg-white hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200"
-            >
-              Add New Test
-            </button>
+            {/* Tests Section */}
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold text-white">Mock Tests</h2>
+                <button
+                  type="button"
+                  onClick={addTest}
+                  className="flex items-center gap-x-2 rounded-lg px-6 py-3 font-semibold text-white bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                  <FaPlus /> Add New Test
+                </button>
+              </div>
 
-            <div className="flex gap-x-4">
+              {series.mockTests && series.mockTests.map((test, testIndex) => (
+                <div key={testIndex} className="rounded-2xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 shadow-2xl overflow-hidden">
+                  <div
+                    className="flex justify-between items-center cursor-pointer p-6 hover:bg-zinc-800/50 transition-all duration-200"
+                    onClick={() => toggleTest(testIndex)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="text-blue-400 transition-transform duration-200">
+                        {expandedTests[testIndex] ? <FaChevronDown size={20} /> : <FaChevronRight size={20} />}
+                      </div>
+                      <h3 className="font-semibold text-white text-lg">{test.testName || `Test ${testIndex + 1}`}</h3>
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${test.status === 'published'
+                          ? 'bg-green-500/20 text-green-400'
+                          : 'bg-yellow-500/20 text-yellow-400'
+                        }`}>
+                        {test.status}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteTest(testIndex);
+                      }}
+                      className="text-red-400 hover:text-red-300 transition-colors duration-200 p-2 hover:bg-red-500/10 rounded-lg"
+                    >
+                      <FaTrash size={18} />
+                    </button>
+                  </div>
+
+                  {expandedTests[testIndex] && (
+                    <div className="p-6 pt-0 space-y-6 border-t border-zinc-700/50">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                        <div className="space-y-2">
+                          <label className="block text-sm font-medium text-gray-200">
+                            Test Name <sup className="text-pink-400">*</sup>
+                          </label>
+                          <input
+                            type="text"
+                            name="testName"
+                            value={test.testName}
+                            onChange={(e) => handleTestChange(e, testIndex)}
+                            className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="block text-sm font-medium text-gray-200">
+                            Duration (minutes) <sup className="text-pink-400">*</sup>
+                          </label>
+                          <input
+                            type="number"
+                            name="duration"
+                            value={test.duration}
+                            onChange={(e) => handleTestChange(e, testIndex)}
+                            className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="block text-sm font-medium text-gray-200">
+                            Status <sup className="text-pink-400">*</sup>
+                          </label>
+                          <select
+                            name="status"
+                            value={test.status}
+                            onChange={(e) => handleTestStatusChange(e, testIndex)}
+                            className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer"
+                          >
+                            <option value="draft">Draft</option>
+                            <option value="published">Published</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Questions */}
+                      <div className="space-y-4">
+                        <h4 className="font-semibold text-white text-lg">Questions ({test.questions?.length || 0})</h4>
+                        {test.questions && test.questions.map((question, questionIndex) => (
+                          <div key={questionIndex} className="rounded-xl bg-zinc-800/50 p-5 relative border border-zinc-700/30">
+                            <button
+                              type="button"
+                              onClick={() => deleteQuestion(testIndex, questionIndex)}
+                              className="absolute top-3 right-3 text-red-400 hover:text-red-300 transition-colors duration-200 p-2 hover:bg-red-500/10 rounded-lg"
+                            >
+                              <FaTrash size={16} />
+                            </button>
+
+                            <div className="space-y-4">
+                              <div className="space-y-2">
+                                <label className="block text-sm font-medium text-gray-200">
+                                  Question {questionIndex + 1} <sup className="text-pink-400">*</sup>
+                                </label>
+                                <input
+                                  type="text"
+                                  name="text"
+                                  value={question.text}
+                                  onChange={(e) => handleQuestionChange(e, testIndex, questionIndex)}
+                                  className="w-full px-4 py-3 rounded-lg bg-zinc-700 border border-zinc-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                  placeholder="Enter question text"
+                                />
+                              </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                {question.options && question.options.map((option, optionIndex) => (
+                                  <div key={optionIndex} className="space-y-2">
+                                    <label className="block text-sm font-medium text-gray-200">
+                                      Option {String.fromCharCode(65 + optionIndex)}
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={option}
+                                      onChange={(e) => handleOptionChange(testIndex, questionIndex, optionIndex, e.target.value)}
+                                      className="w-full px-4 py-2 rounded-lg bg-zinc-700 border border-zinc-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                      placeholder={`Option ${String.fromCharCode(65 + optionIndex)}`}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+
+                              <div className="space-y-2">
+                                <label className="block text-sm font-medium text-gray-200">
+                                  Correct Answer <sup className="text-pink-400">*</sup>
+                                </label>
+                                <select
+                                  name="correctAnswer"
+                                  value={question.correctAnswer}
+                                  onChange={(e) => handleQuestionChange(e, testIndex, questionIndex)}
+                                  className="w-full px-4 py-3 rounded-lg bg-zinc-700 border border-zinc-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer"
+                                >
+                                  <option value="">Select correct answer</option>
+                                  {question.options.map((option, optionIndex) => (
+                                    <option key={optionIndex} value={option}>
+                                      {option || `Option ${String.fromCharCode(65 + optionIndex)}`}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+
+                        <button
+                          type="button"
+                          onClick={() => addQuestion(testIndex)}
+                          className="w-full py-3 px-4 border-2 border-dashed border-zinc-600 rounded-lg text-gray-400 hover:text-white hover:border-blue-500 transition-all duration-200 font-medium"
+                        >
+                          + Add Question
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-zinc-700/50">
+              <button
+                type="button"
+                onClick={openAddMockTestModal}
+                className="flex-1 py-3 px-6 rounded-lg font-semibold text-white bg-zinc-700 hover:bg-zinc-600 transition-all duration-200"
+              >
+                Add Mock Test
+              </button>
+              <button
+                type="button"
+                onClick={openAddAttachmentsModal}
+                className="flex-1 py-3 px-6 rounded-lg font-semibold text-white bg-zinc-700 hover:bg-zinc-600 transition-all duration-200"
+              >
+                Add OMR Based Test
+              </button>
+            </div>
+
+            <div className="flex gap-x-4 pt-4">
               <button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-richblack-900 bg-white hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200"
+                disabled={isLoading}
+                className="flex-1 py-3 px-6 rounded-lg font-semibold text-white bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
               >
-                Save Series
+                {isLoading ? 'Saving...' : 'Save Series'}
               </button>
               <Link
                 to="/dashboard/instructor"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-richblack-900 bg-white hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200"
+                className="flex-1 py-3 px-6 rounded-lg font-semibold text-white bg-zinc-700 hover:bg-zinc-600 transition-all duration-200 text-center"
               >
                 Cancel
               </Link>
@@ -449,25 +517,16 @@ const EditMockTestSeries = () => {
           </form>
 
           {submitStatus === 'success' && (
-            <p className="mt-4 text-3xl font-medium text-richblack-5">Mock test series updated successfully!</p>
+            <div className="mt-6 p-4 rounded-lg bg-green-500/20 border border-green-500/50">
+              <p className="text-green-400 font-medium text-center">✓ Mock test series updated successfully!</p>
+            </div>
           )}
           {submitStatus === 'error' && (
-            <p className="mt-4 text-3xl font-medium text-richblack-5">Error updating mock test series. Please try again.</p>
+            <div className="mt-6 p-4 rounded-lg bg-red-500/20 border border-red-500/50">
+              <p className="text-red-400 font-medium text-center">✗ Error updating mock test series. Please try again.</p>
+            </div>
           )}
         </div>
-
-        <button
-          onClick={openAddMockTestModal}
-          className="mt-4 bg-white text-black py-2 px-4 rounded-md hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-2"
-        >
-          Add Mock Test
-        </button>
-        <button
-          onClick={openAddAttachmentsModal}
-          className="mt-4 bg-white text-black py-2 px-4 rounded-md hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-2"
-        >
-          Add Omr Based Test
-        </button>
 
         <Modal isOpen={isAddMockTestModalOpen} onClose={closeAddMockTestModal}>
           <AddMockTest seriesId={seriesId} onClose={closeAddMockTestModal} />
@@ -478,18 +537,45 @@ const EditMockTestSeries = () => {
       </div>
 
       {/* Tips Section */}
-      <div className="sticky top-10 hidden lg:block max-w-[400px] flex-1 rounded-md border-[1px] border-richblack-700 bg-richblack-800 p-6">
-        <p className="mb-8 text-lg text-richblack-5">⚡ Mock Test Series Editing Tips</p>
-        <ul className="ml-5 list-item list-disc space-y-4 text-xs text-richblack-5">
-          <li>Review and update the series name and description if needed.</li>
-          <li>Set an appropriate price for the series.</li>
-          <li>Check existing tests for any necessary modifications.</li>
-          <li>When adding new tests, ensure the name and duration are appropriate.</li>
-          <li>Create diverse questions to cover various aspects of the subject.</li>
-          <li>Double-check all questions and answers for accuracy.</li>
-          <li>Ensure a good balance of difficulty levels across the tests.</li>
-          <li>Preview the entire series before saving to catch any errors.</li>
-          <li>Consider the overall flow and structure of the test series.</li>
+      <div className="sticky top-10 hidden lg:block max-w-[420px] flex-1 rounded-xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-8 shadow-2xl backdrop-blur-sm">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+            <svg className="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <p className="text-xl font-semibold text-white">Editing Tips</p>
+        </div>
+
+        <ul className="space-y-4 text-sm text-gray-300">
+          <li className="flex items-start gap-3 p-3 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 transition-colors duration-200">
+            <span className="text-blue-400 mt-0.5">•</span>
+            <span>Review and update the series name and description if needed.</span>
+          </li>
+          <li className="flex items-start gap-3 p-3 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 transition-colors duration-200">
+            <span className="text-purple-400 mt-0.5">•</span>
+            <span>Set an appropriate price for the series.</span>
+          </li>
+          <li className="flex items-start gap-3 p-3 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 transition-colors duration-200">
+            <span className="text-pink-400 mt-0.5">•</span>
+            <span>Check existing tests for any necessary modifications.</span>
+          </li>
+          <li className="flex items-start gap-3 p-3 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 transition-colors duration-200">
+            <span className="text-green-400 mt-0.5">•</span>
+            <span>Create diverse questions to cover various aspects.</span>
+          </li>
+          <li className="flex items-start gap-3 p-3 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 transition-colors duration-200">
+            <span className="text-yellow-400 mt-0.5">•</span>
+            <span>Double-check all questions and answers for accuracy.</span>
+          </li>
+          <li className="flex items-start gap-3 p-3 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 transition-colors duration-200">
+            <span className="text-indigo-400 mt-0.5">•</span>
+            <span>Ensure a good balance of difficulty levels.</span>
+          </li>
+          <li className="flex items-start gap-3 p-3 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 transition-colors duration-200">
+            <span className="text-red-400 mt-0.5">•</span>
+            <span>Preview the entire series before saving to catch any errors.</span>
+          </li>
         </ul>
       </div>
     </div>

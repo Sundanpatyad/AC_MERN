@@ -1,49 +1,52 @@
 import { useSelector } from "react-redux"
-import { Table, Thead, Tbody, Tr, Th, Td } from 'react-super-responsive-table'
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css'
-import { useState } from "react"
 import { FiEdit2 } from "react-icons/fi"
-import { RiDeleteBin6Line } from "react-icons/ri"
+import { FaCheck } from "react-icons/fa"
+import { HiClock } from "react-icons/hi"
 import { useNavigate } from "react-router-dom"
 import { formatDate } from "../../../../services/formatDate"
 
-import ConfirmationModal from "../../../common/ConfirmationModal"
-import toast from 'react-hot-toast'
-import { fetchInstructorMockTest } from "../../../../services/operations/mocktest"
-
-export default function MockTestsTable({ mockTests, setMockTests, loading, setLoading }) {
+export default function MockTestsTable({ mockTests, loading }) {
   const navigate = useNavigate()
-  const { token } = useSelector((state) => state.auth)
-  const [confirmationModal, setConfirmationModal] = useState(null)
+  const TRUNCATE_LENGTH = 40
 
-  const handleMockTestDelete = async (mockTestId) => {
-    setLoading(true)
-    const toastId = toast.loading('Deleting...')
-    try {
-      await deleteMockTest({ mockTestId: mockTestId }, token)
-      const result = await fetchInstructorMockTest(token)
-      if (result) {
-        setMockTests(result)
-      }
-      toast.success("Mock test deleted successfully")
-    } catch (error) {
-      toast.error("Failed to delete mock test")
-    }
-    setConfirmationModal(null)
-    setLoading(false)
-    toast.dismiss(toastId)
+  const SkeletonCard = () => {
+    return (
+      <div className="rounded-2xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-6 shadow-2xl">
+        <div className="flex flex-col gap-4">
+          <div className="h-6 w-3/4 rounded-lg skeleton"></div>
+          <div className="h-4 w-full rounded-lg skeleton"></div>
+          <div className="h-4 w-5/6 rounded-lg skeleton"></div>
+          <div className="flex gap-4 mt-4">
+            <div className="h-8 w-32 rounded-lg skeleton"></div>
+            <div className="h-8 w-32 rounded-lg skeleton"></div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
-  const skItem = () => {
+  if (loading) {
     return (
-      <div className="flex border-b border-richblack-800 px-6 py-8 w-full">
-        <div className="flex flex-1 gap-x-4">
-          <div className='h-[148px] min-w-[300px] rounded-xl skeleton'></div>
-          <div className="flex flex-col w-[40%]">
-            <p className="h-5 w-[50%] rounded-xl skeleton"></p>
-            <p className="h-20 w-[60%] rounded-xl mt-3 skeleton"></p>
-            <p className="h-2 w-[20%] rounded-xl skeleton mt-3"></p>
-            <p className="h-2 w-[20%] rounded-xl skeleton mt-2"></p>
+      <div className="space-y-4">
+        <SkeletonCard />
+        <SkeletonCard />
+        <SkeletonCard />
+      </div>
+    )
+  }
+
+  if (!loading && mockTests?.length === 0) {
+    return (
+      <div className="rounded-2xl border-2 border-dashed border-zinc-700 bg-zinc-900/50 p-16 text-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="p-4 rounded-full bg-zinc-800 border border-zinc-700">
+            <svg className="w-16 h-16 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <div>
+            <p className="text-gray-300 text-xl font-medium">No mock tests found</p>
+            <p className="text-gray-500 text-sm mt-2">Create your first mock test series to get started</p>
           </div>
         </div>
       </div>
@@ -52,102 +55,108 @@ export default function MockTestsTable({ mockTests, setMockTests, loading, setLo
 
   return (
     <>
-      <Table className="rounded-2xl border border-richblack-800">
-        <Thead>
-          <Tr className="flex gap-x-10 rounded-t-3xl border-b border-b-richblack-800 px-6 py-2">
-            <Th className="flex-1 text-left text-sm font-medium uppercase text-richblack-100">
-              Series Name
-            </Th>
-            <Th className="text-left text-sm font-medium uppercase text-richblack-100">
-              Description
-            </Th>
-            <Th className="text-left text-sm font-medium uppercase text-richblack-100">
-              Total Tests
-            </Th>
-            <Th className="text-left text-sm font-medium uppercase text-richblack-100">
-              Price
-            </Th>
-            <Th className="text-left text-sm font-medium uppercase text-richblack-100">
-              Status
-            </Th>
-            <Th className="text-left text-sm font-medium uppercase text-richblack-100">
-              Actions
-            </Th>
-          </Tr>
-        </Thead>
+      <div className="space-y-4">
+        {mockTests?.map((series) => (
+          <div
+            key={series._id}
+            className="group rounded-2xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-6 shadow-2xl hover:border-zinc-600/50 transition-all duration-300"
+          >
+            <div className="flex flex-col">
+              {/* Header with Title and Status */}
+              <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-xl font-bold text-white mb-2 capitalize">
+                    {series.seriesName}
+                  </h3>
+                  <p className="text-sm text-gray-400 line-clamp-2">
+                    {series.description?.split(" ").length > TRUNCATE_LENGTH
+                      ? series.description.split(" ").slice(0, TRUNCATE_LENGTH).join(" ") + "..."
+                      : series.description}
+                  </p>
+                </div>
 
-        {loading && (
-          <Tbody>
-            {skItem()}{skItem()}{skItem()}
-          </Tbody>
-        )}
+                {/* Status Badge */}
+                <div className="flex-shrink-0">
+                  {series.status === 'draft' ? (
+                    <div className="flex items-center gap-2 rounded-full bg-yellow-500/20 backdrop-blur-sm px-4 py-2 text-xs font-semibold text-yellow-400 border border-yellow-500/30">
+                      <HiClock size={14} />
+                      Draft
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 rounded-full bg-green-500/20 backdrop-blur-sm px-4 py-2 text-xs font-semibold text-green-400 border border-green-500/30">
+                      <FaCheck size={12} />
+                      Published
+                    </div>
+                  )}
+                </div>
+              </div>
 
-        <Tbody>
-          {!loading && mockTests?.length === 0 ? (
-            <Tr>
-              <Td className="py-10 text-center text-2xl font-medium text-richblack-100">
-                No mock tests found
-              </Td>
-            </Tr>
-          ) : (
-            mockTests?.map((series) => (
-              <Tr
-                key={series._id}
-                className="flex gap-x-10 border-b border-richblack-800 px-6 py-8"
-              >
-                <Td className="flex flex-1 gap-x-4 relative">
-                  <div className="flex flex-col">
-                    <p className="text-lg font-semibold text-richblack-5 capitalize">{series.seriesName}</p>
-                    <p className="text-sm text-richblack-100 mt-2">{series.description}</p>
-                    <p className="text-[12px] text-richblack-100 mt-4">
-                      Created: {formatDate(series?.createdAt)}
-                    </p>
-                    <p className="text-[12px] text-richblack-100">
-                      Updated: {formatDate(series?.updatedAt)}
-                    </p>
+              {/* Meta Info Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
+                <div className="flex items-center gap-2 text-sm">
+                  <div className="p-1.5 rounded-lg bg-purple-500/10">
+                    <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
                   </div>
-                </Td>
-                <Td className="text-sm font-medium text-richblack-100">{series.totalTests}</Td>
-                <Td className="text-sm font-medium text-richblack-100">{series.price}</Td>
-                <Td className="text-sm font-medium text-richblack-100">{series.status}</Td>
-                <Td className="text-sm font-medium text-richblack-100">
-                  <button
-                    disabled={loading}
-                    onClick={() => { navigate(`/dashboard/edit-mock-test-series/${series._id}`) }}
-                    title="Edit"
-                    className="px-2 transition-all duration-200 hover:scale-110 hover:text-caribbeangreen-300"
-                  >
-                    <FiEdit2 size={20} />
-                  </button>
-                  <button
-                    disabled={loading}
-                    onClick={() => {
-                      setConfirmationModal({
-                        text1: "Do you want to delete this mock test series?",
-                        text2: "All the data related to this mock test series will be deleted",
-                        btn1Text: !loading ? "Delete" : "Loading...",
-                        btn2Text: "Cancel",
-                        btn1Handler: !loading
-                          ? () => handleMockTestDelete(series._id)
-                          : () => { },
-                        btn2Handler: !loading
-                          ? () => setConfirmationModal(null)
-                          : () => { },
-                      })
-                    }}
-                    title="Delete"
-                    className="px-1 transition-all duration-200 hover:scale-110 hover:text-[#ff0000]"
-                  >
-                    <RiDeleteBin6Line size={20} />
-                  </button>
-                </Td>
-              </Tr>
-            ))
-          )}
-        </Tbody>
-      </Table>
+                  <div>
+                    <p className="text-xs text-gray-500">Total Tests</p>
+                    <p className="text-gray-300 font-semibold">{series.mockTests?.length || 0}</p>
+                  </div>
+                </div>
 
-      {confirmationModal && <ConfirmationModal modalData={confirmationModal} />}
+                <div className="flex items-center gap-2 text-sm">
+                  <div className="p-1.5 rounded-lg bg-green-500/10">
+                    <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Price</p>
+                    <p className="text-gray-300 font-semibold">₹{series.price}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 text-sm col-span-2 sm:col-span-1">
+                  <div className="p-1.5 rounded-lg bg-blue-500/10">
+                    <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Students</p>
+                    <p className="text-gray-300 font-semibold">{series.studentsEnrolled?.length || 0}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Dates */}
+              <div className="flex flex-wrap gap-4 text-xs text-gray-500 mb-4 pb-4 border-b border-zinc-700/50">
+                <div className="flex items-center gap-1.5">
+                  <span>Created:</span>
+                  <span className="text-gray-400">{formatDate(series?.createdAt)}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span>Updated:</span>
+                  <span className="text-gray-400">{formatDate(series?.updatedAt)}</span>
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <div>
+                <button
+                  disabled={loading}
+                  onClick={() => navigate(`/dashboard/edit-mock-test-series/${series._id}`)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 hover:border-blue-500/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <FiEdit2 size={18} />
+                  <span>Edit</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </>
   )
 }

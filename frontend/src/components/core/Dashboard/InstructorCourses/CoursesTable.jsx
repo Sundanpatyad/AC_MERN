@@ -1,6 +1,4 @@
 import { useDispatch, useSelector } from "react-redux"
-import { Table, Thead, Tbody, Tr, Th, Td } from 'react-super-responsive-table'
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css'
 import { useState } from "react"
 import { FaCheck } from "react-icons/fa"
 import { FiEdit2 } from "react-icons/fi"
@@ -18,7 +16,7 @@ export default function CoursesTable({ courses, setCourses, loading, setLoading 
   const navigate = useNavigate()
   const { token } = useSelector((state) => state.auth)
   const [confirmationModal, setConfirmationModal] = useState(null)
-  const TRUNCATE_LENGTH = 25
+  const TRUNCATE_LENGTH = 30
 
   const handleCourseDelete = async (courseId) => {
     setLoading(true)
@@ -33,16 +31,47 @@ export default function CoursesTable({ courses, setCourses, loading, setLoading 
     toast.dismiss(toastId)
   }
 
-  const skItem = () => {
+  const SkeletonCard = () => {
     return (
-      <div className="flex flex-col md:flex-row border-b border-richblack-800 px-4 py-4 md:px-6 md:py-8 w-full">
-        <div className="flex flex-col md:flex-row flex-1 gap-4">
-          <div className='h-[148px] w-full md:min-w-[270px] md:max-w-[270px] rounded-xl skeleton'></div>
-          <div className="flex flex-col w-full md:w-[40%]">
-            <p className="h-5 w-[50%] rounded-xl skeleton"></p>
-            <p className="h-20 w-[60%] rounded-xl mt-3 skeleton"></p>
-            <p className="h-2 w-[20%] rounded-xl skeleton mt-3"></p>
-            <p className="h-2 w-[20%] rounded-xl skeleton mt-2"></p>
+      <div className="rounded-2xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-6 shadow-2xl">
+        <div className="flex flex-col md:flex-row gap-6">
+          <div className='h-48 w-full md:w-64 rounded-xl skeleton'></div>
+          <div className="flex flex-col flex-1 gap-3">
+            <div className="h-6 w-3/4 rounded-lg skeleton"></div>
+            <div className="h-4 w-full rounded-lg skeleton"></div>
+            <div className="h-4 w-5/6 rounded-lg skeleton"></div>
+            <div className="flex gap-2 mt-auto">
+              <div className="h-8 w-24 rounded-lg skeleton"></div>
+              <div className="h-8 w-24 rounded-lg skeleton"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <SkeletonCard />
+        <SkeletonCard />
+        <SkeletonCard />
+      </div>
+    )
+  }
+
+  if (!loading && courses?.length === 0) {
+    return (
+      <div className="rounded-2xl border-2 border-dashed border-zinc-700 bg-zinc-900/50 p-16 text-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="p-4 rounded-full bg-zinc-800 border border-zinc-700">
+            <svg className="w-16 h-16 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          </div>
+          <div>
+            <p className="text-gray-300 text-xl font-medium">No courses found</p>
+            <p className="text-gray-500 text-sm mt-2">Create your first course to get started</p>
           </div>
         </div>
       </div>
@@ -51,107 +80,114 @@ export default function CoursesTable({ courses, setCourses, loading, setLoading 
 
   return (
     <>
-      <Table className="rounded-xl border border-richblack-800">
-        <Thead>
-          <Tr className="flex flex-col md:flex-row md:gap-x-10 rounded-t-xl border-b border-b-richblack-800 px-4 py-2 md:px-6">
-            <Th className="flex-1 text-left text-sm font-medium uppercase text-richblack-100">
-              Courses
-            </Th>
-            <Th className="text-left text-sm font-medium uppercase text-richblack-100 mt-2 md:mt-0">
-              Duration
-            </Th>
-            <Th className="text-left text-sm font-medium uppercase text-richblack-100 mt-2 md:mt-0">
-              Price
-            </Th>
-            <Th className="text-left text-sm font-medium uppercase text-richblack-100 mt-2 md:mt-0">
-              Actions
-            </Th>
-          </Tr>
-        </Thead>
+      <div className="space-y-4">
+        {courses?.map((course) => (
+          <div
+            key={course._id}
+            className="group rounded-2xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-6 shadow-2xl hover:border-zinc-600/50 transition-all duration-300"
+          >
+            <div className="flex flex-col lg:flex-row gap-6">
+              {/* Course Thumbnail */}
+              <div className="relative lg:w-80 flex-shrink-0">
+                <Img
+                  src={course?.thumbnail}
+                  alt={course?.courseName}
+                  className="h-48 w-full rounded-xl object-cover"
+                />
+                {/* Status Badge on Image */}
+                <div className="absolute top-3 right-3">
+                  {course.status === COURSE_STATUS.DRAFT ? (
+                    <div className="flex items-center gap-2 rounded-full bg-yellow-500/90 backdrop-blur-sm px-3 py-1.5 text-xs font-semibold text-black">
+                      <HiClock size={14} />
+                      Draft
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 rounded-full bg-green-500/90 backdrop-blur-sm px-3 py-1.5 text-xs font-semibold text-black">
+                      <FaCheck size={12} />
+                      Published
+                    </div>
+                  )}
+                </div>
+              </div>
 
-        {loading && <div>{skItem()}{skItem()}{skItem()}</div>}
+              {/* Course Details */}
+              <div className="flex flex-col flex-1 min-w-0">
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-white mb-2 capitalize line-clamp-1">
+                    {course.courseName}
+                  </h3>
+                  <p className="text-sm text-gray-400 line-clamp-2 mb-4">
+                    {course.courseDescription.split(" ").length > TRUNCATE_LENGTH
+                      ? course.courseDescription.split(" ").slice(0, TRUNCATE_LENGTH).join(" ") + "..."
+                      : course.courseDescription}
+                  </p>
 
-        <Tbody>
-          {!loading && courses?.length === 0 ? (
-            <Tr>
-              <Td className="py-10 text-center text-2xl font-medium text-richblack-100">
-                No courses found
-              </Td>
-            </Tr>
-          ) : (
-            courses?.map((course) => (
-              <Tr
-                key={course._id}
-                className="flex flex-col md:flex-row md:gap-x-10 border-b border-richblack-800 px-4 py-4 md:px-6 md:py-8"
-              >
-                <Td className="flex flex-col md:flex-row flex-1 gap-4 relative">
-                  <Img
-                    src={course?.thumbnail}
-                    alt={course?.courseName}
-                    className="h-[148px] w-full md:min-w-[270px] md:max-w-[270px] rounded-lg object-cover"
-                  />
-                  <div className="flex flex-col">
-                    <p className="text-lg font-semibold text-richblack-5 capitalize">{course.courseName}</p>
-                    <p className="text-xs text-richblack-300">
-                      {course.courseDescription.split(" ").length > TRUNCATE_LENGTH
-                        ? course.courseDescription.split(" ").slice(0, TRUNCATE_LENGTH).join(" ") + "..."
-                        : course.courseDescription}
-                    </p>
-                    <p className="text-[12px] text-richblack-100 mt-4">
-                      Created: {formatDate(course?.createdAt)}
-                    </p>
-                    <p className="text-[12px] text-richblack-100">
-                      Updated: {formatDate(course?.updatedAt)}
-                    </p>
-                    {course.status === COURSE_STATUS.DRAFT ? (
-                      <p className="mt-2 flex w-fit flex-row items-center gap-2 rounded-full bg-richblack-700 px-2 py-[2px] text-[12px] font-medium text-pink-100">
-                        <HiClock size={14} />
-                        Drafted
-                      </p>
-                    ) : (
-                      <div className="mt-2 flex w-fit flex-row items-center gap-2 rounded-full bg-richblack-700 px-2 py-[2px] text-[12px] font-medium text-yellow-100">
-                        <p className="flex h-3 w-3 items-center justify-center rounded-full bg-yellow-100 text-richblack-700">
-                          <FaCheck size={8} />
-                        </p>
-                        Published
+                  {/* Course Meta Info */}
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="p-1.5 rounded-lg bg-blue-500/10">
+                        <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                       </div>
-                    )}
+                      <span className="text-gray-300">2hr 30min</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="p-1.5 rounded-lg bg-green-500/10">
+                        <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <span className="text-gray-300 font-semibold">₹{course.price}</span>
+                    </div>
                   </div>
-                </Td>
-                <Td className="text-sm font-medium text-richblack-100 mt-2 md:mt-0">2hr 30min</Td>
-                <Td className="text-sm font-medium text-richblack-100 mt-2 md:mt-0">₹{course.price}</Td>
-                <Td className="text-sm font-medium text-richblack-100 mt-2 md:mt-0 flex justify-start md:justify-end">
+
+                  {/* Dates */}
+                  <div className="flex flex-wrap gap-4 text-xs text-gray-500">
+                    <div className="flex items-center gap-1.5">
+                      <span>Created:</span>
+                      <span className="text-gray-400">{formatDate(course?.createdAt)}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span>Updated:</span>
+                      <span className="text-gray-400">{formatDate(course?.updatedAt)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 mt-4 pt-4 border-t border-zinc-700/50">
                   <button
                     disabled={loading}
-                    onClick={() => { navigate(`/dashboard/edit-course/${course._id}`) }}
-                    title="Edit"
-                    className="px-2 transition-all duration-200 hover:scale-110 hover:text-caribbeangreen-300"
+                    onClick={() => navigate(`/dashboard/edit-course/${course._id}`)}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 hover:border-blue-500/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <FiEdit2 size={20} />
+                    <FiEdit2 size={18} />
+                    <span>Edit</span>
                   </button>
                   <button
                     disabled={loading}
                     onClick={() => {
                       setConfirmationModal({
-                        text1: "Do you want to delete this course?",
+                        text1: "Delete this course?",
                         text2: "All the data related to this course will be deleted",
                         btn1Text: !loading ? "Delete" : "Loading...",
                         btn2Text: "Cancel",
-                        btn1Handler: !loading ? () => handleCourseDelete(course._id) : () => {},
-                        btn2Handler: !loading ? () => setConfirmationModal(null) : () => {},
+                        btn1Handler: !loading ? () => handleCourseDelete(course._id) : () => { },
+                        btn2Handler: !loading ? () => setConfirmationModal(null) : () => { },
                       })
                     }}
-                    title="Delete"
-                    className="px-1 transition-all duration-200 hover:scale-110 hover:text-[#ff0000]"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 hover:border-red-500/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <RiDeleteBin6Line size={20} />
+                    <RiDeleteBin6Line size={18} />
+                    <span>Delete</span>
                   </button>
-                </Td>
-              </Tr>
-            ))
-          )}
-        </Tbody>
-      </Table>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
 
       {confirmationModal && <ConfirmationModal modalData={confirmationModal} />}
     </>

@@ -1,5 +1,3 @@
-"use client";
-
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -34,10 +32,16 @@ export function PlaceholdersAndVanishInput({
   };
 
   useEffect(() => {
-    const meta = document.createElement('meta');
-    meta.name = 'viewport';
-    meta.content = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no';
-    document.getElementsByTagName('head')[0].appendChild(meta);
+    let metaTag = null;
+
+    // Only add meta tag if it doesn't already exist
+    const existingMeta = document.querySelector('meta[name="viewport"]');
+    if (!existingMeta) {
+      metaTag = document.createElement('meta');
+      metaTag.name = 'viewport';
+      metaTag.content = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no';
+      document.getElementsByTagName('head')[0].appendChild(metaTag);
+    }
 
     startAnimation();
     document.addEventListener("visibilitychange", handleVisibilityChange);
@@ -47,7 +51,11 @@ export function PlaceholdersAndVanishInput({
         clearInterval(intervalRef.current);
       }
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-      document.getElementsByTagName('head')[0].removeChild(meta);
+
+      // Only remove the meta tag if we created it
+      if (metaTag && metaTag.parentNode) {
+        metaTag.parentNode.removeChild(metaTag);
+      }
     };
   }, [placeholders]);
 
@@ -220,7 +228,7 @@ export function PlaceholdersAndVanishInput({
             animating && "text-transparent dark:text-transparent"
           )}
         />
-      
+
         <div className="absolute inset-0 flex items-center rounded-full pointer-events-none">
           <AnimatePresence mode="wait">
             {!value && (
