@@ -602,7 +602,7 @@ const MockTestSeries = () => {
                 onClick={() => setShowAttemptDetails(!showAttemptDetails)}
                 className="py-3 px-6 bg-slate-200 text-black font-bold rounded-lg hover:bg-gray-700 transition duration-300 shadow-md"
               >
-                {showAttemptDetails ? "Hide Attempt Details" : "Show Attempt Details"}
+                {showAttemptDetails ? "Hide Answers" : "Show Answers"}
               </button>
             </div>
 
