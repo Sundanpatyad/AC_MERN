@@ -9,7 +9,7 @@ import Footer from '../../common/Footer';
 import { motion, AnimatePresence } from "framer-motion";
 import { BsFiletypePdf, BsExclamationTriangle } from "react-icons/bs";
 import { AiOutlineCaretDown, AiOutlineHome } from "react-icons/ai";
-import { FiLogOut } from "react-icons/fi";
+import { FiLogOut, FiSun, FiMoon } from "react-icons/fi";
 import { IoMdTime } from "react-icons/io";
 import { IoChevronBackCircle } from "react-icons/io5";
 
@@ -36,6 +36,30 @@ const MockTestSeries = () => {
   const [isRankOpen, setIsRankOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const savedMode = localStorage.getItem('mockTestDarkMode');
+    return savedMode ? JSON.parse(savedMode) : false;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('mockTestDarkMode', JSON.stringify(isDarkMode));
+  }, [isDarkMode]);
+
+  const scrollContainerRef = React.useRef(null);
+
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      const activeBtn = scrollContainerRef.current.querySelector(`button[data-index="${currentQuestion}"]`);
+      if (activeBtn) {
+        const container = scrollContainerRef.current;
+        const scrollLeft = activeBtn.offsetLeft - (container.offsetWidth / 2) + (activeBtn.offsetWidth / 2);
+        container.scrollTo({
+          left: scrollLeft,
+          behavior: 'smooth'
+        });
+      }
+    }
+  }, [currentQuestion]);
 
   useEffect(() => {
     fetchTestSeries();
@@ -251,21 +275,21 @@ const MockTestSeries = () => {
               <div
                 key={index}
                 className={`flex flex-col md:flex-row gap-6 p-6 rounded-2xl border transition-all duration-300 ${isCorrect ? 'bg-green-500/5 border-green-500/20 hover:bg-green-500/10' :
-                    isIncorrect ? 'bg-red-500/5 border-red-500/20 hover:bg-red-500/10' :
-                      'bg-zinc-800/50 border-zinc-700/50 hover:bg-zinc-800'
+                  isIncorrect ? 'bg-red-500/5 border-red-500/20 hover:bg-red-500/10' :
+                    'bg-zinc-800/50 border-zinc-700/50 hover:bg-zinc-800'
                   }`}
               >
                 {/* Status Icon & Number */}
                 <div className="flex-shrink-0 flex md:flex-col items-center gap-3">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm border-2 ${isCorrect ? 'bg-green-500 text-white border-green-400' :
-                      isIncorrect ? 'bg-red-500 text-white border-red-400' :
-                        'bg-zinc-700 text-zinc-300 border-zinc-600'
+                    isIncorrect ? 'bg-red-500 text-white border-red-400' :
+                      'bg-zinc-700 text-zinc-300 border-zinc-600'
                     }`}>
                     {index + 1}
                   </div>
                   <div className={`text-2xl ${isCorrect ? 'text-green-500' :
-                      isIncorrect ? 'text-red-500' :
-                        'text-zinc-500'
+                    isIncorrect ? 'text-red-500' :
+                      'text-zinc-500'
                     }`}>
                     {isCorrect ? (
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
@@ -286,13 +310,13 @@ const MockTestSeries = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                     <div className={`p-4 rounded-xl border ${isCorrect ? 'bg-green-500/10 border-green-500/20' :
-                        isIncorrect ? 'bg-red-500/10 border-red-500/20' :
-                          'bg-zinc-800 border-zinc-700'
+                      isIncorrect ? 'bg-red-500/10 border-red-500/20' :
+                        'bg-zinc-800 border-zinc-700'
                       }`}>
                       <p className="text-xs uppercase tracking-wider font-semibold mb-1 opacity-70">Your Answer</p>
                       <p className={`font-medium ${isCorrect ? 'text-green-400' :
-                          isIncorrect ? 'text-red-400' :
-                            'text-zinc-400'
+                        isIncorrect ? 'text-red-400' :
+                          'text-zinc-400'
                         }`}>
                         {userAnswer}
                       </p>
@@ -346,7 +370,7 @@ const MockTestSeries = () => {
         <div className="w-full max-w-6xl mx-auto space-y-8">
           {/* Header */}
           <div className="border-b border-white/10 pb-6">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3">
+            <h1 className="text-2xl md:text-2xl lg:text-5xl font-bold text-white mb-3">
               {testSeries.seriesName}
             </h1>
             <p className="text-gray-400 text-base md:text-lg">
@@ -702,11 +726,11 @@ const MockTestSeries = () => {
   const currentQuestionData = currentTest.questions[currentQuestion];
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 font-inter">
-      <div className="w-full md:w-[90vw] max-w-6xl bg-zinc-900/50 border border-zinc-800 shadow-2xl rounded-2xl p-6 md:p-10 space-y-8 backdrop-blur-sm relative overflow-hidden">
+    <div className={`min-h-screen flex flex-col items-center justify-center p-2 md:p-4 font-inter transition-colors duration-300 ${isDarkMode ? 'bg-black' : 'bg-gray-200'}`}>
+      <div className={`w-full md:w-[90vw] max-w-6xl shadow-2xl rounded-xl md:rounded-2xl p-3 md:p-10 space-y-4 md:space-y-8 backdrop-blur-sm relative overflow-hidden flex flex-col h-[calc(100vh-1rem)] md:h-auto border transition-colors duration-300 ${isDarkMode ? 'bg-zinc-900/50 border-zinc-800' : 'bg-gray-50 border-gray-300'}`}>
 
         {/* Progress Bar */}
-        <div className="absolute top-0 left-0 w-full h-1 bg-zinc-800">
+        <div className={`absolute top-0 left-0 w-full h-1 ${isDarkMode ? 'bg-zinc-800' : 'bg-gray-300'}`}>
           <div
             className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"
             style={{ width: `${((currentQuestion + 1) / currentTest.questions.length) * 100}%` }}
@@ -714,53 +738,71 @@ const MockTestSeries = () => {
         </div>
 
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-zinc-800">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">{currentTest.testName}</h2>
-            <p className="text-zinc-400 text-sm mt-1">Question {currentQuestion + 1} of {currentTest.questions.length}</p>
+        <div className={`flex flex-row justify-between items-center gap-2 pb-2 md:pb-6 border-b flex-shrink-0 ${isDarkMode ? 'border-zinc-800' : 'border-gray-300'}`}>
+          <div className="flex flex-col gap-1.5">
+            <h2 className={`text-lg md:text-2xl font-bold tracking-tight truncate max-w-[250px] md:max-w-none ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+              {currentTest.testName}
+            </h2>
+            <div className={`flex items-center gap-3 text-xs md:text-sm font-medium ${isDarkMode ? 'text-zinc-400' : 'text-slate-600'}`}>
+              <span>Q {currentQuestion + 1} <span className="text-[10px] opacity-60">/</span> {currentTest.questions.length}</span>
+              <div className={`w-px h-3 ${isDarkMode ? 'bg-zinc-700' : 'bg-gray-300'}`}></div>
+              <div className={`flex items-center gap-1.5 font-mono ${timeLeft < 300 ? 'text-red-500' : (isDarkMode ? 'text-zinc-300' : 'text-slate-600')}`}>
+                <IoMdTime className="text-blue-500 text-sm" />
+                {formatTime(timeLeft)}
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-3 bg-zinc-800/50 px-4 py-2 rounded-full border border-zinc-700/50">
-            <IoMdTime className="text-xl text-blue-400" />
-            <span className={`text-lg font-mono font-medium ${timeLeft < 300 ? 'text-red-400' : 'text-gray-200'}`}>
-              {formatTime(timeLeft)}
-            </span>
+
+          <div className="flex items-center gap-3">
+            {/* Theme Toggle */}
+            <button
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className={`relative rounded-full w-9 h-[18px] transition-colors duration-300 focus:outline-none ${isDarkMode ? 'bg-zinc-800 border border-zinc-700' : 'bg-gray-200 border border-gray-300'}`}
+            >
+              <div
+                className={`absolute top-0.5 left-0.5 w-3 h-3 rounded-full shadow-sm transform transition-transform duration-300 flex items-center justify-center ${isDarkMode ? 'translate-x-4 bg-zinc-700 text-yellow-400' : 'translate-x-0 bg-white text-orange-400'}`}
+              >
+                {isDarkMode ? <FiMoon size={10} /> : <FiSun size={10} />}
+              </div>
+            </button>
           </div>
         </div>
 
-        {/* Main Question Content */}
-        <div className="space-y-6 min-h-[400px]">
-          <div className="prose prose-invert max-w-none">
-            <h3 className="text-xl md:text-2xl leading-relaxed font-medium text-gray-100">
+        {/* Scrollable Content Area */}
+        <div className="flex-1 overflow-y-auto space-y-4 min-h-0">
+          {/* Question Text */}
+          <div className={`prose max-w-none ${isDarkMode ? 'prose-invert' : 'prose-slate'}`}>
+            <h3 className={`text-base md:text-2xl leading-snug font-medium ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
               {currentQuestionData.text}
             </h3>
           </div>
 
           {/* Match Question Columns */}
           {currentQuestionData.questionType === 'MATCH' && currentQuestionData.leftColumn && currentQuestionData.rightColumn && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 my-8">
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 pb-2 border-b border-blue-500/20">
-                  <span className="bg-blue-500/20 text-blue-400 text-xs font-bold px-2 py-1 rounded">COLUMN A</span>
+            <div className="grid grid-cols-2 gap-2 md:gap-8 my-2 md:my-8">
+              <div className="space-y-2 md:space-y-4">
+                <div className="flex items-center gap-2 pb-1 border-b border-blue-500/20">
+                  <span className="bg-blue-500/20 text-blue-400 text-[10px] md:text-xs font-bold px-1.5 py-0.5 md:px-2 md:py-1 rounded">COL A</span>
                 </div>
                 {currentQuestionData.leftColumn.map((item, idx) => (
-                  <div key={`left-${idx}`} className="flex items-start gap-4 p-4 bg-zinc-800/50 rounded-xl border border-zinc-700/50 hover:bg-zinc-800 transition-colors">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold mt-0.5">
+                  <div key={`left-${idx}`} className={`flex items-start gap-2 md:gap-4 p-2 md:p-4 rounded-lg md:rounded-xl border transition-colors ${isDarkMode ? 'bg-zinc-800/50 border-zinc-700/50 hover:bg-zinc-800' : 'bg-gray-50 border-gray-200 hover:bg-gray-100'}`}>
+                    <span className="flex-shrink-0 w-4 h-4 md:w-6 md:h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-[10px] md:text-xs font-bold mt-0.5">
                       {String.fromCharCode(97 + idx)}
                     </span>
-                    <span className="text-gray-300 leading-relaxed">{item.replace(/^[a-z]\)\s*/, '')}</span>
+                    <span className={`text-[10px] md:text-base leading-snug ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{item.replace(/^[a-z]\)\s*/, '')}</span>
                   </div>
                 ))}
               </div>
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 pb-2 border-b border-orange-500/20">
-                  <span className="bg-orange-500/20 text-orange-400 text-xs font-bold px-2 py-1 rounded">COLUMN B</span>
+              <div className="space-y-2 md:space-y-4">
+                <div className="flex items-center gap-2 pb-1 border-b border-orange-500/20">
+                  <span className="bg-orange-500/20 text-orange-400 text-[10px] md:text-xs font-bold px-1.5 py-0.5 md:px-2 md:py-1 rounded">COL B</span>
                 </div>
                 {currentQuestionData.rightColumn.map((item, idx) => (
-                  <div key={`right-${idx}`} className="flex items-start gap-4 p-4 bg-zinc-800/50 rounded-xl border border-zinc-700/50 hover:bg-zinc-800 transition-colors">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center text-xs font-bold mt-0.5">
+                  <div key={`right-${idx}`} className={`flex items-start gap-2 md:gap-4 p-2 md:p-4 rounded-lg md:rounded-xl border transition-colors ${isDarkMode ? 'bg-zinc-800/50 border-zinc-700/50 hover:bg-zinc-800' : 'bg-gray-50 border-gray-200 hover:bg-gray-100'}`}>
+                    <span className="flex-shrink-0 w-4 h-4 md:w-6 md:h-6 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center text-[10px] md:text-xs font-bold mt-0.5">
                       {idx + 1}
                     </span>
-                    <span className="text-gray-300 leading-relaxed">{item.replace(/^\d+\)\s*/, '')}</span>
+                    <span className={`text-[10px] md:text-base leading-snug ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{item.replace(/^\d+\)\s*/, '')}</span>
                   </div>
                 ))}
               </div>
@@ -768,7 +810,7 @@ const MockTestSeries = () => {
           )}
 
           {/* Options Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+          <div className="grid grid-cols-2 gap-2 md:gap-4 pt-2">
             {(currentQuestionData.questionType === 'MATCH'
               ? currentQuestionData.options.slice(0, 4)
               : currentQuestionData.options
@@ -776,21 +818,21 @@ const MockTestSeries = () => {
               <button
                 key={index}
                 onClick={() => handleAnswerSelect(option)}
-                className={`group relative p-4 md:p-5 text-left rounded-xl border-2 transition-all duration-200 hover:shadow-lg
+                className={`group relative p-3 md:p-5 text-left rounded-xl border-2 transition-all duration-200 hover:shadow-lg
                   ${selectedAnswer === option
                     ? 'bg-blue-600/10 border-blue-500 shadow-blue-500/10'
-                    : 'bg-zinc-800/30 border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800'
+                    : (isDarkMode ? 'bg-zinc-800/30 border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800' : 'bg-white border-gray-200 hover:border-gray-400 hover:bg-gray-50')
                   }`}
               >
-                <div className="flex items-start gap-3">
-                  <div className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center mt-0.5 transition-colors
+                <div className="flex items-start gap-2 md:gap-3">
+                  <div className={`flex-shrink-0 w-4 h-4 md:w-6 md:h-6 rounded-full border-2 flex items-center justify-center mt-0.5 transition-colors
                     ${selectedAnswer === option
                       ? 'border-blue-500 bg-blue-500'
-                      : 'border-zinc-500 group-hover:border-zinc-400'
+                      : (isDarkMode ? 'border-zinc-500 group-hover:border-zinc-400' : 'border-gray-300 group-hover:border-gray-400')
                     }`}>
-                    {selectedAnswer === option && <div className="w-2.5 h-2.5 rounded-full bg-white" />}
+                    {selectedAnswer === option && <div className="w-1.5 h-1.5 md:w-2.5 md:h-2.5 rounded-full bg-white" />}
                   </div>
-                  <span className={`text-base md:text-lg leading-relaxed ${selectedAnswer === option ? 'text-white' : 'text-gray-300'}`}>
+                  <span className={`text-xs md:text-lg leading-snug ${selectedAnswer === option ? (isDarkMode ? 'text-white' : 'text-gray-900') : (isDarkMode ? 'text-gray-300' : 'text-gray-700')}`}>
                     {option}
                   </span>
                 </div>
@@ -799,22 +841,29 @@ const MockTestSeries = () => {
           </div>
         </div>
 
-        {/* Footer Navigation */}
-        <div className="flex flex-col-reverse md:flex-row gap-6 pt-6 border-t border-zinc-800">
-          <div className="flex-1 overflow-x-auto pb-2 md:pb-0">
-            <div className="flex gap-2">
+
+
+        {/* Footer Navigation (Compact) */}
+        <div className={`flex flex-col gap-3 pt-3 md:pt-6 border-t flex-shrink-0 -mx-3 px-3 md:mx-0 md:px-0 transition-colors ${isDarkMode ? 'border-zinc-800 bg-zinc-900/50 md:bg-transparent' : 'border-gray-200 bg-white md:bg-transparent'}`}>
+          {/* Question Numbers Horizontal Scroll */}
+          <div
+            ref={scrollContainerRef}
+            className="overflow-x-auto pb-2 scrollbar-hide"
+          >
+            <div className="flex gap-1.5 md:gap-2">
               {currentTest.questions.map((_, index) => (
                 <button
                   key={index}
+                  data-index={index}
                   onClick={() => handleQuestionNavigation(index)}
-                  className={`flex-shrink-0 w-10 h-10 rounded-lg font-medium text-sm transition-all duration-200 border
+                  className={`flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-lg font-medium text-xs md:text-sm transition-all duration-200 border
                     ${index === currentQuestion
                       ? 'bg-white text-black border-white shadow-lg scale-105'
                       : answeredQuestions[index]
-                        ? 'bg-blue-600/20 text-blue-400 border-blue-500/30'
+                        ? 'bg-blue-600/20 text-blue-500 border-blue-500/30'
                         : skippedQuestions.includes(index)
-                          ? 'bg-orange-500/20 text-orange-400 border-orange-500/30'
-                          : 'bg-zinc-800 text-zinc-500 border-zinc-700 hover:border-zinc-600 hover:text-zinc-300'
+                          ? 'bg-orange-500/20 text-orange-500 border-orange-500/30'
+                          : (isDarkMode ? 'bg-zinc-800 text-zinc-500 border-zinc-700 hover:border-zinc-600 hover:text-zinc-300' : 'bg-gray-100 text-gray-500 border-gray-200 hover:border-gray-300 hover:text-gray-700')
                     }`}
                 >
                   {index + 1}
@@ -823,22 +872,22 @@ const MockTestSeries = () => {
             </div>
           </div>
 
-          <div className="flex gap-3 justify-end min-w-fit">
+          <div className="flex gap-2 justify-between">
             <button
               onClick={() => currentQuestion > 0 && setCurrentQuestion(currentQuestion - 1)}
               disabled={currentQuestion === 0}
-              className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200
+              className={`flex-1 py-2.5 md:py-3 rounded-xl font-semibold text-xs md:text-sm transition-all duration-200 border
                 ${currentQuestion > 0
-                  ? 'bg-zinc-800 text-white hover:bg-zinc-700 border border-zinc-700'
-                  : 'bg-zinc-900 text-zinc-600 cursor-not-allowed border border-zinc-800'
+                  ? (isDarkMode ? 'bg-zinc-800 text-white hover:bg-zinc-700 border-zinc-700' : 'bg-white text-gray-900 hover:bg-gray-100 border-gray-200')
+                  : (isDarkMode ? 'bg-zinc-900 text-zinc-600 cursor-not-allowed border-zinc-800' : 'bg-gray-100 text-gray-300 cursor-not-allowed border-gray-200')
                 }`}
             >
-              Previous
+              Prev
             </button>
 
             <button
               onClick={handleSkipQuestion}
-              className="px-6 py-3 rounded-xl font-semibold text-sm text-zinc-400 hover:text-white transition-colors"
+              className={`flex-1 py-2.5 md:py-3 rounded-xl font-semibold text-xs md:text-sm transition-colors border ${isDarkMode ? 'text-zinc-400 bg-zinc-800/50 hover:bg-zinc-800 hover:text-white border-zinc-800' : 'text-gray-500 bg-gray-50 hover:bg-gray-100 hover:text-gray-900 border-gray-200'}`}
             >
               Skip
             </button>
@@ -846,17 +895,16 @@ const MockTestSeries = () => {
             <button
               onClick={handleNextQuestion}
               disabled={!selectedAnswer && !answeredQuestions[currentQuestion]}
-              className={`px-8 py-3 rounded-xl font-semibold text-sm shadow-lg transition-all duration-200
+              className={`flex-[2] py-2.5 md:py-3 rounded-xl font-semibold text-xs md:text-sm shadow-lg transition-all duration-200 border
                 ${selectedAnswer || answeredQuestions[currentQuestion]
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-blue-500/25 hover:from-blue-500 hover:to-indigo-500 transform hover:-translate-y-0.5'
-                  : 'bg-zinc-800 text-zinc-500 cursor-not-allowed border border-zinc-700'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-blue-500/25 border-transparent'
+                  : (isDarkMode ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed border-zinc-700' : 'bg-gray-100 text-gray-300 cursor-not-allowed border-gray-200')
                 }`}
             >
-              {currentQuestion + 1 === currentTest.questions.length ? 'Finish Test' : 'Next'}
+              {currentQuestion + 1 === currentTest.questions.length ? 'Finish' : 'Next'}
             </button>
           </div>
         </div>
-        <Footer />
       </div>
     </div>
   );

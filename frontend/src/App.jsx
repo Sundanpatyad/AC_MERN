@@ -137,7 +137,7 @@ function App() {
         transition={{ duration: 0.4, ease: "easeInOut" }} // Increase duration and add easing
         className="flex flex-col min-h-screen"
       >
-        <Navbar />
+        {!location.pathname.includes("view-mock") && <Navbar />}
         <main className="flex-grow">
           <Suspense fallback={""}>
             <Routes>
@@ -288,7 +288,7 @@ function App() {
         </main>
       </motion.div>
 
-      {token && (
+      {token && !location.pathname.includes("view-mock") && (
         <motion.div
           initial={{ y: "100%" }} // Start from below the viewport
           animate={{ y: "0%" }} // Slide up and fade in
