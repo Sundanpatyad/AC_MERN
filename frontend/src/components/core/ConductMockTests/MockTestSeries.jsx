@@ -248,28 +248,25 @@ const MockTestSeries = () => {
             const userAnswer = userAnswers[index] || "Not answered";
 
             return (
-              <div 
-                key={index} 
-                className={`flex flex-col md:flex-row gap-6 p-6 rounded-2xl border transition-all duration-300 ${
-                  isCorrect ? 'bg-green-500/5 border-green-500/20 hover:bg-green-500/10' :
-                  isIncorrect ? 'bg-red-500/5 border-red-500/20 hover:bg-red-500/10' :
-                  'bg-zinc-800/50 border-zinc-700/50 hover:bg-zinc-800'
-                }`}
+              <div
+                key={index}
+                className={`flex flex-col md:flex-row gap-6 p-6 rounded-2xl border transition-all duration-300 ${isCorrect ? 'bg-green-500/5 border-green-500/20 hover:bg-green-500/10' :
+                    isIncorrect ? 'bg-red-500/5 border-red-500/20 hover:bg-red-500/10' :
+                      'bg-zinc-800/50 border-zinc-700/50 hover:bg-zinc-800'
+                  }`}
               >
                 {/* Status Icon & Number */}
                 <div className="flex-shrink-0 flex md:flex-col items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm border-2 ${
-                     isCorrect ? 'bg-green-500 text-white border-green-400' :
-                     isIncorrect ? 'bg-red-500 text-white border-red-400' :
-                     'bg-zinc-700 text-zinc-300 border-zinc-600'
-                  }`}>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm border-2 ${isCorrect ? 'bg-green-500 text-white border-green-400' :
+                      isIncorrect ? 'bg-red-500 text-white border-red-400' :
+                        'bg-zinc-700 text-zinc-300 border-zinc-600'
+                    }`}>
                     {index + 1}
                   </div>
-                  <div className={`text-2xl ${
-                     isCorrect ? 'text-green-500' :
-                     isIncorrect ? 'text-red-500' :
-                     'text-zinc-500'
-                  }`}>
+                  <div className={`text-2xl ${isCorrect ? 'text-green-500' :
+                      isIncorrect ? 'text-red-500' :
+                        'text-zinc-500'
+                    }`}>
                     {isCorrect ? (
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                     ) : isIncorrect ? (
@@ -288,25 +285,23 @@ const MockTestSeries = () => {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                    <div className={`p-4 rounded-xl border ${
-                      isCorrect ? 'bg-green-500/10 border-green-500/20' : 
-                      isIncorrect ? 'bg-red-500/10 border-red-500/20' : 
-                      'bg-zinc-800 border-zinc-700'
-                    }`}>
-                      <p className="text-xs uppercase tracking-wider font-semibold mb-1 opacity-70">Your Answer</p>
-                      <p className={`font-medium ${
-                        isCorrect ? 'text-green-400' : 
-                        isIncorrect ? 'text-red-400' : 
-                        'text-zinc-400'
+                    <div className={`p-4 rounded-xl border ${isCorrect ? 'bg-green-500/10 border-green-500/20' :
+                        isIncorrect ? 'bg-red-500/10 border-red-500/20' :
+                          'bg-zinc-800 border-zinc-700'
                       }`}>
-                         {userAnswer}
+                      <p className="text-xs uppercase tracking-wider font-semibold mb-1 opacity-70">Your Answer</p>
+                      <p className={`font-medium ${isCorrect ? 'text-green-400' :
+                          isIncorrect ? 'text-red-400' :
+                            'text-zinc-400'
+                        }`}>
+                        {userAnswer}
                       </p>
                     </div>
 
                     <div className="p-4 rounded-xl border bg-blue-500/5 border-blue-500/20">
                       <p className="text-xs uppercase tracking-wider font-semibold mb-1 text-blue-400/70">Correct Answer</p>
                       <p className="font-medium text-blue-400">
-                         {question.correctAnswer}
+                        {question.correctAnswer}
                       </p>
                     </div>
                   </div>
@@ -857,7 +852,7 @@ const MockTestSeries = () => {
                   : 'bg-zinc-800 text-zinc-500 cursor-not-allowed border border-zinc-700'
                 }`}
             >
-              {currentQuestion + 1 === currentTest.questions.length ? 'Finish Test' : 'Next Question'}
+              {currentQuestion + 1 === currentTest.questions.length ? 'Finish Test' : 'Next'}
             </button>
           </div>
         </div>
