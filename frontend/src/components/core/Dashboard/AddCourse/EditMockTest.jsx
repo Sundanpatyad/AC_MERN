@@ -18,6 +18,7 @@ const EditMockTestSeries = () => {
   const [isAddAttachmentsModalOpen, setIsAddAttachmentsModalOpen] = useState(false);
   const [isBulkImportModalOpen, setIsBulkImportModalOpen] = useState(false);
   const [bulkImportText, setBulkImportText] = useState('');
+  const [bulkImportQuestionType, setBulkImportQuestionType] = useState('mcq'); // 'mcq' or 'match'
   const [currentBulkImportTestIndex, setCurrentBulkImportTestIndex] = useState(null);
   const [expandedTests, setExpandedTests] = useState({});
 
@@ -37,6 +38,7 @@ const EditMockTestSeries = () => {
   const openBulkImportModal = (testIndex) => {
     setCurrentBulkImportTestIndex(testIndex);
     setBulkImportText('');
+    setBulkImportQuestionType('mcq');
     setIsBulkImportModalOpen(true);
   };
   const closeBulkImportModal = () => {
@@ -87,13 +89,44 @@ const EditMockTestSeries = () => {
     setSeries({ ...series, mockTests: updatedTests });
   };
 
-  const addQuestion = (testIndex) => {
+  const handleLeftColumnChange = (testIndex, questionIndex, itemIndex, value) => {
     const updatedTests = [...series.mockTests];
-    updatedTests[testIndex].questions.push({
+    if (!updatedTests[testIndex].questions[questionIndex].leftColumn) {
+      updatedTests[testIndex].questions[questionIndex].leftColumn = ['', '', '', ''];
+    }
+    updatedTests[testIndex].questions[questionIndex].leftColumn[itemIndex] = value;
+    setSeries({ ...series, mockTests: updatedTests });
+  };
+
+  const handleRightColumnChange = (testIndex, questionIndex, itemIndex, value) => {
+    const updatedTests = [...series.mockTests];
+    if (!updatedTests[testIndex].questions[questionIndex].rightColumn) {
+      updatedTests[testIndex].questions[questionIndex].rightColumn = ['', '', '', ''];
+    }
+    updatedTests[testIndex].questions[questionIndex].rightColumn[itemIndex] = value;
+    // Also update options array for compatibility
+    updatedTests[testIndex].questions[questionIndex].options[itemIndex] = value;
+    setSeries({ ...series, mockTests: updatedTests });
+  };
+
+  const addQuestion = (testIndex, type = 'MCQ') => {
+    const updatedTests = [...series.mockTests];
+
+    const newQuestion = type === 'MATCH' ? {
       text: '',
+      questionType: 'MATCH',
+      leftColumn: ['', '', '', ''],
+      rightColumn: ['', '', '', ''],
+      options: ['', '', '', '', ''],
+      correctAnswer: ''
+    } : {
+      text: '',
+      questionType: 'MCQ',
       options: ['', '', '', ''],
-      correctAnswer: '',
-    });
+      correctAnswer: ''
+    };
+
+    updatedTests[testIndex].questions.push(newQuestion);
     setSeries({ ...series, mockTests: updatedTests });
   };
 
@@ -148,40 +181,99 @@ const EditMockTestSeries = () => {
     setSeries({ ...series, attachments: updatedAttachments });
   };
 
-  const parseBulkQuestions = (text) => {
+  const parseBulkQuestions = (text, questionType) => {
     const lines = text.trim().split('\n').filter(line => line.trim());
     const questions = [];
     let i = 0;
 
-    while (i < lines.length) {
-      // Question text
-      const questionText = lines[i]?.trim();
-      if (!questionText) {
-        i++;
-        continue;
-      }
+    if (questionType === 'match') {
+      // Parse Match the Following format
+      // Expected format per question (14 lines):
+      // Line 1: Question text
+      // Lines 2-5: Left column items (a, b, c, d)
+      // Lines 6-9: Right column items (1, 2, 3, 4)
+      // Lines 10-14: Five mapping options (5th one is correct)
 
-      // Options (next 4 lines)
-      const options = [];
-      for (let j = 1; j <= 4; j++) {
-        if (i + j < lines.length) {
-          options.push(lines[i + j].trim());
+      while (i < lines.length) {
+        const questionText = lines[i]?.trim();
+        if (!questionText) {
+          i++;
+          continue;
         }
+
+        // Next 4 lines are left column items
+        const leftColumn = [];
+        for (let j = 1; j <= 4; j++) {
+          if (i + j < lines.length) {
+            leftColumn.push(lines[i + j].trim());
+          }
+        }
+
+        // Next 4 lines are right column items
+        const rightColumn = [];
+        for (let j = 5; j <= 8; j++) {
+          if (i + j < lines.length) {
+            rightColumn.push(lines[i + j].trim());
+          }
+        }
+
+        // Next 5 lines are the mapping options
+        const options = [];
+        for (let j = 9; j <= 13; j++) {
+          if (i + j < lines.length) {
+            options.push(lines[i + j].trim());
+          }
+        }
+
+        // The 5th option (last one) is the correct answer
+        const correctAnswer = options.length === 5 ? options[4] : '';
+
+        if (leftColumn.length === 4 && rightColumn.length === 4 && options.length === 5 && correctAnswer) {
+          questions.push({
+            text: questionText,
+            questionType: 'MATCH',
+            leftColumn: leftColumn,
+            rightColumn: rightColumn,
+            options: options, // All 5 mapping options
+            correctAnswer: correctAnswer // The 5th option
+          });
+        }
+
+        // Move to next question (1 question + 4 left + 4 right + 5 options = 14 lines)
+        i += 14;
       }
+    } else {
+      // Parse MCQ format (existing logic)
+      while (i < lines.length) {
+        const questionText = lines[i]?.trim();
+        if (!questionText) {
+          i++;
+          continue;
+        }
 
-      // Correct answer (5th line after question)
-      const correctAnswer = i + 5 < lines.length ? lines[i + 5].trim() : '';
+        // Options (next 4 lines)
+        const options = [];
+        for (let j = 1; j <= 4; j++) {
+          if (i + j < lines.length) {
+            options.push(lines[i + j].trim());
+          }
+        }
 
-      if (options.length === 4 && correctAnswer) {
-        questions.push({
-          text: questionText,
-          options: options,
-          correctAnswer: correctAnswer
-        });
+        // Correct answer (5th line after question)
+        const correctAnswer = i + 5 < lines.length ? lines[i + 5].trim() : '';
+
+        if (options.length === 4 && correctAnswer) {
+          questions.push({
+            text: questionText,
+            questionType: 'MCQ',
+            options: options,
+            correctAnswer: correctAnswer
+          });
+        }
+
+        // Move to next question (question + 4 options + 1 answer = 6 lines)
+        i += 6;
       }
-
-      // Move to next question (question + 4 options + 1 answer = 6 lines)
-      i += 6;
     }
 
     return questions;
@@ -190,7 +282,7 @@ const EditMockTestSeries = () => {
   const handleBulkImport = () => {
     if (currentBulkImportTestIndex === null || !bulkImportText.trim()) return;
 
-    const parsedQuestions = parseBulkQuestions(bulkImportText);
+    const parsedQuestions = parseBulkQuestions(bulkImportText, bulkImportQuestionType);
 
     if (parsedQuestions.length === 0) {
       alert('No valid questions found. Please check the format.');
@@ -219,11 +311,22 @@ const EditMockTestSeries = () => {
         duration: test.duration,
         negative: test.negative || 0,
         status: test.status,
-        questions: test.questions.map(question => ({
-          text: question.text,
-          options: question.options,
-          correctAnswer: question.correctAnswer
-        }))
+        questions: test.questions.map(question => {
+          const baseQuestion = {
+            text: question.text,
+            questionType: question.questionType || 'MCQ',
+            options: question.options,
+            correctAnswer: question.correctAnswer
+          };
+
+          // Add leftColumn and rightColumn for MATCH questions
+          if (question.questionType === 'MATCH' && question.leftColumn && question.rightColumn) {
+            baseQuestion.leftColumn = question.leftColumn;
+            baseQuestion.rightColumn = question.rightColumn;
+          }
+
+          return baseQuestion;
+        })
       })),
       attachments: series.attachments
     };
@@ -502,6 +605,15 @@ const EditMockTestSeries = () => {
                               <FaTrash size={16} />
                             </button>
 
+                            {/* Question Type Badge */}
+                            {question.questionType === 'MATCH' && (
+                              <div className="mb-3">
+                                <span className="px-3 py-1 rounded-full text-xs font-medium bg-purple-500/20 text-purple-400">
+                                  🔗 Match the Following
+                                </span>
+                              </div>
+                            )}
+
                             <div className="space-y-4">
                               <div className="space-y-2">
                                 <label className="block text-sm font-medium text-gray-200">
@@ -517,41 +629,125 @@ const EditMockTestSeries = () => {
                                 />
                               </div>
 
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                {question.options && question.options.map((option, optionIndex) => (
-                                  <div key={optionIndex} className="space-y-2">
+                              {question.questionType === 'MATCH' ? (
+                                // Match the Following UI
+                                <>
+                                  {/* Left Column Items */}
+                                  <div className="space-y-2">
                                     <label className="block text-sm font-medium text-gray-200">
-                                      Option {String.fromCharCode(65 + optionIndex)}
+                                      Left Column Items <sup className="text-pink-400">*</sup>
                                     </label>
-                                    <input
-                                      type="text"
-                                      value={option}
-                                      onChange={(e) => handleOptionChange(testIndex, questionIndex, optionIndex, e.target.value)}
-                                      className="w-full px-4 py-2 rounded-lg bg-zinc-700 border border-zinc-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                      placeholder={`Option ${String.fromCharCode(65 + optionIndex)}`}
-                                    />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                      {question.leftColumn && question.leftColumn.map((leftItem, itemIndex) => (
+                                        <div key={itemIndex} className="space-y-1">
+                                          <label className="block text-xs font-medium text-blue-300">
+                                            L{itemIndex + 1}
+                                          </label>
+                                          <input
+                                            type="text"
+                                            value={leftItem}
+                                            onChange={(e) => handleLeftColumnChange(testIndex, questionIndex, itemIndex, e.target.value)}
+                                            className="w-full px-4 py-2 rounded-lg bg-zinc-700 border border-zinc-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                            placeholder={`Left item ${itemIndex + 1}`}
+                                          />
+                                        </div>
+                                      ))}
+                                    </div>
                                   </div>
-                                ))}
-                              </div>
 
-                              <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-200">
-                                  Correct Answer <sup className="text-pink-400">*</sup>
-                                </label>
-                                <select
-                                  name="correctAnswer"
-                                  value={question.correctAnswer}
-                                  onChange={(e) => handleQuestionChange(e, testIndex, questionIndex)}
-                                  className="w-full px-4 py-3 rounded-lg bg-zinc-700 border border-zinc-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer"
-                                >
-                                  <option value="">Select correct answer</option>
-                                  {question.options.map((option, optionIndex) => (
-                                    <option key={optionIndex} value={option}>
-                                      {option || `Option ${String.fromCharCode(65 + optionIndex)}`}
-                                    </option>
-                                  ))}
-                                </select>
-                              </div>
+                                  {/* Right Column Items */}
+                                  <div className="space-y-2">
+                                    <label className="block text-sm font-medium text-gray-200">
+                                      Right Column Items <sup className="text-pink-400">*</sup>
+                                    </label>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                      {question.rightColumn && question.rightColumn.map((rightItem, itemIndex) => (
+                                        <div key={itemIndex} className="space-y-1">
+                                          <label className="block text-xs font-medium text-orange-300">
+                                            R{itemIndex + 1}
+                                          </label>
+                                          <input
+                                            type="text"
+                                            value={rightItem}
+                                            onChange={(e) => handleRightColumnChange(testIndex, questionIndex, itemIndex, e.target.value)}
+                                            className="w-full px-4 py-2 rounded-lg bg-zinc-700 border border-zinc-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                            placeholder={`Right item ${itemIndex + 1}`}
+                                          />
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+
+                                  {/* Mapping Options (5 options) */}
+                                  <div className="space-y-2">
+                                    <label className="block text-sm font-medium text-gray-200">
+                                      Mapping Options <sup className="text-pink-400">*</sup>
+                                    </label>
+                                    <div className="space-y-2">
+                                      {question.options && question.options.map((option, optionIndex) => (
+                                        <div key={optionIndex} className="flex items-center gap-2">
+                                          <span className={`px-3 py-2 rounded-lg font-medium text-sm min-w-[80px] text-center ${optionIndex === 4
+                                            ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                            : 'bg-zinc-700 text-gray-300'
+                                            }`}>
+                                            Option {optionIndex + 1}
+                                            {optionIndex === 4 && ' ✓'}
+                                          </span>
+                                          <input
+                                            type="text"
+                                            value={option}
+                                            onChange={(e) => handleOptionChange(testIndex, questionIndex, optionIndex, e.target.value)}
+                                            className="flex-1 px-4 py-2 rounded-lg bg-zinc-700 border border-zinc-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                            placeholder={`e.g., a-${optionIndex + 1} b-${(optionIndex + 1) % 4 + 1} c-${(optionIndex + 2) % 4 + 1} d-${(optionIndex + 3) % 4 + 1}`}
+                                          />
+                                        </div>
+                                      ))}
+                                    </div>
+                                    <p className="text-xs text-gray-400 mt-2">
+                                      💡 The 5th option (last one) is automatically set as the correct answer
+                                    </p>
+                                  </div>
+                                </>
+                              ) : (
+                                // Regular MCQ UI
+                                <>
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    {question.options && question.options.map((option, optionIndex) => (
+                                      <div key={optionIndex} className="space-y-2">
+                                        <label className="block text-sm font-medium text-gray-200">
+                                          Option {String.fromCharCode(65 + optionIndex)}
+                                        </label>
+                                        <input
+                                          type="text"
+                                          value={option}
+                                          onChange={(e) => handleOptionChange(testIndex, questionIndex, optionIndex, e.target.value)}
+                                          className="w-full px-4 py-2 rounded-lg bg-zinc-700 border border-zinc-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                          placeholder={`Option ${String.fromCharCode(65 + optionIndex)}`}
+                                        />
+                                      </div>
+                                    ))}
+                                  </div>
+
+                                  <div className="space-y-2">
+                                    <label className="block text-sm font-medium text-gray-200">
+                                      Correct Answer <sup className="text-pink-400">*</sup>
+                                    </label>
+                                    <select
+                                      name="correctAnswer"
+                                      value={question.correctAnswer}
+                                      onChange={(e) => handleQuestionChange(e, testIndex, questionIndex)}
+                                      className="w-full px-4 py-3 rounded-lg bg-zinc-700 border border-zinc-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer"
+                                    >
+                                      <option value="">Select correct answer</option>
+                                      {question.options.map((option, optionIndex) => (
+                                        <option key={optionIndex} value={option}>
+                                          {option || `Option ${String.fromCharCode(65 + optionIndex)}`}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </div>
+                                </>
+                              )}
                             </div>
                           </div>
                         ))}
@@ -559,10 +755,17 @@ const EditMockTestSeries = () => {
                         <div className="flex gap-3">
                           <button
                             type="button"
-                            onClick={() => addQuestion(testIndex)}
+                            onClick={() => addQuestion(testIndex, 'MCQ')}
                             className="flex-1 py-3 px-4 border-2 border-dashed border-zinc-600 rounded-lg text-gray-400 hover:text-white hover:border-blue-500 transition-all duration-200 font-medium"
                           >
-                            + Add Question
+                            + Add MCQ
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => addQuestion(testIndex, 'MATCH')}
+                            className="flex-1 py-3 px-4 border-2 border-dashed border-zinc-600 rounded-lg text-gray-400 hover:text-white hover:border-purple-500 transition-all duration-200 font-medium"
+                          >
+                            + Add Match
                           </button>
                           <button
                             type="button"
@@ -635,22 +838,113 @@ const EditMockTestSeries = () => {
         <Modal isOpen={isBulkImportModalOpen} onClose={closeBulkImportModal}>
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-white">Bulk Import Questions</h2>
-            <p className="text-gray-400 text-sm">
-              Paste your questions in the following format (6 lines per question):
-            </p>
-            <div className="bg-zinc-800 p-4 rounded-lg text-xs text-gray-300 font-mono">
-              <div>Question text?</div>
-              <div>Option 1</div>
-              <div>Option 2</div>
-              <div>Option 3</div>
-              <div>Option 4</div>
-              <div>Correct Answer</div>
+
+            {/* Question Type Selector */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-200">
+                Question Type <sup className="text-pink-400">*</sup>
+              </label>
+              <div className="flex gap-4">
+                <button
+                  type="button"
+                  onClick={() => setBulkImportQuestionType('mcq')}
+                  className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${bulkImportQuestionType === 'mcq'
+                    ? 'bg-blue-500 text-white shadow-lg'
+                    : 'bg-zinc-700 text-gray-300 hover:bg-zinc-600'
+                    }`}
+                >
+                  📝 Multiple Choice (MCQ)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setBulkImportQuestionType('match')}
+                  className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${bulkImportQuestionType === 'match'
+                    ? 'bg-purple-500 text-white shadow-lg'
+                    : 'bg-zinc-700 text-gray-300 hover:bg-zinc-600'
+                    }`}
+                >
+                  🔗 Match the Following
+                </button>
+              </div>
             </div>
+
+            {/* Format Instructions */}
+            {bulkImportQuestionType === 'mcq' ? (
+              <div>
+                <p className="text-gray-400 text-sm mb-2">
+                  <strong>MCQ Format</strong> (6 lines per question):
+                </p>
+                <div className="bg-zinc-800 p-4 rounded-lg text-xs text-gray-300 font-mono space-y-1">
+                  <div className="text-blue-400">Question text?</div>
+                  <div>Option 1</div>
+                  <div>Option 2</div>
+                  <div>Option 3</div>
+                  <div>Option 4</div>
+                  <div className="text-green-400">Correct Answer</div>
+                </div>
+                <div className="mt-3 bg-zinc-900 p-3 rounded-lg text-xs text-gray-400 font-mono">
+                  <div className="text-yellow-400 mb-2">Example:</div>
+                  <div>What is the capital of France?</div>
+                  <div>Paris</div>
+                  <div>London</div>
+                  <div>Berlin</div>
+                  <div>Rome</div>
+                  <div>Paris</div>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <p className="text-gray-400 text-sm mb-2">
+                  <strong>Match the Following Format</strong> (14 lines per question):
+                </p>
+                <div className="bg-zinc-800 p-4 rounded-lg text-xs text-gray-300 font-mono space-y-1">
+                  <div className="text-purple-400">Question text</div>
+                  <div className="text-blue-400">a) Left Item 1</div>
+                  <div className="text-blue-400">b) Left Item 2</div>
+                  <div className="text-blue-400">c) Left Item 3</div>
+                  <div className="text-blue-400">d) Left Item 4</div>
+                  <div className="text-orange-400">1) Right Item 1</div>
+                  <div className="text-orange-400">2) Right Item 2</div>
+                  <div className="text-orange-400">3) Right Item 3</div>
+                  <div className="text-orange-400">4) Right Item 4</div>
+                  <div className="text-gray-400">a-1 b-2 c-3 d-4</div>
+                  <div className="text-gray-400">a-2 b-1 c-3 d-4</div>
+                  <div className="text-gray-400">a-1 b-3 c-2 d-4</div>
+                  <div className="text-gray-400">a-4 b-2 c-1 d-3</div>
+                  <div className="text-green-400">a-2 b-1 c-3 d-4 (Correct)</div>
+                </div>
+                <div className="mt-3 bg-zinc-900 p-3 rounded-lg text-xs text-gray-400 font-mono">
+                  <div className="text-yellow-400 mb-2">Example:</div>
+                  <div>Match the following dams:</div>
+                  <div>a) Bhakra</div>
+                  <div>b) Hirakud</div>
+                  <div>c) Nagarjuna Sagar</div>
+                  <div>d) Sardar Sarovar</div>
+                  <div>1) Mahanadi</div>
+                  <div>2) Sutlej</div>
+                  <div>3) Krishna</div>
+                  <div>4) Narmada</div>
+                  <div>a-1 b-2 c-3 d-4</div>
+                  <div>a-2 b-1 c-3 d-4</div>
+                  <div>a-1 b-3 c-2 d-4</div>
+                  <div>a-4 b-2 c-1 d-3</div>
+                  <div>a-2 b-1 c-3 d-4</div>
+                </div>
+                <div className="mt-2 p-2 bg-yellow-500/10 border border-yellow-500/30 rounded text-xs text-yellow-300">
+                  <strong>Note:</strong> The 5th mapping option (last line) is the correct answer
+                </div>
+              </div>
+            )}
+
             <textarea
               value={bulkImportText}
               onChange={(e) => setBulkImportText(e.target.value)}
               rows="15"
-              placeholder="What is the speed of light in vacuum?&#10;299,792 km/s&#10;300,000 km/s&#10;150,000 km/s&#10;250,000 km/s&#10;299,792 km/s"
+              placeholder={
+                bulkImportQuestionType === 'mcq'
+                  ? "What is the speed of light in vacuum?\n299,792 km/s\n300,000 km/s\n150,000 km/s\n250,000 km/s\n299,792 km/s"
+                  : "Match the following dams:\na) Bhakra\nb) Hirakud\nc) Nagarjuna Sagar\nd) Sardar Sarovar\n1) Mahanadi\n2) Sutlej\n3) Krishna\n4) Narmada\na-1 b-2 c-3 d-4\na-2 b-1 c-3 d-4\na-1 b-3 c-2 d-4\na-4 b-2 c-1 d-3\na-2 b-1 c-3 d-4"
+              }
               className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 resize-none font-mono text-sm"
             />
             <div className="flex gap-3">

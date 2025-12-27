@@ -234,36 +234,82 @@ const MockTestSeries = () => {
 
   const renderAttemptDetails = () => {
     return (
-      <div className="space-y-8">
-        <div className="flex flex-col sm:flex-row justify-between items-center">
-          <h3 className="text-2xl font-bold text-white mb-2 sm:mb-0">Attempt Details</h3>
-          <p className="text-indigo-300 text-lg">
-            Total Time: {formatTime(currentTest.duration * 60 - timeLeft)}
-          </p>
+      <div className="space-y-6">
+        <div className="flex items-center gap-2 mb-6">
+          <h3 className="text-xl font-bold text-white">Review Solutions</h3>
+          <span className="bg-zinc-800 text-zinc-400 text-xs px-2 py-1 rounded-full">{currentTest.questions.length} Questions</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6">
           {currentTest.questions.map((question, index) => {
-            const incorrectAnswer = incorrectAnswers.find(item => item.questionIndex === index);
             const isCorrect = correctAnswers.some(item => item.questionIndex === index);
+            const isIncorrect = incorrectAnswers.some(item => item.questionIndex === index);
+            const isUnanswered = !isCorrect && !isIncorrect;
             const userAnswer = userAnswers[index] || "Not answered";
 
             return (
-              <div key={index} className="bg-zinc-800 p-6 rounded-xl shadow-lg border border-gray-600">
-                <div className="flex justify-between items-center mb-4">
-                  <h4 className="text-lg font-semibold text-white">Question {index + 1}</h4>
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${isCorrect ? "bg-green-900 text-green-300" : "bg-red-900 text-red-300"}`}>
-                    {isCorrect ? "Correct" : "Incorrect"}
-                  </span>
+              <div 
+                key={index} 
+                className={`flex flex-col md:flex-row gap-6 p-6 rounded-2xl border transition-all duration-300 ${
+                  isCorrect ? 'bg-green-500/5 border-green-500/20 hover:bg-green-500/10' :
+                  isIncorrect ? 'bg-red-500/5 border-red-500/20 hover:bg-red-500/10' :
+                  'bg-zinc-800/50 border-zinc-700/50 hover:bg-zinc-800'
+                }`}
+              >
+                {/* Status Icon & Number */}
+                <div className="flex-shrink-0 flex md:flex-col items-center gap-3">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm border-2 ${
+                     isCorrect ? 'bg-green-500 text-white border-green-400' :
+                     isIncorrect ? 'bg-red-500 text-white border-red-400' :
+                     'bg-zinc-700 text-zinc-300 border-zinc-600'
+                  }`}>
+                    {index + 1}
+                  </div>
+                  <div className={`text-2xl ${
+                     isCorrect ? 'text-green-500' :
+                     isIncorrect ? 'text-red-500' :
+                     'text-zinc-500'
+                  }`}>
+                    {isCorrect ? (
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                    ) : isIncorrect ? (
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
+                    ) : (
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M20 12H4" /></svg>
+                    )}
+                  </div>
                 </div>
-                <p className="text-gray-100 mb-4">{question.text}</p>
-                <div className="space-y-2">
-                  <p className="text-gray-300">
-                    <span className="font-medium text-indigo-300">Your Answer:</span> {userAnswer}
-                  </p>
-                  <p className="text-gray-300">
-                    <span className="font-medium text-indigo-300">Correct Answer:</span> {question.correctAnswer}
-                  </p>
+
+                {/* Content */}
+                <div className="flex-1 space-y-4">
+                  <div>
+                    <p className="text-gray-200 text-lg leading-relaxed font-medium">{question.text}</p>
+                    {/* Add support for Match Question columns view in review if needed, currently kept simple */}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                    <div className={`p-4 rounded-xl border ${
+                      isCorrect ? 'bg-green-500/10 border-green-500/20' : 
+                      isIncorrect ? 'bg-red-500/10 border-red-500/20' : 
+                      'bg-zinc-800 border-zinc-700'
+                    }`}>
+                      <p className="text-xs uppercase tracking-wider font-semibold mb-1 opacity-70">Your Answer</p>
+                      <p className={`font-medium ${
+                        isCorrect ? 'text-green-400' : 
+                        isIncorrect ? 'text-red-400' : 
+                        'text-zinc-400'
+                      }`}>
+                         {userAnswer}
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-xl border bg-blue-500/5 border-blue-500/20">
+                      <p className="text-xs uppercase tracking-wider font-semibold mb-1 text-blue-400/70">Correct Answer</p>
+                      <p className="font-medium text-blue-400">
+                         {question.correctAnswer}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             );
@@ -512,32 +558,97 @@ const MockTestSeries = () => {
 
   if (showScore) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-4">
-        <div className="w-full max-w-4xl bg-black border border-gray-700 shadow-2xl rounded-2xl overflow-hidden">
-          <button
-            onClick={() => {
-              setCurrentTest(null);
-              setOpenTestIndex(null);
-            }}
-            className="py-2 px-2 m-2 bg-slate-200 text-black font-bold rounded-full hover:bg-gray-700 transition duration-300 shadow-md"
-          >
-            <IoChevronBackCircle size={"16"} />
-          </button>
-          <div className="bg-black p-6 text-center">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
-              {currentTest.testName} Completed
-            </h2>
-          </div>
-          <div className='text-center'>
-            <button onClick={rankOpen}
-              className="py-3 px-6 text-center bg-slate-200 text-black font-bold rounded-lg hover:bg-gray-700 transition duration-300 shadow-md"
+      <div className="min-h-screen bg-black flex items-center justify-center p-4 font-inter">
+        <div className="w-full max-w-5xl bg-zinc-900/50 border border-zinc-800 shadow-2xl rounded-3xl overflow-hidden backdrop-blur-sm">
+
+          {/* Header */}
+          <div className="bg-gradient-to-r from-zinc-900 to-black p-6 md:p-10 border-b border-zinc-800 flex flex-col items-center relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
+
+            <button
+              onClick={() => {
+                setCurrentTest(null);
+                setOpenTestIndex(null);
+              }}
+              className="absolute top-6 left-6 p-2 bg-zinc-800 text-zinc-400 hover:text-white rounded-full hover:bg-zinc-700 transition-all duration-300"
             >
-              See My Rank
+              <IoChevronBackCircle size={24} />
             </button>
 
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">
+              Test Completed!
+            </h2>
+            <p className="text-zinc-400 text-lg">{currentTest.testName}</p>
+
+            {/* Score Card */}
+            <div className="mt-8 relative">
+              <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-zinc-800 flex flex-col items-center justify-center bg-zinc-900/50 shadow-2xl relative z-10">
+                <span className="text-gray-400 text-sm font-medium uppercase tracking-wider">Score</span>
+                <span className="text-3xl md:text-4xl font-bold text-white mt-1">
+                  {score.toFixed(1)}
+                </span>
+                <span className="text-zinc-500 text-xs mt-1">out of {currentTest.questions.length}</span>
+              </div>
+              {/* Decorative glows */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-blue-500/20 rounded-full blur-xl animate-pulse"></div>
+            </div>
+          </div>
+
+          <div className="p-6 md:p-10 space-y-10">
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              <div className="bg-zinc-800/50 p-6 rounded-2xl border border-zinc-700/50 text-center hover:bg-zinc-800 transition-colors group">
+                <p className="text-zinc-400 text-sm font-medium uppercase tracking-wider mb-2 group-hover:text-zinc-300">Accuracy</p>
+                <div className="text-2xl md:text-3xl font-bold text-blue-400">
+                  {Math.round((correctAnswers.length / currentTest.questions.length) * 100)}%
+                </div>
+              </div>
+              <div className="bg-zinc-800/50 p-6 rounded-2xl border border-zinc-700/50 text-center hover:bg-zinc-800 transition-colors group">
+                <p className="text-zinc-400 text-sm font-medium uppercase tracking-wider mb-2 group-hover:text-zinc-300">Correct</p>
+                <div className="text-2xl md:text-3xl font-bold text-green-400">
+                  {correctAnswers.length}
+                </div>
+              </div>
+              <div className="bg-zinc-800/50 p-6 rounded-2xl border border-zinc-700/50 text-center hover:bg-zinc-800 transition-colors group">
+                <p className="text-zinc-400 text-sm font-medium uppercase tracking-wider mb-2 group-hover:text-zinc-300">Incorrect</p>
+                <div className="text-2xl md:text-3xl font-bold text-red-400">
+                  {incorrectAnswers.length}
+                </div>
+              </div>
+              <div className="bg-zinc-800/50 p-6 rounded-2xl border border-zinc-700/50 text-center hover:bg-zinc-800 transition-colors group">
+                <p className="text-zinc-400 text-sm font-medium uppercase tracking-wider mb-2 group-hover:text-zinc-300">Unanswered</p>
+                <div className="text-2xl md:text-3xl font-bold text-orange-400">
+                  {currentTest.questions.length - (correctAnswers.length + incorrectAnswers.length)}
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row justify-center gap-4 border-t border-zinc-800 pt-8">
+              <button
+                onClick={rankOpen}
+                className="flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 hover:-translate-y-0.5"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                View Leadership Board
+              </button>
+
+              <button
+                onClick={() => setShowAttemptDetails(!showAttemptDetails)}
+                className="flex items-center justify-center gap-2 px-8 py-4 bg-zinc-800 hover:bg-zinc-700 text-white font-semibold rounded-xl transition-all duration-300 border border-zinc-700 hover:border-zinc-600"
+              >
+                {showAttemptDetails ? (
+                  <><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg> Hide Solutions</>
+                ) : (
+                  <><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg> Review Solutions</>
+                )}
+              </button>
+            </div>
+
+            {/* Rank Modal */}
             <AnimatePresence>
               {isRankOpen && (
-                <div className="fixed inset-0 z-50 h-screen w-screen flex items-center justify-center p-4 backdrop-blur-md">
+                <div className="fixed inset-0 z-50 h-screen w-screen flex items-center justify-center p-4 backdrop-blur-md bg-black/50">
                   <motion.div
                     initial="hidden"
                     animate="visible"
@@ -545,32 +656,29 @@ const MockTestSeries = () => {
                     variants={modalVariants}
                     className="relative"
                   >
-                    <div
-                      className="bg-zinc-900 rounded-lg shadow-xl max-w-md w-full p-6"
-                    >
-                      <div className="flex items-center mb-4">
-                        <BsExclamationTriangle className="text-yellow-500 text-2xl mr-3" />
-                        <h3 className="text-lg font-semibold text-slate-300">
-                          Confirm Goto Rankings
-                        </h3>
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl max-w-md w-full p-8">
+                      <div className="flex items-center mb-6">
+                        <div className="w-12 h-12 rounded-full bg-yellow-500/20 text-yellow-500 flex items-center justify-center mr-4">
+                          <BsExclamationTriangle className="text-xl" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-bold text-white">View Rankings?</h3>
+                          <p className="text-sm text-zinc-400">This will exit the current result view.</p>
+                        </div>
                       </div>
-                      <p className="text-sm text-slate-300 mb-4">
-                        Are you sure you want to Navigate to Rankings ? This action will clear your current attempt details!
-                      </p>
-                      <div className="flex justify-end space-x-2">
+
+                      <div className="flex justify-end space-x-3">
                         <button
                           onClick={() => setIsRankOpen(false)}
-                          className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-300"
+                          className="px-4 py-2 text-sm font-medium text-white bg-zinc-800 rounded-lg hover:bg-zinc-700 transition-colors"
                         >
-                          <IoMdTime className="mr-2" />
-                          Wait
+                          Cancel
                         </button>
                         <button
                           onClick={() => rankClose(currentTest.testName)}
-                          className="flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-300"
+                          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-500 shadow-lg shadow-blue-500/20 transition-colors"
                         >
-                          <FiLogOut className="mr-2" />
-                          Yes
+                          Proceed
                         </button>
                       </div>
                     </div>
@@ -578,38 +686,16 @@ const MockTestSeries = () => {
                 </div>
               )}
             </AnimatePresence>
-          </div>
-          <div className="p-6 sm:p-8 space-y-6 sm:space-y-8">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-              <div className="bg-black border border-gray-700 p-4 rounded-lg">
-                <p className="text-lg sm:text-xl font-semibold text-gray-300">Score</p>
-                <p className="text-2xl sm:text-3xl font-bold text-blue-400">
-                  {score.toFixed(2)} / {currentTest.questions.length}
-                </p>
-              </div>
-              <div className="bg-black border border-gray-700 p-4 rounded-lg">
-                <p className="text-lg sm:text-xl font-semibold text-gray-300">Correct</p>
-                <p className="text-2xl sm:text-3xl font-bold text-green-400">{correctAnswers.length}</p>
-              </div>
-              <div className="bg-black border border-gray-700 p-4 rounded-lg">
-                <p className="text-lg sm:text-xl font-semibold text-gray-300">Incorrect</p>
-                <p className="text-2xl sm:text-3xl font-bold text-red-400">{incorrectAnswers.length}</p>
-              </div>
-            </div>
 
-            <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-              <button
-                onClick={() => setShowAttemptDetails(!showAttemptDetails)}
-                className="py-3 px-6 bg-slate-200 text-black font-bold rounded-lg hover:bg-gray-700 transition duration-300 shadow-md"
-              >
-                {showAttemptDetails ? "Hide Answers" : "Show Answers"}
-              </button>
-            </div>
-
+            {/* Attempt Details Section */}
             {showAttemptDetails && (
-              <div className="mt-8 bg-zinc-900 p-6 rounded-lg">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="pt-8 border-t border-zinc-800"
+              >
                 {renderAttemptDetails()}
-              </div>
+              </motion.div>
             )}
           </div>
           <Footer />
@@ -621,82 +707,159 @@ const MockTestSeries = () => {
   const currentQuestionData = currentTest.questions[currentQuestion];
 
   return (
-    <div className="min-h-screen bg-black flex items-center overflow-hidden justify-center p-4">
-      <div className="w-full md:w-[90vw] bg-black border border-gray-700 shadow-2xl rounded-xl p-6 md:p-10 space-y-6">
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-white">{currentTest.testName}</h2>
-          <div className="text-lg md:text-xl font-semibold text-white">
-            Time left: <span className="text-red-500">{formatTime(timeLeft)}</span>
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 font-inter">
+      <div className="w-full md:w-[90vw] max-w-6xl bg-zinc-900/50 border border-zinc-800 shadow-2xl rounded-2xl p-6 md:p-10 space-y-8 backdrop-blur-sm relative overflow-hidden">
+
+        {/* Progress Bar */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-zinc-800">
+          <div
+            className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"
+            style={{ width: `${((currentQuestion + 1) / currentTest.questions.length) * 100}%` }}
+          />
+        </div>
+
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-zinc-800">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">{currentTest.testName}</h2>
+            <p className="text-zinc-400 text-sm mt-1">Question {currentQuestion + 1} of {currentTest.questions.length}</p>
+          </div>
+          <div className="flex items-center gap-3 bg-zinc-800/50 px-4 py-2 rounded-full border border-zinc-700/50">
+            <IoMdTime className="text-xl text-blue-400" />
+            <span className={`text-lg font-mono font-medium ${timeLeft < 300 ? 'text-red-400' : 'text-gray-200'}`}>
+              {formatTime(timeLeft)}
+            </span>
           </div>
         </div>
-        <div className="space-y-4">
-          <h3 className="text-xl md:text-2xl font-semibold text-white">
-            Question {currentQuestion + 1} of {currentTest.questions.length}
-          </h3>
-          <p className="text-white text-lg md:text-xl">{currentQuestionData.text}</p>
+
+        {/* Main Question Content */}
+        <div className="space-y-6 min-h-[400px]">
+          <div className="prose prose-invert max-w-none">
+            <h3 className="text-xl md:text-2xl leading-relaxed font-medium text-gray-100">
+              {currentQuestionData.text}
+            </h3>
+          </div>
+
+          {/* Match Question Columns */}
+          {currentQuestionData.questionType === 'MATCH' && currentQuestionData.leftColumn && currentQuestionData.rightColumn && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 my-8">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 pb-2 border-b border-blue-500/20">
+                  <span className="bg-blue-500/20 text-blue-400 text-xs font-bold px-2 py-1 rounded">COLUMN A</span>
+                </div>
+                {currentQuestionData.leftColumn.map((item, idx) => (
+                  <div key={`left-${idx}`} className="flex items-start gap-4 p-4 bg-zinc-800/50 rounded-xl border border-zinc-700/50 hover:bg-zinc-800 transition-colors">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold mt-0.5">
+                      {String.fromCharCode(97 + idx)}
+                    </span>
+                    <span className="text-gray-300 leading-relaxed">{item.replace(/^[a-z]\)\s*/, '')}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 pb-2 border-b border-orange-500/20">
+                  <span className="bg-orange-500/20 text-orange-400 text-xs font-bold px-2 py-1 rounded">COLUMN B</span>
+                </div>
+                {currentQuestionData.rightColumn.map((item, idx) => (
+                  <div key={`right-${idx}`} className="flex items-start gap-4 p-4 bg-zinc-800/50 rounded-xl border border-zinc-700/50 hover:bg-zinc-800 transition-colors">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center text-xs font-bold mt-0.5">
+                      {idx + 1}
+                    </span>
+                    <span className="text-gray-300 leading-relaxed">{item.replace(/^\d+\)\s*/, '')}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Options Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+            {(currentQuestionData.questionType === 'MATCH'
+              ? currentQuestionData.options.slice(0, 4)
+              : currentQuestionData.options
+            ).map((option, index) => (
+              <button
+                key={index}
+                onClick={() => handleAnswerSelect(option)}
+                className={`group relative p-4 md:p-5 text-left rounded-xl border-2 transition-all duration-200 hover:shadow-lg
+                  ${selectedAnswer === option
+                    ? 'bg-blue-600/10 border-blue-500 shadow-blue-500/10'
+                    : 'bg-zinc-800/30 border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800'
+                  }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center mt-0.5 transition-colors
+                    ${selectedAnswer === option
+                      ? 'border-blue-500 bg-blue-500'
+                      : 'border-zinc-500 group-hover:border-zinc-400'
+                    }`}>
+                    {selectedAnswer === option && <div className="w-2.5 h-2.5 rounded-full bg-white" />}
+                  </div>
+                  <span className={`text-base md:text-lg leading-relaxed ${selectedAnswer === option ? 'text-white' : 'text-gray-300'}`}>
+                    {option}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="space-y-4">
-          {currentQuestionData.options.map((option, index) => (
+
+        {/* Footer Navigation */}
+        <div className="flex flex-col-reverse md:flex-row gap-6 pt-6 border-t border-zinc-800">
+          <div className="flex-1 overflow-x-auto pb-2 md:pb-0">
+            <div className="flex gap-2">
+              {currentTest.questions.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleQuestionNavigation(index)}
+                  className={`flex-shrink-0 w-10 h-10 rounded-lg font-medium text-sm transition-all duration-200 border
+                    ${index === currentQuestion
+                      ? 'bg-white text-black border-white shadow-lg scale-105'
+                      : answeredQuestions[index]
+                        ? 'bg-blue-600/20 text-blue-400 border-blue-500/30'
+                        : skippedQuestions.includes(index)
+                          ? 'bg-orange-500/20 text-orange-400 border-orange-500/30'
+                          : 'bg-zinc-800 text-zinc-500 border-zinc-700 hover:border-zinc-600 hover:text-zinc-300'
+                    }`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex gap-3 justify-end min-w-fit">
             <button
-              key={index}
-              onClick={() => handleAnswerSelect(option)}
-              className={`w-full py-3 px-6 text-sm text-left rounded-lg transition duration-300 ${selectedAnswer === option
-                ? 'bg-white text-gray-900 font-semibold'
-                : 'bg-black border border-white text-white hover:bg-gray-600'
+              onClick={() => currentQuestion > 0 && setCurrentQuestion(currentQuestion - 1)}
+              disabled={currentQuestion === 0}
+              className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200
+                ${currentQuestion > 0
+                  ? 'bg-zinc-800 text-white hover:bg-zinc-700 border border-zinc-700'
+                  : 'bg-zinc-900 text-zinc-600 cursor-not-allowed border border-zinc-800'
                 }`}
             >
-              {option}
+              Previous
             </button>
-          ))}
-        </div>
-        <div className="flex gap-4 justify-between w-full">
-          <button
-            onClick={() => currentQuestion > 0 && setCurrentQuestion(currentQuestion - 1)}
-            disabled={currentQuestion === 0}
-            className={`py-2 px-4 md:py-3 md:px-6 text-xs md:text-sm font-semibold rounded-lg transition duration-300 w-full md:w-auto ${currentQuestion > 0
-              ? 'bg-white text-gray-900 hover:bg-gray-100'
-              : 'bg-gray-700 text-gray-400 cursor-not-allowed'
-              }`}
-          >
-            Previous
-          </button>
 
-          <button
-            onClick={handleSkipQuestion}
-            className="py-2 px-4 md:py-3 md:px-6 font-semibold rounded-lg text-xs md:text-sm transition duration-300 bg-white text-black hover:bg-slate-200 w-full md:w-auto"
-          >
-            Skip
-          </button>
-
-          <button
-            onClick={handleNextQuestion}
-            disabled={!selectedAnswer}
-            className={`py-2 px-4 md:py-3 md:px-6 font-semibold rounded-lg text-xs md:text-sm transition duration-300 w-full md:w-auto ${selectedAnswer
-              ? 'bg-white text-black hover:bg-gray-100'
-              : 'bg-gray-700 border border-white text-white cursor-not-allowed'
-              }`}
-          >
-            {currentQuestion + 1 === currentTest.questions.length ? 'Finish Test' : 'Next'}
-          </button>
-        </div>
-        <div className="flex flex-wrap justify-center gap-2 md:gap-3">
-          {currentTest.questions.map((_, index) => (
             <button
-              key={index}
-              onClick={() => handleQuestionNavigation(index)}
-              className={`w-8 h-8 md:w-10 md:h-10 rounded-full font-semibold text-sm transition duration-300 
-                ${index === currentQuestion
-                  ? 'bg-violet-700 text-white'
-                  : answeredQuestions[index]
-                    ? 'bg-white text-gray-900'
-                    : skippedQuestions.includes(index)
-                      ? 'bg-orange-500 text-white'
-                      : 'bg-gray-700 text-white hover:bg-gray-600'
+              onClick={handleSkipQuestion}
+              className="px-6 py-3 rounded-xl font-semibold text-sm text-zinc-400 hover:text-white transition-colors"
+            >
+              Skip
+            </button>
+
+            <button
+              onClick={handleNextQuestion}
+              disabled={!selectedAnswer && !answeredQuestions[currentQuestion]}
+              className={`px-8 py-3 rounded-xl font-semibold text-sm shadow-lg transition-all duration-200
+                ${selectedAnswer || answeredQuestions[currentQuestion]
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-blue-500/25 hover:from-blue-500 hover:to-indigo-500 transform hover:-translate-y-0.5'
+                  : 'bg-zinc-800 text-zinc-500 cursor-not-allowed border border-zinc-700'
                 }`}
             >
-              {index + 1}
+              {currentQuestion + 1 === currentTest.questions.length ? 'Finish Test' : 'Next Question'}
             </button>
-          ))}
+          </div>
         </div>
         <Footer />
       </div>
