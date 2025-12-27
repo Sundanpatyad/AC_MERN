@@ -143,7 +143,7 @@ function App() {
         transition={{ duration: 0.4, ease: "easeInOut" }} // Increase duration and add easing
         className="flex flex-col min-h-screen"
       >
-        {!location.pathname.includes("view-mock") && <Navbar />}
+        {!location.pathname.includes("attempt-test") && <Navbar />}
         <main className="flex-grow">
           <Suspense fallback={<div className="flex justify-center items-center min-h-screen text-white">Loading...</div>}>
             <Routes>
