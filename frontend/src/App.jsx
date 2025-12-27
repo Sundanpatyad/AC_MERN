@@ -72,6 +72,12 @@ const ExamList = lazy(() =>
 const CreateContent = lazy(() =>
   import("./components/core/StudyMaterials/CreateContent")
 );
+const AttemptMockTest = lazy(() =>
+  import("./components/core/ConductMockTests/AttemptMockTest")
+);
+const MockTestResults = lazy(() =>
+  import("./components/core/ConductMockTests/MockTestResults")
+);
 
 function App() {
   const { user } = useSelector((state) => state.profile);
@@ -139,7 +145,7 @@ function App() {
       >
         {!location.pathname.includes("view-mock") && <Navbar />}
         <main className="flex-grow">
-          <Suspense fallback={""}>
+          <Suspense fallback={<div className="flex justify-center items-center min-h-screen text-white">Loading...</div>}>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/contact" element={<Contact />} />
@@ -281,6 +287,8 @@ function App() {
 
               <Route path="/mocktest" element={<Mocktest />} />
               <Route path="view-mock/:mockId" element={<MockTestSeries />} />
+              <Route path="attempt-test/:mockId/:testId" element={<AttemptMockTest />} />
+              <Route path="mock-result/:mockId/:testId" element={<MockTestResults />} />
               <Route path="adminMockTest" element={<AdminCountMock />} />
               <Route path="*" element={<PageNotFound />} />
             </Routes>
