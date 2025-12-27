@@ -169,19 +169,25 @@ const MockTestSeries = () => {
     let newIncorrectAnswers = [];
 
     currentTest.questions.forEach((question, index) => {
-      if (userAnswers[index] === question.correctAnswer) {
+      // For Match questions added manually, Option 5 (index 4) contains the correct answer
+      let trueCorrectAnswer = question.correctAnswer;
+      if (question.questionType === "MATCH" && question.options && question.options.length >= 5) {
+        trueCorrectAnswer = question.options[4];
+      }
+
+      if (userAnswers[index] === trueCorrectAnswer) {
         newScore += 1;
         newCorrectAnswers.push({
           questionIndex: index,
           userAnswer: userAnswers[index],
-          correctAnswer: question.correctAnswer
+          correctAnswer: trueCorrectAnswer
         });
       } else if (userAnswers[index] !== '') {
         newScore -= currentTest.negative;
         newIncorrectAnswers.push({
           questionIndex: index,
           userAnswer: userAnswers[index],
-          correctAnswer: question.correctAnswer
+          correctAnswer: trueCorrectAnswer
         });
       }
     });
@@ -304,7 +310,7 @@ const MockTestSeries = () => {
                 {/* Content */}
                 <div className="flex-1 space-y-4">
                   <div>
-                    <p className="text-gray-200 text-lg leading-relaxed font-medium">{question.text}</p>
+                    <p className="text-gray-200 text-lg leading-relaxed font-medium whitespace-pre-line">{question.text.replace(/\\n/g, '\n')}</p>
                     {/* Add support for Match Question columns view in review if needed, currently kept simple */}
                   </div>
 
@@ -325,7 +331,9 @@ const MockTestSeries = () => {
                     <div className="p-4 rounded-xl border bg-blue-500/5 border-blue-500/20">
                       <p className="text-xs uppercase tracking-wider font-semibold mb-1 text-blue-400/70">Correct Answer</p>
                       <p className="font-medium text-blue-400">
-                        {question.correctAnswer}
+                        {(question.questionType === "MATCH" && question.options && question.options.length >= 5)
+                          ? question.options[4]
+                          : question.correctAnswer}
                       </p>
                     </div>
                   </div>
@@ -772,8 +780,8 @@ const MockTestSeries = () => {
         <div className="flex-1 overflow-y-auto space-y-4 min-h-0">
           {/* Question Text */}
           <div className={`prose max-w-none ${isDarkMode ? 'prose-invert' : 'prose-slate'}`}>
-            <h3 className={`text-base md:text-2xl leading-snug font-medium ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
-              {currentQuestionData.text}
+            <h3 className={`text-base md:text-2xl leading-snug font-medium whitespace-pre-line ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
+              {currentQuestionData.text.replace(/\\n/g, '\n')}
             </h3>
           </div>
 
