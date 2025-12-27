@@ -134,7 +134,7 @@ const TestResultView = ({
                         <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-zinc-800 flex flex-col items-center justify-center bg-zinc-900/50 shadow-2xl relative z-10">
                             <span className="text-gray-400 text-sm font-medium uppercase tracking-wider">Score</span>
                             <span className="text-3xl md:text-4xl font-bold text-white mt-1">
-                                {score.toFixed(1)}
+                                {score}
                             </span>
                             <span className="text-zinc-500 text-xs mt-1">out of {currentTest.questions.length}</span>
                         </div>

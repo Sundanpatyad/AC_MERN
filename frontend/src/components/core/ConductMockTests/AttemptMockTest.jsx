@@ -232,28 +232,53 @@ const AttemptMockTest = () => {
         let newCorrectAnswers = [];
         let newIncorrectAnswers = [];
 
+        // Ensure negative marking is a valid positive number for deduction
+        const negativeMarking = Math.abs(Number(currentTest.negative) || 0);
+
+        console.group("Score Calculation Debugging");
+        console.log("Negative Marking per wrong answer:", negativeMarking);
+
         currentTest.questions.forEach((question, index) => {
             let trueCorrectAnswer = question.correctAnswer;
-            if (question.questionType === "MATCH" && question.options && question.options.length >= 5) {
+            // Fallback for match questions if correctAnswer isn't directly set (redundant check but safe)
+            if (question.questionType === "MATCH" && (!trueCorrectAnswer || String(trueCorrectAnswer).trim() === "") && question.options && question.options.length >= 5) {
                 trueCorrectAnswer = question.options[4];
             }
 
-            if (userAnswers[index] === trueCorrectAnswer) {
+            const userAnswer = userAnswers[index];
+
+            // Normalize for comparison
+            const normalizedUserAnswer = userAnswer ? String(userAnswer).trim() : "";
+            const normalizedCorrectAnswer = trueCorrectAnswer ? String(trueCorrectAnswer).trim() : "";
+
+            const isCorrect = normalizedUserAnswer !== "" && normalizedUserAnswer === normalizedCorrectAnswer;
+            const isAttempted = normalizedUserAnswer !== "";
+
+            console.log(`Q${index + 1}: User: "${normalizedUserAnswer}" | Correct: "${normalizedCorrectAnswer}" | Match: ${isCorrect}`);
+
+            if (isCorrect) {
                 newScore += 1;
                 newCorrectAnswers.push({
                     questionIndex: index,
-                    userAnswer: userAnswers[index],
+                    userAnswer: userAnswer,
                     correctAnswer: trueCorrectAnswer
                 });
-            } else if (userAnswers[index] !== '') {
-                newScore -= currentTest.negative;
+            } else if (isAttempted) {
+                // Apply negative marking
+                newScore -= negativeMarking;
                 newIncorrectAnswers.push({
                     questionIndex: index,
-                    userAnswer: userAnswers[index],
+                    userAnswer: userAnswer,
                     correctAnswer: trueCorrectAnswer
                 });
+                console.log(`   -> Incorrect. Deducting ${negativeMarking}`);
+            } else {
+                console.log(`   -> Skipped.`);
             }
         });
+
+        console.log("Final Score:", newScore);
+        console.groupEnd();
 
         return {
             score: newScore,
