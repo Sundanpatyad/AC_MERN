@@ -296,7 +296,7 @@ function App() {
         </main>
       </motion.div>
 
-      {token && !location.pathname.includes("view-mock") && (
+      {token && !location.pathname.includes("attempt-test") && (
         <motion.div
           initial={{ y: "100%" }} // Start from below the viewport
           animate={{ y: "0%" }} // Slide up and fade in
