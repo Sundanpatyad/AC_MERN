@@ -1,5 +1,5 @@
 
-const BASE_URL = 'https://jellyfish-app-gbvm8.ondigitalocean.app';
+const BASE_URL = 'https://jellyfish-app-sv273.ondigitalocean.app';
 // const BASE_URL = 'http://localhost:8000';
 
 
