@@ -27,7 +27,7 @@ const RankingsPage = () => {
 
 
   const calculateRanks = (testResults) => {
-  const sortedResults = testResults.sort((a, b) => b.score - a.score);
+    const sortedResults = testResults.sort((a, b) => b.score - a.score);
 
     let currentRank = 1;
     let prevScore = null;
@@ -68,7 +68,7 @@ const RankingsPage = () => {
 
           Object.keys(groupedRankings).forEach(testName => {
             groupedRankings[testName] = calculateRanks(groupedRankings[testName]);
-            
+
             const userRanking = groupedRankings[testName].find(r => r.userId === userId);
             if (userRanking) {
               userRanks[testName] = userRanking.rank;
@@ -183,7 +183,7 @@ const RankingsPage = () => {
               <h2 className="text-3xl font-bold mb-6 text-center text-gray-100">{selectedTest}</h2>
               <div className='flex justify-center align-center'>
                 <div className="text-xl flex justify-evenly font-semibold mb-4 text-center bg-slate-200 py-2 px-4 w-80 rounded-md text-zinc-800">
-                  <span><FaRankingStar size={"26"}/></span><span>My Rank : {userRanks[selectedTest] || 'N/A'} / {(rankings[selectedTest] || []).length}</span>
+                  <span><FaRankingStar size={"26"} /></span><span>My Rank : {userRanks[selectedTest] || 'N/A'} / {(rankings[selectedTest] || []).length}</span>
                 </div>
               </div>
               <div className="space-y-8">
@@ -200,8 +200,8 @@ const RankingsPage = () => {
             </>
           ) : (
             <p className="text-center text-gray-400 font-medium text-lg">
-              {Object.keys(rankings).length === 0 ? 'No rankings data available.' : 
-               filteredTests.length === 0 ? 'No matching mock tests found.' : 'Select a mock test to view rankings.'}
+              {Object.keys(rankings).length === 0 ? 'No rankings data available.' :
+                filteredTests.length === 0 ? 'No matching mock tests found.' : 'Select a mock test to view rankings.'}
             </p>
           )}
         </div>
