@@ -1,5 +1,5 @@
 
-const BASE_URL = 'https://jellyfish-app-sv273.ondigitalocean.app';
+const BASE_URL = 'https://events-app-xbfw.onrender.com';
 // const BASE_URL = 'http://localhost:8000';
 
 
