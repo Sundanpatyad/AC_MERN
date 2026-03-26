@@ -16,6 +16,7 @@ const AddMockTestSeries = () => {
   const [redirectId, setRedirectId] = useState(null);
   const [status, setStatus] = useState('published');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [thumbnailFile, setThumbnailFile] = useState(null);
 
   const { CREATE_MOCKTESTS_API } = mocktestEndpoints;
 
@@ -26,11 +27,21 @@ const AddMockTestSeries = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const seriesData = { seriesName, description, price, mockTests, status };
 
     try {
+      const formData = new FormData();
+      formData.append("seriesName", seriesName);
+      formData.append("description", description);
+      formData.append("price", price);
+      formData.append("status", status);
+      formData.append("mockTests", JSON.stringify(mockTests));
+      
+      if (thumbnailFile) {
+        formData.append("thumbnail", thumbnailFile);
+      }
+
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const response = await axios.post(CREATE_MOCKTESTS_API, seriesData, { headers });
+      const response = await axios.post(CREATE_MOCKTESTS_API, formData, { headers });
       setSubmitStatus('success');
       setRedirectId(response.data.data._id);
       // Reset form
@@ -38,6 +49,7 @@ const AddMockTestSeries = () => {
       setDescription('');
       setPrice('');
       setMockTests([]);
+      setThumbnailFile(null);
     } catch (error) {
       console.error('Error submitting mock test series:', error);
       setSubmitStatus('error');
@@ -128,6 +140,19 @@ const AddMockTestSeries = () => {
                     placeholder="0"
                     min="0"
                     className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="thumbnail" className="block text-sm font-medium text-gray-200">
+                    Thumbnail Image (Optional)
+                  </label>
+                  <input
+                    type="file"
+                    id="thumbnail"
+                    accept="image/*"
+                    onChange={(e) => setThumbnailFile(e.target.files[0])}
+                    className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-zinc-700 file:text-blue-400 hover:file:bg-zinc-600 cursor-pointer"
                   />
                 </div>
               </div>

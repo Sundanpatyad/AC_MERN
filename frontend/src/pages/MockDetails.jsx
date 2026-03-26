@@ -183,6 +183,16 @@ const MockTestDetails = () => {
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Main Content Section */}
           <div className="lg:w-8/12">
+            {testDetails.thumbnail && (
+              <div className="w-full mb-6 rounded-lg overflow-hidden border border-zinc-800" style={{ aspectRatio: '16/9' }}>
+                <img
+                  src={testDetails.thumbnail}
+                  alt={testDetails.seriesName}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+
             <h1 className="text-2xl sm:text-3xl font-bold text-white mb-4">
               {testDetails.seriesName}
             </h1>

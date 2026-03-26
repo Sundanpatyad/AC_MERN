@@ -89,7 +89,7 @@ const MockTestsSection = ({ setShowLoginModal }) => {
   return (
     <div className="container w-11/12 mx-auto">
       <h2 className="text-3xl md:text-5xl text-center mt-10 font-bold text-white mb-10">Popular Mock Tests</h2>
-      
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-center items-center">
         {isLoading
           ? Array(4).fill().map((_, index) => (
@@ -98,21 +98,22 @@ const MockTestsSection = ({ setShowLoginModal }) => {
             </div>
           ))
           : mockTests
-              .slice(0, 4)
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .map((mockTest) => (
-                <MockTestCard
-                  key={mockTest._id}
-                  mockTest={mockTest}
-                  handleAddToCart={handleAddToCart}
-                  handleRemoveFromCart={handleRemoveFromCart}
-                  handleBuyNow={handleBuyNow}
-                  handleStartTest={handleStartTest}
-                  setShowLoginModal={setShowLoginModal}
-                  isLoggedIn={isLoggedIn}
-                  userId={user?._id}
-                />
-              ))}
+            .slice(0, 4)
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .map((mockTest) => (
+              <MockTestCard
+                key={mockTest._id}
+                mockTest={mockTest}
+                onCardClick={() => navigate(`/mock-test/${mockTest._id}`)}
+                handleAddToCart={handleAddToCart}
+                handleRemoveFromCart={handleRemoveFromCart}
+                handleBuyNow={handleBuyNow}
+                handleStartTest={handleStartTest}
+                setShowLoginModal={setShowLoginModal}
+                isLoggedIn={isLoggedIn}
+                userId={user?._id}
+              />
+            ))}
       </div>
 
       <div className="text-center mt-12">

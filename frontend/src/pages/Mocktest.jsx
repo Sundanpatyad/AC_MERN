@@ -33,27 +33,42 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
 
   return (
     <div 
-      className="bg-zinc-900 border border-slate-500 w-full rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer flex flex-col"
+      className="bg-black border border-zinc-800 rounded-md overflow-hidden cursor-pointer flex flex-col transition-colors duration-200 hover:border-zinc-500"
       onClick={() => navigate(`/mock-test/${mockTest._id}`)}
     >
-      <div className="relative h-28 sm:h-32 md:h-40 bg-gradient-to-br from-white to-slate-700">
-        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-80 p-2">
-          <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-white text-center">{mockTest.seriesName}</h3>
-        </div>
+      {/* 16:9 image area */}
+      <div className="w-full border-b border-zinc-800" style={{ aspectRatio: '16/9', overflow: 'hidden' }}>
+        {mockTest.thumbnail ? (
+          <img
+            src={mockTest.thumbnail}
+            alt={mockTest.seriesName}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-zinc-900 p-4">
+            <FaBookOpen className="text-4xl text-zinc-700" />
+          </div>
+        )}
       </div>
-      <div className="p-3 sm:p-4 md:p-6 flex-grow flex flex-col justify-between">
-        <p className="text-xs sm:text-sm md:text-base text-richblack-100 mb-2 sm:mb-4 line-clamp-2">{mockTest.description}</p>
-        <div className="flex justify-between items-center text-xs sm:text-sm text-richblack-200 mb-2 sm:mb-4 md:mb-6">
-          <div className="flex items-center">
-            <p className="font-semibold bg-white px-3 rounded-full text-black">
-              {mockTest.price === 0 ? 'Free' : `₹${mockTest.price}`}
-            </p>
-          </div>
-          <div className="flex items-center">
-            <FaBookOpen className="mr-1 text-richblack-50" />
-            <p className="font-medium">{mockTest.mockTests?.length + mockTest.attachments?.length || 0} Tests</p>
+
+      <div className="p-5 flex-grow flex flex-col justify-between">
+        <div className="mb-4">
+          <h3 className="text-base sm:text-lg font-bold text-white mb-2 line-clamp-2 leading-snug">
+            {mockTest.seriesName}
+          </h3>
+          <p className="text-sm text-gray-400 line-clamp-2">{mockTest.description}</p>
+        </div>
+
+        <div className="flex justify-between items-center text-sm mb-5 pb-4 border-b border-zinc-800">
+          <span className="font-bold text-white">
+            {mockTest.price === 0 ? 'Free' : `₹${mockTest.price}`}
+          </span>
+          <div className="flex items-center text-gray-400">
+            <FaBookOpen className="mr-2" />
+            <span>{mockTest.mockTests?.length + mockTest.attachments?.length || 0} Tests</span>
           </div>
         </div>
+
         <div className="flex flex-col space-y-2">
           {isLoggedIn ? (
             isEnrolled || mockTest.price === 0 ? (
@@ -62,21 +77,21 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
                   e.stopPropagation()
                   handleStartTest(mockTest._id)
                 }}
-                className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-xs sm:text-sm"
+                className="w-full py-3 px-4 bg-white text-black font-bold text-sm tracking-wide hover:bg-gray-200 transition-colors rounded-sm"
               >
-                Start Test
+                START TEST
               </button>
             ) : (
-              <>
+              <div className="flex gap-2">
                 {isInCart ? (
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
-                      navigate("/dashboard/cart")
+                      navigate('/dashboard/cart')
                     }}
-                    className="w-full py-2 px-3 bg-richblack-700 text-white font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-600 text-xs sm:text-sm"
+                    className="flex-1 py-3 px-4 bg-zinc-900 text-white font-bold text-sm tracking-wide hover:bg-zinc-800 transition-colors border border-zinc-700 rounded-sm whitespace-nowrap"
                   >
-                    Go to Cart
+                    GO TO CART
                   </button>
                 ) : (
                   <button
@@ -84,10 +99,9 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
                       e.stopPropagation()
                       handleAddToCart(mockTest)
                     }}
-                    className="w-full py-2 px-3 bg-richblack-700 text-white font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-600 text-xs sm:text-sm"
+                    className="py-3 px-4 bg-zinc-900 text-white flex items-center justify-center hover:bg-zinc-800 transition-colors border border-zinc-700 rounded-sm"
                   >
-                    <FaShoppingCart className="inline mr-1" />
-                    Add to Cart
+                    <FaShoppingCart className="text-lg" />
                   </button>
                 )}
                 <button
@@ -95,21 +109,21 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
                     e.stopPropagation()
                     handleBuyNow(mockTest)
                   }}
-                  className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-xs sm:text-sm"
+                  className="flex-1 py-3 px-4 bg-white text-black font-bold text-sm tracking-wide hover:bg-gray-200 transition-colors rounded-sm"
                 >
-                  Buy Now           
-                       </button>
-              </>
+                  BUY NOW
+                </button>
+              </div>
             )
           ) : (
             <button
               onClick={(e) => {
                 e.stopPropagation()
-                navigate("/login")
+                navigate('/login')
               }}
-              className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-xs sm:text-sm"
+              className="w-full py-3 px-4 bg-white text-black font-bold text-sm tracking-wide hover:bg-gray-200 transition-colors rounded-sm"
             >
-              Login to {mockTest.price === 0 ? 'Start' : 'Purchase'}
+              LOGIN TO {mockTest.price === 0 ? 'START' : 'PURCHASE'}
             </button>
           )}
         </div>
