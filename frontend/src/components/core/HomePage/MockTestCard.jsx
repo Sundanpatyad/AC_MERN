@@ -73,22 +73,33 @@ const MockTestCard = React.memo(({
                 </div>
 
                 {/* Actions Area */}
-                <div className="mt-8 flex gap-3">
-                    {isLoggedIn && (isEnrolled || mockTest.price === 0) ? (
+                <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                    {!isLoggedIn ? (
+                        <button
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setShowLoginModal(true);
+                            }}
+                            className="w-full py-2.5 bg-white text-black font-bold text-sm tracking-wide hover:bg-zinc-200 transition-all rounded-full"
+                        >
+                            LOGIN TO {mockTest.price === 0 ? 'START' : 'PURCHASE'}
+                        </button>
+                    ) : isEnrolled || mockTest.price === 0 ? (
                         <Link
                             to={`/view-mock/${mockTest._id}`}
                             onClick={(e) => e.stopPropagation()}
-                            className="w-full py-4 bg-white text-black text-center font-bold text-sm tracking-wide hover:bg-zinc-200 transition-all rounded-full"
+                            className="w-full py-2.5 bg-white text-black text-center font-bold text-sm tracking-wide hover:bg-zinc-200 transition-all rounded-full"
                         >
                             START TEST
                         </Link>
                     ) : (
-                        <>
+                        <div className="flex flex-col sm:flex-row gap-3 w-full">
                             {isInCart ? (
                                 <Link
                                     to="/dashboard/cart"
                                     onClick={(e) => e.stopPropagation()}
-                                    className="flex-1 py-4 bg-zinc-900 text-white text-center font-bold text-sm tracking-wide hover:bg-zinc-800 transition-all border border-zinc-800 rounded-full whitespace-nowrap"
+                                    className="w-full sm:flex-1 py-2.5 bg-zinc-900 text-white text-center font-bold text-sm tracking-wide hover:bg-zinc-800 transition-all border border-zinc-800 rounded-full whitespace-nowrap"
                                 >
                                     GO TO CART
                                 </Link>
@@ -99,7 +110,7 @@ const MockTestCard = React.memo(({
                                         e.stopPropagation();
                                         handleButtonClick(handleAddToCart);
                                     }}
-                                    className="px-6 py-4 bg-zinc-900 text-white flex items-center justify-center hover:bg-zinc-800 transition-all border border-zinc-800 rounded-full"
+                                    className="w-full sm:px-6 py-2.5 bg-zinc-900 text-white flex items-center justify-center hover:bg-zinc-800 transition-all border border-zinc-800 rounded-full"
                                 >
                                     <span className="text-sm">Add To Cart</span>
                                 </button>
@@ -110,24 +121,11 @@ const MockTestCard = React.memo(({
                                     e.stopPropagation();
                                     handleButtonClick(handleBuyNow);
                                 }}
-                                className="flex-1 py-4 bg-white text-black font-bold text-sm tracking-wide hover:bg-zinc-200 transition-all rounded-full"
+                                className="w-full sm:flex-1 py-2.5 bg-white text-black font-bold text-sm tracking-wide hover:bg-zinc-200 transition-all rounded-full"
                             >
                                 Buy Now
                             </button>
-                        </>
-                    )}
-
-                    {!isLoggedIn && (
-                        <button
-                            onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setShowLoginModal(true);
-                            }}
-                            className="w-full py-4 bg-white text-black font-bold text-sm tracking-wide hover:bg-zinc-200 transition-all rounded-full"
-                        >
-                            LOGIN TO {mockTest.price === 0 ? 'START' : 'PURCHASE'}
-                        </button>
+                        </div>
                     )}
                 </div>
             </div>
