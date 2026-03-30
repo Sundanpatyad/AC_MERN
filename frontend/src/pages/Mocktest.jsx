@@ -32,12 +32,12 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
   const navigate = useNavigate()
 
   return (
-    <div 
-      className="bg-black border border-zinc-800 rounded-md overflow-hidden cursor-pointer flex flex-col transition-colors duration-200 hover:border-zinc-500"
+    <div
+      className="bg-[#0f0f0f] border border-zinc-900 rounded-[2.5rem] p-1 cursor-pointer transition-all duration-300  flex flex-col group shadow-xl"
       onClick={() => navigate(`/mock-test/${mockTest._id}`)}
     >
-      {/* 16:9 image area */}
-      <div className="w-full border-b border-zinc-800" style={{ aspectRatio: '16/9', overflow: 'hidden' }}>
+      {/* Image Area */}
+      <div className="w-full relative overflow-hidden rounded-[2rem] bg-zinc-900" style={{ aspectRatio: '16/9' }}>
         {mockTest.thumbnail ? (
           <img
             src={mockTest.thumbnail}
@@ -45,31 +45,34 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-zinc-900 p-4">
-            <FaBookOpen className="text-4xl text-zinc-700" />
+          <div className="w-full h-full flex flex-col items-center justify-center p-4">
+            <FaBookOpen className="text-4xl text-zinc-800" />
           </div>
         )}
+        {/* Subtle Stats Overlay */}
+        <div className="absolute top-3 right-3 flex gap-2">
+          <span className="bg-black/50 backdrop-blur-md text-[10px] text-zinc-300 px-3 py-1 rounded-full border border-white/5">
+            {mockTest.mockTests?.length + mockTest.attachments?.length || 0} Tests
+          </span>
+          <span className="bg-black/50 backdrop-blur-md text-[10px] text-zinc-300 px-3 py-1 rounded-full border border-white/5">
+            {mockTest.studentsEnrolled?.length || 0} Students
+          </span>
+        </div>
       </div>
 
-      <div className="p-5 flex-grow flex flex-col justify-between">
-        <div className="mb-4">
-          <h3 className="text-base sm:text-lg font-bold text-white mb-2 line-clamp-2 leading-snug">
+      {/* Content Area */}
+      <div className="p-6 pb-4 flex-grow flex flex-col justify-between">
+        <div>
+          <h3 className="text-2xl font-medium text-white mb-2 line-clamp-1">
             {mockTest.seriesName}
           </h3>
-          <p className="text-sm text-gray-400 line-clamp-2">{mockTest.description}</p>
+          <p className="text-zinc-500 text-lg flex items-center gap-2">
+            Price: <span className="text-white font-bold">{mockTest.price === 0 ? 'Free' : `₹${mockTest.price}`}</span>
+          </p>
         </div>
 
-        <div className="flex justify-between items-center text-sm mb-5 pb-4 border-b border-zinc-800">
-          <span className="font-bold text-white">
-            {mockTest.price === 0 ? 'Free' : `₹${mockTest.price}`}
-          </span>
-          <div className="flex items-center text-gray-400">
-            <FaBookOpen className="mr-2" />
-            <span>{mockTest.mockTests?.length + mockTest.attachments?.length || 0} Tests</span>
-          </div>
-        </div>
-
-        <div className="flex flex-col space-y-2">
+        {/* Actions Area */}
+        <div className="mt-8 flex gap-3">
           {isLoggedIn ? (
             isEnrolled || mockTest.price === 0 ? (
               <button
@@ -77,19 +80,19 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
                   e.stopPropagation()
                   handleStartTest(mockTest._id)
                 }}
-                className="w-full py-3 px-4 bg-white text-black font-bold text-sm tracking-wide hover:bg-gray-200 transition-colors rounded-sm"
+                className="w-full py-4 bg-white text-black font-bold text-sm tracking-wide hover:bg-zinc-200 transition-all rounded-full"
               >
                 START TEST
               </button>
             ) : (
-              <div className="flex gap-2">
+              <div className="flex gap-2 w-full">
                 {isInCart ? (
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
                       navigate('/dashboard/cart')
                     }}
-                    className="flex-1 py-3 px-4 bg-zinc-900 text-white font-bold text-sm tracking-wide hover:bg-zinc-800 transition-colors border border-zinc-700 rounded-sm whitespace-nowrap"
+                    className="flex-1 py-4 bg-zinc-900 text-white font-bold text-sm tracking-wide hover:bg-zinc-800 transition-all border border-zinc-800 rounded-full whitespace-nowrap"
                   >
                     GO TO CART
                   </button>
@@ -99,9 +102,9 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
                       e.stopPropagation()
                       handleAddToCart(mockTest)
                     }}
-                    className="py-3 px-4 bg-zinc-900 text-white flex items-center justify-center hover:bg-zinc-800 transition-colors border border-zinc-700 rounded-sm"
+                    className="px-6 py-4 bg-zinc-900 text-white flex items-center justify-center hover:bg-zinc-800 transition-all border border-zinc-800 rounded-full"
                   >
-                    <FaShoppingCart className="text-lg" />
+                    <span className="text-sm">Add To Cart</span>
                   </button>
                 )}
                 <button
@@ -109,9 +112,9 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
                     e.stopPropagation()
                     handleBuyNow(mockTest)
                   }}
-                  className="flex-1 py-3 px-4 bg-white text-black font-bold text-sm tracking-wide hover:bg-gray-200 transition-colors rounded-sm"
+                  className="flex-1 py-4 bg-white text-black font-bold text-sm tracking-wide hover:bg-zinc-200 transition-all rounded-full"
                 >
-                  BUY NOW
+                  Buy Now
                 </button>
               </div>
             )
@@ -121,7 +124,7 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
                 e.stopPropagation()
                 navigate('/login')
               }}
-              className="w-full py-3 px-4 bg-white text-black font-bold text-sm tracking-wide hover:bg-gray-200 transition-colors rounded-sm"
+              className="w-full py-4 bg-white text-black font-bold text-sm tracking-wide hover:bg-zinc-200 transition-all rounded-full"
             >
               LOGIN TO {mockTest.price === 0 ? 'START' : 'PURCHASE'}
             </button>
@@ -224,30 +227,30 @@ const MockTestComponent = () => {
   const memoizedMockTests = useMemo(() => mockTests || [], [mockTests])
 
   if (isLoading) {
-    return <LoadingSpinner title={"Loading Mocktest..."}/>
+    return <LoadingSpinner title={"Loading Mocktest..."} />
   }
 
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex-grow align-center justify-center mx-auto w-full max-w-maxContent px-4 pt-8 sm:pt-20">
         <h2 className="text-7xl tracking-wide sm:text-3xl md:text-[90px] font-inter text-center mt-10 text-slate-200 pb-4">
-         Explore Tests
+          Explore Tests
         </h2>
         <div className="relative md:mt-8 text-center">
-        <input
-              type="text"
-              placeholder="Search Courses..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-80 py-3 px-8 rounded-2xl border border-slate-500 bg-transparent text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400 touch-action-manipulation select-none"
-            />
+          <input
+            type="text"
+            placeholder="Search Courses..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-80 py-3 px-8 rounded-2xl border border-slate-500 bg-transparent text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400 touch-action-manipulation select-none"
+          />
         </div>
         <div className='text-sm md:text-xl text-center text-slate-300 pt-3 pb-20'>
           <p>
-          Challenge yourself with our latest mock tests and elevate your skills to the next level!
+            Challenge yourself with our latest mock tests and elevate your skills to the next level!
           </p>
         </div>
-         
+
         {memoizedMockTests.length > 0 ? (
           <div>
             {/* Display the latest mock test first */}
@@ -266,7 +269,7 @@ const MockTestComponent = () => {
                   isInCart={cart.some(item => item._id === mockTest._id)}
                 />
               ))}
-    
+
             {/* Display the rest of the mock tests in descending order */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8">
               {memoizedMockTests
@@ -292,7 +295,7 @@ const MockTestComponent = () => {
           </p>
         )}
       </div>
-    
+
       <Footer />
       {confirmationModal && <ConfirmationModal modalData={confirmationModal} />}
     </div>

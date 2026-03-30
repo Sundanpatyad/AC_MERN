@@ -34,10 +34,11 @@ const MockTestCard = React.memo(({
 
     return (
         <div
-            className="bg-black border border-zinc-800 rounded-md overflow-hidden cursor-pointer flex flex-col transition-colors duration-200 hover:border-zinc-500"
+            className="bg-[#0f0f0f] border border-zinc-900 rounded-[2.5rem] p-2 cursor-pointer transition-all duration-300 flex flex-col group shadow-xl"
             onClick={onCardClick}
         >
-            <div className="w-full border-b border-zinc-800" style={{ aspectRatio: '16/9', overflow: 'hidden' }}>
+            {/* Image Area */}
+            <div className="w-full relative overflow-hidden rounded-[2rem] bg-zinc-900" style={{ aspectRatio: '16/9' }}>
                 {mockTest.thumbnail ? (
                     <img
                         src={mockTest.thumbnail}
@@ -45,84 +46,85 @@ const MockTestCard = React.memo(({
                         className="w-full h-full object-cover"
                     />
                 ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 p-4">
-                        <FaBookOpen className="text-4xl text-zinc-700" />
+                    <div className="w-full h-full flex flex-col items-center justify-center p-4">
+                        <FaBookOpen className="text-4xl text-zinc-800" />
                     </div>
                 )}
+                {/* Subtle Stats Overlay */}
+                <div className="absolute top-3 right-3 flex gap-2">
+                    <span className="bg-black/50 backdrop-blur-md text-[10px] text-zinc-300 px-3 py-1 rounded-full border border-white/5">
+                        {mockTest.mockTests?.length + mockTest.attachments?.length || 0} Tests
+                    </span>
+                    {/* <span className="bg-black/50 backdrop-blur-md text-[10px] text-zinc-300 px-3 py-1 rounded-full border border-white/5">
+                        {mockTest.studentsEnrolled?.length  || 0} Students
+                    </span> */}
+                </div>
             </div>
-            
-            <div className="p-5 flex-grow flex flex-col justify-between bg-black">
-                <div className="mb-4">
-                    <h3 className="text-lg font-bold text-white mb-2 line-clamp-2 leading-snug">
+
+            {/* Content Area */}
+            <div className="p-6 pb-4 flex-grow flex flex-col justify-between">
+                <div>
+                    <h3 className="text-xl font-medium text-white mb-2 line-clamp-1">
                         {mockTest.seriesName}
                     </h3>
-                    <p className="text-sm text-gray-400 line-clamp-2">
-                        {mockTest.description}
+                    <p className="text-zinc-500 text-sm flex items-center gap-2">
+                        Price: <span className="text-white bg-zinc-900 px-2 py-0.5 rounded-full">{mockTest.price === 0 ? 'Free' : `₹${mockTest.price}`}</span>
                     </p>
                 </div>
-                
-                <div className="flex justify-between items-center text-sm mb-5 pb-4 border-b border-zinc-800/50">
-                    <div className="font-bold text-white">
-                        {mockTest.price === 0 ? 'Free' : `₹${mockTest.price}`}
-                    </div>
-                    <div className="flex items-center text-gray-400">
-                        <FaBookOpen className="mr-2" />
-                        <span>{mockTest.mockTests?.length + mockTest.attachments?.length || 0} Tests</span>
-                    </div>
-                </div>
-                
-                <div className="flex flex-col space-y-2 mt-auto">
-                    {isLoggedIn ? (
-                        isEnrolled || mockTest.price === 0 ? (
-                            <Link
-                                to={`/view-mock/${mockTest._id}`}
-                                onClick={(e) => e.stopPropagation()}
-                                className="w-full py-3 px-4 bg-white text-black text-center font-bold text-sm tracking-wide hover:bg-gray-200 transition-colors rounded-sm"
-                            >
-                                START TEST
-                            </Link>
-                        ) : (
-                            <div className="flex gap-2">
-                                {isInCart ? (
-                                    <Link
-                                        to="/dashboard/cart"
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="w-full flex-1 py-3 px-4 bg-zinc-900 text-white text-center font-bold text-sm tracking-wide hover:bg-zinc-800 transition-colors border border-zinc-700 rounded-sm whitespace-nowrap"
-                                    >
-                                        GO TO CART
-                                    </Link>
-                                ) : (
-                                    <button
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            handleButtonClick(handleAddToCart);
-                                        }}
-                                        className="py-3 px-4 bg-zinc-900 text-white flex items-center justify-center hover:bg-zinc-800 transition-colors border border-zinc-700 rounded-sm"
-                                    >
-                                        <FaShoppingCart className="text-lg" />
-                                    </button>
-                                )}
+
+                {/* Actions Area */}
+                <div className="mt-8 flex gap-3">
+                    {isLoggedIn && (isEnrolled || mockTest.price === 0) ? (
+                        <Link
+                            to={`/view-mock/${mockTest._id}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="w-full py-4 bg-white text-black text-center font-bold text-sm tracking-wide hover:bg-zinc-200 transition-all rounded-full"
+                        >
+                            START TEST
+                        </Link>
+                    ) : (
+                        <>
+                            {isInCart ? (
+                                <Link
+                                    to="/dashboard/cart"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="flex-1 py-4 bg-zinc-900 text-white text-center font-bold text-sm tracking-wide hover:bg-zinc-800 transition-all border border-zinc-800 rounded-full whitespace-nowrap"
+                                >
+                                    GO TO CART
+                                </Link>
+                            ) : (
                                 <button
                                     onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
-                                        handleButtonClick(handleBuyNow);
+                                        handleButtonClick(handleAddToCart);
                                     }}
-                                    className="w-full flex-[2] py-3 px-4 bg-white text-black font-bold text-sm tracking-wide hover:bg-gray-200 transition-colors rounded-sm"
+                                    className="px-6 py-4 bg-zinc-900 text-white flex items-center justify-center hover:bg-zinc-800 transition-all border border-zinc-800 rounded-full"
                                 >
-                                    BUY NOW
+                                    <span className="text-sm">Add To Cart</span>
                                 </button>
-                            </div>
-                        )
-                    ) : (
+                            )}
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleButtonClick(handleBuyNow);
+                                }}
+                                className="flex-1 py-4 bg-white text-black font-bold text-sm tracking-wide hover:bg-zinc-200 transition-all rounded-full"
+                            >
+                                Buy Now
+                            </button>
+                        </>
+                    )}
+
+                    {!isLoggedIn && (
                         <button
                             onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 setShowLoginModal(true);
                             }}
-                            className="w-full py-3 px-4 bg-white text-black font-bold text-sm tracking-wide hover:bg-gray-200 transition-colors rounded-sm"
+                            className="w-full py-4 bg-white text-black font-bold text-sm tracking-wide hover:bg-zinc-200 transition-all rounded-full"
                         >
                             LOGIN TO {mockTest.price === 0 ? 'START' : 'PURCHASE'}
                         </button>
