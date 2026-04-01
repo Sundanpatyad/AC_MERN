@@ -1,210 +1,301 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
-import RankingTable from "./RankingTable";
 import Footer from '../../common/Footer';
 import { studentEndpoints } from '../../../services/apis';
-import RankingsGraph from './RankingGraph';
 import LoadingSpinner from '../ConductMockTests/Spinner';
-import { Menu, Search } from 'lucide-react';
-import { FaRankingStar } from "react-icons/fa6";
+import { FaRankingStar } from 'react-icons/fa6';
+import { FaCrown, FaSearch } from 'react-icons/fa';
+import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react';
+
+const PAGE_LIMIT = 20;
 
 const RankingsPage = () => {
-  const [rankings, setRankings] = useState({});
+  const [testList, setTestList] = useState([]);   // [{ testId, testName }]
   const [selectedTest, setSelectedTest] = useState(null);
-  const [userRanks, setUserRanks] = useState({});
-  const { token } = useSelector((state) => state.auth);
-  const { user } = useSelector((state) => state.profile);
-  const [error, setError] = useState(null);
-  const { RANKINGS_API } = studentEndpoints;
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const [rankings, setRankings] = useState([]);
+  const [pagination, setPagination] = useState({ total: 0, totalPages: 1, hasNextPage: false, hasPrevPage: false });
+  const [userRank, setUserRank] = useState(null);
+
+  const [page, setPage] = useState(1);
+
+  const [nameQuery, setNameQuery] = useState('');
+  const [searchResults, setSearchResults] = useState(null);
+  const [isSearching, setIsSearching] = useState(false);
+
   const [isLoading, setIsLoading] = useState(true);
-  const userId = user._id;
-  const { testName } = useParams();
+  const [error, setError] = useState(null);
+
+  // Guards against re-runs
+  const bootstrapDone = useRef(false);
+  const lastFetchKey = useRef('');   // "<testId|testName>:<page>"
+
+  const { token } = useSelector(s => s.auth);
+  const { user } = useSelector(s => s.profile);
+  const userId = user?._id;
+  const { testName: routeTestName } = useParams();
   const navigate = useNavigate();
 
+  const { RANKINGS_API, USER_RANKING_BY_NAME_API, GET_ATTEMPTED_TEST_NAMES_API } = studentEndpoints;
 
-  const calculateRanks = (testResults) => {
-    const sortedResults = testResults.sort((a, b) => b.score - a.score);
+  // ── helpers ──────────────────────────────────────────────
+  const testKey = (test, pg) => `${test?.testId ?? test?.testName}:${pg}`;
 
-    let currentRank = 1;
-    let prevScore = null;
-    let rankedResults = sortedResults.map((result, index) => {
-      if (result.score !== prevScore) {
-        currentRank = index + 1;
-      }
-      prevScore = result.score;
-      return { ...result, rank: currentRank };
-    });
-
-    return rankedResults;
+  const makeParams = (test, pg) => {
+    const p = new URLSearchParams({ page: pg, limit: PAGE_LIMIT });
+    test?.testId ? p.set('testId', test.testId) : p.set('testName', test.testName);
+    return p;
   };
 
+  // ── fetch rankings ────────────────────────────────────────
+  const fetchRankings = async (test, pg) => {
+    const key = testKey(test, pg);
+    if (lastFetchKey.current === key) return;   // skip duplicate call
+    lastFetchKey.current = key;
+
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`${RANKINGS_API}?${makeParams(test, pg)}`, { headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message);
+
+      setRankings(data.data ?? []);
+      setPagination(data.pagination ?? { total: 0, totalPages: 1, hasNextPage: false, hasPrevPage: false });
+      const me = (data.data ?? []).find(r => String(r.userId) === String(userId));
+      setUserRank(me?.rank ?? null);
+    } catch (err) {
+      console.error('fetchRankings:', err);
+      setError('Failed to load rankings.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // ── bootstrap (runs exactly once) ─────────────────────────
   useEffect(() => {
-    const fetchRankings = async () => {
-      setIsLoading(true);
+    if (!token || bootstrapDone.current) return;
+    bootstrapDone.current = true;
+
+    (async () => {
       try {
-        const response = await fetch(RANKINGS_API, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        if (data.success) {
-          const groupedRankings = {};
-          const userRanks = {};
+        const res = await fetch(GET_ATTEMPTED_TEST_NAMES_API, { headers: { Authorization: `Bearer ${token}` } });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || 'Failed to fetch test names');
 
-          data.data.forEach(ranking => {
-            if (!groupedRankings[ranking.testName]) {
-              groupedRankings[ranking.testName] = [];
-            }
-            groupedRankings[ranking.testName].push(ranking);
-          });
+        // The API returns an alphabetically sorted array of strings
+        const list = (data.data || []).map(name => ({ testId: null, testName: name }));
+        setTestList(list);
 
-          Object.keys(groupedRankings).forEach(testName => {
-            groupedRankings[testName] = calculateRanks(groupedRankings[testName]);
-
-            const userRanking = groupedRankings[testName].find(r => r.userId === userId);
-            if (userRanking) {
-              userRanks[testName] = userRanking.rank;
-            }
-          });
-
-          setRankings(groupedRankings);
-          setUserRanks(userRanks);
-
-          if (testName && groupedRankings[testName]) {
-            setSelectedTest(testName);
-          } else if (Object.keys(groupedRankings).length > 0) {
-            const firstTest = Object.keys(groupedRankings)[0];
-            setSelectedTest(firstTest);
-            navigate(`/rankings/${firstTest}`);
-          }
-
-        } else {
-          setError(data.message || 'Failed to fetch rankings');
-        }
-      } catch (error) {
-        console.error('Error fetching rankings:', error);
-        setError('Failed to fetch rankings. Please try again later.');
+        // Pick initial selection
+        const initial = list.find(t => routeTestName && (t.testName === routeTestName)) ?? list[0] ?? null;
+        setSelectedTest(initial);
+      } catch (err) {
+        console.error('bootstrap:', err);
+        setError('Failed to load rankings.');
       } finally {
         setIsLoading(false);
       }
-    };
-    if (token) {
-      fetchRankings();
-    } else {
-      setError('Authentication token is missing');
-      setIsLoading(false);
+    })();
+  }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── sync URL (never navigates from inside async) ──────────
+  useEffect(() => {
+    if (!selectedTest) return;
+    // Only navigate when URL doesn't already match — prevents remount loop
+    if (routeTestName !== selectedTest.testName) {
+      navigate(`/rankings/${encodeURIComponent(selectedTest.testName)}`, { replace: true });
     }
-  }, [token, RANKINGS_API, userId, testName, navigate]);
+  }, [selectedTest?.testName]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const filteredTests = Object.keys(rankings).filter(testName =>
-    testName.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // ── fetch when test or page changes ───────────────────────
+  useEffect(() => {
+    if (!selectedTest || !token) return;
+    fetchRankings(selectedTest, page);
+  }, [selectedTest, page]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
+  // ── name search (debounced 500 ms) ────────────────────────
+  useEffect(() => {
+    if (!nameQuery.trim()) { setSearchResults(null); return; }
+    const t = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const p = new URLSearchParams({ name: nameQuery.trim() });
+        selectedTest?.testId ? p.set('testId', selectedTest.testId) : p.set('testName', selectedTest?.testName ?? '');
+        const res = await fetch(`${USER_RANKING_BY_NAME_API}?${p}`, { headers: { Authorization: `Bearer ${token}` } });
+        const data = await res.json();
+        setSearchResults(data.success ? data.data : []);
+      } catch { setSearchResults([]); }
+      finally { setIsSearching(false); }
+    }, 500);
+    return () => clearTimeout(t);
+  }, [nameQuery, selectedTest, token]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleTestSelection = (newTestName) => {
-    setSelectedTest(newTestName);
-    setIsDropdownOpen(false);
-    navigate(`/rankings/${newTestName}`);
+  // ── handlers ──────────────────────────────────────────────
+  const selectTest = (test) => {
+    if (test.testName === selectedTest?.testName) { setDropdownOpen(false); return; }
+    setPage(1);
+    lastFetchKey.current = '';   // reset so new test fetches
+    setRankings([]);
+    setUserRank(null);
+    setNameQuery('');
+    setSearchResults(null);
+    setSelectedTest(test);
+    setDropdownOpen(false);
   };
 
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
+  const changePage = (dir) => setPage(p => Math.max(1, Math.min(pagination.totalPages, p + dir)));
 
-  if (error) {
-    return <div className="text-center text-red-500 mt-8 font-semibold text-xl">An error occurred. Please try again later.</div>;
-  }
+  // ── medal helpers ─────────────────────────────────────────
+  const medalClass = r => r === 1 ? 'text-yellow-400' : r === 2 ? 'text-slate-400' : r === 3 ? 'text-amber-600' : 'text-zinc-700';
+  const displayList = searchResults !== null ? searchResults : rankings;
+
+  // ── render ────────────────────────────────────────────────
+  if (!token || (isLoading && testList.length === 0)) return <LoadingSpinner />;
+  if (error) return (
+    <div className="flex items-center justify-center min-h-screen bg-black">
+      <p className="text-red-400">{error}</p>
+    </div>
+  );
 
   return (
-    <div className="bg-black w-screen text-gray-100 min-h-screen">
-      <div className="mx-auto px-4 sm:px-6 lg:px-8 mt-5">
-        <div className="relative mb-8">
-          <button
-            onClick={toggleDropdown}
-            className="flex items-center text-sm justify-between w-full px-4 py-4 bg-zinc-900 text-white rounded-md"
-          >
-            <span>{selectedTest || "Select a mock test"}</span>
-            <Menu size={24} />
-          </button>
-          <AnimatePresence>
-            {isDropdownOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="absolute z-10 py-4 px-2 left-0 mt-2 w-full rounded-lg shadow-lg bg-slate-400 bg-opacity-10 border border-white/20 backdrop-blur-lg"
-              >
-                <div className="relative mb-4">
-                  <input
-                    type="text"
-                    placeholder="Search mock tests..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full px-3 py-2 pl-10 bg-transparent border border-slate-200 text-white rounded-md focus:outline-none"
-                  />
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                </div>
+    <div className="min-h-screen bg-black text-white">
+      <div className="max-w-2xl mx-auto px-4 pt-8 pb-24">
 
-                <motion.div className="max-h-60 overflow-y-auto">
-                  {filteredTests.map((testName, index) => (
-                    <motion.div
-                      key={testName}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.05 }}
-                    >
-                      <button
-                        onClick={() => handleTestSelection(testName)}
-                        className="block w-full text-left px-4 py-2 text-sm my-2 text-white hover:bg-white/20 transition-colors duration-200 ease-in-out rounded-lg"
-                      >
-                        {testName} (My Rank : {userRanks[testName] || 'N/A'})
-                      </button>
-                    </motion.div>
-                  ))}
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        <div className="bg-transparent bg-opacity-50 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl">
-          {selectedTest && rankings[selectedTest] ? (
-            <>
-              <h2 className="text-3xl font-bold mb-6 text-center text-gray-100">{selectedTest}</h2>
-              <div className='flex justify-center align-center'>
-                <div className="text-xl flex justify-evenly font-semibold mb-4 text-center bg-slate-200 py-2 px-4 w-80 rounded-md text-zinc-800">
-                  <span><FaRankingStar size={"26"} /></span><span>My Rank : {userRanks[selectedTest] || 'N/A'} / {(rankings[selectedTest] || []).length}</span>
-                </div>
-              </div>
-              <div className="space-y-8">
-                <div>
-                  <div className="overflow-x-auto">
-                    <RankingTable rankings={rankings[selectedTest] || []} />
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-center mb-4">Rankings Graph</h3>
-                  <RankingsGraph rankings={rankings[selectedTest] || []} />
-                </div>
-              </div>
-            </>
-          ) : (
-            <p className="text-center text-gray-400 font-medium text-lg">
-              {Object.keys(rankings).length === 0 ? 'No rankings data available.' :
-                filteredTests.length === 0 ? 'No matching mock tests found.' : 'Select a mock test to view rankings.'}
-            </p>
+        {/* ── Title row ── */}
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-xl font-semibold flex items-center gap-2">
+            <FaRankingStar className="text-yellow-400" size={20} />
+            Rankings
+          </h1>
+          {userRank && (
+            <span className="text-xs px-2.5 py-1 rounded-full bg-zinc-800 border border-zinc-700 text-zinc-300">
+              Your rank <span className="text-white font-bold ml-1">#{userRank}</span>
+              <span className="text-zinc-600"> / {pagination.total}</span>
+            </span>
           )}
         </div>
+
+        {/* ── Test selector ── */}
+        <div className="relative mb-6">
+          <button
+            onClick={() => setDropdownOpen(o => !o)}
+            className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg bg-zinc-900 border border-zinc-800 text-sm text-white hover:border-zinc-600 transition-colors"
+          >
+            <span className="truncate text-left">{selectedTest?.testName ?? 'Select a test'}</span>
+            {dropdownOpen ? <ChevronUp size={15} className="text-zinc-500 flex-shrink-0" /> : <ChevronDown size={15} className="text-zinc-500 flex-shrink-0" />}
+          </button>
+
+          {dropdownOpen && (
+            <div className="absolute z-30 top-full left-0 mt-1 w-full rounded-lg bg-zinc-900 border border-zinc-800 shadow-2xl overflow-hidden">
+              <div className="max-h-52 overflow-y-auto">
+                {testList.map(t => (
+                  <button
+                    key={t.testId ?? t.testName}
+                    onClick={() => selectTest(t)}
+                    className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${t.testName === selectedTest?.testName ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'}`}
+                  >
+                    {t.testName}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* ── Search bar ── */}
+        <div className="relative mb-5">
+          <input
+            type="text"
+            placeholder="Search by name…"
+            value={nameQuery}
+            onChange={e => setNameQuery(e.target.value)}
+            className="w-full px-4 py-2.5 pl-9 rounded-lg bg-zinc-900 border border-zinc-800 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-zinc-600 transition-colors"
+          />
+          {isSearching
+            ? <div className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 border-2 border-zinc-500 border-t-transparent rounded-full animate-spin" />
+            : <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" size={12} />}
+        </div>
+
+        {/* ── Rankings list ── */}
+        {isLoading ? (
+          <div className="flex justify-center py-16"><LoadingSpinner /></div>
+        ) : displayList.length === 0 ? (
+          <p className="text-center text-zinc-600 py-16 text-sm">
+            {searchResults !== null ? `No results for "${nameQuery}"` : 'No data available.'}
+          </p>
+        ) : (
+          <div className="space-y-1">
+            {displayList.map((r, idx) => {
+              const isMe = userId && String(r.userId) === String(userId);
+              return (
+                <div
+                  key={`${r._id ?? r.userId ?? r.rank}-${idx}`}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isMe ? 'bg-blue-950/50 border border-blue-900/40' : 'hover:bg-zinc-900'} transition-colors`}
+                >
+                  {/* Rank */}
+                  <div className={`w-7 text-sm font-bold flex-shrink-0 ${medalClass(r.rank)}`}>
+                    {r.rank <= 3 ? <FaCrown size={13} /> : <span>#{r.rank}</span>}
+                  </div>
+
+                  {/* Avatar */}
+                  <img
+                    src={r.userImage}
+                    alt={r.userName}
+                    onError={e => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(r.userName)}&background=27272a&color=fff`; }}
+                    className="w-8 h-8 rounded-full object-cover border border-zinc-800 flex-shrink-0"
+                  />
+
+                  {/* Name */}
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-medium truncate ${isMe ? 'text-blue-300' : 'text-zinc-200'}`}>
+                      {r.userName}
+                      {r.rank <= 3 && <span className={`ml-2 text-xs ${medalClass(r.rank)}`}>#{r.rank}</span>}
+                      {isMe && <span className="ml-1.5 text-xs text-blue-500">you</span>}
+                    </p>
+                    {r.attemptDate && (
+                      <p className="text-[11px] text-zinc-600 mt-0.5">
+                        {new Date(r.attemptDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Score */}
+                  <div className="text-right flex-shrink-0">
+                    <span className="text-sm font-semibold text-white">{r.score}</span>
+                    <span className="text-xs text-zinc-600 ml-1">pts</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* ── Pagination ── */}
+        {searchResults === null && pagination.totalPages > 1 && (
+          <div className="flex justify-center items-center gap-3 mt-8">
+            <button
+              onClick={() => changePage(-1)} disabled={!pagination.hasPrevPage}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-md text-xs bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronLeft size={14} /> Prev
+            </button>
+            <span className="text-xs text-zinc-500">
+              <span className="text-white font-semibold">{page}</span> / {pagination.totalPages}
+            </span>
+            <button
+              onClick={() => changePage(1)} disabled={!pagination.hasNextPage}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-md text-xs bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              Next <ChevronRight size={14} />
+            </button>
+          </div>
+        )}
+
       </div>
       <Footer />
     </div>

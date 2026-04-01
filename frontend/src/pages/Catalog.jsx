@@ -91,7 +91,7 @@ const CourseCard = React.memo(
                   className="w-full py-2 px-3 bg-richblack-700 text-white font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-600 text-xs sm:text-sm"
                 >
                   <FaShoppingCart className="inline mr-1" />
-                  Add to Cart
+                
                 </button>
                 <button
                   onClick={(e) => {

@@ -39,7 +39,9 @@ export const studentEndpoints = {
   COURSE_PAYMENT_API: `${BASE_URL}/api/v1/payment/capturePayment`,
   COURSE_VERIFY_API: `${BASE_URL}/api/v1/payment/verifyPayment`,
   SEND_PAYMENT_SUCCESS_EMAIL_API: `${BASE_URL}/api/v1/payment/sendPaymentSuccessEmail`,
-  RANKINGS_API: `${BASE_URL}/api/v1/mock/getRankings`
+  RANKINGS_API: `${BASE_URL}/api/v1/mock/getRankings`,
+  USER_RANKING_BY_NAME_API: `${BASE_URL}/api/v1/mock/getRankingByName`,
+  GET_ATTEMPTED_TEST_NAMES_API: `${BASE_URL}/api/v1/mock/getAttemptedTestNames`
 }
 
 // MOCK TEST PAYMENT ENDPOINTS

@@ -158,7 +158,6 @@ const MockTestDetails = () => {
                       className="w-full py-3 px-4 bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition duration-300 font-medium"
                     >
                       <FaShoppingCart className="inline-block mr-2" />
-                      Add to Cart
                     </button>
                   )}
                   <button
@@ -266,7 +265,6 @@ const MockTestDetails = () => {
                         className="w-full py-3 px-4 bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition duration-300 font-medium"
                       >
                         <FaShoppingCart className="inline-block mr-2" />
-                        Add to Cart
                       </button>
                     )}
                     <button

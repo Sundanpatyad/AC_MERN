@@ -113,7 +113,7 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
                   }}
                   className="px-4 sm:px-6 py-2.5 bg-zinc-900 text-white flex items-center justify-center hover:bg-zinc-800 transition-all border border-zinc-800 rounded-full"
                 >
-                  <span className="text-[10px] sm:text-sm">Add To Cart</span>
+                  <FaShoppingCart className="inline-block mr-2" />
                 </button>
               )}
               <button

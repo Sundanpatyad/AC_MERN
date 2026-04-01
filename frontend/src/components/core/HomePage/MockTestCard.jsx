@@ -34,11 +34,11 @@ const MockTestCard = React.memo(({
 
     return (
         <div
-            className="bg-[#0f0f0f] border border-zinc-900 rounded-[2.5rem] p-2 cursor-pointer transition-all duration-300 flex flex-col group shadow-xl"
+            className="relative flex flex-col bg-black/40 backdrop-blur-xl border border-white/10 rounded-[2rem] p-2.5 cursor-pointer overflow-hidden"
             onClick={onCardClick}
         >
             {/* Image Area */}
-            <div className="w-full relative overflow-hidden rounded-[2rem] bg-zinc-900" style={{ aspectRatio: '16/9' }}>
+            <div className="w-full relative overflow-hidden rounded-[1.5rem] bg-black/50 aspect-video">
                 {mockTest.thumbnail ? (
                     <img
                         src={mockTest.thumbnail}
@@ -47,83 +47,67 @@ const MockTestCard = React.memo(({
                     />
                 ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center p-4">
-                        <FaBookOpen className="text-4xl text-zinc-800" />
+                        <FaBookOpen className="text-4xl text-white/20" />
                     </div>
                 )}
-                {/* Subtle Stats Overlay */}
-                <div className="absolute top-3 right-3 flex gap-2">
-                    <span className="bg-black/50 backdrop-blur-md text-[10px] text-zinc-300 px-3 py-1 rounded-full border border-white/5">
-                        {mockTest.mockTests?.length + mockTest.attachments?.length || 0} Tests
+
+                {/* Top Badges overlay */}
+                <div className="absolute top-3 left-3 right-3 flex justify-between items-start pointer-events-none">
+                    <span className="bg-black/60 backdrop-blur-md text-[10px] font-medium tracking-wide text-white px-3 py-1.5 rounded-full border border-white/20 uppercase">
+                        {mockTest.mockTests?.length + (mockTest.attachments?.length || 0)} Tests
                     </span>
-                    {/* <span className="bg-black/50 backdrop-blur-md text-[10px] text-zinc-300 px-3 py-1 rounded-full border border-white/5">
-                        {mockTest.studentsEnrolled?.length  || 0} Students
-                    </span> */}
+                    <span className="bg-black/60 backdrop-blur-md text-xs font-bold px-3 py-1.5 rounded-full border border-white/20 text-white shadow-lg">
+                        {mockTest.price === 0 ? 'FREE' : `₹${mockTest.price}`}
+                    </span>
                 </div>
             </div>
 
             {/* Content Area */}
-            <div className="p-6 pb-4 flex-grow flex flex-col justify-between">
+            <div className="pt-5 px-3 pb-2 flex-grow flex flex-col justify-between">
                 <div>
-                    <h3 className="text-xl font-medium text-white mb-2 line-clamp-1">
+                    <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 line-clamp-2">
                         {mockTest.seriesName}
                     </h3>
-                    <p className="text-zinc-500 text-sm flex items-center gap-2">
-                        Price: <span className="text-white bg-zinc-900 px-2 py-0.5 rounded-full">{mockTest.price === 0 ? 'Free' : `₹${mockTest.price}`}</span>
-                    </p>
                 </div>
 
                 {/* Actions Area */}
-                <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                <div className="mt-6 pt-4 border-t border-white/10 w-full" onClick={(e) => e.stopPropagation()}>
                     {!isLoggedIn ? (
                         <button
-                            onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setShowLoginModal(true);
-                            }}
-                            className="w-full py-2.5 bg-white text-black font-bold text-sm tracking-wide hover:bg-zinc-200 transition-all rounded-full"
+                            onClick={(e) => { e.preventDefault(); setShowLoginModal(true); }}
+                            className="w-full py-3 bg-white text-black font-bold text-sm tracking-wide active:scale-95 transition-transform rounded-full shadow-lg"
                         >
                             LOGIN TO {mockTest.price === 0 ? 'START' : 'PURCHASE'}
                         </button>
                     ) : isEnrolled || mockTest.price === 0 ? (
                         <Link
                             to={`/view-mock/${mockTest._id}`}
-                            onClick={(e) => e.stopPropagation()}
-                            className="w-full py-2.5 bg-white text-black text-center font-bold text-sm tracking-wide hover:bg-zinc-200 transition-all rounded-full"
+                            className="block w-full py-3 bg-white text-black text-center font-bold text-sm tracking-wide active:scale-95 transition-transform rounded-full shadow-lg"
                         >
                             START TEST
                         </Link>
                     ) : (
-                        <div className="flex flex-col sm:flex-row gap-3 w-full">
+                        <div className="flex flex-col sm:flex-row gap-2.5 w-full">
                             {isInCart ? (
                                 <Link
                                     to="/dashboard/cart"
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="w-full sm:flex-1 py-2.5 bg-zinc-900 text-white text-center font-bold text-sm tracking-wide hover:bg-zinc-800 transition-all border border-zinc-800 rounded-full whitespace-nowrap"
+                                    className="flex-1 py-3 bg-black/50 text-white text-center font-bold text-sm tracking-wide border border-white/20 rounded-full active:scale-95 transition-transform"
                                 >
                                     GO TO CART
                                 </Link>
                             ) : (
                                 <button
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        handleButtonClick(handleAddToCart);
-                                    }}
-                                    className="w-full sm:px-6 py-2.5 bg-zinc-900 text-white flex items-center justify-center hover:bg-zinc-800 transition-all border border-zinc-800 rounded-full"
+                                    onClick={(e) => { e.preventDefault(); handleButtonClick(handleAddToCart); }}
+                                    className="flex-1 py-3 bg-black/50 text-white font-bold text-sm tracking-wide border border-white/20 rounded-full flex items-center justify-center gap-2 active:scale-95 transition-transform"
                                 >
-                                    <span className="text-sm">Add To Cart</span>
+                                    <FaShoppingCart /> 
                                 </button>
                             )}
                             <button
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    handleButtonClick(handleBuyNow);
-                                }}
-                                className="w-full sm:flex-1 py-2.5 bg-white text-black font-bold text-sm tracking-wide hover:bg-zinc-200 transition-all rounded-full"
+                                onClick={(e) => { e.preventDefault(); handleButtonClick(handleBuyNow); }}
+                                className="flex-1 py-3 bg-white text-black font-bold text-sm tracking-wide rounded-full shadow-lg active:scale-95 transition-transform"
                             >
-                                Buy Now
+                                BUY NOW
                             </button>
                         </div>
                     )}
