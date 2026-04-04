@@ -11,9 +11,10 @@ import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react'
 const PAGE_LIMIT = 20;
 
 const RankingsPage = () => {
-  const [testList, setTestList] = useState([]);   // [{ testId, testName }]
+  const [testList, setTestList] = useState([]);   // [{ testId, testName, seriesName }]
   const [selectedTest, setSelectedTest] = useState(null);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalSearch, setModalSearch] = useState('');
 
   const [rankings, setRankings] = useState([]);
   const [pagination, setPagination] = useState({ total: 0, totalPages: 1, hasNextPage: false, hasPrevPage: false });
@@ -152,7 +153,7 @@ const RankingsPage = () => {
 
   // ── handlers ──────────────────────────────────────────────
   const selectTest = (test) => {
-    if (test.testId === selectedTest?.testId && test.testName === selectedTest?.testName) { setDropdownOpen(false); return; }
+    if (test.testId === selectedTest?.testId && test.testName === selectedTest?.testName) { setIsModalOpen(false); return; }
     setPage(1);
     lastFetchKey.current = '';   // reset so new test fetches
     setRankings([]);
@@ -160,7 +161,7 @@ const RankingsPage = () => {
     setNameQuery('');
     setSearchResults(null);
     setSelectedTest(test);
-    setDropdownOpen(false);
+    setIsModalOpen(false);
   };
 
   const changePage = (dir) => setPage(p => Math.max(1, Math.min(pagination.totalPages, p + dir)));
@@ -168,14 +169,6 @@ const RankingsPage = () => {
   // ── medal helpers ─────────────────────────────────────────
   const medalClass = r => r === 1 ? 'text-yellow-400' : r === 2 ? 'text-slate-400' : r === 3 ? 'text-amber-600' : 'text-zinc-700';
   const displayList = searchResults !== null ? searchResults : rankings;
-
-  // ── grouping helper ──────────────────────────────────────
-  const groupedData = testList.reduce((acc, item) => {
-    const group = item.seriesName || "Other";
-    if (!acc[group]) acc[group] = [];
-    acc[group].push(item);
-    return acc;
-  }, {});
 
   // ── render ────────────────────────────────────────────────
   if (!token || (isLoading && testList.length === 0)) return <LoadingSpinner />;
@@ -225,39 +218,107 @@ const RankingsPage = () => {
           </div>
         </div>
 
-        {/* ── Test selector ── */}
-        <div className="relative mb-6">
+        {/* ── Test Selector Button ── */}
+        <div className="mb-6">
           <button
-            onClick={() => setDropdownOpen(o => !o)}
-            className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg bg-zinc-900 border border-zinc-800 text-sm text-white hover:border-zinc-600 transition-colors"
+            onClick={() => setIsModalOpen(true)}
+            className="w-full flex items-center justify-between px-5 py-3 rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-zinc-500 transition-all group shadow-2xl backdrop-blur-sm"
           >
-            <span className="truncate text-left">{selectedTest?.testName ?? 'Select a test'}</span>
-            {dropdownOpen ? <ChevronUp size={15} className="text-zinc-500 flex-shrink-0" /> : <ChevronDown size={15} className="text-zinc-500 flex-shrink-0" />}
+            <div className="flex flex-col items-start min-w-0">
+              <span className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mb-0.5 group-hover:text-zinc-400 transition-colors">Selected Test</span>
+              <span className="text-sm text-white font-medium truncate w-full text-left">
+                {selectedTest?.testName ?? 'Select a mock test…'}
+              </span>
+            </div>
+            <div className="flex items-center gap-2 text-zinc-500 group-hover:text-white transition-colors">
+              <span className="text-[10px] font-bold uppercase tracking-tighter">Change</span>
+              <ChevronRight size={16} />
+            </div>
           </button>
+        </div>
 
-          {dropdownOpen && (
-            <div className="absolute z-30 top-full left-0 mt-1 w-full rounded-lg bg-zinc-900 border border-zinc-800 shadow-2xl overflow-hidden">
-              <div className="max-h-64 overflow-y-auto">
-                {Object.entries(groupedData).map(([series, tests], sIdx) => (
-                  <div key={series} className={sIdx > 0 ? "border-t border-zinc-800" : ""}>
-                    <div className="px-4 py-2 bg-zinc-950 text-[10px] font-bold uppercase tracking-widest text-zinc-500 sticky top-0 z-10">
-                      {series}
-                    </div>
-                    {tests.map(t => (
-                      <button
-                        key={`${t.testId}-${t.testName}`}
-                        onClick={() => selectTest(t)}
-                        className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${t.testName === selectedTest?.testName && (t.testId === selectedTest?.testId) ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'}`}
-                      >
-                        {t.testName}
-                      </button>
-                    ))}
+        {/* ── Tabular Test Selector Modal ── */}
+        {isModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+            <div className="bg-zinc-950 border border-zinc-800 w-full max-w-2xl max-h-[85vh] rounded-2xl shadow-[0_0_50px_-12px_rgba(255,255,255,0.1)] flex flex-col overflow-hidden animate-in zoom-in-95 duration-300">
+              {/* Modal Header */}
+              <div className="p-5 border-b border-zinc-900 flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-bold text-white leading-tight">Explore Mock Tests</h2>
+                  <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold mt-1">Select a test to view its global leaderboard</p>
+                </div>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="p-2 hover:bg-zinc-900 rounded-lg text-zinc-500 hover:text-white transition-colors"
+                >
+                  <ChevronDown size={20} />
+                </button>
+              </div>
+
+              {/* Modal Search */}
+              <div className="p-4 bg-zinc-900/20">
+                <div className="relative">
+                  <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" size={14} />
+                  <input
+                    type="text"
+                    placeholder="Search by series or test name…"
+                    value={modalSearch}
+                    onChange={e => setModalSearch(e.target.value)}
+                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-zinc-600 transition-colors"
+                    autoFocus
+                  />
+                </div>
+              </div>
+
+              {/* Modal Tabular List */}
+              <div className="flex-1 overflow-y-auto px-4 pb-6 scrollbar-hide">
+                <table className="w-full text-left border-collapse">
+                  <thead className="sticky top-0 bg-zinc-950 z-10">
+                    <tr>
+                      <th className="py-3 px-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest border-b border-zinc-900">Series</th>
+                      <th className="py-3 px-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest border-b border-zinc-900">Test Name</th>
+                      <th className="py-3 px-4 text-right border-b border-zinc-900"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {testList
+                      .filter(t =>
+                        t.testName.toLowerCase().includes(modalSearch.toLowerCase()) ||
+                        (t.seriesName?.toLowerCase().includes(modalSearch.toLowerCase()))
+                      )
+                      .map((t, idx) => (
+                        <tr
+                          key={`${t.testId}-${t.testName}-${idx}`}
+                          onClick={() => selectTest(t)}
+                          className="group hover:bg-zinc-900/50 cursor-pointer transition-colors"
+                        >
+                          <td className="py-4 px-4 text-xs font-semibold text-zinc-400 group-hover:text-white transition-colors">
+                            {t.seriesName || 'General'}
+                          </td>
+                          <td className="py-4 px-4 text-xs font-medium text-white">
+                            {t.testName}
+                          </td>
+                          <td className="py-4 px-4 text-right">
+                            <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border transition-all ${t.testName === selectedTest?.testName && t.testId === selectedTest?.testId ? 'bg-white text-black border-white' : 'border-zinc-800 text-zinc-500 group-hover:border-zinc-600 group-hover:text-white'}`}>
+                              {t.testName === selectedTest?.testName && t.testId === selectedTest?.testId ? 'Active' : 'Select'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+                {testList.filter(t =>
+                  t.testName.toLowerCase().includes(modalSearch.toLowerCase()) ||
+                  (t.seriesName?.toLowerCase().includes(modalSearch.toLowerCase()))
+                ).length === 0 && (
+                  <div className="py-12 text-center">
+                    <p className="text-sm text-zinc-600">No tests found matching "{modalSearch}"</p>
                   </div>
-                ))}
+                )}
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* ── Search bar ── */}
         <div className="relative mb-5">
