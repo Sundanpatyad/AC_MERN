@@ -45,7 +45,8 @@ const RankingsPage = () => {
 
   const makeParams = (test, pg) => {
     const p = new URLSearchParams({ page: pg, limit: PAGE_LIMIT });
-    test?.testId ? p.set('testId', test.testId) : p.set('testName', test.testName);
+    if (test?.testId) p.set('testId', test.testId);
+    if (test?.testName) p.set('testName', test.testName);
     return p;
   };
 
@@ -94,8 +95,13 @@ const RankingsPage = () => {
         const data = await res.json();
         if (!data.success) throw new Error(data.message || 'Failed to fetch test names');
 
-        // The API returns an array of objects: { testName, mockTestSeriesId }
-        const list = (data.data || []).map(item => ({ testId: item.mockTestSeriesId, testName: item.testName }));
+        // The API returns an array of objects: { testName, mockTestSeriesId, seriesName, mockTestId }
+        const list = (data.data || []).map(item => ({
+          testId: item.mockTestSeriesId,
+          testName: item.testName,
+          seriesName: item.seriesName,
+          mockTestId: item.mockTestId
+        }));
         setTestList(list);
 
         // Pick initial selection
@@ -132,7 +138,9 @@ const RankingsPage = () => {
       setIsSearching(true);
       try {
         const p = new URLSearchParams({ name: nameQuery.trim() });
-        selectedTest?.testId ? p.set('testId', selectedTest.testId) : p.set('testName', selectedTest?.testName ?? '');
+        if (selectedTest?.testId) p.set('testId', selectedTest.testId);
+        if (selectedTest?.testName) p.set('testName', selectedTest.testName);
+
         const res = await fetch(`${USER_RANKING_BY_NAME_API}?${p}`, { headers: { Authorization: `Bearer ${token}` } });
         const data = await res.json();
         setSearchResults(data.success ? data.data : []);
@@ -144,7 +152,7 @@ const RankingsPage = () => {
 
   // ── handlers ──────────────────────────────────────────────
   const selectTest = (test) => {
-    if (test.testName === selectedTest?.testName) { setDropdownOpen(false); return; }
+    if (test.testId === selectedTest?.testId && test.testName === selectedTest?.testName) { setDropdownOpen(false); return; }
     setPage(1);
     lastFetchKey.current = '';   // reset so new test fetches
     setRankings([]);
@@ -160,6 +168,14 @@ const RankingsPage = () => {
   // ── medal helpers ─────────────────────────────────────────
   const medalClass = r => r === 1 ? 'text-yellow-400' : r === 2 ? 'text-slate-400' : r === 3 ? 'text-amber-600' : 'text-zinc-700';
   const displayList = searchResults !== null ? searchResults : rankings;
+
+  // ── grouping helper ──────────────────────────────────────
+  const groupedData = testList.reduce((acc, item) => {
+    const group = item.seriesName || "Other";
+    if (!acc[group]) acc[group] = [];
+    acc[group].push(item);
+    return acc;
+  }, {});
 
   // ── render ────────────────────────────────────────────────
   if (!token || (isLoading && testList.length === 0)) return <LoadingSpinner />;
@@ -200,7 +216,7 @@ const RankingsPage = () => {
               </div>
             ) : (
               <Link
-                to={selectedTest?.testId ? `/mock-test/${selectedTest.testId}` : "/explore"}
+                to={selectedTest?.testId ? `/view-mock/${selectedTest.testId}` : "/explore"}
                 className="text-xs px-4 py-2 rounded-full bg-white text-black font-bold uppercase tracking-wider hover:bg-zinc-200 transition-colors shadow-lg block"
               >
                 Attempt Test
@@ -221,15 +237,22 @@ const RankingsPage = () => {
 
           {dropdownOpen && (
             <div className="absolute z-30 top-full left-0 mt-1 w-full rounded-lg bg-zinc-900 border border-zinc-800 shadow-2xl overflow-hidden">
-              <div className="max-h-52 overflow-y-auto">
-                {testList.map(t => (
-                  <button
-                    key={t.testId ?? t.testName}
-                    onClick={() => selectTest(t)}
-                    className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${t.testName === selectedTest?.testName ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'}`}
-                  >
-                    {t.testName}
-                  </button>
+              <div className="max-h-64 overflow-y-auto">
+                {Object.entries(groupedData).map(([series, tests], sIdx) => (
+                  <div key={series} className={sIdx > 0 ? "border-t border-zinc-800" : ""}>
+                    <div className="px-4 py-2 bg-zinc-950 text-[10px] font-bold uppercase tracking-widest text-zinc-500 sticky top-0 z-10">
+                      {series}
+                    </div>
+                    {tests.map(t => (
+                      <button
+                        key={`${t.testId}-${t.testName}`}
+                        onClick={() => selectTest(t)}
+                        className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${t.testName === selectedTest?.testName && (t.testId === selectedTest?.testId) ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'}`}
+                      >
+                        {t.testName}
+                      </button>
+                    ))}
+                  </div>
                 ))}
               </div>
             </div>
@@ -286,11 +309,25 @@ const RankingsPage = () => {
                       {r.rank <= 3 && <span className={`ml-2 text-xs ${medalClass(r.rank)}`}>#{r.rank}</span>}
                       {isMe && <span className="ml-1.5 text-xs text-blue-500">you</span>}
                     </p>
-                    {r.attemptDate && (
-                      <p className="text-[11px] text-zinc-600 mt-0.5">
-                        {new Date(r.attemptDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                      </p>
-                    )}
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
+                      {r.testName && (
+                        <div className="flex items-center gap-1 bg-zinc-900 px-1.5 py-0.5 rounded border border-zinc-800">
+                          <span className="text-[8px] text-zinc-600 font-bold uppercase tracking-widest">Test:</span>
+                          <span className="text-[9px] text-zinc-400 font-medium uppercase truncate max-w-[80px] sm:max-w-none">{r.testName}</span>
+                        </div>
+                      )}
+                      {r.seriesName && (
+                        <div className="flex items-center gap-1 bg-zinc-900 px-1.5 py-0.5 rounded border border-zinc-800">
+                          <span className="text-[8px] text-zinc-600 font-bold uppercase tracking-widest">Series:</span>
+                          <span className="text-[9px] text-zinc-400 font-medium uppercase truncate max-w-[80px] sm:max-w-none">{r.seriesName}</span>
+                        </div>
+                      )}
+                      {r.attemptDate && (
+                        <span className="text-[10px] text-zinc-600 ml-auto sm:ml-0">
+                          {new Date(r.attemptDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   {/* Score */}

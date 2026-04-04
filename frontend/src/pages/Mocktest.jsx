@@ -14,19 +14,101 @@ import LoadingSpinner from '../components/core/ConductMockTests/Spinner'
 
 const MockTestCardSkeleton = () => (
   <div className="bg-black w-full rounded-xl overflow-hidden shadow-lg animate-pulse">
-    <div className="h-28 sm:h-32 md:h-40 bg-richblack-700"></div>
+    <div className="h-28 sm:h-32 md:h-40 bg-zinc-700"></div>
     <div className="p-3 sm:p-4 md:p-6">
-      <div className="h-4 bg-richblack-700 rounded w-3/4 mb-2"></div>
-      <div className="h-4 bg-richblack-700 rounded w-full mb-4"></div>
+      <div className="h-4 bg-zinc-700 rounded w-3/4 mb-2"></div>
+      <div className="h-4 bg-zinc-700 rounded w-full mb-4"></div>
       <div className="flex justify-between items-center mb-4">
-        <div className="h-4 bg-richblack-700 rounded w-1/4"></div>
-        <div className="h-4 bg-richblack-700 rounded w-1/4"></div>
+        <div className="h-4 bg-zinc-700 rounded w-1/4"></div>
+        <div className="h-4 bg-zinc-700 rounded w-1/4"></div>
       </div>
-      <div className="h-8 bg-richblack-700 rounded w-full mb-2"></div>
-      <div className="h-8 bg-richblack-700 rounded w-full"></div>
+      <div className="h-8 bg-zinc-700 rounded w-full mb-2"></div>
+      <div className="h-8 bg-zinc-700 rounded w-full"></div>
     </div>
   </div>
 )
+
+const MockTestTable = ({ filteredMockTests, handleAddToCart, handleBuyNow, handleStartTest, isLoggedIn, user, cart, navigate }) => {
+  const allTests = useMemo(() => {
+    return filteredMockTests.flatMap(series => 
+      (series.mockTests || []).map(test => ({
+        ...test,
+        seriesId: series._id,
+        seriesName: series.seriesName,
+        price: series.price,
+        isEnrolled: series.studentsEnrolled?.includes(user?._id),
+        isInCart: cart.some(item => item._id === series._id),
+        thumbnail: series.thumbnail
+      }))
+    ).sort((a,b) => a.testName.localeCompare(b.testName));
+  }, [filteredMockTests, user?._id, cart]);
+
+  if (allTests.length === 0) return null;
+
+  return (
+    <div className="mt-24 mb-20 overflow-x-auto rounded-[2rem] border border-zinc-800 bg-[#070707] shadow-2xl">
+      <div className="px-8 py-6 border-b border-zinc-800">
+        <h3 className="text-xl font-bold text-white">All Individual Tests</h3>
+        <p className="text-zinc-500 text-sm">A comprehensive list of every test available in our library.</p>
+      </div>
+      <table className="w-full text-left border-collapse min-w-[800px]">
+        <thead>
+          <tr className="bg-zinc-900/30 backdrop-blur-xl">
+            <th className="px-8 py-5 text-[11px] font-extrabold text-zinc-500 uppercase tracking-[0.2em] border-b border-zinc-800">Mock Test / Series</th>
+            <th className="px-8 py-5 text-[11px] font-extrabold text-zinc-500 uppercase tracking-[0.2em] border-b border-zinc-800 text-center">Questions</th>
+            <th className="px-8 py-5 text-[11px] font-extrabold text-zinc-500 uppercase tracking-[0.2em] border-b border-zinc-800 text-center">Duration</th>
+            <th className="px-8 py-5 text-[11px] font-extrabold text-zinc-500 uppercase tracking-[0.2em] border-b border-zinc-800">Status</th>
+            <th className="px-8 py-5 text-[11px] font-extrabold text-zinc-500 uppercase tracking-[0.2em] border-b border-zinc-800 text-right">Action</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-zinc-900">
+          {allTests.map((test, idx) => (
+            <tr key={`${test.seriesId}-${test.testName}-${idx}`} className="hover:bg-white/[0.02] transition-colors group">
+              <td className="px-8 py-6">
+                <div className="flex items-center gap-4">
+                   <div className="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex-shrink-0 overflow-hidden shadow-inner">
+                      {test.thumbnail ? <img src={test.thumbnail} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" /> : <FaBookOpen className="m-auto mt-3.5 text-zinc-700" />}
+                   </div>
+                   <div className="flex flex-col">
+                      <span className="text-white font-bold text-sm tracking-tight group-hover:text-blue-400 transition-colors uppercase">{test.testName}</span>
+                      <span className="text-[10px] text-zinc-500 font-medium tracking-wide uppercase mt-0.5">{test.seriesName}</span>
+                   </div>
+                </div>
+              </td>
+              <td className="px-8 py-6 text-center">
+                <span className="text-sm font-bold text-zinc-300">{test.questions?.length || 0}</span>
+              </td>
+              <td className="px-8 py-6 text-center">
+                <span className="text-sm font-bold text-zinc-300">{test.duration}m</span>
+              </td>
+              <td className="px-8 py-6">
+                <span className={`text-[10px] px-3 py-1.5 rounded-full font-black tracking-widest border uppercase ${test.price === 0 ? 'border-emerald-500/20 bg-emerald-500/5 text-emerald-400' : 'border-zinc-800 bg-zinc-900/50 text-zinc-500'}`}>
+                  {test.price === 0 ? 'FREE' : `₹${test.price}`}
+                </span>
+              </td>
+              <td className="px-8 py-6 text-right">
+                {!isLoggedIn ? (
+                  <button onClick={() => navigate('/login')} className="text-[10px] font-black pointer-events-auto uppercase tracking-[0.15em] py-2.5 px-6 rounded-full bg-white text-black active:scale-95 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)]">LOGIN</button>
+                ) : test.isEnrolled || test.price === 0 ? (
+                  <button onClick={() => handleStartTest(test.seriesId)} className="text-[10px] font-black uppercase tracking-[0.15em] py-2.5 px-8 rounded-full bg-white text-black active:scale-95 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)]">START</button>
+                ) : (
+                  <div className="flex justify-end gap-3">
+                    {test.isInCart ? (
+                        <button onClick={() => navigate('/dashboard/cart')} className="px-5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-full text-[10px] font-black text-white hover:border-zinc-700 uppercase tracking-widest active:scale-95 transition-all">IN CART</button>
+                    ) : (
+                        <button onClick={() => handleAddToCart({_id: test.seriesId, seriesName: test.seriesName, price: test.price})} className="p-3 bg-zinc-900 border border-zinc-800 rounded-full text-white hover:border-zinc-700 active:scale-95 transition-all"><FaShoppingCart size={12} /></button>
+                    )}
+                    <button onClick={() => handleBuyNow({_id: test.seriesId, seriesName: test.seriesName, price: test.price})} className="px-6 py-2.5 bg-white text-black rounded-full text-[10px] font-black active:scale-95 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] uppercase tracking-widest">BUY</button>
+                  </div>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
 
 const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, handleStartTest, isLoggedIn, isEnrolled, isInCart }) => {
   const navigate = useNavigate()
@@ -286,6 +368,18 @@ const MockTestComponent = () => {
                   />
                 ))}
             </div>
+
+            {/* NEW Tabular View Section */}
+            <MockTestTable 
+              filteredMockTests={filteredMockTests}
+              handleAddToCart={handleAddToCart}
+              handleBuyNow={handleBuyNow}
+              handleStartTest={handleStartTest}
+              isLoggedIn={isLoggedIn}
+              user={user}
+              cart={cart}
+              navigate={navigate}
+            />
           </div>
         ) : (
           <p className="text-center text-xl text-richblack-5 bg-richblack-800 rounded-lg p-8 shadow-lg mt-8">
