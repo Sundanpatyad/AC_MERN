@@ -188,29 +188,45 @@ const RankingsPage = () => {
             <FaRankingStar className="text-yellow-400" size={20} />
             Rankings
           </h1>
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 w-full sm:w-auto">
             {userStats ? (
-              <div className="flex items-center gap-3 px-1.5 py-1.5 pr-4 rounded-full bg-zinc-800/80 border border-zinc-700/80 backdrop-blur-md shadow-lg">
-                <img
-                  src={userStats.userImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(userStats.userName || 'User')}&background=27272a&color=fff`}
-                  alt="You"
-                  onError={e => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(userStats.userName || 'User')}&background=27272a&color=fff`; }}
-                  className="w-8 h-8 rounded-full border border-zinc-600 object-cover"
-                />
-                <div className="flex flex-col">
-                  <span className="text-[11px] leading-tight text-zinc-400 font-medium">
-                    Rank <span className="text-white font-bold ml-0.5">#{userStats.rank}</span>
-                    <span className="text-zinc-500"> / {pagination.total}</span>
-                  </span>
-                  <span className="text-[10px] leading-tight text-zinc-500 mt-0.5">
-                    Score: <span className="text-blue-400 font-bold">{userStats.score} pts</span>
-                  </span>
+              <div className="relative group w-full">
+                {/* Visual Glow Effect */}
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-zinc-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+
+                <div className="relative flex items-center gap-4 px-4 py-2.5 rounded-2xl bg-zinc-900/40 border border-zinc-700/50 backdrop-blur-xl shadow-2xl w-full">
+                  {/* User Avatar with Rank Badge */}
+                  <div className="relative">
+                    <img
+                      src={userStats.userImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(userStats.userName || 'User')}&background=27272a&color=fff`}
+                      alt="You"
+                      onError={e => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(userStats.userName || 'User')}&background=27272a&color=fff`; }}
+                      className="w-10 h-10 rounded-full border-2 border-zinc-700 object-cover shadow-inner"
+                    />
+                    <div className="absolute -bottom-1 -right-1 bg-white text-black text-[9px] font-black px-1.5 py-0.5 rounded-md shadow-lg border border-black/10">
+                      YOU
+                    </div>
+                  </div>
+
+                  {/* Rank Stats */}
+                  <div className="flex flex-col">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Rank</span>
+                      <span className="text-xl font-black text-white italic">#{userStats.rank}</span>
+                      <span className="text-[11px] text-zinc-600 font-bold">/ {pagination.total}</span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 font-bold border border-zinc-700/50">
+                        {userStats.score} <span className="text-[8px] opacity-70">PTS</span>
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : (
               <Link
                 to={selectedTest?.testId ? `/view-mock/${selectedTest.testId}` : "/explore"}
-                className="text-xs px-4 py-2 rounded-full bg-white text-black font-bold uppercase tracking-wider hover:bg-zinc-200 transition-colors shadow-lg block"
+                className="text-xs px-6 py-2.5 rounded-xl bg-white text-black font-black uppercase tracking-widest hover:bg-zinc-200 active:scale-95 transition-all shadow-xl block text-center"
               >
                 Attempt Test
               </Link>
@@ -270,51 +286,62 @@ const RankingsPage = () => {
                 </div>
               </div>
 
-              {/* Modal Tabular List */}
-              <div className="flex-1 overflow-y-auto px-4 pb-6 scrollbar-hide">
-                <table className="w-full text-left border-collapse">
-                  <thead className="sticky top-0 bg-zinc-950 z-10">
-                    <tr>
-                      <th className="py-3 px-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest border-b border-zinc-900">Series</th>
-                      <th className="py-3 px-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest border-b border-zinc-900">Test Name</th>
-                      <th className="py-3 px-4 text-right border-b border-zinc-900"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {testList
-                      .filter(t =>
-                        t.testName.toLowerCase().includes(modalSearch.toLowerCase()) ||
-                        (t.seriesName?.toLowerCase().includes(modalSearch.toLowerCase()))
-                      )
-                      .map((t, idx) => (
-                        <tr
-                          key={`${t.testId}-${t.testName}-${idx}`}
-                          onClick={() => selectTest(t)}
-                          className="group hover:bg-zinc-900/50 cursor-pointer transition-colors"
-                        >
-                          <td className="py-4 px-4 text-xs font-semibold text-zinc-400 group-hover:text-white transition-colors">
-                            {t.seriesName || 'General'}
-                          </td>
-                          <td className="py-4 px-4 text-xs font-medium text-white">
-                            {t.testName}
-                          </td>
-                          <td className="py-4 px-4 text-right">
-                            <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border transition-all ${t.testName === selectedTest?.testName && t.testId === selectedTest?.testId ? 'bg-white text-black border-white' : 'border-zinc-800 text-zinc-500 group-hover:border-zinc-600 group-hover:text-white'}`}>
-                              {t.testName === selectedTest?.testName && t.testId === selectedTest?.testId ? 'Active' : 'Select'}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-                {testList.filter(t =>
-                  t.testName.toLowerCase().includes(modalSearch.toLowerCase()) ||
-                  (t.seriesName?.toLowerCase().includes(modalSearch.toLowerCase()))
-                ).length === 0 && (
-                  <div className="py-12 text-center">
-                    <p className="text-sm text-zinc-600">No tests found matching "{modalSearch}"</p>
-                  </div>
-                )}
+              {/* Modal Grouped List with Robust Per-Series Sticky Headers */}
+              <div className="flex-1 overflow-y-auto custom-scrollbar relative">
+                {(() => {
+                  const filtered = testList.filter(t =>
+                    t.testName.toLowerCase().includes(modalSearch.toLowerCase()) ||
+                    (t.seriesName?.toLowerCase().includes(modalSearch.toLowerCase()))
+                  );
+
+                  if (filtered.length === 0) {
+                    return (
+                      <div className="py-12 text-center text-zinc-600 text-sm">No tests found matching "{modalSearch}"</div>
+                    );
+                  }
+
+                  const groups = filtered.reduce((acc, item) => {
+                    const g = item.seriesName || "Other";
+                    if (!acc[g]) acc[g] = [];
+                    acc[g].push(item);
+                    return acc;
+                  }, {});
+
+                  return Object.entries(groups).map(([series, tests]) => (
+                    <div key={series} className="relative">
+                      {/* Sticky Header within its own relative container pushes previous ones out */}
+                      <div className="sticky top-0 z-20 bg-zinc-950 border-b border-zinc-900/50 py-3 px-6 shadow-sm">
+                        <h3 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] truncate">
+                          {series}
+                        </h3>
+                      </div>
+
+                      <table className="w-full text-left border-collapse table-fixed">
+                        <tbody>
+                          {tests.map((t, tIdx) => {
+                            const isActive = t.testName === selectedTest?.testName && t.testId === selectedTest?.testId;
+                            return (
+                              <tr
+                                key={`${t.testId}-${t.testName}-${tIdx}`}
+                                onClick={() => selectTest(t)}
+                                className={`group hover:bg-zinc-900/40 cursor-pointer transition-all border-b border-zinc-900 last:border-0 ${isActive ? 'bg-zinc-900/60' : ''}`}
+                              >
+                                <td className="py-4 px-8 text-[13px] font-medium text-white group-hover:pl-10 transition-all duration-300 truncate">
+                                  {t.testName}
+                                </td>
+                                <td className="py-4 px-8 text-right w-[120px]">
+                                  <span className={`text-[9px] font-black uppercase tracking-widest px-4 py-1.5 rounded-lg border transition-all inline-block whitespace-nowrap ${isActive ? 'bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.2)] scale-105' : 'border-zinc-800 text-zinc-600 group-hover:border-zinc-500 group-hover:text-white'}`}>
+                                    {isActive ? 'Active' : 'Select'}
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  ));
+                })()}
               </div>
             </div>
           </div>
@@ -350,10 +377,7 @@ const RankingsPage = () => {
                   key={`${r._id ?? r.userId ?? r.rank}-${idx}`}
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isMe ? 'bg-blue-950/50 border border-blue-900/40' : 'hover:bg-zinc-900'} transition-colors`}
                 >
-                  {/* Rank */}
-                  <div className={`w-7 text-sm font-bold flex-shrink-0 ${medalClass(r.rank)}`}>
-                    {r.rank <= 3 ? <FaCrown size={13} /> : <span>#{r.rank}</span>}
-                  </div>
+
 
                   {/* Avatar */}
                   <img
