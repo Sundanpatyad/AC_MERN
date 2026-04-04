@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import Footer from '../../common/Footer';
 import { studentEndpoints } from '../../../services/apis';
 import LoadingSpinner from '../ConductMockTests/Spinner';
@@ -17,7 +17,7 @@ const RankingsPage = () => {
 
   const [rankings, setRankings] = useState([]);
   const [pagination, setPagination] = useState({ total: 0, totalPages: 1, hasNextPage: false, hasPrevPage: false });
-  const [userRank, setUserRank] = useState(null);
+  const [userStats, setUserStats] = useState(null);
 
   const [page, setPage] = useState(1);
 
@@ -65,8 +65,15 @@ const RankingsPage = () => {
 
       setRankings(data.data ?? []);
       setPagination(data.pagination ?? { total: 0, totalPages: 1, hasNextPage: false, hasPrevPage: false });
-      const me = (data.data ?? []).find(r => String(r.userId) === String(userId));
-      setUserRank(me?.rank ?? null);
+
+      // Use loggedInUserRank from backend to show global rank regardless of pagination
+      if (data.loggedInUserRank && data.loggedInUserRank.length > 0) {
+        setUserStats(data.loggedInUserRank[0]);
+      } else {
+        // Fallback for older backend versions
+        const me = (data.data ?? []).find(r => String(r.userId) === String(userId));
+        setUserStats(me ?? null);
+      }
     } catch (err) {
       console.error('fetchRankings:', err);
       setError('Failed to load rankings.');
@@ -87,8 +94,8 @@ const RankingsPage = () => {
         const data = await res.json();
         if (!data.success) throw new Error(data.message || 'Failed to fetch test names');
 
-        // The API returns an alphabetically sorted array of strings
-        const list = (data.data || []).map(name => ({ testId: null, testName: name }));
+        // The API returns an array of objects: { testName, mockTestSeriesId }
+        const list = (data.data || []).map(item => ({ testId: item.mockTestSeriesId, testName: item.testName }));
         setTestList(list);
 
         // Pick initial selection
@@ -141,7 +148,7 @@ const RankingsPage = () => {
     setPage(1);
     lastFetchKey.current = '';   // reset so new test fetches
     setRankings([]);
-    setUserRank(null);
+    setUserStats(null);
     setNameQuery('');
     setSearchResults(null);
     setSelectedTest(test);
@@ -167,17 +174,39 @@ const RankingsPage = () => {
       <div className="max-w-2xl mx-auto px-4 pt-8 pb-24">
 
         {/* ── Title row ── */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
           <h1 className="text-xl font-semibold flex items-center gap-2">
             <FaRankingStar className="text-yellow-400" size={20} />
             Rankings
           </h1>
-          {userRank && (
-            <span className="text-xs px-2.5 py-1 rounded-full bg-zinc-800 border border-zinc-700 text-zinc-300">
-              Your rank <span className="text-white font-bold ml-1">#{userRank}</span>
-              <span className="text-zinc-600"> / {pagination.total}</span>
-            </span>
-          )}
+          <div className="flex-shrink-0">
+            {userStats ? (
+              <div className="flex items-center gap-3 px-1.5 py-1.5 pr-4 rounded-full bg-zinc-800/80 border border-zinc-700/80 backdrop-blur-md shadow-lg">
+                <img
+                  src={userStats.userImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(userStats.userName || 'User')}&background=27272a&color=fff`}
+                  alt="You"
+                  onError={e => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(userStats.userName || 'User')}&background=27272a&color=fff`; }}
+                  className="w-8 h-8 rounded-full border border-zinc-600 object-cover"
+                />
+                <div className="flex flex-col">
+                  <span className="text-[11px] leading-tight text-zinc-400 font-medium">
+                    Rank <span className="text-white font-bold ml-0.5">#{userStats.rank}</span>
+                    <span className="text-zinc-500"> / {pagination.total}</span>
+                  </span>
+                  <span className="text-[10px] leading-tight text-zinc-500 mt-0.5">
+                    Score: <span className="text-blue-400 font-bold">{userStats.score} pts</span>
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <Link
+                to={selectedTest?.testId ? `/mock-test/${selectedTest.testId}` : "/explore"}
+                className="text-xs px-4 py-2 rounded-full bg-white text-black font-bold uppercase tracking-wider hover:bg-zinc-200 transition-colors shadow-lg block"
+              >
+                Attempt Test
+              </Link>
+            )}
+          </div>
         </div>
 
         {/* ── Test selector ── */}
