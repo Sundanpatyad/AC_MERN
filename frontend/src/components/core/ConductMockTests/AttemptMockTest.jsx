@@ -8,6 +8,7 @@ import LoadingSpinner from './Spinner';
 import QuestionArea from './components/QuestionArea';
 import TestHeader from './components/TestHeader';
 import TestFooter from './components/TestFooter';
+import ConfirmationModal from './components/ConfirmationModal';
 
 const AttemptMockTest = () => {
     const { mockId, testId } = useParams();
@@ -24,6 +25,7 @@ const AttemptMockTest = () => {
     const [skippedQuestions, setSkippedQuestions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
 
     const { GET_MCOKTEST_SERIES_BY_ID, CREATE_ATTEMPT_DETAILS } = mocktestEndpoints;
 
@@ -178,16 +180,30 @@ const AttemptMockTest = () => {
     }, [timeLeft, currentTest]);
 
     const handleAnswerSelect = (answer) => {
-        setSelectedAnswer(answer);
-        const newAnsweredQuestions = [...answeredQuestions];
-        newAnsweredQuestions[currentQuestion] = true;
-        setAnsweredQuestions(newAnsweredQuestions);
-
         const newUserAnswers = [...userAnswers];
-        newUserAnswers[currentQuestion] = answer;
-        setUserAnswers(newUserAnswers);
+        const newAnsweredQuestions = [...answeredQuestions];
+        const newSkippedQuestions = [...skippedQuestions];
 
-        const newSkippedQuestions = skippedQuestions.filter(q => q !== currentQuestion);
+        if (selectedAnswer === answer) {
+            // Undo/Deselect if the same option is clicked
+            setSelectedAnswer('');
+            newAnsweredQuestions[currentQuestion] = false;
+            newUserAnswers[currentQuestion] = '';
+        } else {
+            // Normal selection
+            setSelectedAnswer(answer);
+            newAnsweredQuestions[currentQuestion] = true;
+            newUserAnswers[currentQuestion] = answer;
+            
+            // Remove from skipped if it was there
+            const skipIndex = newSkippedQuestions.indexOf(currentQuestion);
+            if (skipIndex > -1) {
+                newSkippedQuestions.splice(skipIndex, 1);
+            }
+        }
+
+        setAnsweredQuestions(newAnsweredQuestions);
+        setUserAnswers(newUserAnswers);
         setSkippedQuestions(newSkippedQuestions);
     };
 
@@ -196,7 +212,7 @@ const AttemptMockTest = () => {
             setCurrentQuestion(currentQuestion + 1);
             setSelectedAnswer(userAnswers[currentQuestion + 1] || '');
         } else {
-            endTest();
+            setShowConfirmModal(true);
         }
     };
 
@@ -218,7 +234,7 @@ const AttemptMockTest = () => {
             setCurrentQuestion(currentQuestion + 1);
             setSelectedAnswer(userAnswers[currentQuestion + 1] || '');
         } else {
-            endTest();
+            setShowConfirmModal(true);
         }
     };
 
@@ -396,6 +412,18 @@ const AttemptMockTest = () => {
                     handleSkipQuestion={handleSkipQuestion}
                     isDarkMode={isDarkMode}
                     selectedAnswer={selectedAnswer}
+                />
+
+                <ConfirmationModal
+                    isOpen={showConfirmModal}
+                    onCancel={() => setShowConfirmModal(false)}
+                    onConfirm={() => {
+                        setShowConfirmModal(false);
+                        endTest();
+                    }}
+                    totalQuestions={currentTest.questions.length}
+                    answeredCount={answeredQuestions.filter(Boolean).length}
+                    isDarkMode={isDarkMode}
                 />
             </div>
         </div>

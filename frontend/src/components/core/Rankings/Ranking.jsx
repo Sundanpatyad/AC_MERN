@@ -309,8 +309,8 @@ const RankingsPage = () => {
 
                   return Object.entries(groups).map(([series, tests]) => (
                     <div key={series} className="relative">
-                      {/* Sticky Header within its own relative container pushes previous ones out */}
-                      <div className="sticky top-0 z-20 bg-zinc-950 border-b border-zinc-900/50 py-3 px-6 shadow-sm">
+                      {/* Robust Sticky Header - Pushes previous header out naturally */}
+                      <div className="sticky top-0 z-30 bg-zinc-950 border-b border-zinc-900 py-3.5 px-6 shadow-md backdrop-blur-md">
                         <h3 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] truncate">
                           {series}
                         </h3>
