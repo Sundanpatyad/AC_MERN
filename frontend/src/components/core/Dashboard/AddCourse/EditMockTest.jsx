@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { FaTrash, FaChevronDown, FaChevronRight, FaPlus } from 'react-icons/fa';
+import { FaTrash, FaChevronDown, FaChevronRight, FaPlus, FaImage } from 'react-icons/fa';
 import { fetchSeries } from '../../../../services/operations/mocktest';
 import { saveSeries } from '../../../../services/operations/profileAPI';
 import AddMockTest from './AddTextQuestions';
 import AddAttachments from './AddOMRbased';
+import { uploadImageToCloudinary } from '../../../../services/operations/uploadToCloudinary';
+import toast from 'react-hot-toast';
 
 const EditMockTestSeries = () => {
   const { token } = useSelector((state) => state.auth);
@@ -83,10 +85,34 @@ const EditMockTestSeries = () => {
     setSeries({ ...series, mockTests: updatedTests });
   };
 
-  const handleOptionChange = (testIndex, questionIndex, optionIndex, value) => {
+  // Normalise option: legacy string -> {text,image} object
+  const normaliseOpt = (opt) => (typeof opt === 'string' ? { text: opt, image: '' } : { text: opt?.text || '', image: opt?.image || '' });
+
+  const handleOptionChange = (testIndex, questionIndex, optionIndex, field, value) => {
     const updatedTests = [...series.mockTests];
-    updatedTests[testIndex].questions[questionIndex].options[optionIndex] = value;
+    const q = updatedTests[testIndex].questions[questionIndex];
+    const current = normaliseOpt(q.options[optionIndex]);
+    q.options[optionIndex] = { ...current, [field]: value };
     setSeries({ ...series, mockTests: updatedTests });
+  };
+
+  const handleQuestionImageChange = (testIndex, questionIndex, url) => {
+    const updatedTests = [...series.mockTests];
+    updatedTests[testIndex].questions[questionIndex].questionImage = url;
+    setSeries({ ...series, mockTests: updatedTests });
+  };
+
+  // Upload helper: reads a file, uploads to Cloudinary, calls setter with URL
+  const uploadField = async (file, setter) => {
+    if (!file) return;
+    const tid = toast.loading('Uploading image...');
+    try {
+      const url = await uploadImageToCloudinary(file, token);
+      setter(url);
+      toast.success('Image uploaded!', { id: tid });
+    } catch (e) {
+      toast.error('Upload failed', { id: tid });
+    }
   };
 
   const handleLeftColumnChange = (testIndex, questionIndex, itemIndex, value) => {
@@ -121,8 +147,9 @@ const EditMockTestSeries = () => {
       correctAnswer: ''
     } : {
       text: '',
+      questionImage: '',
       questionType: 'MCQ',
-      options: ['', '', '', ''],
+      options: [{ text: '', image: '' }, { text: '', image: '' }, { text: '', image: '' }, { text: '', image: '' }],
       correctAnswer: ''
     };
 
@@ -312,14 +339,15 @@ const EditMockTestSeries = () => {
         negative: test.negative || 0,
         status: test.status,
         questions: test.questions.map(question => {
+          const normOpt = (opt) => (typeof opt === 'string' ? { text: opt, image: '' } : { text: opt?.text || '', image: opt?.image || '' });
           const baseQuestion = {
-            text: question.text,
+            text: question.text || '',
+            questionImage: question.questionImage || '',
             questionType: question.questionType || 'MCQ',
-            options: question.options,
+            options: question.options.map(normOpt),
             correctAnswer: question.correctAnswer
           };
 
-          // Add leftColumn and rightColumn for MATCH questions
           if (question.questionType === 'MATCH' && question.leftColumn && question.rightColumn) {
             baseQuestion.leftColumn = question.leftColumn;
             baseQuestion.rightColumn = question.rightColumn;
@@ -622,11 +650,24 @@ const EditMockTestSeries = () => {
                                 <input
                                   type="text"
                                   name="text"
-                                  value={question.text}
+                                  value={question.text || ''}
                                   onChange={(e) => handleQuestionChange(e, testIndex, questionIndex)}
                                   className="w-full px-4 py-3 rounded-lg bg-zinc-700 border border-zinc-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                   placeholder="Enter question text"
                                 />
+                                <div className="mt-2">
+                                  {question.questionImage ? (
+                                    <div className="relative inline-block w-full max-w-sm border border-zinc-600 rounded-lg overflow-hidden mt-2">
+                                      <img src={question.questionImage} alt="Question" className="w-full h-auto max-h-48 object-contain bg-zinc-800" />
+                                      <button type="button" onClick={() => handleQuestionImageChange(testIndex, questionIndex, '')} className="absolute top-1 right-1 bg-red-500 p-1 text-xs rounded-md text-white">Remove</button>
+                                    </div>
+                                  ) : (
+                                    <label className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-700 hover:bg-zinc-600 border border-zinc-600 rounded-lg text-sm text-gray-300 cursor-pointer transition-colors">
+                                      <FaImage /> Add Question Image
+                                      <input type="file" className="hidden" accept="image/*" onChange={(e) => uploadField(e.target.files[0], (url) => handleQuestionImageChange(testIndex, questionIndex, url))} />
+                                    </label>
+                                  )}
+                                </div>
                               </div>
 
                               {question.questionType === 'MATCH' ? (
@@ -711,21 +752,37 @@ const EditMockTestSeries = () => {
                               ) : (
                                 // Regular MCQ UI
                                 <>
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    {question.options && question.options.map((option, optionIndex) => (
-                                      <div key={optionIndex} className="space-y-2">
-                                        <label className="block text-sm font-medium text-gray-200">
-                                          Option {String.fromCharCode(65 + optionIndex)}
-                                        </label>
-                                        <input
-                                          type="text"
-                                          value={option}
-                                          onChange={(e) => handleOptionChange(testIndex, questionIndex, optionIndex, e.target.value)}
-                                          className="w-full px-4 py-2 rounded-lg bg-zinc-700 border border-zinc-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                          placeholder={`Option ${String.fromCharCode(65 + optionIndex)}`}
-                                        />
-                                      </div>
-                                    ))}
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {question.options && question.options.map((opt, optionIndex) => {
+                                      const option = typeof opt === 'string' ? { text: opt, image: '' } : { text: opt?.text || '', image: opt?.image || '' };
+                                      return (
+                                        <div key={optionIndex} className="space-y-2 p-3 bg-zinc-800/80 rounded-lg border border-zinc-600/50">
+                                          <label className="block text-sm font-medium text-gray-300">
+                                            Option {String.fromCharCode(65 + optionIndex)}
+                                          </label>
+                                          <input
+                                            type="text"
+                                            value={option.text}
+                                            onChange={(e) => handleOptionChange(testIndex, questionIndex, optionIndex, 'text', e.target.value)}
+                                            className="w-full px-4 py-2 rounded-lg bg-zinc-700 border border-zinc-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm"
+                                            placeholder={`Option ${String.fromCharCode(65 + optionIndex)} text`}
+                                          />
+                                          <div className="mt-2">
+                                            {option.image ? (
+                                              <div className="relative inline-block w-full max-w-sm border border-zinc-600 rounded-lg overflow-hidden mt-1">
+                                                <img src={option.image} alt={`Opt ${String.fromCharCode(65 + optionIndex)}`} className="w-full h-auto max-h-32 object-contain bg-zinc-800" />
+                                                <button type="button" onClick={() => handleOptionChange(testIndex, questionIndex, optionIndex, 'image', '')} className="absolute top-1 right-1 bg-red-500 p-1 text-xs rounded-md text-white">Remove</button>
+                                              </div>
+                                            ) : (
+                                              <label className="inline-flex items-center gap-2 px-3 py-1.5 bg-zinc-700 hover:bg-zinc-600 border border-zinc-600 rounded-lg text-xs text-gray-300 cursor-pointer transition-colors">
+                                                <FaImage /> Add Option Image
+                                                <input type="file" className="hidden" accept="image/*" onChange={(e) => uploadField(e.target.files[0], (url) => handleOptionChange(testIndex, questionIndex, optionIndex, 'image', url))} />
+                                              </label>
+                                            )}
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
                                   </div>
 
                                   <div className="space-y-2">
@@ -739,11 +796,16 @@ const EditMockTestSeries = () => {
                                       className="w-full px-4 py-3 rounded-lg bg-zinc-700 border border-zinc-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer"
                                     >
                                       <option value="">Select correct answer</option>
-                                      {question.options.map((option, optionIndex) => (
-                                        <option key={optionIndex} value={option}>
-                                          {option || `Option ${String.fromCharCode(65 + optionIndex)}`}
-                                        </option>
-                                      ))}
+                                      {question.options.map((opt, optionIndex) => {
+                                        const optionObj = typeof opt === 'string' ? { text: opt, image: '' } : { text: opt?.text || '', image: opt?.image || '' };
+                                        const val = optionObj.text || optionObj.image;
+                                        const label = optionObj.text || (optionObj.image ? `Image Option ${String.fromCharCode(65 + optionIndex)}` : `Option ${String.fromCharCode(65 + optionIndex)}`);
+                                        return (
+                                          <option key={optionIndex} value={val}>
+                                            {label}
+                                          </option>
+                                        );
+                                      })}
                                     </select>
                                   </div>
                                 </>

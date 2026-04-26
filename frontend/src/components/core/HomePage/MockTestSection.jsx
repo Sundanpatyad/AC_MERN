@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
+import { ArrowRight } from 'lucide-react';
 
 import { fetchAllMockTests } from '../../../services/operations/mocktest';
 import { buyItem } from '../../../services/operations/studentFeaturesAPI';
@@ -10,19 +11,12 @@ import { ACCOUNT_TYPE } from '../../../utils/constants';
 import MockTestCard from './MockTestCard';
 
 const MockTestSkeleton = () => (
-  <div className="bg-zinc-900 w-72 rounded-xl overflow-hidden shadow-lg flex flex-col animate-pulse">
-    <div className="h-36 bg-zinc-700"></div>
-    <div className="p-4 flex-grow flex flex-col justify-between">
-      <div className="h-4 bg-zinc-700 rounded w-3/4 mb-3"></div>
-      <div className="h-4 bg-zinc-700 rounded w-1/2 mb-3"></div>
-      <div className="flex justify-between items-center mb-3">
-        <div className="h-4 bg-zinc-700 rounded w-1/4"></div>
-        <div className="h-4 bg-zinc-700 rounded w-1/4"></div>
-      </div>
-      <div className="space-y-2">
-        <div className="h-8 bg-zinc-700 rounded"></div>
-        <div className="h-8 bg-zinc-700 rounded"></div>
-      </div>
+  <div className="glass rounded-3xl overflow-hidden animate-pulse">
+    <div className="aspect-video bg-white/[0.05]" />
+    <div className="p-6 space-y-4">
+      <div className="h-5 bg-white/[0.06] rounded-lg w-3/4" />
+      <div className="h-4 bg-white/[0.04] rounded-lg w-1/2" />
+      <div className="h-12 bg-white/[0.05] rounded-2xl mt-4" />
     </div>
   </div>
 );
@@ -48,7 +42,6 @@ const MockTestsSection = ({ setShowLoginModal }) => {
         setIsLoading(false);
       }
     };
-
     loadMockTests();
   }, [token]);
 
@@ -59,7 +52,6 @@ const MockTestsSection = ({ setShowLoginModal }) => {
       toast.error("Instructors can't add mock tests to cart.");
       return;
     }
-
     dispatch(addToCart(mockTest));
   }, [user, dispatch]);
 
@@ -73,7 +65,6 @@ const MockTestsSection = ({ setShowLoginModal }) => {
       toast.error("Instructors can't purchase mock tests.");
       return;
     }
-
     try {
       await buyItem(token, [mockTest._id], ['MOCK_TEST'], user, navigate, dispatch);
     } catch (error) {
@@ -87,68 +78,62 @@ const MockTestsSection = ({ setShowLoginModal }) => {
   }, [navigate]);
 
   return (
-    <div className="container w-11/12 mx-auto">
-      <h2 className="text-3xl md:text-5xl text-center mt-10 font-bold text-white mb-10">Popular Mock Tests</h2>
+    <section className="py-24 px-6 md:px-12 lg:px-16 relative overflow-hidden">
+      {/* Decorative background blur */}
+      <div className="absolute top-1/2 right-0 -translate-y-1/2 w-[30%] h-[50%] bg-blue-500/5 blur-[120px] pointer-events-none" />
+      
+      <div className="max-w-7xl mx-auto relative z-10">
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-center items-center">
-        {isLoading
-          ? Array(4).fill().map((_, index) => (
-            <div key={index} className="flex justify-center">
-              <MockTestSkeleton />
+        {/* Section header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+          <div className="space-y-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.05] border border-white/[0.1] text-[10px] font-bold uppercase tracking-widest text-white/50">
+              <span className="w-1 h-1 rounded-full bg-blue-400" />
+              Assessments
             </div>
-          ))
-          : mockTests
-            .slice(0, 4)
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-            .map((mockTest) => (
-              <MockTestCard
-                key={mockTest._id}
-                mockTest={mockTest}
-                onCardClick={() => navigate(`/mock-test/${mockTest._id}`)}
-                handleAddToCart={handleAddToCart}
-                handleRemoveFromCart={handleRemoveFromCart}
-                handleBuyNow={handleBuyNow}
-                handleStartTest={handleStartTest}
-                setShowLoginModal={setShowLoginModal}
-                isLoggedIn={isLoggedIn}
-                userId={user?._id}
-              />
-            ))}
-      </div>
-
-      <div className="text-center mt-12">
-        <Link
-          to="/mocktest"
-          className="bg-zinc-900 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-full p-px text-xs font-semibold leading-6 text-white inline-block"
-        >
-          <span className="absolute inset-0 overflow-hidden rounded-full">
-            <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-          </span>
-          <div className="relative flex space-x-2 items-center z-10 rounded-full bg-zinc-950 py-0.5 px-4 ring-1 ring-white/10 ">
-            <span>View All MockTests</span>
-            <svg
-              fill="none"
-              height="16"
-              viewBox="0 0 24 24"
-              width="16"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M10.75 8.75L14.25 12L10.75 15.25"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.5"
-              />
-            </svg>
+            <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight">
+              Popular <span className="text-white/40 font-light italic">Mock Tests</span>
+            </h2>
           </div>
-          <span className="absolute -bottom-0 left-[1.125rem] h-px w-[calc(100%-2.25rem)] bg-gradient-to-r from-emerald-400/0 via-emerald-400/90 to-emerald-400/0 transition-opacity duration-500 group-hover:opacity-40" />
-        </Link>
+          <Link
+            to="/mocktest"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full glass glass-hover text-sm font-medium text-white/70 hover:text-white transition-all group"
+          >
+            Explore All Tests
+            <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform opacity-50" />
+          </Link>
+        </div>
+
+        {/* Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {isLoading
+            ? Array(4).fill(null).map((_, i) => <MockTestSkeleton key={i} />)
+            : mockTests
+                .slice(0, 4)
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                .map((mockTest) => (
+                  <MockTestCard
+                    key={mockTest._id}
+                    mockTest={mockTest}
+                    onCardClick={() => navigate(`/mock-test/${mockTest._id}`)}
+                    handleAddToCart={handleAddToCart}
+                    handleRemoveFromCart={handleRemoveFromCart}
+                    handleBuyNow={handleBuyNow}
+                    handleStartTest={handleStartTest}
+                    setShowLoginModal={setShowLoginModal}
+                    isLoggedIn={isLoggedIn}
+                    userId={user?._id}
+                  />
+                ))}
+        </div>
+
+        {!isLoading && mockTests.length === 0 && (
+          <div className="text-center py-20 glass rounded-3xl mt-12">
+            <p className="text-white/30 text-sm font-medium">No mock tests available at the moment.</p>
+          </div>
+        )}
       </div>
-      {!isLoading && mockTests.length === 0 && (
-        <p className="text-center text-gray-400 mt-8">No mock tests available.</p>
-      )}
-    </div>
+    </section>
   );
 };
 

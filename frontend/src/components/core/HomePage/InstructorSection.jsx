@@ -1,73 +1,70 @@
 import React from 'react'
-import Instructor from '../../../assets/Images/1img.png'
-import HighlightText from './HighlightText'
-import CTAButton from "../HomePage/Button"
-import { FaArrowRight } from 'react-icons/fa'
-import Img from './../../common/Img';
-
-
-import { motion } from 'framer-motion'
-import { scaleUp } from './../../common/motionFrameVarients';
 import YourComponent from '../../ui/InitialLoader'
-
 
 const InstructorSection = () => {
   return (
-    <div className=''>
-    
-    <div>
-      
-      <div className='flex flex-col-reverse lg:flex-row gap-10 lg:gap-20 items-center'>
-{/*   
-        <motion.div
-         
-          className='lg:w-[50%]'>
-          <Img
-            src={Instructor}
-            alt="Instructor"
-            className='shadow-white rounded-3xl'
-            loading="lazy"
-          />
-        </motion.div> */}
-        <div className='lg:w-[50%]'>
-        <YourComponent/>
-        </div>
+    <section className="py-24 px-6 md:px-12 lg:px-16 relative overflow-hidden">
+      {/* Background glow */}
+      <div className="absolute bottom-0 right-0 w-[40%] h-[60%] bg-blue-500/5 blur-[120px] pointer-events-none" />
 
-        <div className='lg:w-[50%] flex flex-col'>
-          <div className='text-3xl text-center lg:text-4xl font-semobold mb-2'>
-            Enroll Now <br /> <strong>Mock Test</strong>
-              {/* <HighlightText text={"Mock Test"} /> */}
+      <div className="max-w-7xl mx-auto relative z-10">
+
+        {/* Divider */}
+        <div className="w-full h-px bg-white/[0.05] mb-24" />
+
+        <div className="flex flex-col lg:flex-row-reverse items-center gap-16 lg:gap-32">
+
+          {/* Loader / Animation */}
+          <div className="flex-1 flex justify-center w-full">
+            <div className="relative w-full max-w-md aspect-square glass rounded-[3rem] flex items-center justify-center overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent" />
+              <YourComponent />
+              
+              {/* Decorative rings */}
+              <div className="absolute inset-8 border border-white/[0.03] rounded-[2.5rem] pointer-events-none group-hover:scale-110 transition-transform duration-700" />
+              <div className="absolute inset-16 border border-white/[0.02] rounded-[2rem] pointer-events-none group-hover:scale-125 transition-transform duration-700 delay-75" />
+            </div>
           </div>
 
-          <p className='font-medium text-[16px] text-center text-richblack-300 mb-12'>
-            With our Mock Tests Imporve your skills and make an impact in your journey.
-          </p>
-
-          {/* <div className='w-fit'>
-            <CTAButton active={true} linkto={"/signup"}>
-              <div className='flex flex-row gap-2 items-center'>
-                Start Learning Today
-                <FaArrowRight />
+          {/* Text */}
+          <div className="flex-1 space-y-8 text-center lg:text-left">
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.05] border border-white/[0.1] text-[10px] font-bold uppercase tracking-widest text-white/50">
+                Ready to excel?
               </div>
-            </CTAButton>
-          </div> */}
+              <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.1]">
+                Master Your Future<br />
+                <span className="text-white/40 font-light italic">Start your journey today</span>
+              </h2>
+            </div>
+            
+            <p className="text-lg text-white/40 leading-relaxed max-w-md mx-auto lg:mx-0 font-light">
+              Don't just study, prepare with purpose. Our mock tests are meticulously crafted to provide the most authentic exam experience.
+            </p>
+
+            <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
+               <div className="px-6 py-3 rounded-2xl glass text-sm font-medium text-white/60">Real-time Analytics</div>
+               <div className="px-6 py-3 rounded-2xl glass text-sm font-medium text-white/60">Expert Curated</div>
+               <div className="px-6 py-3 rounded-2xl glass text-sm font-medium text-white/60">Mobile Ready</div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Brand tagline */}
+        <div className="mt-32 text-center relative">
+          <div className="absolute inset-0 flex items-center justify-center blur-3xl opacity-20 pointer-events-none">
+             <h2 className="text-6xl md:text-9xl font-black text-white tracking-tighter uppercase select-none">
+                Awakening
+             </h2>
+          </div>
+          <h2 className="relative text-6xl md:text-9xl lg:text-[10rem] font-bold text-transparent bg-clip-text bg-gradient-to-b from-white/[0.08] to-transparent tracking-tighter select-none leading-none">
+            AWAKENING
+          </h2>
         </div>
 
       </div>
-    </div>
-    {/* <h1 className="text-center text-4xl lg:text-6xl mt-20 font-semibold flex justify-center items-center gap-x-3">
-          What People Are Saying
-        </h1>   */}
-        <h1 className="text-center text-5xl lg:text-8xl mt-20 font-semibold flex justify-center items-center gap-x-3">
-          Awakening Classes
-        </h1>
-        {/* <p className='font-medium text-[16px] mt-4 text-center text-richblack-300 '>
-          Don't just take our word for it. Here's what real people are saying about Awakening Classes!.
-        </p>  */}
-        <p className='font-medium text-[16px] mt-4 text-center text-richblack-300 '>
-        Awakening Classes offers top-tier coaching for government exam preparation with a focus on success and quality education.
-        </p>
-    </div>
+    </section>
   )
 }
 

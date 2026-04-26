@@ -1,26 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body, #root {
+:root {
+  --primary: #ffffff;
+  --secondary: #a1a1aa;
+  --accent: #10b981;
+  --background: #000000;
+  --glass: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+body {
+  margin: 0;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--background);
+  color: var(--primary);
+  overflow-x: hidden;
+}
+
+#root {
   width: 100vw;
   overflow-x: hidden;
-  background-color: #000; /* Set this to match your app's background color */
+}
+
+/* Glassmorphism Utilities */
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
+
+.glass-hover:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Subtle Noise Texture Overlay */
+.noise-bg::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.03;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3column %3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
 /* Hide scrollbar for all devices and browsers */
 * {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
-  overflow: -moz-scrollbars-none;  /* Older Firefox versions */
 }
 
-/* Hide scrollbar for Chrome, Safari, Opera, and Webkit-based browsers */
 *::-webkit-scrollbar {
   display: none;
 }
 
-/* For iOS devices */
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* iOS optimizations */
 html, body {
-  -webkit-overflow-scrolling: touch;  /* Enable smooth scrolling on iOS */
+  -webkit-overflow-scrolling: touch;
 }

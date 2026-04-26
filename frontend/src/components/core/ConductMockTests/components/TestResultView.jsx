@@ -26,6 +26,34 @@ const TestResultView = ({
         navigate(`/rankings/${testName}`);
     };
 
+    // ── Helpers ──────────────────────────────────────────────────────────────
+    const isImageUrl = (str) => {
+        if (!str) return false;
+        return /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(str) ||
+            str.includes('cloudinary.com') ||
+            str.includes('res.cloudinary');
+    };
+
+    /** Renders a value that may be an image URL or plain text */
+    const renderAnswerValue = (value, colorClass) => {
+        if (!value || value === 'Not answered') {
+            return <p className={`font-medium ${colorClass || 'text-zinc-400'}`}>{value || 'Not answered'}</p>;
+        }
+        if (isImageUrl(value)) {
+            return (
+                <div className="mt-1 rounded-lg overflow-hidden border border-white/10">
+                    <img
+                        src={value}
+                        alt="Answer"
+                        className="w-full h-auto max-h-40 object-contain bg-black/20"
+                        loading="lazy"
+                    />
+                </div>
+            );
+        }
+        return <p className={`font-medium ${colorClass}`}>{value}</p>;
+    };
+
     const renderAttemptDetails = () => {
         return (
             <div className="space-y-6">
@@ -39,6 +67,10 @@ const TestResultView = ({
                         const isCorrect = correctAnswers.some(item => item.questionIndex === index);
                         const isIncorrect = incorrectAnswers.some(item => item.questionIndex === index);
                         const userAnswer = userAnswers[index] || "Not answered";
+
+                        const correctAns = (question.questionType === "MATCH" && question.options && question.options.length >= 5)
+                            ? question.options[4]
+                            : question.correctAnswer;
 
                         return (
                             <div
@@ -72,32 +104,38 @@ const TestResultView = ({
 
                                 {/* Content */}
                                 <div className="flex-1 space-y-4">
-                                    <div>
-                                        <p className="text-gray-200 text-lg leading-relaxed font-medium whitespace-pre-line">{question.text.replace(/\\n/g, '\n')}</p>
-                                        {/* Add support for Match Question columns view in review if needed, currently kept simple */}
+                                    {/* Question image + text */}
+                                    <div className="space-y-2">
+                                        {question.questionImage && (
+                                            <div className="rounded-xl overflow-hidden border border-white/10">
+                                                <img
+                                                    src={question.questionImage}
+                                                    alt={`Question ${index + 1}`}
+                                                    className="w-full h-auto max-h-56 object-contain bg-black/20"
+                                                    loading="lazy"
+                                                />
+                                            </div>
+                                        )}
+                                        {question.text && (
+                                            <p className="text-gray-200 text-lg leading-relaxed font-medium whitespace-pre-line">
+                                                {question.text.replace(/\\n/g, '\n')}
+                                            </p>
+                                        )}
                                     </div>
 
+                                    {/* Answer boxes */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                                         <div className={`p-4 rounded-xl border ${isCorrect ? 'bg-green-500/10 border-green-500/20' :
                                             isIncorrect ? 'bg-red-500/10 border-red-500/20' :
                                                 'bg-zinc-800 border-zinc-700'
                                             }`}>
-                                            <p className="text-xs uppercase tracking-wider font-semibold mb-1 opacity-70">Your Answer</p>
-                                            <p className={`font-medium ${isCorrect ? 'text-green-400' :
-                                                isIncorrect ? 'text-red-400' :
-                                                    'text-zinc-400'
-                                                }`}>
-                                                {userAnswer}
-                                            </p>
+                                            <p className="text-xs uppercase tracking-wider font-semibold mb-2 opacity-70">Your Answer</p>
+                                            {renderAnswerValue(userAnswer, isCorrect ? 'text-green-400' : isIncorrect ? 'text-red-400' : 'text-zinc-400')}
                                         </div>
 
                                         <div className="p-4 rounded-xl border bg-blue-500/5 border-blue-500/20">
-                                            <p className="text-xs uppercase tracking-wider font-semibold mb-1 text-blue-400/70">Correct Answer</p>
-                                            <p className="font-medium text-blue-400">
-                                                {(question.questionType === "MATCH" && question.options && question.options.length >= 5)
-                                                    ? question.options[4]
-                                                    : question.correctAnswer}
-                                            </p>
+                                            <p className="text-xs uppercase tracking-wider font-semibold mb-2 text-blue-400/70">Correct Answer</p>
+                                            {renderAnswerValue(correctAns, 'text-blue-400')}
                                         </div>
                                     </div>
                                 </div>

@@ -32,82 +32,85 @@ const MockTestCard = React.memo(({
         }
     };
 
+    const testCount = mockTest.mockTests?.length + (mockTest.attachments?.length || 0);
+
     return (
         <div
-            className="relative flex flex-col bg-black/40 backdrop-blur-xl border border-white/10 rounded-[2rem] p-2.5 cursor-pointer overflow-hidden"
+            className="group relative flex flex-col glass glass-hover rounded-[2rem] overflow-hidden cursor-pointer transition-all duration-500 hover:translate-y-[-8px] hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)]"
             onClick={onCardClick}
         >
-            {/* Image Area */}
-            <div className="w-full relative overflow-hidden rounded-[1.5rem] bg-black/50 aspect-video">
+            {/* Thumbnail */}
+            <div className="w-full relative overflow-hidden bg-white/[0.02] aspect-[16/10]">
                 {mockTest.thumbnail ? (
                     <img
                         src={mockTest.thumbnail}
                         alt={mockTest.seriesName}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
                     />
                 ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center p-4">
-                        <FaBookOpen className="text-4xl text-white/20" />
+                    <div className="w-full h-full flex items-center justify-center">
+                        <FaBookOpen className="text-4xl text-white/5" />
                     </div>
                 )}
 
-                {/* Top Badges overlay */}
-                <div className="absolute top-3 left-3 right-3 flex justify-between items-start pointer-events-none">
-                    <span className="bg-black/60 backdrop-blur-md text-[10px] font-medium tracking-wide text-white px-3 py-1.5 rounded-full border border-white/20 uppercase">
-                        {mockTest.mockTests?.length + (mockTest.attachments?.length || 0)} Tests
+                {/* Overlay Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500" />
+
+                {/* Badges */}
+                <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
+                    <span className="text-[10px] font-bold tracking-widest text-white/80 bg-white/[0.05] backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 uppercase">
+                        {testCount} Tests
                     </span>
-                    <span className="bg-black/60 backdrop-blur-md text-xs font-bold px-3 py-1.5 rounded-full border border-white/20 text-white shadow-lg">
+                    <span className="text-xs font-bold text-black bg-white px-3 py-1.5 rounded-full shadow-lg">
                         {mockTest.price === 0 ? 'FREE' : `₹${mockTest.price}`}
                     </span>
                 </div>
             </div>
 
-            {/* Content Area */}
-            <div className="pt-5 px-3 pb-2 flex-grow flex flex-col justify-between">
-                <div>
-                    <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 line-clamp-2">
-                        {mockTest.seriesName}
-                    </h3>
-                </div>
+            {/* Content */}
+            <div className="p-6 flex flex-col flex-grow">
+                <h3 className="text-base font-semibold text-white/90 line-clamp-2 leading-tight mb-6 group-hover:text-white transition-colors">
+                    {mockTest.seriesName}
+                </h3>
 
-                {/* Actions Area */}
-                <div className="mt-6 pt-4 border-t border-white/10 w-full" onClick={(e) => e.stopPropagation()}>
+                {/* Action */}
+                <div className="mt-auto" onClick={(e) => e.stopPropagation()}>
                     {!isLoggedIn ? (
                         <button
                             onClick={(e) => { e.preventDefault(); setShowLoginModal(true); }}
-                            className="w-full py-3 bg-white text-black font-bold text-sm tracking-wide active:scale-95 transition-transform rounded-full shadow-lg"
+                            className="w-full py-3.5 rounded-2xl text-xs font-bold tracking-widest uppercase bg-white text-black hover:bg-white/90 transition-all active:scale-95"
                         >
-                            LOGIN TO {mockTest.price === 0 ? 'START' : 'PURCHASE'}
+                            Login to {mockTest.price === 0 ? 'Start' : 'Purchase'}
                         </button>
                     ) : isEnrolled || mockTest.price === 0 ? (
                         <Link
                             to={`/view-mock/${mockTest._id}`}
-                            className="block w-full py-3 bg-white text-black text-center font-bold text-sm tracking-wide active:scale-95 transition-transform rounded-full shadow-lg"
+                            className="block w-full py-3.5 rounded-2xl text-xs font-bold tracking-widest uppercase text-center bg-white text-black hover:bg-white/90 transition-all active:scale-95"
                         >
-                            START TEST
+                            Start Now
                         </Link>
                     ) : (
-                        <div className="flex flex-col sm:flex-row gap-2.5 w-full">
+                        <div className="flex gap-3 w-full">
                             {isInCart ? (
                                 <Link
                                     to="/dashboard/cart"
-                                    className="flex-1 py-3 bg-black/50 text-white text-center font-bold text-sm tracking-wide border border-white/20 rounded-full active:scale-95 transition-transform"
+                                    className="flex-1 py-3.5 rounded-2xl text-xs font-bold tracking-widest uppercase text-white/70 text-center glass glass-hover transition-all"
                                 >
-                                    GO TO CART
+                                    In Cart
                                 </Link>
                             ) : (
                                 <button
                                     onClick={(e) => { e.preventDefault(); handleButtonClick(handleAddToCart); }}
-                                    className="flex-1 py-3 bg-black/50 text-white font-bold text-sm tracking-wide border border-white/20 rounded-full flex items-center justify-center gap-2 active:scale-95 transition-transform"
+                                    className="w-12 h-12 rounded-2xl glass glass-hover flex items-center justify-center transition-all group/cart"
                                 >
-                                    <FaShoppingCart /> 
+                                    <FaShoppingCart className="text-white/40 group-hover/cart:text-white transition-colors" />
                                 </button>
                             )}
                             <button
                                 onClick={(e) => { e.preventDefault(); handleButtonClick(handleBuyNow); }}
-                                className="flex-1 py-3 bg-white text-black font-bold text-sm tracking-wide rounded-full shadow-lg active:scale-95 transition-transform"
+                                className="flex-1 py-3.5 rounded-2xl text-xs font-bold tracking-widest uppercase bg-white text-black hover:bg-white/90 transition-all active:scale-95"
                             >
-                                BUY NOW
+                                Buy Now
                             </button>
                         </div>
                     )}

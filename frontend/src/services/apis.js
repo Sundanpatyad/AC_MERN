@@ -1,5 +1,5 @@
 
-const BASE_URL = 'https://events-app-xbfw.onrender.com';
+const BASE_URL = 'https://ac-62i9.onrender.com';
 // const BASE_URL = 'http://localhost:8000';
 
 
@@ -110,8 +110,10 @@ export const mocktestEndpoints = {
   CREATE_ATTEMPT_DETAILS: `${BASE_URL}/api/v1/mock/createAttemptDetails`,
   TEXT_EDIT_MOCKTEST: `${BASE_URL}/api/v1/mock/addMocktestToSeries`,
   SEARCH_API: `${BASE_URL}/api/v1/course/search`
-  // http://localhost:8000/api/v1/mock/getMockTestSeriesById
+}
 
+export const uploadEndpoints = {
+  UPLOAD_IMAGE_API: `${BASE_URL}/api/v1/upload/image`,
 }
 
 export const chatEndPoints = {

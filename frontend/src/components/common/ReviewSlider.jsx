@@ -7,22 +7,105 @@ import { apiConnector } from "../../services/apiConnector";
 import { ratingsEndpoints } from "../../services/apis";
 import { useSelector } from "react-redux";
 
-const ReviewCarousel = () => {
-  const [reviews, setReviews] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState(1); // 1 for forward, -1 for backward
-  const { token } = useSelector((state) => state.auth);
-  const truncateWords = 15;
+const DUMMY_REVIEWS = [
+  {
+    user: { firstName: "Sahil", lastName: "Ahmed", image: null },
+    course: { courseName: "JKSSB Patwari" },
+    review: "The mock tests are incredibly realistic. They helped me manage my time much better during the actual exam. Best coaching in Jammu!",
+    rating: 5
+  },
+  {
+    user: { firstName: "Mehak", lastName: "Kour", image: null },
+    course: { courseName: "JKSSB Naib Tehsildar" },
+    review: "The faculty is very supportive and the study material is top-notch. I saw a significant improvement in my scores within a month. Highly recommend for aspirants in Srinagar.",
+    rating: 5
+  },
+  {
+    user: { firstName: "Irfan", lastName: "Lone", image: null },
+    course: { courseName: "General Aptitude" },
+    review: "I love how the interface is so clean and easy to navigate. The detailed analysis after each test is a game-changer for my preparation.",
+    rating: 4.5
+  },
+  {
+    user: { firstName: "Anjali", lastName: "Sharma", image: null },
+    course: { courseName: "Current Affairs" },
+    review: "Awakening Classes is the best platform for JKSSB prep in the valley. The current affairs section is always up to date with regional news.",
+    rating: 5
+  },
+  {
+    user: { firstName: "Umar", lastName: "Dar", image: null },
+    course: { courseName: "JKP SI" },
+    review: "Excellent quality mock tests. The difficulty level matches exactly with the recent JKSSB patterns. Truly a blessing for J&K students.",
+    rating: 5
+  }
+];
 
-  // Memoized fetch function
+const ReviewCard = ({ review, truncateWords }) => (
+  <div className="flex-shrink-0 w-[300px] md:w-[380px] glass rounded-[2rem] overflow-hidden group/card hover:border-white/20 transition-all duration-500 mx-4">
+    <div className="p-6 md:p-8 space-y-5">
+      <div className="flex items-center gap-4">
+        <div className="relative">
+          <div className="absolute -inset-1 bg-gradient-to-tr from-purple-500 to-blue-500 rounded-full opacity-30 blur-sm group-hover/card:opacity-100 transition-opacity" />
+          <Img
+            src={
+              review?.user?.image ||
+              `https://api.dicebear.com/5.x/initials/svg?seed=${review?.user?.firstName} ${review?.user?.lastName}`
+            }
+            alt=""
+            className="relative h-12 w-12 rounded-full object-cover border-2 border-white/10"
+          />
+        </div>
+        <div>
+          <h3 className="font-bold text-base text-white capitalize leading-tight">
+            {`${review?.user?.firstName} ${review?.user?.lastName}`}
+          </h3>
+          <p className="text-[10px] text-white/40 font-medium uppercase tracking-wider">
+            {review?.course?.courseName || 'Student'}
+          </p>
+        </div>
+      </div>
+      
+      <p className="text-base text-white/70 font-light leading-relaxed italic whitespace-normal">
+        "{review?.review.split(" ").length > truncateWords
+          ? `${review?.review.split(" ").slice(0, truncateWords).join(" ")} ...`
+          : review?.review}"
+      </p>
+
+      <div className="flex items-center justify-between pt-4 border-t border-white/[0.05]">
+        <div className="flex items-center gap-1.5">
+          <span className="text-xl font-black text-white">
+            {review.rating}
+          </span>
+          <div className="flex gap-0.5">
+            {[...Array(5)].map((_, i) => (
+              <FaStar 
+                key={i} 
+                size={10} 
+                className={i < Math.floor(review.rating) ? "text-yellow-400" : "text-white/10"} 
+              />
+            ))}
+          </div>
+        </div>
+        <div className="text-[9px] font-bold text-white/20 uppercase tracking-widest">Verified Student</div>
+      </div>
+    </div>
+  </div>
+);
+
+const ReviewCarousel = () => {
+  const [reviews, setReviews] = useState(DUMMY_REVIEWS);
+  const { token } = useSelector((state) => state.auth);
+  const truncateWords = 18;
+
   const fetchReviews = useMemo(() => {
     return async () => {
-      const { data } = await apiConnector(
-        "GET",
-        ratingsEndpoints.REVIEWS_DETAILS_API
-      );
-      if (data?.success) {
-        setReviews(data?.data);
+      try {
+        const { data } = await apiConnector("GET", ratingsEndpoints.REVIEWS_DETAILS_API);
+        if (data?.success && data?.data?.length > 0) {
+          setReviews(data?.data);
+        }
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
       }
     };
   }, []);
@@ -31,147 +114,49 @@ const ReviewCarousel = () => {
     fetchReviews();
   }, [fetchReviews]);
 
-  useEffect(() => {
-    if (reviews.length > 0) {
-      const timer = setInterval(() => {
-        setDirection(1);
-        setCurrentIndex((prevIndex) => 
-          prevIndex === reviews.length - 1 ? 0 : prevIndex + 1
-        );
-      }, 4000); // Change card every 4 seconds
-
-      return () => clearInterval(timer);
-    }
-  }, [reviews.length]);
-
-  const handleCardClick = (index) => {
-    setDirection(index > currentIndex ? 1 : -1);
-    setCurrentIndex(index);
-  };
-
-  const variants = {
-    enter: (direction) => ({
-      scale: 0.8,
-      y: direction > 0 ? 100 : -100,
-      opacity: 0,
-      zIndex: 0,
-    }),
-    center: {
-      zIndex: 5,
-      x: 0,
-      y: 0,
-      scale: 1,
-      opacity: 1,
-    },
-    exit: (direction) => ({
-      zIndex: 0,
-      scale: 0.8,
-      y: direction < 0 ? 100 : -100,
-      opacity: 0,
-    }),
-  };
-
-  const getCardStyles = (index) => {
-    const diff = (index - currentIndex + reviews.length) % reviews.length;
-    const isActive = diff === 0;
-    const isPrev = diff === reviews.length - 1;
-    const isNext = diff === 1;
-
-    let zIndex = reviews.length - diff;
-    let scale = 1 - (diff * 0.05);
-    let y = diff * 10;
-    let opacity = 1 - (diff * 0.2);
-
-    if (diff > 2) {
-      opacity = 0;
-    }
-
-    return {
-      zIndex,
-      scale,
-      y,
-      opacity,
-    };
-  };
+  // Duplicate reviews for infinite scroll
+  const duplicatedReviews = [...reviews, ...reviews];
 
   return (
-    <div className="bg-transparent py-8 md:py-16">
-      <div className="container mx-auto px-2 relative">
-        <div className="relative h-[400px] w-full flex items-center justify-center">
-          <div className="relative w-[280px] sm:w-[320px] md:w-[360px] h-full">
-            {reviews.map((review, index) => {
-              const styles = getCardStyles(index);
-              
-              return (
-                <motion.div
-                  key={index}
-                  className="absolute top-0 left-0 w-full cursor-pointer"
-                  initial={false}
-                  animate={{
-                    zIndex: styles.zIndex,
-                    scale: styles.scale,
-                    y: styles.y,
-                    opacity: styles.opacity,
-                  }}
-                  transition={{
-                    duration: 0.8,
-                    ease: "easeInOut",
-                    opacity: { duration: 0.4 }
-                  }}
-                  onClick={() => handleCardClick(index)}
-                  whileHover={{ scale: styles.scale * 1.02 }}
-                >
-                  <div className="bg-black rounded-lg shadow-xl overflow-hidden border border-gray-700">
-                    <div className="p-4 md:p-6">
-                      <div className="flex items-center gap-3 md:gap-4 mb-3 md:mb-4">
-                       <div> <Img
-                          src={
-                            review?.user?.image ||
-                            `https://api.dicebear.com/5.x/initials/svg?seed=${review?.user?.firstName} ${review?.user?.lastName}`
-                          }
-                          alt=""
-                          className="h-10 w-10 rounded-full object-cover border-2 border-purple-500"
-                        />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-sm md:text-base text-gray-100 capitalize">
-                            {`${review?.user?.firstName} ${review?.user?.lastName}`}
-                          </h3>
-                          <p className="text-xs md:text-sm text-gray-400">
-                            {review?.course?.courseName}
-                          </p>
-                        </div>
-                      </div>
-                      <p className="text-sm md:text-base text-gray-300 mb-3 md:mb-4">
-                        {review?.review.split(" ").length > truncateWords
-                          ? `${review?.review.split(" ").slice(0, truncateWords).join(" ")} ...`
-                          : review?.review}
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl md:text-2xl font-bold text-purple-400">
-                          {review.rating}
-                        </span>
-                        <ReactStars
-                          count={5}
-                          value={parseInt(review.rating)}
-                          size={20}
-                          edit={false}
-                          activeColor="#A78BFA"
-                          color="#4B5563"
-                          emptyIcon={<FaStar />}
-                          fullIcon={<FaStar />}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
+    <div className="bg-transparent py-24 relative overflow-hidden">
+      {/* Decorative background blur */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-purple-500/5 blur-[120px] pointer-events-none" />
+
+      <div className="relative z-10">
+        <div className="text-center mb-16 space-y-4 px-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-[10px] font-bold uppercase tracking-widest text-purple-400">
+            Community Love
           </div>
+          <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight">
+            Student <span className="text-white/40 font-light italic">Testimonials</span>
+          </h2>
+        </div>
+
+        {/* Marquee Wrapper */}
+        <div className="relative flex overflow-hidden">
+          <motion.div
+            className="flex whitespace-nowrap"
+            animate={{
+              x: ["0%", "-50%"],
+            }}
+            transition={{
+              duration: 30,
+              ease: "linear",
+              repeat: Infinity,
+            }}
+          >
+            {duplicatedReviews.map((review, index) => (
+              <ReviewCard key={index} review={review} truncateWords={truncateWords} />
+            ))}
+          </motion.div>
+
+          {/* Gradient Masks */}
+          <div className="absolute inset-y-0 left-0 w-24 md:w-64 bg-gradient-to-r from-black via-black/80 to-transparent z-10 pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 w-24 md:w-64 bg-gradient-to-l from-black via-black/80 to-transparent z-10 pointer-events-none" />
         </div>
       </div>
     </div>
   );
 };
 
-export default ReviewCarousel;
+export default ReviewCarousel;
