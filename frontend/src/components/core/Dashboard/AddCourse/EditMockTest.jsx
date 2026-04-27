@@ -825,14 +825,14 @@ const EditMockTestSeries = () => {
                           <button
                             type="button"
                             onClick={() => addQuestion(testIndex, 'MATCH')}
-                            className="flex-1 py-3 px-4 border-2 border-dashed border-zinc-600 rounded-lg text-gray-400 hover:text-white hover:border-purple-500 transition-all duration-200 font-medium"
+                            className="flex-1 py-3 px-4 border-2 border-dashed border-zinc-600 rounded-lg text-gray-400 hover:text-white hover:border-emerald-500 transition-all duration-200 font-medium"
                           >
                             + Add Match
                           </button>
                           <button
                             type="button"
                             onClick={() => openBulkImportModal(testIndex)}
-                            className="flex-1 py-3 px-4 border-2 border-dashed border-purple-600 rounded-lg text-purple-400 hover:text-white hover:border-purple-500 transition-all duration-200 font-medium"
+                            className="flex-1 py-3 px-4 border-2 border-dashed border-blue-600 rounded-lg text-blue-400 hover:text-white hover:border-blue-500 transition-all duration-200 font-medium"
                           >
                             📋 Bulk Import Questions
                           </button>
@@ -921,7 +921,7 @@ const EditMockTestSeries = () => {
                   type="button"
                   onClick={() => setBulkImportQuestionType('match')}
                   className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${bulkImportQuestionType === 'match'
-                    ? 'bg-purple-500 text-white shadow-lg'
+                    ? 'bg-emerald-500 text-white shadow-lg'
                     : 'bg-zinc-700 text-gray-300 hover:bg-zinc-600'
                     }`}
                 >
@@ -960,7 +960,7 @@ const EditMockTestSeries = () => {
                   <strong>Match the Following Format</strong> (14 lines per question):
                 </p>
                 <div className="bg-zinc-800 p-4 rounded-lg text-xs text-gray-300 font-mono space-y-1">
-                  <div className="text-purple-400">Question text</div>
+                  <div className="text-emerald-400">Question text</div>
                   <div className="text-blue-400">a) Left Item 1</div>
                   <div className="text-blue-400">b) Left Item 2</div>
                   <div className="text-blue-400">c) Left Item 3</div>
@@ -1007,13 +1007,13 @@ const EditMockTestSeries = () => {
                   ? "What is the speed of light in vacuum?\n299,792 km/s\n300,000 km/s\n150,000 km/s\n250,000 km/s\n299,792 km/s"
                   : "Match the following dams:\na) Bhakra\nb) Hirakud\nc) Nagarjuna Sagar\nd) Sardar Sarovar\n1) Mahanadi\n2) Sutlej\n3) Krishna\n4) Narmada\na-1 b-2 c-3 d-4\na-2 b-1 c-3 d-4\na-1 b-3 c-2 d-4\na-4 b-2 c-1 d-3\na-2 b-1 c-3 d-4"
               }
-              className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 resize-none font-mono text-sm"
+              className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 resize-none font-mono text-sm"
             />
             <div className="flex gap-3">
               <button
                 type="button"
                 onClick={handleBulkImport}
-                className="flex-1 py-3 px-6 rounded-lg font-semibold text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-all duration-200"
+                className="flex-1 py-3 px-6 rounded-lg font-semibold text-white bg-gradient-to-r from-blue-500 to-emerald-500 hover:from-blue-600 hover:to-emerald-600 transition-all duration-200"
               >
                 Import Questions
               </button>

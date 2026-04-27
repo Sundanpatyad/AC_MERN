@@ -45,7 +45,7 @@ const ReviewCard = ({ review, truncateWords }) => (
     <div className="p-6 md:p-8 space-y-5">
       <div className="flex items-center gap-4">
         <div className="relative">
-          <div className="absolute -inset-1 bg-gradient-to-tr from-purple-500 to-blue-500 rounded-full opacity-30 blur-sm group-hover/card:opacity-100 transition-opacity" />
+          <div className="absolute -inset-1 bg-gradient-to-tr from-emerald-500 to-blue-500 rounded-full opacity-30 blur-sm group-hover/card:opacity-100 transition-opacity" />
           <Img
             src={
               review?.user?.image ||
@@ -120,11 +120,11 @@ const ReviewCarousel = () => {
   return (
     <div className="bg-transparent py-24 relative overflow-hidden">
       {/* Decorative background blur */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-purple-500/5 blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-blue-500/5 blur-[120px] pointer-events-none" />
 
       <div className="relative z-10">
         <div className="text-center mb-16 space-y-4 px-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-[10px] font-bold uppercase tracking-widest text-purple-400">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-bold uppercase tracking-widest text-emerald-400">
             Community Love
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight">

@@ -30,14 +30,14 @@ export default function SidebarLink({ link, iconName }) {
       to={link.path}
       onClick={handleClick}
       className={`relative px-6 py-3 text-sm font-medium transition-all duration-300 group ${isActive
-          ? "bg-gradient-to-r from-blue-500/10 to-purple-500/10 text-white border-l-4 border-blue-500"
-          : "text-gray-400 hover:text-white hover:bg-zinc-800/50 border-l-4 border-transparent"
+        ? "bg-gradient-to-r from-blue-500/10 to-purple-500/10 text-white border-l-4 border-blue-500"
+        : "text-gray-400 hover:text-white hover:bg-zinc-800/50 border-l-4 border-transparent"
         }`}
     >
       <div className="flex items-center gap-x-3">
         <Icon className={`text-xl transition-all duration-300 ${isActive
-            ? "text-blue-400"
-            : "text-gray-500 group-hover:text-blue-400"
+          ? "text-blue-400"
+          : "text-gray-500 group-hover:text-blue-400"
           }`} />
         <span className={`font-medium transition-all duration-300 ${isActive ? "font-semibold" : ""
           }`}>
