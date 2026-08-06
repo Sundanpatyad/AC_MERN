@@ -1,29 +1,20 @@
-import IconBtn from "./IconBtn"
-
 export default function ConfirmationModal({ modalData }) {
     return (
-        <div className="fixed inset-0 z-[1000] !mt-0 grid place-items-center overflow-auto bg-black bg-opacity-50 backdrop-blur-sm">
-            <div className="w-11/12 max-w-[400px] rounded-xl border border-white border-opacity-20 bg-black p-8 shadow-lg">
-                <p className="text-3xl font-bold text-white mb-4">
+        <div className="fixed inset-0 z-[1000] !mt-0 grid place-items-center overflow-auto bg-[var(--c-overlay)] backdrop-blur-sm p-4">
+            <div className="w-full max-w-[400px] rounded-2xl border border-line bg-surface p-6 shadow-xl">
+                <p className="text-xl font-semibold text-fg">
                     {modalData?.text1}
                 </p>
-                
-                <p className="mt-2 mb-6 text-lg leading-relaxed text-gray-300">
+
+                <p className="mt-2 mb-6 text-sm leading-relaxed text-muted">
                     {modalData?.text2}
                 </p>
-                
-                <div className="flex align-center  gap-x-4">
-                    <IconBtn
-                        onclick={modalData?.btn1Handler}
-                        text={modalData?.btn1Text}
-                        className="bg-white text-black hover:bg-gray-200 transition-colors duration-300"
-                    />
-                    <button
-                        className="cursor-pointer rounded-lg bg-black text-white border border-white
-                                   py-2 px-4 font-semibold hover:bg-white hover:text-black
-                                   transition-all duration-300 ease-in-out"
-                        onClick={modalData?.btn2Handler}
-                    >
+
+                <div className="flex items-center gap-3">
+                    <button className="btn-primary flex-1" onClick={modalData?.btn1Handler}>
+                        {modalData?.btn1Text}
+                    </button>
+                    <button className="btn-secondary flex-1" onClick={modalData?.btn2Handler}>
                         {modalData?.btn2Text}
                     </button>
                 </div>

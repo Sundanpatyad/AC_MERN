@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Link, matchPath, useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { Link, matchPath, useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { motion, useMotionValueEvent, useScroll, AnimatePresence } from 'framer-motion';
 import { NavbarLinks } from '../../../data/navbar-links';
 import { fetchCourseCategories } from './../../services/operations/courseDetailsAPI';
+import { logout } from '../../services/operations/authAPI';
 import ProfileDropDown from '../core/Auth/ProfileDropDown';
-import MobileProfileDropDown from '../core/Auth/MobileProfileDropDown';
+import ConfirmationModal from './ConfirmationModal';
+import Img from './Img';
 import { BsFiletypePdf } from "react-icons/bs";
+import { FaRankingStar } from 'react-icons/fa6';
+import { VscDashboard, VscSignOut } from 'react-icons/vsc';
 import {
     AiOutlineSearch,
     AiOutlineHome,
@@ -29,6 +33,8 @@ const SCROLL_THRESHOLD = 50;
 const Navbar = () => {
     const { token } = useSelector((state) => state.auth);
     const location = useLocation();
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const [subLinks, setSubLinks] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -39,6 +45,7 @@ const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [hidden, setHidden] = useState(false);
     const [deferredPrompt, setDeferredPrompt] = useState(null);
+    const [confirmationModal, setConfirmationModal] = useState(null);
     const lastScrollY = useRef(0);
 
     const { scrollY } = useScroll();
@@ -91,9 +98,13 @@ const Navbar = () => {
     };
 
     useEffect(() => {
-        document.body.style.overflow = isMobileMenuOpen ? 'hidden' : '';
+        if (!isMobileMenuOpen) return;
+        const onKeyDown = (e) => e.key === 'Escape' && setIsMobileMenuOpen(false);
+        document.body.style.overflow = 'hidden';
+        window.addEventListener('keydown', onKeyDown);
         return () => {
             document.body.style.overflow = '';
+            window.removeEventListener('keydown', onKeyDown);
         };
     }, [isMobileMenuOpen]);
 
@@ -216,86 +227,143 @@ const Navbar = () => {
                         </div>
 
                         <button
-                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+                            onClick={() => setIsMobileMenuOpen(true)}
+                            aria-label="Open menu"
+                            aria-expanded={isMobileMenuOpen}
                             className="lg:hidden p-2 text-fg hover:bg-elevated rounded-full transition-colors"
                         >
-                            {isMobileMenuOpen ? <IoClose size={24} /> : <HiBars3BottomRight size={24} />}
+                            <HiBars3BottomRight size={24} />
                         </button>
                     </div>
                 </div>
 
-                <AnimatePresence>
-                    {isMobileMenuOpen && (
-                        <>
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                className="fixed inset-0 bg-[var(--c-overlay)] z-[99] lg:hidden"
-                            />
-                            <motion.div
-                                initial={{ x: '100%' }}
-                                animate={{ x: 0 }}
-                                exit={{ x: '100%' }}
-                                transition={{ type: 'spring', damping: 28, stiffness: 260 }}
-                                className="fixed top-0 right-0 bottom-0 w-[min(100%,300px)] bg-page border-l border-line z-[100] p-5 pt-20 lg:hidden overflow-y-auto"
-                            >
-                                <div className="flex flex-col gap-1">
-                                    {[
-                                        { to: '/', icon: AiOutlineHome, text: 'Home' },
-                                        { to: '/catalog/mock-tests', icon: AiOutlineBook, text: 'Courses' },
-                                        { to: '/mocktest', icon: AiOutlineFileDone, text: 'Mock Tests' },
-                                        { to: '/exams', icon: BsFiletypePdf, text: 'Free PDF' },
-                                        { to: '/about', icon: AiOutlineInfoCircle, text: 'About' },
-                                        { to: '/contact', icon: AiOutlineContacts, text: 'Contact' },
-                                    ].map((item) => (
+            </motion.nav>
+
+            {/* Rendered outside the nav: the nav's transform would otherwise become
+                the containing block and clip these fixed layers to its 64px height. */}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="fixed inset-0 bg-[var(--c-overlay)] z-[110] lg:hidden"
+                        />
+                        <motion.div
+                            initial={{ x: '100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '100%' }}
+                            transition={{ type: 'spring', damping: 28, stiffness: 260 }}
+                            className="fixed top-0 right-0 bottom-0 w-[min(85%,320px)] bg-page border-l border-line z-[120] flex flex-col lg:hidden"
+                        >
+                            <div className="h-16 shrink-0 flex items-center justify-between gap-3 px-5 border-b border-line">
+                                <span className="text-sm font-semibold text-fg tracking-tight truncate">
+                                    Menu
+                                </span>
+                                <button
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    aria-label="Close menu"
+                                    className="p-2 -mr-2 text-fg hover:bg-elevated rounded-full transition-colors"
+                                >
+                                    <IoClose size={24} />
+                                </button>
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] flex flex-col gap-1">
+                                {[
+                                    { to: '/', icon: AiOutlineHome, text: 'Home' },
+                                    { to: '/catalog/mock-tests', icon: AiOutlineBook, text: 'Courses' },
+                                    { to: '/mocktest', icon: AiOutlineFileDone, text: 'Mock Tests' },
+                                    { to: '/rankings', icon: FaRankingStar, text: 'Rankings' },
+                                    { to: '/exams', icon: BsFiletypePdf, text: 'Free PDF' },
+                                    { to: '/about', icon: AiOutlineInfoCircle, text: 'About' },
+                                    { to: '/contact', icon: AiOutlineContacts, text: 'Contact' },
+                                ].map((item) => (
+                                    <Link
+                                        key={item.to}
+                                        to={item.to}
+                                        className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-colors ${
+                                            matchRoute(item.to)
+                                                ? 'bg-elevated text-fg'
+                                                : 'text-muted hover:text-fg hover:bg-elevated'
+                                        }`}
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                    >
+                                        <item.icon size={18} />
+                                        <span className="text-sm font-medium">{item.text}</span>
+                                    </Link>
+                                ))}
+
+                                <div className="h-px bg-line my-3" />
+
+                                {token === null ? (
+                                    <div className="grid grid-cols-2 gap-2">
                                         <Link
-                                            key={item.to}
-                                            to={item.to}
-                                            className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-colors ${
-                                                matchRoute(item.to)
-                                                    ? 'bg-elevated text-fg'
-                                                    : 'text-muted hover:text-fg hover:bg-elevated'
-                                            }`}
+                                            to="/login"
+                                            className="btn-secondary"
                                             onClick={() => setIsMobileMenuOpen(false)}
                                         >
-                                            <item.icon size={18} />
-                                            <span className="text-sm font-medium">{item.text}</span>
+                                            Log in
                                         </Link>
-                                    ))}
-
-                                    <div className="h-px bg-line my-3" />
-
-                                    {token === null ? (
-                                        <div className="grid grid-cols-2 gap-2">
-                                            <Link
-                                                to="/login"
-                                                className="btn-secondary"
-                                                onClick={() => setIsMobileMenuOpen(false)}
-                                            >
-                                                Log in
-                                            </Link>
-                                            <Link
-                                                to="/signup"
-                                                className="btn-primary"
-                                                onClick={() => setIsMobileMenuOpen(false)}
-                                            >
-                                                Sign up
-                                            </Link>
+                                        <Link
+                                            to="/signup"
+                                            className="btn-primary"
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                        >
+                                            Sign up
+                                        </Link>
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col gap-1">
+                                        <div className="flex items-center gap-3 px-3 py-2">
+                                            <Img
+                                                src={user?.image}
+                                                alt={user?.firstName || 'Profile'}
+                                                className="w-9 h-9 rounded-full object-cover shrink-0"
+                                            />
+                                            <div className="min-w-0">
+                                                <p className="text-sm font-medium text-fg truncate">
+                                                    {`${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() || 'My account'}
+                                                </p>
+                                                <p className="text-xs text-subtle truncate">{user?.email}</p>
+                                            </div>
                                         </div>
-                                    ) : (
-                                        <div className="flex justify-center py-2">
-                                            <MobileProfileDropDown />
-                                        </div>
-                                    )}
-                                </div>
-                            </motion.div>
-                        </>
-                    )}
-                </AnimatePresence>
-            </motion.nav>
+
+                                        <Link
+                                            to="/dashboard/my-profile"
+                                            className="flex items-center gap-3 px-3 py-3 rounded-xl text-muted hover:text-fg hover:bg-elevated transition-colors"
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                        >
+                                            <VscDashboard size={18} />
+                                            <span className="text-sm font-medium">Dashboard</span>
+                                        </Link>
+
+                                        <button
+                                            onClick={() => {
+                                                setIsMobileMenuOpen(false);
+                                                setConfirmationModal({
+                                                    text1: 'Are you sure?',
+                                                    text2: 'You will be logged out of your account.',
+                                                    btn1Text: 'Log out',
+                                                    btn2Text: 'Cancel',
+                                                    btn1Handler: () => dispatch(logout(navigate)),
+                                                    btn2Handler: () => setConfirmationModal(null),
+                                                });
+                                            }}
+                                            className="flex items-center gap-3 px-3 py-3 rounded-xl text-brand hover:bg-elevated transition-colors text-left"
+                                        >
+                                            <VscSignOut size={18} />
+                                            <span className="text-sm font-medium">Log out</span>
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
 
             <div className="h-16" />
 
@@ -333,6 +401,8 @@ const Navbar = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {confirmationModal && <ConfirmationModal modalData={confirmationModal} />}
         </>
     );
 };
