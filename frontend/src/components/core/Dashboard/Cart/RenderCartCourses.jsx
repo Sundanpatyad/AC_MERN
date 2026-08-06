@@ -5,77 +5,82 @@ import ReactStars from "react-rating-stars-component"
 import { useDispatch, useSelector } from "react-redux"
 import { removeFromCart } from "../../../../slices/cartSlice"
 import Img from './../../../common/Img'
-import { IoThermometer } from "react-icons/io5"
 
 export default function RenderCartItems() {
   const { cart } = useSelector((state) => state.cart)
   const dispatch = useDispatch()
 
   return (
-    <div className="flex flex-1 flex-col space-y-4 bg-black border border-slate-500 rounded-xl p-4 shadow-lg overflow-hidden">
-      {cart.map((item, indx) => (
-        <div
-          key={item._id}
-          className={`flex flex-col w-full gap-4 pb-4
-            ${indx !== cart.length - 1 && "border-b border-richblack-700"}`}
-        >
-          <div className="flex flex-col sm:flex-row gap-4">
-            {/* Item thumbnail */}
-         {
-          item.thumbnail && (
-            <div className="relative w-full sm:w-[100px] h-[100px] rounded-lg overflow-hidden flex-shrink-0">
-            <Img
-              src={item ? item.thumbnail : ""}
-              alt={item?.seriesName}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          )
-         }
+    <div className="flex flex-col gap-3">
+      {cart.map((item) => {
+        const tags = [item?.category?.name, item?.itemType].filter(Boolean)
 
-            <div className="flex flex-col justify-between flex-grow">
-              <div>
-                <h3 className="text-base font-semibold text-white line-clamp-2 mb-1">
-                  {item && item.courseName}
-                  {item && item.seriesName}
-                 
-                </h3>
-                <div className="flex flex-wrap items-center gap-2 text-xs text-richblack-300 mb-2">
-                  <span className="px-2 py-1 bg-richblack-700 rounded-full">{item?.category?.name}</span>
-                  <span className="px-2 py-1 bg-richblack-700 rounded-full">{item?.itemType}</span>
-                </div>
-              </div>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-2 sm:mt-0">
-                <p className="text-lg font-bold text-yellow-50 mb-2 sm:mb-0">
-                  ₹{item?.price}
-                </p>
-                <div className="flex items-center gap-1">
-                  <ReactStars
-                    count={5}
-                    value={4.5}
-                    size={16}
-                    edit={false}
-                    activeColor="#ffd700"
-                    emptyIcon={<FaStar />}
-                    fullIcon={<FaStar />}
+        return (
+          <div
+            key={item._id}
+            className="rounded-2xl border border-line bg-surface p-4 sm:p-5"
+          >
+            <div className="flex gap-4">
+              {item.thumbnail && (
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-elevated shrink-0">
+                  <Img
+                    src={item.thumbnail}
+                    alt={item?.seriesName || item?.courseName}
+                    className="w-full h-full object-cover"
                   />
-                  <span className="text-richblack-300 text-xs">
-                    ({item?.ratingAndReviews?.length})
+                </div>
+              )}
+
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm sm:text-base font-medium text-fg line-clamp-2">
+                  {item?.courseName || item?.seriesName}
+                </h3>
+
+                {tags.length > 0 && (
+                  <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                    {tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="px-2 py-0.5 rounded-full bg-elevated text-[11px] text-muted capitalize"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <div className="mt-3 flex items-center gap-3">
+                  <p className="text-base sm:text-lg font-semibold text-fg">
+                    ₹{item?.price}
+                  </p>
+                  <span className="flex items-center gap-1 text-xs text-subtle">
+                    <ReactStars
+                      count={5}
+                      value={4.5}
+                      size={14}
+                      edit={false}
+                      activeColor="#fbbf24"
+                      emptyIcon={<FaStar />}
+                      fullIcon={<FaStar />}
+                    />
+                    ({item?.ratingAndReviews?.length || 0})
                   </span>
                 </div>
               </div>
             </div>
-          </div>
 
-          <button
-            onClick={() => dispatch(removeFromCart(item._id))}
-            className="flex items-center justify-center gap-x-2 rounded-lg border border-red-700 bg-red-700 py-2 px-3 text-sm text-white hover:bg-pink-800 transition-all duration-200 w-full"
-          >
-            <RiDeleteBin6Line size={18} />
-            <span>Remove</span>
-          </button>
-        </div>
-      ))}
+            <div className="mt-4 pt-3 border-t border-line flex justify-end">
+              <button
+                onClick={() => dispatch(removeFromCart(item._id))}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm text-muted hover:text-brand hover:bg-elevated transition-colors"
+              >
+                <RiDeleteBin6Line size={16} />
+                Remove
+              </button>
+            </div>
+          </div>
+        )
+      })}
     </div>
   )
 }

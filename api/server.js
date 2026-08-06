@@ -3,7 +3,6 @@ const path = require("path");
 const fileUpload = require('express-fileupload');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-const schedule = require('node-schedule');
 require('dotenv').config();
 
 const { connectDB } = require('./config/database');
@@ -79,26 +78,6 @@ app.get('/', (req, res) => {
     </div>
   `);
 });
-
-/* =========================
-   CRON JOBS
-========================= */
-
-// Standard cron job that runs exactly every 30 seconds:
-schedule.scheduleJob('*/30 * * * * *', () => {
-  console.log('✅ Cron job executed (every 30 seconds)');
-});
-
-// If you meant an exponentially increasing interval (30s, 60s, 120s, etc.), you can use this instead:
-/*
-let intervalDelay = 30000; // Starts at 30 seconds
-const runExponentialJob = () => {
-  console.log(`✅ Exponential job executed. Next run in ${(intervalDelay * 2) / 1000} seconds`);
-  intervalDelay *= 2; // Multiply by 2 for exponential backoff
-  setTimeout(runExponentialJob, intervalDelay);
-};
-setTimeout(runExponentialJob, intervalDelay);
-*/
 
 /* =========================
    SERVER START

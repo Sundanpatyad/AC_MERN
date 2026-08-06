@@ -13,59 +13,58 @@ export default function Cart() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen bg-black text-white"
+      className="w-full"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl"
+      <div className="flex items-start justify-between gap-4 mb-6 sm:mb-8">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-fg">
+            Your cart
+          </h1>
+          <p className="mt-1 text-sm text-muted">
+            {totalItems} {totalItems === 1 ? "item" : "items"}
+          </p>
+        </div>
+
+        <Link
+          to="/"
+          className="hidden sm:inline-flex items-center gap-1.5 text-sm text-muted hover:text-fg transition-colors"
         >
-          <div className="px-6 sm:px-8 py-6 bg-zinc-800 flex justify-between items-center">
-            <h1 className="text-2xl sm:text-3xl font-bold">Your Cart</h1>
-            <span className="bg-white text-black rounded-full px-4 py-2 text-sm font-semibold">
-              {totalItems} {totalItems === 1 ? 'Item' : 'Items'}
-            </span>
+          <FiChevronLeft />
+          Continue shopping
+        </Link>
+      </div>
+
+      {totalItems > 0 ? (
+        <>
+          <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+            <RenderCartCourses />
+            <div className="lg:sticky lg:top-6">
+              <RenderTotalAmount />
+            </div>
           </div>
 
-          {totalItems > 0 ? (
-            <div className="p-6 sm:p-8 space-y-8">
-              <RenderCartCourses />
-              <div className="border-t border-gray-700 pt-6">
-                <RenderTotalAmount />
-              </div>
-              <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
-                <Link
-                  to="/"
-                  className="group flex items-center text-slate-400 hover:text-indigo-300 transition-colors duration-200"
-                >
-                  <FiChevronLeft className="mr-2 group-hover:transform group-hover:-translate-x-1 transition-transform duration-200" />
-                  Continue Shopping
-                </Link>
-               
-              </div>
-            </div>
-          ) : (
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="text-center py-10 px-6 sm:px-8"
-            >
-              <FiShoppingCart className="mx-auto h-24 w-24 text-gray-500" />
-              <h2 className="mt-6 text-3xl font-bold text-white">Your cart is empty</h2>
-              <p className="mt-3 text-md text-gray-400">Looks like you haven't added any courses yet.</p>
-              <Link
-                to="/"
-                className="mt-8 inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-lg text-black bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg"
-              >
-                Browse Courses
-              </Link>
-            </motion.div>
-          )}
-        </motion.div>
-      </div>
+          <Link
+            to="/"
+            className="sm:hidden mt-6 inline-flex items-center gap-1.5 text-sm text-muted hover:text-fg transition-colors"
+          >
+            <FiChevronLeft />
+            Continue shopping
+          </Link>
+        </>
+      ) : (
+        <div className="rounded-2xl border border-line bg-surface px-6 py-16 text-center">
+          <div className="mx-auto w-14 h-14 rounded-full bg-elevated flex items-center justify-center">
+            <FiShoppingCart className="w-6 h-6 text-muted" />
+          </div>
+          <h2 className="mt-5 text-lg font-medium text-fg">Your cart is empty</h2>
+          <p className="mt-1.5 text-sm text-muted">
+            Browse our mock tests and courses to get started.
+          </p>
+          <Link to="/mocktest" className="btn-primary mt-6">
+            Browse mock tests
+          </Link>
+        </div>
+      )}
     </motion.div>
   );
 }

@@ -1,7 +1,5 @@
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
-import { FaShoppingCart } from "react-icons/fa"
-import { motion } from "framer-motion"
 import { buyItem } from "../../../../services/operations/studentFeaturesAPI"
 import { SiRazorpay } from "react-icons/si";
 
@@ -19,30 +17,34 @@ export default function RenderTotalAmount() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="w-full max-w-md mx-auto rounded-xl border-2 border-slate-500 bg-transparent p-4 sm:p-6 shadow-lg"
-    >
-      <div className="flex justify-between items-center mb-6">
-        <p className="text-sm font-medium text-gray-400">Total Amount:</p>
-        <p className="text-2xl sm:text-4xl font-bold text-white">₹ {total.toLocaleString()}</p>
+    <div className="rounded-2xl border border-line bg-surface p-5">
+      <h2 className="text-sm font-medium text-fg">Order summary</h2>
+
+      <div className="mt-4 space-y-2.5 text-sm">
+        <div className="flex justify-between">
+          <span className="text-muted">
+            Items ({cart.length})
+          </span>
+          <span className="text-fg">₹{total.toLocaleString()}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted">Discount</span>
+          <span className="text-fg">₹0</span>
+        </div>
       </div>
-      
-      <motion.button
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.98 }}
-        onClick={handleBuyCourse}
-        className="w-full bg-white text-black py-3 px-4  rounded-lg font-semibold text-xs sm:text-lg flex items-center justify-center space-x-2 transition-colors duration-300 hover:bg-black hover:border hover:border-slate-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-900"
-      >
-        <FaShoppingCart className="text-xl" />
-        <span>Buy Now</span>
-      </motion.button>
-      
-      <p className="mt-4 text-xs text-center text-gray-500 flex align-center justify-center">
-      Secure checkout powered by <SiRazorpay className="inline mx-1 text-blue-200" /> Razorpay
+
+      <div className="mt-4 pt-4 border-t border-line flex items-baseline justify-between">
+        <span className="text-sm text-muted">Total</span>
+        <span className="text-2xl font-semibold text-fg">₹{total.toLocaleString()}</span>
+      </div>
+
+      <button onClick={handleBuyCourse} className="btn-primary w-full mt-5">
+        Buy now
+      </button>
+
+      <p className="mt-3 flex items-center justify-center gap-1 text-xs text-subtle">
+        Secure checkout by <SiRazorpay /> Razorpay
       </p>
-    </motion.div>
+    </div>
   )
 }
