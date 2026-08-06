@@ -1,5 +1,5 @@
 
-const BASE_URL = 'https://ac-7tsw.onrender.com';
+const BASE_URL = 'https://ac-mern-569448299007.europe-west1.run.app';
 // const BASE_URL = 'http://localhost:8000';
 
 
