@@ -10,129 +10,68 @@ import ContactFormSection from "../components/core/AboutPage/ContactFormSection"
 import LearningGrid from "../components/core/AboutPage/LearningGrid"
 import Quote from "../components/core/AboutPage/Quote"
 import StatsComponenet from "../components/core/AboutPage/Stats"
-import HighlightText from "../components/core/HomePage/HighlightText"
 import Img from "../components/common/Img"
-import ReviewSlider from './../components/common/ReviewSlider';
-
-import { motion } from 'framer-motion';
-import { fadeIn } from "../components/common/motionFrameVarients"
-
-
-
-
+import ReviewSlider from "./../components/common/ReviewSlider"
 
 const About = () => {
   return (
-    <div>
-      <section className="bg-richblack-700">
-        <div className="relative mx-auto flex w-11/12 max-w-maxContent flex-col justify-between gap-10 text-center text-white">
-          <motion.header
-            className="mx-auto py-20 text-4xl font-semibold lg:w-[70%]"
-          >
-            <motion.p
-              variants={fadeIn('down', 0.1)}
-              initial='hidden'
-              whileInView={'show'}
-              viewport={{ once: false, amount: 0.1 }}
-            > Driving Innovation in Online Education for a
-              <HighlightText text={"Brighter Future"} />
-            </motion.p>
+    <div className="bg-page text-fg">
+      <section className="border-b border-line">
+        <div className="page-shell section-pad text-center max-w-3xl mx-auto space-y-5">
+          <p className="text-sm font-semibold text-muted">About Awakening Classes</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight leading-tight">
+            Clear coaching for competitive exams
+          </h1>
+          <p className="text-base text-muted leading-relaxed">
+            We help aspirants prepare with focused courses, realistic mock tests, and practical guidance.
+          </p>
+        </div>
 
-            <motion.p
-              variants={fadeIn('up', 0.1)}
-              initial='hidden'
-              whileInView={'show'}
-              viewport={{ once: false, amount: 0.1 }}
-              className="mx-auto mt-3 text-center text-base font-medium text-richblack-300 lg:w-[95%]">
-              Aawakening Classesis at the forefront of driving innovation in online
-              education. We're passionate about creating a brighter future by
-              offering cutting-edge courses, leveraging emerging technologies,
-              and nurturing a vibrant learning community.
-            </motion.p>
-          </motion.header>
-
-          <div className="sm:h-[70px] lg:h-[150px]"></div>
-
-          <div className=" absolute bottom-0 left-[50%] grid w-[100%] translate-x-[-50%] translate-y-[30%] grid-cols-3 gap-3 lg:gap-5">
-            <Img src={BannerImage1} alt="" />
-            <Img src={BannerImage2} alt="" />
-            <Img src={BannerImage3} alt="" />
+        <div className="page-shell pb-12 md:pb-16">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4">
+            <Img src={BannerImage1} alt="" className="rounded-xl object-cover aspect-[4/3] w-full" />
+            <Img src={BannerImage2} alt="" className="rounded-xl object-cover aspect-[4/3] w-full" />
+            <Img src={BannerImage3} alt="" className="rounded-xl object-cover aspect-[4/3] w-full" />
           </div>
         </div>
       </section>
 
-      <section className="border-b border-richblack-700">
-        <div className="mx-auto flex w-11/12 max-w-maxContent flex-col justify-between gap-10 text-richblack-500">
-          <div className="h-[100px] "></div>
+      <section className="border-b border-line">
+        <div className="page-shell section-pad">
           <Quote />
         </div>
       </section>
 
-      <section>
-        <div className="mx-auto flex w-11/12 max-w-maxContent flex-col justify-between gap-10 text-richblack-500">
-          <div className="flex flex-col items-center gap-10 lg:flex-row justify-between">
-            <motion.div
-              variants={fadeIn('right', 0.1)}
-              initial='hidden'
-              whileInView={'show'}
-              viewport={{ once: false, amount: 0.1 }}
-              className="my-24 flex lg:w-[50%] flex-col gap-10">
-              <h1 className="bg-gradient-to-br from-[#833AB4] via-[#FD1D1D] to-[#FCB045] bg-clip-text text-4xl font-semibold text-transparent lg:w-[70%] ">
-                Our Founding Story
-              </h1>
-              <p className="text-base font-medium text-richblack-300 lg:w-[95%]">
-                Our e-learning platform was born out of a shared vision and
-                passion for transforming education. It all began with a group of
-                educators, technologists, and lifelong learners who recognized
-                the need for accessible, flexible, and high-quality learning
-                opportunities in a rapidly evolving digital world.
+      <section className="border-b border-line">
+        <div className="page-shell section-pad space-y-16 md:space-y-20">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <div className="space-y-4">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">Our founding story</h2>
+              <p className="text-sm md:text-base text-muted leading-relaxed">
+                Our platform started from a simple need: accessible, flexible, high-quality preparation for students who want more than classroom limits.
               </p>
-              <p className="text-base font-medium text-richblack-300 lg:w-[95%]">
-                As experienced educators ourselves, we witnessed firsthand the
-                limitations and challenges of traditional education systems. We
-                believed that education should not be confined to the walls of a
-                classroom or restricted by geographical boundaries. We
-                envisioned a platform that could bridge these gaps and empower
-                individuals from all walks of life to unlock their full
-                potential.
-              </p>
-            </motion.div>
-
-            <motion.div
-             variants={fadeIn('left', 0.1)}
-             initial='hidden'
-             whileInView={'show'}
-             viewport={{ once: false, amount: 0.1 }}
-            >
-              <Img
-                src={FoundingStory}
-                alt="FoundingStory"
-                className="shadow-[0_0_20px_0] shadow-[#FC6767]"
-              />
-            </motion.div>
-          </div>
-
-          <div className="flex flex-col items-center lg:gap-10 lg:flex-row justify-between">
-            <div className="my-24 flex lg:w-[40%] flex-col gap-10">
-              <h1 className="bg-gradient-to-b from-[#FF512F] to-[#F09819] bg-clip-text text-4xl font-semibold text-transparent lg:w-[70%] ">
-                Our Vision
-              </h1>
-              <p className="text-base font-medium text-richblack-300 lg:w-[95%]">
-                With this vision in mind, we set out on a journey to create an
-                e-learning platform that would revolutionize the way people
-                learn. Our team of dedicated experts worked tirelessly to
-                develop a robust and intuitive platform that combines
-                cutting-edge technology with engaging content, fostering a
-                dynamic and interactive learning experience.
+              <p className="text-sm md:text-base text-muted leading-relaxed">
+                As educators, we saw the gaps in traditional systems. We built Awakening Classes to bridge those gaps with modern tools and focused content.
               </p>
             </div>
+            <Img
+              src={FoundingStory}
+              alt="Founding story"
+              className="rounded-2xl w-full"
+            />
+          </div>
 
-            <div className="my-24 flex lg:w-[40%] flex-col gap-10">
-              <h1 className="bg-gradient-to-b from-[#1FA2FF] via-[#12D8FA] to-[#A6FFCB] text-transparent bg-clip-text text-4xl font-semibold lg:w-[70%] ">
-                Our Mission
-              </h1>
-              <p className="text-base font-medium text-richblack-300 lg:w-[95%]">
-                Our mission goes beyond just delivering courses online. We wanted to create a vibrant community of learners, where individuals can connect, collaborate, and learn from one another. We believe that knowledge thrives in an environment of sharing and dialogue, and we foster this spirit of collaboration through forums, live sessions, and networking opportunities.
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            <div className="space-y-3 rounded-2xl bg-surface p-6 md:p-8">
+              <h3 className="text-xl font-semibold text-fg">Our vision</h3>
+              <p className="text-sm text-muted leading-relaxed">
+                Create a preparation experience that is clear, practical, and built for real exam conditions.
+              </p>
+            </div>
+            <div className="space-y-3 rounded-2xl bg-surface p-6 md:p-8">
+              <h3 className="text-xl font-semibold text-fg">Our mission</h3>
+              <p className="text-sm text-muted leading-relaxed">
+                Help learners connect, practice, and improve through mock tests, sessions, and a supportive community.
               </p>
             </div>
           </div>
@@ -141,20 +80,12 @@ const About = () => {
 
       <StatsComponenet />
 
-      <section className="mx-auto mt-20 flex w-11/12 max-w-maxContent flex-col justify-between gap-10 text-white">
+      <section className="page-shell section-pad space-y-16">
         <LearningGrid />
         <ContactFormSection />
       </section>
 
-      {/* Reviws from Other Learner */}
-      <div className=" my-20 px-5 text-white ">
-        <h1 className="text-center text-4xl font-semibold mt-8">
-          Reviews from other learners
-        </h1>
-        <ReviewSlider />
-      </div>
-
-      {/* footer */}
+      <ReviewSlider />
       <Footer />
     </div>
   )

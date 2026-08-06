@@ -10,15 +10,33 @@ module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     fontFamily: {
-      inter: ["Inter", "sans-serif"],
+      sans: ["Outfit", "system-ui", "sans-serif"],
+      outfit: ["Outfit", "system-ui", "sans-serif"],
+      inter: ["Outfit", "system-ui", "sans-serif"],
       "edu-sa": ["Edu SA Beginner", "cursive"],
       mono: ["Roboto Mono", "monospace"],
       boogaloo: ['Boogaloo', "sans-serif"]
     },
     colors: {
       white: "#fff",
-      black: "#000",
+      black: "#0f0f0f",
       transparent: "#ffffff00",
+      // Theme-aware semantic tokens (values flip with the .dark class)
+      page: "var(--c-bg)",
+      surface: "var(--c-surface)",
+      elevated: "var(--c-elevated)",
+      fg: "var(--c-fg)",
+      muted: "var(--c-muted)",
+      subtle: "var(--c-subtle)",
+      line: "var(--c-line)",
+      solid: "var(--c-solid)",
+      "solid-fg": "var(--c-solid-fg)",
+      brand: {
+        DEFAULT: "var(--c-brand)",
+        hover: "var(--c-brand-hover)",
+        soft: "var(--c-brand-soft)",
+        fg: "var(--c-brand-fg)",
+      },
       // Your custom colors
       richblack: {
         5: "#F1F2FF",

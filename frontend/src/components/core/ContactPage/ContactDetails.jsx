@@ -6,46 +6,40 @@ import * as Icon2 from "react-icons/io5"
 const contactDetails = [
   {
     icon: "HiChatBubbleLeftRight",
-    heading: "Chat on us",
-    description: "Our friendly team is here to help.",
-    details: "info@Aawakening Classes.com",
+    heading: "Chat with us",
+    description: "Our team is here to help.",
+    details: "info@awakeningclasses.com",
   },
   {
     icon: "BiWorld",
     heading: "Visit us",
-    description: "Come and say hello at our office HQ.",
-    details:
-      "Jammu , Jammu & Kashmir ",
+    description: "Come say hello at our office.",
+    details: "Jammu, Jammu & Kashmir",
   },
   {
     icon: "IoCall",
     heading: "Call us",
-    description: "Mon - Fri From 8am to 5pm",
+    description: "Mon - Fri, 8am to 5pm",
     details: "9682578167",
   },
 ]
 
-
 const ContactDetails = () => {
   return (
-    <div className="flex flex-col gap-6 rounded-xl bg-richblack-800 p-4 lg:p-6">
+    <div className="flex flex-col gap-2 rounded-2xl bg-surface p-2">
       {contactDetails.map((ele, i) => {
-        let Icon = Icon1[ele.icon] || Icon2[ele.icon] || Icon3[ele.icon]
+        const Icon = Icon1[ele.icon] || Icon2[ele.icon] || Icon3[ele.icon]
         return (
           <div
-            className="flex flex-col gap-[2px] p-3 text-sm text-richblack-200"
+            className="flex flex-col gap-1 p-4 rounded-xl hover:bg-elevated transition-colors"
             key={i}
           >
-            <div className="flex flex-row items-center gap-3">
-              <Icon size={25} />
-
-              <h1 className="text-lg font-semibold text-richblack-5">
-                {ele?.heading}
-              </h1>
+            <div className="flex items-center gap-3 text-fg">
+              <Icon size={20} className="text-muted" />
+              <h2 className="text-base font-semibold">{ele.heading}</h2>
             </div>
-
-            <p className="font-medium">{ele?.description}</p>
-            <p className="font-semibold">{ele?.details}</p>
+            <p className="text-sm text-subtle pl-8">{ele.description}</p>
+            <p className="text-sm font-medium text-muted pl-8">{ele.details}</p>
           </div>
         )
       })}

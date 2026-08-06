@@ -1,0 +1,2168 @@
+{
+    "_id": {
+        "$oid": "69c55ed2e0022769f8a7d33d"
+    },
+    "seriesName": "JKSSB Finance Account Assistant",
+    "description": "",
+    "totalTests": 19,
+    "price": 149,
+    "itemType": "mocktest",
+    "status": "published",
+    "studentsEnrolled": [
+        {
+            "$oid": "694d80780efa01ca172db22e"
+        },
+        {
+            "$oid": "694e31421e0a4d696598a810"
+        },
+        {
+            "$oid": "69c56183e0022769f8a7f905"
+        },
+        {
+            "$oid": "69c561bde0022769f8a80af1"
+        },
+        {
+            "$oid": "69c5625de0022769f8a83284"
+        },
+        {
+            "$oid": "69c565f7e0022769f8a89910"
+        },
+        {
+            "$oid": "695ddc4512984298c94fed5e"
+        },
+        {
+            "$oid": "69b17fe19ed6f2cf258676e7"
+        },
+        {
+            "$oid": "69b068369ed6f2cf25839ae6"
+        },
+        {
+            "$oid": "699095a04795387501c805dd"
+        },
+        {
+            "$oid": "6958c94712984298c940df1c"
+        },
+        {
+            "$oid": "69affbdb9ed6f2cf2582b882"
+        },
+        {
+            "$oid": "6952992a12984298c9381c47"
+        },
+        {
+            "$oid": "69c5810b9a32550418d3f48e"
+        },
+        {
+            "$oid": "69a191c79ed6f2cf256c2c60"
+        },
+        {
+            "$oid": "69c5b6ffd667f451b363c89a"
+        },
+        {
+            "$oid": "6985c84ddf03f85623401eaf"
+        },
+        {
+            "$oid": "697d7e6e84e6471174a0f071"
+        },
+        {
+            "$oid": "69c6196110a5554c77cf0c1d"
+        },
+        {
+            "$oid": "69c6194610a5554c77cf06b8"
+        },
+        {
+            "$oid": "69c61be010a5554c77cf47ab"
+        },
+        {
+            "$oid": "69c6080f10a5554c77ce53dd"
+        },
+        {
+            "$oid": "69c61fda10a5554c77cf7f9f"
+        },
+        {
+            "$oid": "69c6205810a5554c77cf8fd7"
+        },
+        {
+            "$oid": "69c6224710a5554c77cfc26c"
+        },
+        {
+            "$oid": "69941a594795387501cb96d8"
+        },
+        {
+            "$oid": "69c6231310a5554c77cfd2d8"
+        },
+        {
+            "$oid": "6981857e84e6471174ca22be"
+        },
+        {
+            "$oid": "697b845d84e647117492c8f6"
+        },
+        {
+            "$oid": "69c59bd7eb920f26730c3b7c"
+        },
+        {
+            "$oid": "69c63f5c10a5554c77d14bf2"
+        },
+        {
+            "$oid": "69747e8d12984298c9b510d4"
+        },
+        {
+            "$oid": "69c6471610a5554c77d1b699"
+        },
+        {
+            "$oid": "695a0b0b12984298c94391c0"
+        },
+        {
+            "$oid": "69c650abc10451e3361a0fdf"
+        },
+        {
+            "$oid": "69c65390c10451e3361a4606"
+        },
+        {
+            "$oid": "6986200e2f563d3ca6967b88"
+        },
+        {
+            "$oid": "69c65431c10451e3361a4beb"
+        },
+        {
+            "$oid": "69c65e2dc10451e3361abe58"
+        },
+        {
+            "$oid": "69883621df03f856234f51bc"
+        },
+        {
+            "$oid": "69c65a9dc10451e3361a80fd"
+        },
+        {
+            "$oid": "69be3fa464add32fab8e27e1"
+        },
+        {
+            "$oid": "69c65c37c10451e3361aaf6a"
+        },
+        {
+            "$oid": "69c66a8ac10451e3361b6932"
+        },
+        {
+            "$oid": "69c17be4799ba3521e4ea8b1"
+        },
+        {
+            "$oid": "69c681ef3352de30b0c6eff7"
+        },
+        {
+            "$oid": "69c6820a3352de30b0c6f598"
+        },
+        {
+            "$oid": "69c68c603352de30b0c72a13"
+        },
+        {
+            "$oid": "69c691ec3352de30b0c7429f"
+        },
+        {
+            "$oid": "69c6087810a5554c77ce55bd"
+        },
+        {
+            "$oid": "69c58e7e9a32550418d4390d"
+        },
+        {
+            "$oid": "69c6bc093352de30b0c85022"
+        },
+        {
+            "$oid": "69c42f16058d13554724ed5c"
+        },
+        {
+            "$oid": "69594a5612984298c942638c"
+        },
+        {
+            "$oid": "69c7496c31fd006222498d2d"
+        },
+        {
+            "$oid": "69c7597a31fd00622249e18d"
+        },
+        {
+            "$oid": "69c760a531fd0062224a0147"
+        },
+        {
+            "$oid": "69522ed812984298c9375f47"
+        },
+        {
+            "$oid": "6978a24412984298c9d590ab"
+        },
+        {
+            "$oid": "69ba5033de08cdf1857f939b"
+        },
+        {
+            "$oid": "6967b69f12984298c9706753"
+        },
+        {
+            "$oid": "6956398712984298c93bd4d8"
+        },
+        {
+            "$oid": "69c778c531fd0062224b35a4"
+        },
+        {
+            "$oid": "69c77b5531fd0062224b62a1"
+        },
+        {
+            "$oid": "69c77ec431fd0062224b8074"
+        },
+        {
+            "$oid": "696e7ff612984298c9937b0d"
+        },
+        {
+            "$oid": "69c562ece0022769f8a85312"
+        },
+        {
+            "$oid": "69c782e431fd0062224bbaab"
+        },
+        {
+            "$oid": "69933c4c4795387501ca4ea0"
+        },
+        {
+            "$oid": "67b19ce708f31734a64e620d"
+        },
+        {
+            "$oid": "69c628ea10a5554c77d08739"
+        },
+        {
+            "$oid": "69819d9f84e6471174cb8618"
+        },
+        {
+            "$oid": "69c623a810a5554c77cfefdf"
+        },
+        {
+            "$oid": "69c7d02331fd0062224dec28"
+        },
+        {
+            "$oid": "69c80a9231fd0062224f60c9"
+        },
+        {
+            "$oid": "698f4bf84795387501c65bab"
+        },
+        {
+            "$oid": "6975e42a12984298c9be5f80"
+        },
+        {
+            "$oid": "694fa9d71e0a4d696598e49b"
+        },
+        {
+            "$oid": "699407914795387501cb01f0"
+        },
+        {
+            "$oid": "69c894080ab14441b1926870"
+        },
+        {
+            "$oid": "6961decd12984298c95eef52"
+        },
+        {
+            "$oid": "69c757ec31fd00622249d9f5"
+        },
+        {
+            "$oid": "69c8b9390ab14441b19317e1"
+        },
+        {
+            "$oid": "69c7487631fd0062224985a4"
+        },
+        {
+            "$oid": "69c6410e10a5554c77d1573c"
+        },
+        {
+            "$oid": "695a2fb312984298c943f0d5"
+        },
+        {
+            "$oid": "69c94c080ab14441b1966a78"
+        },
+        {
+            "$oid": "697861da12984298c9d1fe57"
+        },
+        {
+            "$oid": "69ac1bd69ed6f2cf257ccd18"
+        },
+        {
+            "$oid": "69c65be4c10451e3361aa805"
+        },
+        {
+            "$oid": "69c7715031fd0062224abf61"
+        },
+        {
+            "$oid": "69c682293352de30b0c6f781"
+        },
+        {
+            "$oid": "694f82551e0a4d696598ce93"
+        },
+        {
+            "$oid": "69ca5fa18e2d30d5aaeea2e7"
+        },
+        {
+            "$oid": "696c643a12984298c985d77b"
+        },
+        {
+            "$oid": "69ca651d8e2d30d5aaef0028"
+        },
+        {
+            "$oid": "69ca69638e2d30d5aaef21a7"
+        },
+        {
+            "$oid": "69ca68878e2d30d5aaef1de2"
+        },
+        {
+            "$oid": "69ca8bca8e2d30d5aaeff47b"
+        },
+        {
+            "$oid": "69cb2e6a27f4bb7e2ed5eedc"
+        },
+        {
+            "$oid": "69cb414bd3cd0b01cb9f8b3f"
+        },
+        {
+            "$oid": "69bfdf93f63b784d2b9f1f9c"
+        },
+        {
+            "$oid": "69cb6064d3cd0b01cba03a1f"
+        },
+        {
+            "$oid": "695c7edd12984298c94be8de"
+        },
+        {
+            "$oid": "69cb7ac4d3cd0b01cba11288"
+        },
+        {
+            "$oid": "69cb8b9cd3cd0b01cba17767"
+        },
+        {
+            "$oid": "6984c1dcdf03f8562339535a"
+        },
+        {
+            "$oid": "697ef0b484e6471174ae2ba0"
+        },
+        {
+            "$oid": "69c5d4f11f4f40df3a878465"
+        },
+        {
+            "$oid": "69cbad9bd3cd0b01cba31dd4"
+        },
+        {
+            "$oid": "69cb9c08d3cd0b01cba251dd"
+        },
+        {
+            "$oid": "69c65069c10451e33619ff05"
+        },
+        {
+            "$oid": "69cbfce06060e4dcc4d24733"
+        },
+        {
+            "$oid": "69cc920c550ad4e0fd25758f"
+        },
+        {
+            "$oid": "69cbbb87d3cd0b01cba37506"
+        },
+        {
+            "$oid": "69cc9e89550ad4e0fd261ae0"
+        },
+        {
+            "$oid": "695f2c1f12984298c9544464"
+        },
+        {
+            "$oid": "69cca590550ad4e0fd267017"
+        },
+        {
+            "$oid": "698368cf84e6471174e57ecf"
+        },
+        {
+            "$oid": "69ccae55550ad4e0fd271977"
+        },
+        {
+            "$oid": "69ccb0f4550ad4e0fd2740bc"
+        },
+        {
+            "$oid": "69ccad37550ad4e0fd26f7fe"
+        },
+        {
+            "$oid": "6950edd612984298c9363e5f"
+        },
+        {
+            "$oid": "6952b01012984298c93841ae"
+        },
+        {
+            "$oid": "69ccebb31b6f2df35f9182c8"
+        },
+        {
+            "$oid": "69cd0ebe1b6f2df35f922b27"
+        },
+        {
+            "$oid": "69774d4212984298c9ca0737"
+        },
+        {
+            "$oid": "69bfc676f63b784d2b9dad07"
+        },
+        {
+            "$oid": "69bcd69f69b5ed938060d9e4"
+        },
+        {
+            "$oid": "69cdc2384672235ae7f353d7"
+        },
+        {
+            "$oid": "69888058df03f8562350ceaa"
+        },
+        {
+            "$oid": "69cd40583f8dfe3d561e5ccc"
+        },
+        {
+            "$oid": "69c6511dc10451e3361a1d2c"
+        },
+        {
+            "$oid": "695dd14a12984298c94fc895"
+        },
+        {
+            "$oid": "694f74ae1e0a4d696598b66d"
+        },
+        {
+            "$oid": "6950d31d12984298c93612c8"
+        },
+        {
+            "$oid": "69c7b88b31fd0062224d6d53"
+        },
+        {
+            "$oid": "695245a112984298c9378e3f"
+        },
+        {
+            "$oid": "69ca6c898e2d30d5aaef455b"
+        },
+        {
+            "$oid": "69ce60cfa9cb79206878bccb"
+        },
+        {
+            "$oid": "695211b412984298c9371fb8"
+        },
+        {
+            "$oid": "69ce9f23a9cb7920687b37e1"
+        },
+        {
+            "$oid": "69cea0f5a9cb7920687b445a"
+        },
+        {
+            "$oid": "69cea0d8a9cb7920687b4013"
+        },
+        {
+            "$oid": "69cf1f8bbca0e126cd24922c"
+        },
+        {
+            "$oid": "6996d5c09ed6f2cf2560b6aa"
+        },
+        {
+            "$oid": "6950bed112984298c935fdf4"
+        },
+        {
+            "$oid": "69cfb1e8bca0e126cd2a8adf"
+        },
+        {
+            "$oid": "69cdffe6a9cb792068738345"
+        },
+        {
+            "$oid": "69cb4864d3cd0b01cb9facc2"
+        },
+        {
+            "$oid": "6956141712984298c93b89d3"
+        },
+        {
+            "$oid": "6953607112984298c938e6aa"
+        },
+        {
+            "$oid": "69c5c81f2935026c8371bde2"
+        },
+        {
+            "$oid": "69d0cef665e8a1edbcf6a0cc"
+        },
+        {
+            "$oid": "69d1e27693e858d3ebc7be1f"
+        },
+        {
+            "$oid": "69d1eeda93e858d3ebc8af78"
+        },
+        {
+            "$oid": "6956576d12984298c93bf164"
+        },
+        {
+            "$oid": "69cb6a17d3cd0b01cba0841a"
+        },
+        {
+            "$oid": "69d2450693e858d3ebce01c5"
+        },
+        {
+            "$oid": "69c563d7e0022769f8a871b6"
+        },
+        {
+            "$oid": "69ba6c79de08cdf18582f97e"
+        },
+        {
+            "$oid": "69d38f75a9d2114bd914a9ea"
+        },
+        {
+            "$oid": "69d393f5a9d2114bd914f955"
+        },
+        {
+            "$oid": "6950fa9612984298c936491e"
+        },
+        {
+            "$oid": "69b153c94795387501f41523"
+        },
+        {
+            "$oid": "6994a9c29ed6f2cf255e74e6"
+        },
+        {
+            "$oid": "69d4b3bf1a5db0586fc1d698"
+        },
+        {
+            "$oid": "69cd324c3f8dfe3d561db857"
+        },
+        {
+            "$oid": "69d54e9e1a5db0586fca6e7d"
+        },
+        {
+            "$oid": "69d484291a5db0586fbe722e"
+        },
+        {
+            "$oid": "69cfa6bfbca0e126cd29f413"
+        },
+        {
+            "$oid": "69d86bfb0677ee07fc9f6aab"
+        },
+        {
+            "$oid": "69c6180910a5554c77cef2d8"
+        },
+        {
+            "$oid": "69d33be0a9d2114bd9111b8d"
+        },
+        {
+            "$oid": "69d8a40b0677ee07fca2ce0c"
+        },
+        {
+            "$oid": "69c8cf0c0ab14441b1941f98"
+        },
+        {
+            "$oid": "69d9de34923df45e6707ca22"
+        },
+        {
+            "$oid": "69da346b923df45e670ef56a"
+        },
+        {
+            "$oid": "69db36f1a2873f8c185fd84d"
+        },
+        {
+            "$oid": "6978cef412984298c9d7b49b"
+        },
+        {
+            "$oid": "69dbea30a2873f8c186dcfc7"
+        },
+        {
+            "$oid": "69d4d16a1a5db0586fc33ebd"
+        },
+        {
+            "$oid": "6952f04c12984298c938b537"
+        },
+        {
+            "$oid": "69dcb6ff0ef77772a7d3f97c"
+        },
+        {
+            "$oid": "69dccbeb0ef77772a7d54d9f"
+        },
+        {
+            "$oid": "69dd8d2e90f773cad65788fd"
+        },
+        {
+            "$oid": "695f370012984298c954c624"
+        },
+        {
+            "$oid": "69df125876bcec6599607c48"
+        },
+        {
+            "$oid": "69df1d0876bcec659961c820"
+        },
+        {
+            "$oid": "69df68fb76bcec6599685ff8"
+        },
+        {
+            "$oid": "69dfbf4076bcec65996c6654"
+        },
+        {
+            "$oid": "69e09400786e8c991025b856"
+        },
+        {
+            "$oid": "69e0cd8e786e8c9910299fb8"
+        },
+        {
+            "$oid": "69819f7284e6471174cbafd1"
+        },
+        {
+            "$oid": "69e26732b3d92f52158a5a1f"
+        },
+        {
+            "$oid": "69e2fb1ca5c13a7ddbd6a13d"
+        },
+        {
+            "$oid": "69e31413a5c13a7ddbd814e5"
+        },
+        {
+            "$oid": "69e44a98446f8a56b17314fb"
+        },
+        {
+            "$oid": "69e4561f446f8a56b173b793"
+        },
+        {
+            "$oid": "69e4c23c41b12862da58846d"
+        },
+        {
+            "$oid": "697c5ea384e6471174992232"
+        },
+        {
+            "$oid": "69cfd155cafb54534f5e3bbd"
+        },
+        {
+            "$oid": "69e7b9b7e82aca7f4927dc38"
+        },
+        {
+            "$oid": "698de0792f563d3ca6ba603b"
+        },
+        {
+            "$oid": "69d9ca64923df45e67050ba2"
+        },
+        {
+            "$oid": "69eb8195038d3aafc17662af"
+        },
+        {
+            "$oid": "69e73bec86961d16ecd56a97"
+        }
+    ],
+    "creator": {
+        "$oid": "694d6858ce5746c0bd211797"
+    },
+    "attachments": [],
+    "mockTests": [
+        {
+            "testName": "COMPUTER TEST 1",
+            "questions": [
+                {
+                    "text": "Which of the following pairs is NOT matched correctly?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Ctrl + A  – Select all text",
+                        "Alt + F4  – Used to close current or active window",
+                        "F5    ----     Refresh",
+                        "Ctrl + H   ---   Hyperlink"
+                    ],
+                    "correctAnswer": "Ctrl + H   ---   Hyperlink",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845243efab8c4a0127419"
+                    }
+                },
+                {
+                    "text": "Which of the following is not an open source software?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "MySQL",
+                        "Libre Office",
+                        "Adobe Photoshop",
+                        "WordPress"
+                    ],
+                    "correctAnswer": "Adobe Photoshop",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845243efab8c4a012741a"
+                    }
+                },
+                {
+                    "text": "What is the main purpose of cache memory?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "To increase storage capacity",
+                        "To speed up data access from the main memory",
+                        "To backup data",
+                        "To display graphic"
+                    ],
+                    "correctAnswer": "To speed up data access from the main memory",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845243efab8c4a012741b"
+                    }
+                },
+                {
+                    "text": "Which of the following is not an input device?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Trackball",
+                        "Optical scanners",
+                        "Voice recognition device",
+                        "COM (Computer Output to Microfilm"
+                    ],
+                    "correctAnswer": "COM (Computer Output to Microfilm",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845243efab8c4a012741c"
+                    }
+                },
+                {
+                    "text": "Which of the following produces the best quality graphics reproduction?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Laser printer",
+                        "Ink jet printer",
+                        "Plotter",
+                        "Dot matrix printer"
+                    ],
+                    "correctAnswer": "Plotter",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845243efab8c4a012741d"
+                    }
+                },
+                {
+                    "text": "Which of the following is not anti-viruses software?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "AVAST",
+                        "F-Prot",
+                        "Oracle",
+                        "McAfee"
+                    ],
+                    "correctAnswer": "Oracle",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845243efab8c4a012741e"
+                    }
+                },
+                {
+                    "text": "Which of the following is valid statement?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Data in itself is useless unless it is processed",
+                        "The data that is processed is called a program",
+                        "The data which is not yet processed is information",
+                        "Information is processed by computer to generate data"
+                    ],
+                    "correctAnswer": "Data in itself is useless unless it is processed",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845243efab8c4a012741f"
+                    }
+                },
+                {
+                    "text": "The power point view that displays only text (title and bullets) is:",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Slide show",
+                        "Slide sorter view",
+                        "Notes page view",
+                        "Outline view"
+                    ],
+                    "correctAnswer": "Outline view",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127420"
+                    }
+                },
+                {
+                    "text": "Which component is responsible for producing sound in a computer?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "GPU",
+                        "Sound Card",
+                        "CPU",
+                        "Motherboard"
+                    ],
+                    "correctAnswer": "Sound Card",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127421"
+                    }
+                },
+                {
+                    "text": "Which of the following are advantages of e-Governance? \\ni. Improves delivery and efficiency of government services \\nii. Increased transparency in administration \\niii. Increased legitimacy of government \\niv. Improved government interactions with business and industry",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "i, ii, iii and iv",
+                        "Only i ",
+                        "Only ii, iii and iv ",
+                        "Only i, ii and iii"
+                    ],
+                    "correctAnswer": "i, ii, iii and iv",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127422"
+                    }
+                }
+            ],
+            "duration": 10,
+            "negative": 0.25,
+            "status": "published",
+            "studentsEnrolled": [],
+            "updatedAt": {
+                "$date": "2026-04-22T03:48:52.904Z"
+            },
+            "_id": {
+                "$oid": "69e845243efab8c4a0127418"
+            },
+            "createdAt": {
+                "$date": "2026-04-22T03:48:53.090Z"
+            }
+        },
+        {
+            "testName": "COMPUTER TEST 2",
+            "questions": [
+                {
+                    "text": "What database key uniquely identifies a record within a table?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Foreign Key",
+                        "Primary Key",
+                        "Composite Key",
+                        "Alternate Key"
+                    ],
+                    "correctAnswer": "Primary Key",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127424"
+                    }
+                },
+                {
+                    "text": "___  memory in a computer is where information is temporarily stored while it is being accessed or worked on by the processor.",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Secondary Memory",
+                        "Logical Memory",
+                        "ROM",
+                        "RAM"
+                    ],
+                    "correctAnswer": "RAM",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127425"
+                    }
+                },
+                {
+                    "text": "Which among the following is incorrect in terms of Abbrevations:",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "ADSL : Asymmetric Digital Subscriber Line",
+                        "LIFO : Last In, First Out",
+                        "SAN : Solid Area Network",
+                        "DNS : Domain Name System"
+                    ],
+                    "correctAnswer": "SAN : Solid Area Network",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127426"
+                    }
+                },
+                {
+                    "text": "Which of the following options does not represent application software?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Open Office",
+                        "Microsoft Toolkit",
+                        "Adobe Photoshop",
+                        "Ubuntu"
+                    ],
+                    "correctAnswer": "Ubuntu",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127427"
+                    }
+                },
+                {
+                    "text": "__ is a small program embedded inside a GIF (Graphics Interchange Format) image.",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Web bug",
+                        "Cookie",
+                        "Spyware application",
+                        "Spam"
+                    ],
+                    "correctAnswer": "Web bug",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127428"
+                    }
+                },
+                {
+                    "text": "Which part of a computer is called as a nerve centre?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Software",
+                        "Hardware",
+                        "Program",
+                        "Control Unit"
+                    ],
+                    "correctAnswer": "Control Unit",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127429"
+                    }
+                },
+                {
+                    "text": "Which of the following is not an option of edit menu?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Paste",
+                        "Page Setup",
+                        "Cut",
+                        "Copy"
+                    ],
+                    "correctAnswer": "Page Setup",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a012742a"
+                    }
+                },
+                {
+                    "text": "Which view displays the slides on a presentation as miniature representations of the slides in PowerPoint?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Slide show",
+                        "Slide sorter view",
+                        "Notes page view",
+                        "Outline view"
+                    ],
+                    "correctAnswer": "Slide sorter view",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a012742b"
+                    }
+                },
+                {
+                    "text": "Which of the following Gate/Gates is known as building block in digital circuitry? \\na) NAND Gate \\nb) NOR Gate \\nc) OR Gate",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Only a) is correct",
+                        "Only b) is correct",
+                        "Both a) & b) are correct",
+                        "All of the above are correct"
+                    ],
+                    "correctAnswer": "Both a) & b) are correct",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a012742c"
+                    }
+                },
+                {
+                    "text": "The binary equivalent of the decimal number 10 is ____",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "0010",
+                        "10",
+                        "1010",
+                        "010"
+                    ],
+                    "correctAnswer": "1010",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a012742d"
+                    }
+                }
+            ],
+            "duration": 10,
+            "negative": 0.25,
+            "status": "published",
+            "studentsEnrolled": [],
+            "updatedAt": {
+                "$date": "2026-04-22T03:48:52.904Z"
+            },
+            "_id": {
+                "$oid": "69e845253efab8c4a0127423"
+            },
+            "createdAt": {
+                "$date": "2026-04-22T03:48:53.092Z"
+            }
+        },
+        {
+            "testName": "Science test 1",
+            "questions": [
+                {
+                    "text": "Which one of the following is the correct sequence of a food chain?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Diatoms-Crustaceans-Herrings",
+                        "Crustaceans-Diatoms-Herrings",
+                        "Diatoms-Herrings-Crustaceans",
+                        "Crustaceans-Herrings-Diatoms"
+                    ],
+                    "correctAnswer": "Diatoms-Crustaceans-Herrings",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a012742f"
+                    }
+                },
+                {
+                    "text": "Consider the following pairs \\n Vitamins ------------------Deficiency\\n Vitamin C---------------Scurvy \\nVitamin D---------------Rickets\\n Vitamin E --------------Night blindness \\n Which of the following pair is correctly matched",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "1 and 2 only",
+                        "3 only",
+                        "1, 2 and 3",
+                        "None of above "
+                    ],
+                    "correctAnswer": "1 and 2 only",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127430"
+                    }
+                },
+                {
+                    "text": "Which of the following is a pair of bacterial diseases?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Typhoid Cholera",
+                        "Ringworm,AIDS",
+                        "Common cold Dengue",
+                        "Dysentery,Common cold"
+                    ],
+                    "correctAnswer": "Typhoid Cholera",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127431"
+                    }
+                },
+                {
+                    "text": "What are the products obtained by anaerobic respiration in plants?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Lactic acid + energy",
+                        "Carbon dioxide + water + energy",
+                        "Ethanol + carbon dioxide + energy",
+                        "Pyruvate"
+                    ],
+                    "correctAnswer": "Ethanol + carbon dioxide + energy",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127432"
+                    }
+                },
+                {
+                    "text": "The arrangement for Copper, Tin, Lead and Mercury, according to the reactivity series, is:",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Tin> Lead> Copper> Mercury",
+                        "Lead> Copper> Mercury> Tin",
+                        "Copper> Mercury> Tin> Lead",
+                        "Mercury> Tin> Lead> Copper"
+                    ],
+                    "correctAnswer": "Tin> Lead> Copper> Mercury",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127433"
+                    }
+                },
+                {
+                    "text": "Assertion (A): Decomposition reactions are generally endothermic reactions.\\n Reason (R): Decomposition of organic matter into compost is an exothermic process.",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Both A and R are true, and R is the correct explanation of A.",
+                        "Both A and R are true, but R is not the correct explanation of A.",
+                        "A is true, but R is false.",
+                        "A is false, but R is true."
+                    ],
+                    "correctAnswer": "Both A and R are true, but R is not the correct explanation of A.",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127434"
+                    }
+                },
+                {
+                    "text": "Which of the following reactions is used in black-and-white photography?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Combination Reaction",
+                        "Decomposition Reaction",
+                        "Displacement reaction",
+                        "Oxidation reaction"
+                    ],
+                    "correctAnswer": "Decomposition Reaction",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127435"
+                    }
+                },
+                {
+                    "text": "A passenger in a moving bus is thrown forward when the bus suddenly stops. This is explained",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "by Newton's first law",
+                        "by Newton's second law",
+                        "by Newton's third law",
+                        "by the principle of conservation of momentum"
+                    ],
+                    "correctAnswer": "by Newton's first law",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127436"
+                    }
+                },
+                {
+                    "text": "Consider the following statements regarding depletion of the ozone layer: \\n1. Excessive release of chlorine and bromine in the environment from man-made compounds, such as chlorofluorocarbons.\\n 2. Occurrence of certain natural phenomena such as sunspots, and stratospheric winds.\\n 3. Degradation of materials by ultra-violet radiation\\n 4. Major volcanic eruptions.\\n Which of the above can be categorized as causing ozone depletion?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "1, 2 and 3 only",
+                        "1, 3 and 4 only",
+                        "1, 2 and 4 only",
+                        "2, 3 and 4 only"
+                    ],
+                    "correctAnswer": "1, 2 and 4 only",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127437"
+                    }
+                },
+                {
+                    "text": "Which of the following is/are the characteristic/characteristics of Indian coal? \\n1 High ash content \\n2 Low sulphur content\\n 3 Low ash fusion temperature \\nSelect the correct answer using the codes given below.",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "1 and 2 only",
+                        "2 only",
+                        "1 and 3 only",
+                        "1, 2 and 3"
+                    ],
+                    "correctAnswer": "1 and 2 only",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127438"
+                    }
+                }
+            ],
+            "duration": 10,
+            "negative": 0.25,
+            "status": "published",
+            "studentsEnrolled": [],
+            "updatedAt": {
+                "$date": "2026-04-22T03:48:52.904Z"
+            },
+            "_id": {
+                "$oid": "69e845253efab8c4a012742e"
+            },
+            "createdAt": {
+                "$date": "2026-04-22T03:48:53.094Z"
+            }
+        },
+        {
+            "testName": "Science test 2",
+            "questions": [
+                {
+                    "text": "Consider the following processes:\\n I. Rusting of iron \\nII. Melting of ice\\n III. Burning of a candle \\nIV. Boiling of water  \\nWhich of the above are examples of a chemical change (chemical reaction)?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "I and II",
+                        "I and III",
+                        "II and IV",
+                        "I, II, and III"
+                    ],
+                    "correctAnswer": "I and III",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a012743a"
+                    }
+                },
+                {
+                    "text": "Which of the following statements about an exothermic reaction is true?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "It is a reaction where heat is absorbed.",
+                        "Respiration is an example of an endothermic reaction.",
+                        "Burning of natural gas is an exothermic reaction.",
+                        "Decomposition of vegetable matter is an endothermic reaction."
+                    ],
+                    "correctAnswer": "Burning of natural gas is an exothermic reaction.",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a012743b"
+                    }
+                },
+                {
+                    "text": "Consider the following statements regarding vitamins:\\n 1 Vitamins are organic compounds required in small amounts for normal growth and health.\\n 2 Humans can synthesize all required vitamins within their bodies.\\n 3 Vitamins A, D, E, and K are fat-soluble and stored in liver and fatty tissues.\\n 4 Vitamin B-complex and C are water-soluble and must be supplied regularly in the diet. \\n Which of the statements given above are correct?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "1, 2, and 3",
+                        "1, 3, and 4",
+                        "2, 3, and 4",
+                        "1 and 2 only"
+                    ],
+                    "correctAnswer": "1, 3, and 4",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a012743c"
+                    }
+                },
+                {
+                    "text": "Which of the following statements about fat-soluble vitamins is FALSE?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "They are absorbed along with fats in the diet.",
+                        "They are stored in the body, primarily in the liver.",
+                        "They need to be consumed every day.",
+                        "Excess intake of fat-soluble vitamins can lead to toxicity (hypervitaminosis)."
+                    ],
+                    "correctAnswer": "They need to be consumed every day.",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a012743d"
+                    }
+                },
+                {
+                    "text": "Consider the following statements about energy flow:\\n I. The flow of energy in an ecosystem is unidirectional.\\n II. Ecosystems are exempt from the 2nd law of thermodynamics. \\nWhich of the statements given above is/are correct?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Only I",
+                        "Only II",
+                        "Both I and II",
+                        "Neither I nor II"
+                    ],
+                    "correctAnswer": "Only I",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a012743e"
+                    }
+                },
+                {
+                    "text": "Which of the following statements is INCORRECT",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "The liver secretes bile.",
+                        "The liver is the largest gland in the body.",
+                        "The liver is situated in the upper part of the abdomen on the left side.",
+                        "The liver is reddish brown in colour."
+                    ],
+                    "correctAnswer": "The liver is situated in the upper part of the abdomen on the left side.",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a012743f"
+                    }
+                },
+                {
+                    "text": "Which of the following statements is correct?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "If the constituents of the medium oscillate along the direction of wave propagation, we call the wave a transverse wave.",
+                        "The minimum distance between two points in a wave having the same phase at a particular instant of time is called the wave length.",
+                        "If the constituents of the medium oscillate perpendicular to the direction of wave propagation, we call the wave a longitudinal waveIf the constituents of the medium oscillate perpendicular to the direction of wave propagation, we call the wave a longitudinal wave.",
+                        "Frequency of a wave is the number of oscillations of each constituent particle in the vibrating medium per minute."
+                    ],
+                    "correctAnswer": "The minimum distance between two points in a wave having the same phase at a particular instant of time is called the wave length.",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127440"
+                    }
+                },
+                {
+                    "text": "Which of the following statements is INCORRECT?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Pure metals have a shining surface.",
+                        "Metals are good conductors of heat",
+                        "Metals have high melting points.",
+                        "Lead and mercury are best conductors of heat."
+                    ],
+                    "correctAnswer": "Lead and mercury are best conductors of heat.",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127441"
+                    }
+                },
+                {
+                    "text": "What should be the characteristics of an electric-fuse wire?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "High melting point, high specific resistance.",
+                        "Low melting point, low specific resistance.",
+                        "High melting point, low specific resistance.",
+                        "Low melting point, high specific resistance."
+                    ],
+                    "correctAnswer": "Low melting point, high specific resistance.",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127442"
+                    }
+                },
+                {
+                    "text": "Which of the following options is the same as Newton’s second law of motion?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Applied force on a body is inversely proportional to the acceleration of the body.",
+                        "The rate of change of momentum of an object is independent of the applied unbalanced force.",
+                        "An object at rest will remain at rest when external force is not applied.",
+                        "If an object is in motion, applied force is directly proportional to the acceleration."
+                    ],
+                    "correctAnswer": "If an object is in motion, applied force is directly proportional to the acceleration.",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127443"
+                    }
+                }
+            ],
+            "duration": 10,
+            "negative": 0.25,
+            "status": "published",
+            "studentsEnrolled": [],
+            "updatedAt": {
+                "$date": "2026-04-22T03:48:52.904Z"
+            },
+            "_id": {
+                "$oid": "69e845253efab8c4a0127439"
+            },
+            "createdAt": {
+                "$date": "2026-04-22T03:48:53.095Z"
+            }
+        },
+        {
+            "testName": "English test 1",
+            "questions": [
+                {
+                    "text": "Change the given sentence in passive voice: The boys were playing cricket.",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Cricket had been played by the boys.",
+                        "Cricket has been played by the boys.",
+                        "Cricket was played by the boys.",
+                        "Cricket was being played by the boys."
+                    ],
+                    "correctAnswer": "Cricket was being played by the boys.",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127445"
+                    }
+                },
+                {
+                    "text": "Select the correct indirect form of the given sentence: She said to me, “What shall I do after the exam?”",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "She asked me that what should she do after the exam.",
+                        "She told me that what she should do after the exam.",
+                        "She asked me what she should do after the exam.",
+                        "She asked me what should she do after the exam"
+                    ],
+                    "correctAnswer": "She asked me what she should do after the exam.",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127446"
+                    }
+                },
+                {
+                    "text": "Select the synonym of the word: Sagacious",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Foolish",
+                        "Insightful",
+                        "Naive",
+                        "Confused"
+                    ],
+                    "correctAnswer": "Insightful",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127447"
+                    }
+                },
+                {
+                    "text": "Select the antonym of the word: Valent",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Puissant",
+                        "Potent",
+                        "Impotent",
+                        "Cogent"
+                    ],
+                    "correctAnswer": "Impotent",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127448"
+                    }
+                },
+                {
+                    "text": "Choose the appropriate option: Oh! I _________ have loved to go with you all.",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Could",
+                        "Should",
+                        "Might",
+                        "Would"
+                    ],
+                    "correctAnswer": "Would",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127449"
+                    }
+                },
+                {
+                    "text": "Rehan __________ an email to his teachers every Monday morning.",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "has written",
+                        "write",
+                        "wrote",
+                        "writes"
+                    ],
+                    "correctAnswer": "writes",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a012744a"
+                    }
+                },
+                {
+                    "text": "Choose the alternative which best expresses the meaning of the given idiom/phrase: To hit below the belt",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "To punish",
+                        "To tie with a belt",
+                        "To hit with a belt",
+                        "To attack unfairly"
+                    ],
+                    "correctAnswer": "To attack unfairly",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a012744b"
+                    }
+                },
+                {
+                    "text": "Choose the correct preposition: We met a lot of people ________ our holidays.",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "on",
+                        "in",
+                        "during",
+                        "at"
+                    ],
+                    "correctAnswer": "during",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a012744c"
+                    }
+                },
+                {
+                    "text": "Choose the correct article: _________ lion is a ferocious animal.",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "The",
+                        "a",
+                        "An",
+                        "No article"
+                    ],
+                    "correctAnswer": "The",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a012744d"
+                    }
+                },
+                {
+                    "text": "Given below are four jumbled sentences. Out of the given options, pick the one that gives their correct order. \\nP. was a thrilling\\n Q. Our mountain climbing expedition\\n R. and unforgettable experience \\nS. in the Himalayas",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "PRQS",
+                        "QSPR",
+                        "RQSP",
+                        "SPQR"
+                    ],
+                    "correctAnswer": "QSPR",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a012744e"
+                    }
+                }
+            ],
+            "duration": 10,
+            "negative": 0.25,
+            "status": "published",
+            "studentsEnrolled": [],
+            "updatedAt": {
+                "$date": "2026-04-22T03:48:52.904Z"
+            },
+            "_id": {
+                "$oid": "69e845253efab8c4a0127444"
+            },
+            "createdAt": {
+                "$date": "2026-04-22T03:48:53.187Z"
+            }
+        },
+        {
+            "testName": "English test 2",
+            "questions": [
+                {
+                    "text": "Fill in the blank with appropriate preposition: He is addicted ______ smoking.",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "to",
+                        "by",
+                        "for",
+                        "with"
+                    ],
+                    "correctAnswer": "to",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127450"
+                    }
+                },
+                {
+                    "text": "That was a noble act _______ kindness.",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "to",
+                        "of",
+                        "upon",
+                        "for"
+                    ],
+                    "correctAnswer": "of",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127451"
+                    }
+                },
+                {
+                    "text": "Change the given sentence in passive voice: Who has seen him?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "By whom he was seen?",
+                        "By whom has he been seen?",
+                        "By whom he have been seen?",
+                        "By whom had he been seen?"
+                    ],
+                    "correctAnswer": "By whom has he been seen?",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127452"
+                    }
+                },
+                {
+                    "text": "“Did you bring your pen today?” asked Anil.",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Anil told that if I bought my pen today.",
+                        "Anil asked if I had brought my pen that day.",
+                        "Anil asked me if I had brought my pen today.",
+                        "Anil told me if I brought my pen that day."
+                    ],
+                    "correctAnswer": "Anil asked if I had brought my pen that day.",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127453"
+                    }
+                },
+                {
+                    "text": "Choose the alternative which best expresses the meaning of the given idiom/phrase: To bring to light",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "To conceal",
+                        "To reveal",
+                        "To appeal",
+                        "To provide luminescence"
+                    ],
+                    "correctAnswer": "To reveal",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127454"
+                    }
+                },
+                {
+                    "text": "We had _________ lunch at 2 PM.",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "A",
+                        "An",
+                        "The",
+                        "No article"
+                    ],
+                    "correctAnswer": "No article",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127455"
+                    }
+                },
+                {
+                    "text": "Select the antonym of the word: Primordial",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Pristine",
+                        "Postmodern",
+                        "Antediluvian",
+                        "Aboriginal"
+                    ],
+                    "correctAnswer": "Postmodern",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127456"
+                    }
+                },
+                {
+                    "text": "Select the synonym of the word: Prodigal",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Extravagant",
+                        "Frugal",
+                        "Penurious",
+                        "Parsimonious"
+                    ],
+                    "correctAnswer": "Extravagant",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127457"
+                    }
+                },
+                {
+                    "text": "Choose the correct option: The audience __________ settle before the doors are closed.",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Can",
+                        "Shall",
+                        "Might",
+                        "Must"
+                    ],
+                    "correctAnswer": "Must",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127458"
+                    }
+                },
+                {
+                    "text": "Given below are four jumbled sentences. \\nOut of the given options, pick the one that gives their correct order.\\n P. Children are the most adversely affected.\\n Q. Their eyesight goes weak from their very childhood.\\n R. Watching television continuously is very harmful to the eyes.\\n S. This debilitating effect on eyes results in severe headaches as well.",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "PRQS",
+                        "RPQS",
+                        "RQSP",
+                        "PQSR"
+                    ],
+                    "correctAnswer": "RPQS",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127459"
+                    }
+                }
+            ],
+            "duration": 10,
+            "negative": 0.25,
+            "status": "published",
+            "studentsEnrolled": [],
+            "updatedAt": {
+                "$date": "2026-04-22T03:48:52.904Z"
+            },
+            "_id": {
+                "$oid": "69e845253efab8c4a012744f"
+            },
+            "createdAt": {
+                "$date": "2026-04-22T03:48:53.190Z"
+            }
+        },
+        {
+            "testName": "Economics test 1",
+            "questions": [
+                {
+                    "text": "What was the main and immediate reason for adopting economic reforms in India in 1991?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Fiscal deficit",
+                        "Poverty",
+                        "Balance of Payment Crisis",
+                        "Inflation"
+                    ],
+                    "correctAnswer": "Balance of Payment Crisis",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a012745b"
+                    }
+                },
+                {
+                    "text": "Demonetization had occurred in India in the years 1946 and 1978. On which date did the third demonetization occur?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "8th November 2016",
+                        "8th November 2015",
+                        "18th November 2016",
+                        "28th November 2015"
+                    ],
+                    "correctAnswer": "8th November 2016",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a012745c"
+                    }
+                },
+                {
+                    "text": "NNP at Market Prices + Depreciation – Net Indirect Taxes equals",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "GNP at market prices",
+                        "NNI at market prices",
+                        "GNP at factor cost",
+                        "GDP at factor cost"
+                    ],
+                    "correctAnswer": "GNP at factor cost",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a012745d"
+                    }
+                },
+                {
+                    "text": "Consider the following statements:\\n  1) The Governor of the Reserve Bank of India (RBI) is appointed by the Central Government. \\n2) Certain provisions in the Constitution of India give the Central Government the right to issue directions to the RBI in public interest.\\n 3) The Governor of the RBI draws his power from the RBI Act. \\nWhich of the above statements are correct?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "1 and 2 only",
+                        "2 and 3 only",
+                        "1 and 3 only",
+                        "1, 2 and 3"
+                    ],
+                    "correctAnswer": "1 and 3 only",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a012745e"
+                    }
+                },
+                {
+                    "text": "With reference to the calculation of National Income, consider the following statements:\\n Statement I: The value of goods and services produced by the Government is an integral part of the Gross National Product (GNP).\\n Statement II: GNP is calculated by subtracting net exports from the total domestic production. \\nWhich of the following is correct?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Statement I is correct and Statement II is incorrect",
+                        "Statement I is incorrect and Statement II is correct",
+                        "Both Statement I and Statement II are correct",
+                        "Both Statement I and Statement II are incorrect"
+                    ],
+                    "correctAnswer": "Statement I is correct and Statement II is incorrect",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a012745f"
+                    }
+                },
+                {
+                    "text": "With reference to the sectors of the Indian economy, consider the following pairs: \\nEconomic Activity           \tSector \\n1. Storage of agricultural produce\t          Secondary \\n2. Dairy farm               \tPrimary \\n3. Mineral exploration\t            Tertiary 4. Weaving cloth\t          Secondary\\n How many of the pairs given above are correctly matched?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Only one",
+                        "Only two",
+                        "Only three",
+                        "All four"
+                    ],
+                    "correctAnswer": "Only two",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127460"
+                    }
+                },
+                {
+                    "text": "The most appropriate measure of a country’s economic growth is its",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Gross Domestic Product (GDP)",
+                        "Net Domestic Product (NDP)",
+                        "Net National Product (NNP)",
+                        "Per Capita Product (PCP)"
+                    ],
+                    "correctAnswer": "Per Capita Product (PCP)",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127461"
+                    }
+                },
+                {
+                    "text": "According to the Law of Diminishing Returns, in a production function, when more and more units of the variable factor are used, holding the quantities of a fixed factor constant, a point is reached beyond which",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "the marginal revenue will diminish",
+                        "the average revenue will diminish",
+                        "the marginal product will diminish",
+                        "the marginal product will increase"
+                    ],
+                    "correctAnswer": "the marginal product will diminish",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127462"
+                    }
+                },
+                {
+                    "text": "With reference to the Indian economy, consider the following: \\n1. Bank rate\\n 2. Open market operations\\n 3. Public debt \\n4. Public revenue \\nWhich of the above is/are component/components of Monetary Policy?",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "1 only",
+                        "2, 3 and 4",
+                        "1 and 2",
+                        "1,3 and 4"
+                    ],
+                    "correctAnswer": "1 and 2",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127463"
+                    }
+                },
+                {
+                    "text": "Zero price elasticity of demand means",
+                    "questionType": "MCQ",
+                    "leftColumn": [],
+                    "rightColumn": [],
+                    "options": [
+                        "Whatever the change in price, there is absolutely no change in demand",
+                        "For a small change in price, there is a small change in demand",
+                        "For a small change in price, there is a large change in demand",
+                        "For a large change in price , there is a small change in demand"
+                    ],
+                    "correctAnswer": "Whatever the change in price, there is absolutely no change in demand",
+                    "marks": 1,
+                    "_id": {
+                        "$oid": "69e845253efab8c4a0127464"
+                    }
+                }
+            ],
+            "duration": 10,
+            "negative": 0.25,
+            "status": "published",
+            "studentsEnrolled": [],
+            "updatedAt": {
+                "$date": "2026-04-22T03:48:52.904Z"
+            },
+            "_id": {
+                "$oid": "69e845253efab8c4a012745a"
+            },
+            "createdAt": {
+                "$date": "2026-04-22T03:48:53.192Z"
+            }
+        },
+        {
+            "testName": "Economics test 2",
+            "questions": [],
+            "duration": 10,
+            "negative": 0.25,
+            "status": "published",
+            "studentsEnrolled": [],
+            "updatedAt": {
+                "$date": "2026-04-22T03:48:52.904Z"
+            },
+            "_id": {
+                "$oid": "69e845253efab8c4a0127465"
+            },
+            "createdAt": {
+                "$date": "2026-04-22T03:48:53.192Z"
+            }
+        },
+        {
+            "testName": "Accountancy test 1",
+            "questions": [],
+            "duration": 30,
+            "negative": 0.25,
+            "status": "published",
+            "studentsEnrolled": [],
+            "updatedAt": {
+                "$date": "2026-04-22T03:48:52.904Z"
+            },
+            "_id": {
+                "$oid": "69e845253efab8c4a0127466"
+            },
+            "createdAt": {
+                "$date": "2026-04-22T03:48:53.192Z"
+            }
+        },
+        {
+            "testName": "Accountancy test 2",
+            "questions": [],
+            "duration": 30,
+            "negative": 0.25,
+            "status": "published",
+            "studentsEnrolled": [],
+            "updatedAt": {
+                "$date": "2026-04-22T03:48:52.904Z"
+            },
+            "_id": {
+                "$oid": "69e845253efab8c4a0127467"
+            },
+            "createdAt": {
+                "$date": "2026-04-22T03:48:53.192Z"
+            }
+        },
+        {
+            "testName": "Maths test 1",
+            "questions": [],
+            "duration": 10,
+            "negative": 0.25,
+            "status": "published",
+            "studentsEnrolled": [],
+            "updatedAt": {
+                "$date": "2026-04-22T03:48:52.904Z"
+            },
+            "_id": {
+                "$oid": "69e845253efab8c4a0127468"
+            },
+            "createdAt": {
+                "$date": "2026-04-22T03:48:53.192Z"
+            }
+        },
+        {
+            "testName": "Maths test 2",
+            "questions": [],
+            "duration": 10,
+            "negative": 0.25,
+            "status": "published",
+            "studentsEnrolled": [],
+            "updatedAt": {
+                "$date": "2026-04-22T03:48:52.904Z"
+            },
+            "_id": {
+                "$oid": "69e845253efab8c4a0127469"
+            },
+            "createdAt": {
+                "$date": "2026-04-22T03:48:53.192Z"
+            }
+        },
+        {
+            "testName": "GENERAL AWARENESS MOCK 1",
+            "questions": [],
+            "duration": 30,
+            "negative": 0.25,
+            "status": "published",
+            "studentsEnrolled": [],
+            "updatedAt": {
+                "$date": "2026-04-22T03:48:52.904Z"
+            },
+            "_id": {
+                "$oid": "69e845253efab8c4a012746a"
+            },
+            "createdAt": {
+                "$date": "2026-04-22T03:48:53.192Z"
+            }
+        },
+        {
+            "testName": "GENERAL AWARENESS MOCK 2",
+            "questions": [],
+            "duration": 30,
+            "negative": 0.25,
+            "status": "published",
+            "studentsEnrolled": [],
+            "updatedAt": {
+                "$date": "2026-04-22T03:48:52.904Z"
+            },
+            "_id": {
+                "$oid": "69e845253efab8c4a012746b"
+            },
+            "createdAt": {
+                "$date": "2026-04-22T03:48:53.192Z"
+            }
+        },
+        {
+            "testName": "Statistics test 1",
+            "questions": [],
+            "duration": 10,
+            "negative": 0.25,
+            "status": "published",
+            "studentsEnrolled": [],
+            "updatedAt": {
+                "$date": "2026-04-22T03:48:52.904Z"
+            },
+            "_id": {
+                "$oid": "69e845253efab8c4a012746c"
+            },
+            "createdAt": {
+                "$date": "2026-04-22T03:48:53.193Z"
+            }
+        },
+        {
+            "testName": "Statistics test 2",
+            "questions": [],
+            "duration": 10,
+            "negative": 0.25,
+            "status": "published",
+            "studentsEnrolled": [],
+            "updatedAt": {
+                "$date": "2026-04-22T03:48:52.904Z"
+            },
+            "_id": {
+                "$oid": "69e845253efab8c4a012746d"
+            },
+            "createdAt": {
+                "$date": "2026-04-22T03:48:53.193Z"
+            }
+        },
+        {
+            "testName": "FULL TEST 1",
+            "questions": [],
+            "duration": 120,
+            "negative": 0.25,
+            "status": "published",
+            "studentsEnrolled": [],
+            "updatedAt": {
+                "$date": "2026-04-22T03:48:52.904Z"
+            },
+            "_id": {
+                "$oid": "69e845253efab8c4a012746e"
+            },
+            "createdAt": {
+                "$date": "2026-04-22T03:48:53.193Z"
+            }
+        },
+        {
+            "testName": "FULL TEST 2",
+            "questions": [],
+            "duration": 120,
+            "negative": 0.25,
+            "status": "published",
+            "studentsEnrolled": [],
+            "updatedAt": {
+                "$date": "2026-04-22T03:48:52.904Z"
+            },
+            "_id": {
+                "$oid": "69e845253efab8c4a012746f"
+            },
+            "createdAt": {
+                "$date": "2026-04-22T03:48:53.193Z"
+            }
+        },
+        {
+            "testName": "FULL TEST 3",
+            "questions": [],
+            "duration": 120,
+            "negative": 0.25,
+            "status": "published",
+            "studentsEnrolled": [],
+            "updatedAt": {
+                "$date": "2026-04-22T03:48:52.904Z"
+            },
+            "_id": {
+                "$oid": "69e845253efab8c4a0127470"
+            },
+            "createdAt": {
+                "$date": "2026-04-22T03:48:53.193Z"
+            }
+        }
+    ],
+    "createdAt": {
+        "$date": "2026-03-26T16:29:06.967Z"
+    },
+    "updatedAt": {
+        "$date": "2026-04-25T12:44:33.699Z"
+    },
+    "__v": 0,
+    "thumbnail": "https://res.cloudinary.com/dvqyc6wkj/image/upload/v1774543963/LMS_AC/wvlerrwvnqjd9t3e2zf0.png"
+}

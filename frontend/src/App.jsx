@@ -121,8 +121,10 @@ function App() {
   //   };
   // }, []);
 
+  const hideChrome = location.pathname.includes("attempt-test");
+
   return (
-    <div className="w-screen min-h-screen bg-black text-white flex flex-col font-inter">
+    <div className="w-full min-h-screen bg-page text-fg flex flex-col font-outfit">
       {/* <AnimatePresence>
         {isPageLoading && (
           <motion.div
@@ -143,9 +145,9 @@ function App() {
         transition={{ duration: 0.4, ease: "easeInOut" }} // Increase duration and add easing
         className="flex flex-col min-h-screen"
       >
-        {!location.pathname.includes("attempt-test") && <Navbar />}
-        <main className="flex-grow">
-          <Suspense fallback={<div className="flex justify-center items-center min-h-screen text-white">Loading...</div>}>
+        {!hideChrome && <Navbar />}
+        <main className={`flex-grow ${token && !location.pathname.includes("attempt-test") ? "pb-20 md:pb-0" : ""}`}>
+          <Suspense fallback={<div className="flex justify-center items-center min-h-[50vh] text-muted text-sm">Loading...</div>}>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/contact" element={<Contact />} />
@@ -297,20 +299,17 @@ function App() {
       </motion.div>
 
       {token && !location.pathname.includes("attempt-test") && (
-        <motion.div
-          initial={{ y: "100%" }} // Start from below the viewport
-          animate={{ y: "0%" }} // Slide up and fade in
-          transition={{ duration: 0.7, ease: "easeInOut" }} // Smooth animation
-          className="fixed bottom-0 w-full z-[999]"
-        >
+        <div className="md:hidden">
           <BottomBar />
-        </motion.div>
+        </div>
       )}
 
       <button
         onClick={() => window.scrollTo(0, 0)}
-        className={`bg-white hover:bg-gray-200 p-2 text-lg text-black rounded-2xl fixed left-3 z-10 transition-transform duration-500 ease-in-out ${showArrow ? "bottom-20" : "-bottom-24"
-          }`}
+        aria-label="Scroll to top"
+        className={`bg-solid hover:opacity-90 p-2.5 text-solid-fg rounded-full fixed left-3 z-40 shadow-lg transition-all duration-300 ${
+          showArrow ? "bottom-24 md:bottom-8 opacity-100" : "-bottom-16 opacity-0 pointer-events-none"
+        }`}
       >
         <HiArrowNarrowUp />
       </button>
