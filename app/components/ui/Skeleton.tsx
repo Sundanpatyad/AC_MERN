@@ -85,25 +85,42 @@ export function HomeSkeleton({ bannerHeight = 180 }: { bannerHeight?: number }) 
   return (
     <View>
       <View style={[styles.homeHeader, styles.hPad]}>
-        <View style={{ flex: 1, gap: 10 }}>
-          <Skeleton height={10} width={120} />
-          <Skeleton height={26} width="70%" />
-          <Skeleton height={14} width="50%" />
+        <View style={{ flex: 1, gap: 8 }}>
+          <Skeleton height={12} width={140} />
         </View>
-        <SkeletonCircle size={48} />
+        <SkeletonCircle size={32} />
+      </View>
+
+      <View style={[styles.hPad, { marginBottom: 16 }]}>
+        <Skeleton height={24} width="65%" style={{ marginBottom: 8 }} />
+        <Skeleton height={14} width="45%" />
       </View>
 
       <View style={styles.hPad}>
-        <Skeleton height={bannerHeight} borderRadius={Radii.lg} style={{ marginBottom: 12 }} />
-        <Skeleton height={48} borderRadius={Radii.pill} style={{ marginBottom: 24 }} />
-
-        <Skeleton height={18} width={110} style={{ marginBottom: 12 }} />
-        <View style={styles.block}>
+        <View style={[styles.block, { marginBottom: 14, paddingVertical: 14 }]}>
           <View style={styles.statsRow}>
-            <Skeleton height={64} style={{ flex: 1 }} borderRadius={Radii.md} />
-            <Skeleton height={64} style={{ flex: 1 }} borderRadius={Radii.md} />
-            <Skeleton height={64} style={{ flex: 1 }} borderRadius={Radii.md} />
+            <Skeleton height={36} style={{ flex: 1 }} borderRadius={Radii.sm} />
+            <Skeleton height={36} style={{ flex: 1 }} borderRadius={Radii.sm} />
+            <Skeleton height={36} style={{ flex: 1 }} borderRadius={Radii.sm} />
+            <Skeleton height={36} style={{ flex: 1 }} borderRadius={Radii.sm} />
           </View>
+        </View>
+
+        <View style={[styles.statsRow, { marginBottom: 20 }]}>
+          <Skeleton height={56} style={{ flex: 1 }} borderRadius={Radii.md} />
+          <Skeleton height={56} style={{ flex: 1 }} borderRadius={Radii.md} />
+        </View>
+        <View style={[styles.statsRow, { marginBottom: 20 }]}>
+          <Skeleton height={56} style={{ flex: 1 }} borderRadius={Radii.md} />
+          <Skeleton height={56} style={{ flex: 1 }} borderRadius={Radii.md} />
+        </View>
+
+        <Skeleton height={18} width={130} style={{ marginBottom: 12 }} />
+        <MockTestCardSkeleton />
+        <MockTestCardSkeleton />
+
+        <Skeleton height={18} width={120} style={{ marginTop: 20, marginBottom: 12 }} />
+        <View style={styles.block}>
           <Skeleton height={12} width={100} style={{ marginBottom: 12 }} />
           <View style={styles.chartRow}>
             {[40, 70, 55, 90, 60, 75].map((h, i) => (
@@ -112,24 +129,19 @@ export function HomeSkeleton({ bannerHeight = 180 }: { bannerHeight?: number }) 
           </View>
         </View>
 
-        <Skeleton height={18} width={110} style={{ marginTop: 20, marginBottom: 12 }} />
-        <View style={styles.block}>
+        <Skeleton height={18} width={90} style={{ marginTop: 20, marginBottom: 12 }} />
+        <View style={[styles.block, { marginBottom: 16 }]}>
           <View style={styles.row}>
-            <SkeletonCircle size={48} />
+            <Skeleton height={40} width={40} borderRadius={12} />
             <View style={{ flex: 1, gap: 8 }}>
-              <Skeleton height={12} width={80} />
-              <Skeleton height={24} width={64} />
-            </View>
-            <View style={{ alignItems: 'flex-end', gap: 8, width: 90 }}>
-              <Skeleton height={12} width={70} />
-              <Skeleton height={10} width={90} />
+              <Skeleton height={14} width="55%" />
+              <Skeleton height={10} width="75%" />
             </View>
           </View>
         </View>
 
-        <Skeleton height={18} width={140} style={{ marginTop: 20, marginBottom: 12 }} />
-        <MockTestCardSkeleton />
-        <MockTestCardSkeleton />
+        <Skeleton height={18} width={80} style={{ marginBottom: 12 }} />
+        <Skeleton height={bannerHeight} borderRadius={Radii.lg} />
       </View>
     </View>
   );

@@ -1,5 +1,5 @@
 import { getToken, onMessage } from 'firebase/messaging';
-import { FIREBASE_VAPID_KEY, getFirebaseMessaging, initFirebaseAnalytics } from '../firebase/config';
+import { FIREBASE_VAPID_KEY, getFirebaseMessaging } from '../firebase/config';
 import { apiConnector } from './apiConnector';
 import { notificationEndpoints } from './apis';
 
@@ -69,8 +69,6 @@ export async function enablePushNotifications(authToken) {
       console.warn('[FCM] Push requires HTTPS or localhost');
       return null;
     }
-
-    initFirebaseAnalytics().catch(() => {});
 
     const permission =
       Notification.permission === 'granted'

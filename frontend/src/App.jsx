@@ -19,6 +19,11 @@ import TermsOfService from "./pages/Terms";
 import { useTokenExpiry } from "./hooks/useTokenExpiry";
 import { enablePushNotifications, listenForForegroundMessages } from "./services/pushNotifications";
 import { toast } from "react-hot-toast";
+import {
+  initGoogleAnalytics,
+  trackPageView,
+  setAnalyticsUserId,
+} from "./utils/analytics";
 
 // Lazy-loaded components
 const Navbar = lazy(() => import("./components/common/Navbar"));
@@ -96,6 +101,19 @@ function App() {
 
   // Check token expiry and auto-logout
   useTokenExpiry();
+
+  // Google Analytics 4
+  useEffect(() => {
+    initGoogleAnalytics();
+  }, []);
+
+  useEffect(() => {
+    trackPageView(`${location.pathname}${location.search}`);
+  }, [location.pathname, location.search]);
+
+  useEffect(() => {
+    setAnalyticsUserId(user?._id || null);
+  }, [user?._id]);
 
   // Register web push when the user has a session (login or refreshed page)
   useEffect(() => {
