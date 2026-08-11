@@ -208,20 +208,33 @@ export default function HomeScreen() {
           <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
         </TouchableOpacity>
 
+        {/* Analytics first so it's visible without scrolling past mocks */}
         <SectionHeading
-          title="Featured Tests"
-          rightText="See All"
-          onPressRight={() => router.push('/(tabs)/mock-tests')}
+          title="Analytics"
+          rightText="My Tests"
+          onPressRight={() => router.push('/(tabs)/my-tests')}
           style={styles.sectionHeader}
         />
 
-        <View style={styles.testsList}>
-          {featuredTests.length > 0 ? (
-            featuredTests.map((test: any) => <MockTestCard key={test._id} test={test} />)
-          ) : (
-            <Text style={styles.emptyText}>No tests available right now.</Text>
-          )}
-        </View>
+        <Card style={styles.analyticsCard}>
+          <View style={styles.statsRow}>
+            <View style={styles.statPill}>
+              <Text style={styles.statPillValue}>{analytics.testsTaken}</Text>
+              <Text style={styles.statPillLabel}>Attempts</Text>
+            </View>
+            <View style={styles.statPill}>
+              <Text style={styles.statPillValue}>{analytics.avgScore}%</Text>
+              <Text style={styles.statPillLabel}>Avg score</Text>
+            </View>
+            <View style={styles.statPill}>
+              <Text style={styles.statPillValue}>{analytics.bestScore}%</Text>
+              <Text style={styles.statPillLabel}>Best</Text>
+            </View>
+          </View>
+
+          <Text style={styles.chartTitle}>Recent scores</Text>
+          <ScoreBarChart data={analytics.chartData} height={150} />
+        </Card>
 
         <SectionHeading
           title="Your Rank"
@@ -270,33 +283,20 @@ export default function HomeScreen() {
           )}
         </Card>
 
-        {/* Analytics + graph */}
         <SectionHeading
-          title="Analytics"
-          rightText="My Tests"
-          onPressRight={() => router.push('/(tabs)/my-tests')}
+          title="Featured Tests"
+          rightText="See All"
+          onPressRight={() => router.push('/(tabs)/mock-tests')}
           style={styles.sectionHeader}
         />
 
-        <Card style={styles.analyticsCard}>
-          <View style={styles.statsRow}>
-            <View style={styles.statPill}>
-              <Text style={styles.statPillValue}>{analytics.testsTaken}</Text>
-              <Text style={styles.statPillLabel}>Attempts</Text>
-            </View>
-            <View style={styles.statPill}>
-              <Text style={styles.statPillValue}>{analytics.avgScore}%</Text>
-              <Text style={styles.statPillLabel}>Avg score</Text>
-            </View>
-            <View style={styles.statPill}>
-              <Text style={styles.statPillValue}>{analytics.bestScore}%</Text>
-              <Text style={styles.statPillLabel}>Best</Text>
-            </View>
-          </View>
-
-          <Text style={styles.chartTitle}>Recent scores</Text>
-          <ScoreBarChart data={analytics.chartData} height={150} />
-        </Card>
+        <View style={styles.testsList}>
+          {featuredTests.length > 0 ? (
+            featuredTests.map((test: any) => <MockTestCard key={test._id} test={test} />)
+          ) : (
+            <Text style={styles.emptyText}>No tests available right now.</Text>
+          )}
+        </View>
           </>
         )}
       </ScrollView>

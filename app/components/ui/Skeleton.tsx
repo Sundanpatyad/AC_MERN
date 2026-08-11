@@ -99,21 +99,6 @@ export function HomeSkeleton({ bannerHeight = 180 }: { bannerHeight?: number }) 
 
         <Skeleton height={18} width={110} style={{ marginBottom: 12 }} />
         <View style={styles.block}>
-          <View style={styles.row}>
-            <SkeletonCircle size={48} />
-            <View style={{ flex: 1, gap: 8 }}>
-              <Skeleton height={12} width={80} />
-              <Skeleton height={24} width={64} />
-            </View>
-            <View style={{ alignItems: 'flex-end', gap: 8, width: 90 }}>
-              <Skeleton height={12} width={70} />
-              <Skeleton height={10} width={90} />
-            </View>
-          </View>
-        </View>
-
-        <Skeleton height={18} width={110} style={{ marginTop: 20, marginBottom: 12 }} />
-        <View style={styles.block}>
           <View style={styles.statsRow}>
             <Skeleton height={64} style={{ flex: 1 }} borderRadius={Radii.md} />
             <Skeleton height={64} style={{ flex: 1 }} borderRadius={Radii.md} />
@@ -124,6 +109,21 @@ export function HomeSkeleton({ bannerHeight = 180 }: { bannerHeight?: number }) 
             {[40, 70, 55, 90, 60, 75].map((h, i) => (
               <Skeleton key={i} height={h} width={28} borderRadius={Radii.sm} />
             ))}
+          </View>
+        </View>
+
+        <Skeleton height={18} width={110} style={{ marginTop: 20, marginBottom: 12 }} />
+        <View style={styles.block}>
+          <View style={styles.row}>
+            <SkeletonCircle size={48} />
+            <View style={{ flex: 1, gap: 8 }}>
+              <Skeleton height={12} width={80} />
+              <Skeleton height={24} width={64} />
+            </View>
+            <View style={{ alignItems: 'flex-end', gap: 8, width: 90 }}>
+              <Skeleton height={12} width={70} />
+              <Skeleton height={10} width={90} />
+            </View>
           </View>
         </View>
 

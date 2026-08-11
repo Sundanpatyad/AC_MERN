@@ -2,6 +2,7 @@ import ChangeProfilePicture from "./ChangeProfilePicture"
 import DeleteAccount from "./DeleteAccount"
 import EditProfile from "./EditProfile"
 import UpdatePassword from "./UpdatePassword"
+import NotificationPreferences from "./NotificationPreferences"
 
 export default function Settings() {
   return (
@@ -15,6 +16,8 @@ export default function Settings() {
       <EditProfile />
       {/* Password */}
       <UpdatePassword />
+      {/* Notification preferences (web + sync with app) */}
+      <NotificationPreferences />
       {/* Delete Account */}
       <DeleteAccount />
     </>

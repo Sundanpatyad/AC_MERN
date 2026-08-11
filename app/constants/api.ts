@@ -33,4 +33,6 @@ export const endpoints = {
   // Push notifications (FCM)
   REGISTER_FCM_TOKEN: `${BASE_URL}/api/v1/notifications/register`,
   UNREGISTER_FCM_TOKEN: `${BASE_URL}/api/v1/notifications/unregister`,
+  GET_NOTIFICATION_PREFS: `${BASE_URL}/api/v1/notifications/prefs`,
+  UPDATE_NOTIFICATION_PREFS: `${BASE_URL}/api/v1/notifications/prefs`,
 };

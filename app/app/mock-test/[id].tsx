@@ -1,5 +1,12 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Alert } from 'react-native';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import RazorpayCheckout from 'react-native-razorpay';
@@ -9,12 +16,16 @@ import { apiConnector } from '../../services/api';
 import { endpoints } from '../../constants/api';
 import { Button } from '../../components/ui/Button';
 import { DetailSkeleton } from '../../components/ui/Skeleton';
+import { AppPalette, Radii } from '../../constants/theme';
+import { useTheme } from '../../providers/AppThemeProvider';
 
 export default function MockTestDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const { user } = useAuthStore();
-  
+  const { colors, isDark } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const [testDetails, setTestDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -53,7 +64,7 @@ export default function MockTestDetailScreen() {
       try {
         const response = await apiConnector.post(`${endpoints.ENROLL_MOCK_TEST}/${id}`);
         if (response.data?.success) {
-          fetchDetails(); // Refresh details to show Enrolled status
+          fetchDetails();
         }
       } catch {
         // enrollment failed
@@ -61,7 +72,6 @@ export default function MockTestDetailScreen() {
         setIsProcessing(false);
       }
     } else {
-      // Handle Razorpay Payment
       handlePayment();
     }
   };
@@ -69,9 +79,10 @@ export default function MockTestDetailScreen() {
   const handlePayment = async () => {
     setIsProcessing(true);
     try {
-      // 1. Create order
-      const orderResponse = await apiConnector.post(endpoints.CAPTURE_MOCK_PAYMENT, { itemId: id });
-      
+      const orderResponse = await apiConnector.post(endpoints.CAPTURE_MOCK_PAYMENT, {
+        itemId: id,
+      });
+
       if (!orderResponse.data?.success) {
         throw new Error(orderResponse.data?.message || 'Failed to create order');
       }
@@ -85,7 +96,6 @@ export default function MockTestDetailScreen() {
         throw new Error('Invalid payment order from server');
       }
 
-      // Must use the same key that created the order on the backend
       const options = {
         description: `Purchase ${testDetails.seriesName}`,
         image: 'https://ac-62i9.onrender.com/assets/Logo/rzp_logo.png',
@@ -99,40 +109,35 @@ export default function MockTestDetailScreen() {
           name: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
           contact: user?.additionalDetails?.contactNumber || '',
         },
-        theme: { color: '#000000' },
+        theme: { color: isDark ? '#000000' : '#111111' },
       };
 
-      console.log('[Payment] Opening Razorpay', {
-        keyPrefix: String(razorpayKey).slice(0, 12),
-        orderId,
-        amount,
-      });
-
-      // Open Razorpay
       if (!RazorpayCheckout || !RazorpayCheckout.open) {
-        console.error('Razorpay module is not available. Ensure you are running on a Development Build and not Expo Go.');
+        console.error(
+          'Razorpay module is not available. Ensure you are running on a Development Build and not Expo Go.'
+        );
         setIsProcessing(false);
         return;
       }
 
-      // Open Razorpay
-      RazorpayCheckout.open(options).then(async (data: any) => {
-        try {
-          const verifyRes = await apiConnector.post(endpoints.VERIFY_MOCK_PAYMENT, {
-            razorpay_order_id: data.razorpay_order_id,
-            razorpay_payment_id: data.razorpay_payment_id,
-            razorpay_signature: data.razorpay_signature,
-          });
-          if (verifyRes.data?.success) {
-            fetchDetails();
+      RazorpayCheckout.open(options)
+        .then(async (data: any) => {
+          try {
+            const verifyRes = await apiConnector.post(endpoints.VERIFY_MOCK_PAYMENT, {
+              razorpay_order_id: data.razorpay_order_id,
+              razorpay_payment_id: data.razorpay_payment_id,
+              razorpay_signature: data.razorpay_signature,
+            });
+            if (verifyRes.data?.success) {
+              fetchDetails();
+            }
+          } catch {
+            // verification failed; payment may still have gone through
           }
-        } catch {
-          // verification failed; payment may still have gone through
-        }
-      }).catch((error: any) => {
-        console.log('[Razorpay Error]', error);
-      });
-
+        })
+        .catch((error: any) => {
+          console.log('[Razorpay Error]', error);
+        });
     } catch (error: any) {
       console.error('Payment Error:', error);
     } finally {
@@ -151,7 +156,7 @@ export default function MockTestDetailScreen() {
   if (!testDetails) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <Text style={{ color: '#fff' }}>Test not found.</Text>
+        <Text style={{ color: colors.text }}>Test not found.</Text>
         <Button title="Go Back" onPress={() => router.back()} style={{ marginTop: 20 }} />
       </View>
     );
@@ -165,7 +170,7 @@ export default function MockTestDetailScreen() {
             <Image source={{ uri: testDetails.thumbnail }} style={styles.image} />
           ) : (
             <View style={styles.placeholderImage}>
-              <Ionicons name="book" size={60} color="#333" />
+              <Ionicons name="book" size={60} color={colors.textMuted} />
             </View>
           )}
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
@@ -175,7 +180,7 @@ export default function MockTestDetailScreen() {
 
         <View style={styles.content}>
           <Text style={styles.title}>{testDetails.seriesName}</Text>
-          
+
           <View style={styles.metaInfo}>
             <View style={styles.metaItem}>
               <Ionicons name="book-outline" size={20} color="#3b82f6" />
@@ -183,7 +188,9 @@ export default function MockTestDetailScreen() {
             </View>
             <View style={styles.metaItem}>
               <Ionicons name="people-outline" size={20} color="#10b981" />
-              <Text style={styles.metaText}>{testDetails.studentsEnrolled?.length || 0} Enrolled</Text>
+              <Text style={styles.metaText}>
+                {testDetails.studentsEnrolled?.length || 0} Enrolled
+              </Text>
             </View>
             <View style={styles.metaItem}>
               <Ionicons name="cash-outline" size={20} color="#f59e0b" />
@@ -206,16 +213,16 @@ export default function MockTestDetailScreen() {
                     {test.duration} mins • {test.questions?.length || 0} questions
                   </Text>
                 </View>
-                
-                {(isEnrolled || testDetails.price === 0) ? (
-                  <TouchableOpacity 
+
+                {isEnrolled || testDetails.price === 0 ? (
+                  <TouchableOpacity
                     style={styles.startButton}
                     onPress={() => handleStartTest(test._id)}
                   >
                     <Text style={styles.startButtonText}>Start</Text>
                   </TouchableOpacity>
                 ) : (
-                  <Ionicons name="lock-closed" size={20} color="#666" />
+                  <Ionicons name="lock-closed" size={20} color={colors.textMuted} />
                 )}
               </View>
             ))}
@@ -223,11 +230,10 @@ export default function MockTestDetailScreen() {
         </View>
       </ScrollView>
 
-      {/* Bottom Action Bar */}
       <View style={styles.actionBar}>
         {isEnrolled || testDetails.price === 0 ? (
-          <Button 
-            title="Start Learning" 
+          <Button
+            title="Start Learning"
             onPress={() => handleStartTest(testDetails.mockTests?.[0]?._id)}
             disabled={!testDetails.mockTests?.length}
             style={styles.actionButton}
@@ -238,9 +244,9 @@ export default function MockTestDetailScreen() {
               <Text style={styles.priceLabel}>Price</Text>
               <Text style={styles.priceValue}>₹{testDetails.price}</Text>
             </View>
-            <Button 
-              title="Buy Now" 
-              onPress={handleEnroll} 
+            <Button
+              title="Buy Now"
+              onPress={handleEnroll}
               isLoading={isProcessing}
               style={[styles.actionButton, { flex: 1, marginLeft: 20 }]}
             />
@@ -251,151 +257,153 @@ export default function MockTestDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#080808',
-  },
-  centered: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  scrollContent: {
-    paddingBottom: 100, // Make room for action bar
-  },
-  imageContainer: {
-    width: '100%',
-    aspectRatio: 16 / 9,
-    backgroundColor: '#1a1a1a',
-    position: 'relative',
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-  },
-  placeholderImage: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  backButton: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  content: {
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 16,
-  },
-  metaInfo: {
-    flexDirection: 'row',
-    gap: 16,
-    marginBottom: 24,
-    flexWrap: 'wrap',
-  },
-  metaItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: '#121212',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#222',
-  },
-  metaText: {
-    color: '#e4e4e7',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 12,
-    marginTop: 8,
-  },
-  description: {
-    fontSize: 15,
-    color: '#a1a1aa',
-    lineHeight: 24,
-    marginBottom: 24,
-  },
-  testList: {
-    gap: 12,
-  },
-  testItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#121212',
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#222',
-  },
-  testItemInfo: {
-    flex: 1,
-  },
-  testItemTitle: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  testItemMeta: {
-    color: '#a1a1aa',
-    fontSize: 12,
-  },
-  startButton: {
-    backgroundColor: '#3b82f6',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  startButtonText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  actionBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#121212',
-    padding: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#222',
-  },
-  actionButton: {
-    marginVertical: 0,
-  },
-  buyContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  priceLabel: {
-    color: '#a1a1aa',
-    fontSize: 12,
-  },
-  priceValue: {
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-});
+function createStyles(colors: AppPalette) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    centered: {
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    scrollContent: {
+      paddingBottom: 100,
+    },
+    imageContainer: {
+      width: '100%',
+      aspectRatio: 16 / 9,
+      backgroundColor: colors.surfaceRaised,
+      position: 'relative',
+    },
+    image: {
+      width: '100%',
+      height: '100%',
+    },
+    placeholderImage: {
+      width: '100%',
+      height: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    backButton: {
+      position: 'absolute',
+      top: 40,
+      left: 20,
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    content: {
+      padding: 20,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 16,
+    },
+    metaInfo: {
+      flexDirection: 'row',
+      gap: 16,
+      marginBottom: 24,
+      flexWrap: 'wrap',
+    },
+    metaItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      backgroundColor: colors.surface,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: Radii.pill,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    metaText: {
+      color: colors.text,
+      fontSize: 14,
+      fontWeight: '500',
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 12,
+      marginTop: 8,
+    },
+    description: {
+      fontSize: 15,
+      color: colors.textSecondary,
+      lineHeight: 24,
+      marginBottom: 24,
+    },
+    testList: {
+      gap: 12,
+    },
+    testItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: colors.surface,
+      padding: 16,
+      borderRadius: Radii.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    testItemInfo: {
+      flex: 1,
+    },
+    testItemTitle: {
+      color: colors.text,
+      fontSize: 16,
+      fontWeight: '600',
+      marginBottom: 4,
+    },
+    testItemMeta: {
+      color: colors.textSecondary,
+      fontSize: 12,
+    },
+    startButton: {
+      backgroundColor: '#3b82f6',
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: Radii.pill,
+    },
+    startButtonText: {
+      color: '#fff',
+      fontSize: 12,
+      fontWeight: 'bold',
+    },
+    actionBar: {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: colors.surface,
+      padding: 20,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    actionButton: {
+      marginVertical: 0,
+    },
+    buyContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    priceLabel: {
+      color: colors.textSecondary,
+      fontSize: 12,
+    },
+    priceValue: {
+      color: colors.text,
+      fontSize: 24,
+      fontWeight: 'bold',
+    },
+  });
+}

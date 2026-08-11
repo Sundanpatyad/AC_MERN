@@ -90,6 +90,12 @@ const userSchema = new mongoose.Schema(
         updatedAt: { type: Date, default: Date.now },
       },
     ],
+    notificationPrefs: {
+      pushEnabled: { type: Boolean, default: true },
+      testReminders: { type: Boolean, default: true },
+      rankUpdates: { type: Boolean, default: true },
+      promotions: { type: Boolean, default: false },
+    },
   },
   { timestamps: true }
 );

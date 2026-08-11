@@ -15,6 +15,7 @@ const AttemptMockTest = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { token } = useSelector((state) => state.auth);
+    const { user } = useSelector((state) => state.profile);
 
     const [currentTest, setCurrentTest] = useState(null);
     const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -59,10 +60,24 @@ const AttemptMockTest = () => {
         };
     }, [mockId]);
 
-    // Initial Data Load logic
+    // Initial Data Load logic — always verify purchase/enrollment before starting
     useEffect(() => {
+        const canAccessSeries = (series) => {
+            if (!series) return false;
+            if (Number(series.price) === 0) return true;
+            if (!user?._id) return false;
+            return (series.studentsEnrolled || []).some(
+                (id) => String(id?._id || id) === String(user._id)
+            );
+        };
+
+        const redirectToDetails = () => {
+            localStorage.removeItem(`mockTestProgress_${mockId}`);
+            toast.error("Please purchase this mock test to continue");
+            navigate(`/mock-test/${mockId}`, { replace: true });
+        };
+
         const loadValidSession = () => {
-            // 1. Check Location State (passed from Selection View)
             if (location.state?.testData) {
                 const test = location.state.testData;
                 setCurrentTest(test);
@@ -77,12 +92,10 @@ const AttemptMockTest = () => {
         };
 
         const restoreSession = () => {
-            // 2. Check LocalStorage
             const savedProgress = localStorage.getItem(`mockTestProgress_${mockId}`);
             if (savedProgress) {
                 try {
                     const parsedProgress = JSON.parse(savedProgress);
-                    // Verify it matches current testId
                     if (parsedProgress && parsedProgress.testId === testId) {
                         setCurrentTest({
                             _id: parsedProgress.testId,
@@ -107,17 +120,21 @@ const AttemptMockTest = () => {
         };
 
         const fetchAndStart = async () => {
-            // 3. Last Resort: Fetch fresh (user refreshed on start without saving, or link shared)
             try {
                 setLoading(true);
                 const response = await axios.get(`${GET_MCOKTEST_SERIES_BY_ID}/${mockId}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 const series = response.data.data;
+
+                if (!canAccessSeries(series)) {
+                    redirectToDetails();
+                    return;
+                }
+
                 const test = series.mockTests.find(t => t._id === testId);
 
                 if (test) {
-                    // Shuffle questions for freshness if forced to reload
                     const shuffledQuestions = [...test.questions];
                     for (let i = shuffledQuestions.length - 1; i > 0; i--) {
                         const j = Math.floor(Math.random() * (i + 1));
@@ -132,23 +149,52 @@ const AttemptMockTest = () => {
                     setSkippedQuestions([]);
                 } else {
                     toast.error("Test not found");
-                    navigate(`/view-mock/${mockId}`);
+                    navigate(`/mock-test/${mockId}`, { replace: true });
                 }
                 setLoading(false);
             } catch (error) {
                 console.error("Error fetching test", error);
                 toast.error("Failed to load test");
-                navigate(`/view-mock/${mockId}`);
+                navigate(`/mock-test/${mockId}`, { replace: true });
             }
         };
 
-        // Execution Order
-        if (!loadValidSession()) {
-            if (!restoreSession()) {
-                fetchAndStart();
+        const bootstrap = async () => {
+            // Always verify access when opening via URL / refresh / shared link
+            try {
+                setLoading(true);
+                const response = await axios.get(`${GET_MCOKTEST_SERIES_BY_ID}/${mockId}`, {
+                    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+                });
+                const series = response.data.data;
+
+                if (!canAccessSeries(series)) {
+                    redirectToDetails();
+                    return;
+                }
+
+                if (!loadValidSession()) {
+                    if (!restoreSession()) {
+                        await fetchAndStart();
+                        return;
+                    }
+                }
+                setLoading(false);
+            } catch (error) {
+                console.error("Error verifying mock access", error);
+                // Fall back to previous flow if series fetch fails for enrolled users mid-test
+                if (!loadValidSession()) {
+                    if (!restoreSession()) {
+                        await fetchAndStart();
+                        return;
+                    }
+                }
+                setLoading(false);
             }
-        }
-    }, [mockId, testId, location.state, navigate, token, GET_MCOKTEST_SERIES_BY_ID]);
+        };
+
+        bootstrap();
+    }, [mockId, testId, location.state, navigate, token, user?._id, GET_MCOKTEST_SERIES_BY_ID]);
 
     // Persist Progress
     useEffect(() => {

@@ -17,7 +17,6 @@ export const studyMaterialEndPoints = {
 
 }
 
-
 export const endpoints = {
   SENDOTP_API: `${BASE_URL}/api/v1/auth/sendotp`,
   SIGNUP_API: `${BASE_URL}/api/v1/auth/signup`,
@@ -131,4 +130,6 @@ export const notificationEndpoints = {
   REGISTER_TOKEN: `${BASE_URL}/api/v1/notifications/register`,
   UNREGISTER_TOKEN: `${BASE_URL}/api/v1/notifications/unregister`,
   SEND_NOTIFICATION: `${BASE_URL}/api/v1/notifications/send`,
+  GET_PREFS: `${BASE_URL}/api/v1/notifications/prefs`,
+  UPDATE_PREFS: `${BASE_URL}/api/v1/notifications/prefs`,
 }

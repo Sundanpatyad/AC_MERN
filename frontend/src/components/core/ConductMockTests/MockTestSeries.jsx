@@ -10,6 +10,7 @@ import TestSelectionView from './components/TestSelectionView';
 const MockTestSeries = () => {
   const { mockId } = useParams();
   const { token } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.profile);
   const navigate = useNavigate();
   const [isPending, startTransition] = useTransition();
 
@@ -19,17 +20,36 @@ const MockTestSeries = () => {
 
   const { GET_MCOKTEST_SERIES_BY_ID } = mocktestEndpoints;
 
+  const canAccessSeries = (series) => {
+    if (!series) return false;
+    if (Number(series.price) === 0) return true;
+    if (!user?._id) return false;
+    return (series.studentsEnrolled || []).some(
+      (id) => String(id?._id || id) === String(user._id)
+    );
+  };
+
   useEffect(() => {
     fetchTestSeries();
-  }, [mockId]);
+  }, [mockId, user?._id]);
 
   const fetchTestSeries = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await axios.get(`${GET_MCOKTEST_SERIES_BY_ID}/${mockId}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });
-      setTestSeries(response.data.data);
+      const series = response.data.data;
+
+      // Shared /view-mock link: unpaid users go to purchase/detail page
+      if (!canAccessSeries(series)) {
+        toast.error("Please purchase this mock test to access tests");
+        navigate(`/mock-test/${mockId}`, { replace: true });
+        return;
+      }
+
+      setTestSeries(series);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching test series:', error);
@@ -40,6 +60,12 @@ const MockTestSeries = () => {
   };
 
   const startTest = (test) => {
+    if (!canAccessSeries(testSeries)) {
+      toast.error("Please purchase this mock test to continue");
+      navigate(`/mock-test/${mockId}`, { replace: true });
+      return;
+    }
+
     // Determine shuffled questions beforehand so we pass consistent state
     const shuffledQuestions = [...test.questions];
     for (let i = shuffledQuestions.length - 1; i > 0; i--) {

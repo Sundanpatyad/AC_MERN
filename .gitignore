@@ -25,3 +25,4 @@ dist-ssr
 .env
 *firebase-adminsdk*.json
 **/awakening-classes-firebase-adminsdk*.json
+.firebase-admin-env-oneline.txt

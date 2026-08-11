@@ -4,6 +4,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SettingsShell, SettingsCard, SettingsRow } from '../components/ui/SettingsShell';
 import { AppPalette } from '../constants/theme';
 import { useTheme } from '../providers/AppThemeProvider';
+import { apiConnector } from '../services/api';
+import { endpoints } from '../constants/api';
 
 const STORAGE_KEY = 'ac_notification_prefs';
 
@@ -32,13 +34,30 @@ export default function NotificationsScreen() {
       try {
         const raw = await AsyncStorage.getItem(STORAGE_KEY);
         if (raw) setPrefs({ ...DEFAULTS, ...JSON.parse(raw) });
+
+        const res = await apiConnector.get(endpoints.GET_NOTIFICATION_PREFS);
+        if (res?.data?.success && res.data.data) {
+          const merged = { ...DEFAULTS, ...res.data.data };
+          setPrefs(merged);
+          await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+        }
       } catch {
-        // ignore
+        // keep local prefs if offline
       } finally {
         setReady(true);
       }
     })();
   }, []);
+
+  const persist = async (next: Prefs) => {
+    setPrefs(next);
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    try {
+      await apiConnector.put(endpoints.UPDATE_NOTIFICATION_PREFS, next);
+    } catch {
+      // local save still applied
+    }
+  };
 
   const update = async (key: keyof Prefs, value: boolean) => {
     const next = { ...prefs, [key]: value };
@@ -57,11 +76,18 @@ export default function NotificationsScreen() {
         // Native push may be unavailable until a native rebuild
       }
     }
-    setPrefs(next);
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    await persist(next);
   };
 
-  const Toggle = ({ value, onChange, disabled }: { value: boolean; onChange: (v: boolean) => void; disabled?: boolean }) => (
+  const Toggle = ({
+    value,
+    onChange,
+    disabled,
+  }: {
+    value: boolean;
+    onChange: (v: boolean) => void;
+    disabled?: boolean;
+  }) => (
     <Switch
       value={value}
       onValueChange={onChange}
@@ -74,7 +100,8 @@ export default function NotificationsScreen() {
   return (
     <SettingsShell title="Notifications">
       <Text style={styles.hint}>
-        Control which alerts you receive from Awakening Classes. Preferences are saved on this device.
+        Control which alerts you receive from Awakening Classes. Preferences sync to your
+        account for web and mobile.
       </Text>
 
       <SettingsCard>

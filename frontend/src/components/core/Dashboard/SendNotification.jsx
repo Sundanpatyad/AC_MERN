@@ -2,11 +2,35 @@ import { useState } from "react"
 import { useSelector } from "react-redux"
 import { sendPushNotification } from "../../../services/operations/notificationAPI"
 
+const CATEGORIES = [
+  {
+    id: "testReminders",
+    label: "Test reminders",
+    hint: "Upcoming mocks and deadlines",
+  },
+  {
+    id: "rankUpdates",
+    label: "Rank updates",
+    hint: "Leaderboard position changes",
+  },
+  {
+    id: "promotions",
+    label: "Promotions",
+    hint: "Offers and new series",
+  },
+  {
+    id: "general",
+    label: "General",
+    hint: "Any user with push enabled",
+  },
+]
+
 export default function SendNotification() {
   const { token } = useSelector((state) => state.auth)
 
   const [title, setTitle] = useState("")
   const [body, setBody] = useState("")
+  const [category, setCategory] = useState("testReminders")
   const [target, setTarget] = useState("all") // 'all' | 'email'
   const [email, setEmail] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -20,8 +44,18 @@ export default function SendNotification() {
     try {
       const payload =
         target === "all"
-          ? { title: title.trim(), body: body.trim(), broadcast: true }
-          : { title: title.trim(), body: body.trim(), email: email.trim() }
+          ? {
+              title: title.trim(),
+              body: body.trim(),
+              broadcast: true,
+              category,
+            }
+          : {
+              title: title.trim(),
+              body: body.trim(),
+              email: email.trim(),
+              category,
+            }
 
       const result = await sendPushNotification(payload, token)
       if (result?.success) {
@@ -41,7 +75,8 @@ export default function SendNotification() {
           Send Notification
         </h1>
         <p className="mb-10 text-sm text-gray-400 text-center lg:text-left">
-          Push a message to all users with registered devices, or to one user by email.
+          Choose a type matching the toggles in the app/web notification settings.
+          Users who disabled that type will be skipped.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-8 max-w-2xl">
@@ -78,6 +113,33 @@ export default function SendNotification() {
                 placeholder="Write the notification message..."
                 className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-y"
               />
+            </div>
+
+            <div className="space-y-3">
+              <p className="block text-sm font-medium text-gray-200">Notification type</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {CATEGORIES.map((item) => (
+                  <label
+                    key={item.id}
+                    className={`cursor-pointer rounded-lg border px-4 py-3 transition-all ${
+                      category === item.id
+                        ? "border-blue-500 bg-blue-500/10 text-white"
+                        : "border-zinc-700 bg-zinc-800/60 text-gray-300 hover:border-zinc-500"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="category"
+                      value={item.id}
+                      checked={category === item.id}
+                      onChange={() => setCategory(item.id)}
+                      className="sr-only"
+                    />
+                    <span className="font-semibold">{item.label}</span>
+                    <span className="block text-xs text-gray-400 mt-1">{item.hint}</span>
+                  </label>
+                ))}
+              </div>
             </div>
 
             <div className="space-y-3">

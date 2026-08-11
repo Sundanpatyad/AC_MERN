@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -10,6 +10,8 @@ import { useAuthStore } from '../../store/authStore';
 import { Button } from '../../components/ui/Button';
 import { ConfirmationSheet } from '../../components/ui/ConfirmationSheet';
 import { DetailSkeleton } from '../../components/ui/Skeleton';
+import { AppPalette, Radii } from '../../constants/theme';
+import { useTheme } from '../../providers/AppThemeProvider';
 
 /** Normalise an option that may be a plain string (legacy) or {text, image} object — same as web. */
 const normaliseOption = (opt: any): { text: string; image: string } => {
@@ -21,6 +23,8 @@ export default function TakeTestScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const { user } = useAuthStore();
+  const { colors, isDark } = useTheme();
+  const styles = useMemo(() => createStyles(colors, isDark), [colors, isDark]);
   const { answers, setAnswer, clearAnswer, timeRemaining, setTimeRemaining, startTest, resetTest, isTestActive } = useTestStore();
 
   const [testData, setTestData] = useState<any>(null);
@@ -45,40 +49,57 @@ export default function TakeTestScreen() {
     try {
       const response = await apiConnector.get(endpoints.GET_ALL_MOCK_TESTS);
       if (response.data?.success) {
-        let foundTest = null;
+        let foundTest: any = null;
+        let parentSeries: any = null;
+
         for (const series of response.data.data) {
           const test = series.mockTests?.find((t: any) => t._id === id);
           if (test) {
             foundTest = { ...test, seriesId: series._id };
+            parentSeries = series;
             break;
           }
         }
-        
-        if (foundTest) {
-          // Shuffling logic
-          const questionsWithOriginalData = foundTest.questions.map((q: any) => {
-            // Shuffle options but keep track of their original content
-            const optionsToProcess = q.questionType === 'MATCH' ? q.options.slice(0, 4) : q.options;
-            const optionsWithOriginalIndex = optionsToProcess.map((opt: any, idx: number) => ({
-              content: opt,
-              originalIndex: idx
-            }));
-            const shuffledOptions = shuffle(optionsWithOriginalIndex);
-            return {
-              ...q,
-              shuffledOptions
-            };
-          });
 
-          const randomizedQuestions = shuffle(questionsWithOriginalData);
-          setTestData(foundTest);
-          setShuffledQuestions(randomizedQuestions);
-
-          if (!isTestActive) {
-            startTest(foundTest.duration);
-          }
-        } else {
+        if (!foundTest || !parentSeries) {
           router.back();
+          return;
+        }
+
+        // Gate: unpaid users must buy/enroll first via detail page
+        const price = Number(parentSeries.price) || 0;
+        const enrolledIds = (parentSeries.studentsEnrolled || []).map((e: any) =>
+          String(e?._id || e)
+        );
+        const isEnrolled = !!user?._id && enrolledIds.includes(String(user._id));
+        const canAccess = price === 0 || isEnrolled;
+
+        if (!canAccess) {
+          resetTest();
+          router.replace(`/mock-test/${parentSeries._id}`);
+          return;
+        }
+
+        const questionsWithOriginalData = foundTest.questions.map((q: any) => {
+          const optionsToProcess =
+            q.questionType === 'MATCH' ? q.options.slice(0, 4) : q.options;
+          const optionsWithOriginalIndex = optionsToProcess.map((opt: any, idx: number) => ({
+            content: opt,
+            originalIndex: idx,
+          }));
+          const shuffledOptions = shuffle(optionsWithOriginalIndex);
+          return {
+            ...q,
+            shuffledOptions,
+          };
+        });
+
+        const randomizedQuestions = shuffle(questionsWithOriginalData);
+        setTestData(foundTest);
+        setShuffledQuestions(randomizedQuestions);
+
+        if (!isTestActive) {
+          startTest(foundTest.duration);
         }
       }
     } catch (error) {
@@ -86,7 +107,7 @@ export default function TakeTestScreen() {
     } finally {
       setIsLoading(false);
     }
-  }, [id]);
+  }, [id, user?._id, isTestActive, resetTest, router, startTest]);
 
   useEffect(() => {
     fetchTest();
@@ -258,7 +279,7 @@ export default function TakeTestScreen() {
   if (!testData || !shuffledQuestions?.length) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <Text style={{ color: '#fff' }}>No questions available for this test.</Text>
+        <Text style={{ color: colors.text }}>No questions available for this test.</Text>
         <Button title="Go Back" onPress={() => router.back()} style={{ marginTop: 20 }} />
       </View>
     );
@@ -281,7 +302,7 @@ export default function TakeTestScreen() {
           </Text>
         </View>
         <View style={styles.timerContainer}>
-          <Ionicons name="time-outline" size={18} color="#f59e0b" />
+          <Ionicons name="time-outline" size={18} color={colors.warning} />
           <Text style={styles.timerText}>{formatTime(timeRemaining)}</Text>
         </View>
       </View>
@@ -481,293 +502,296 @@ export default function TakeTestScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#080808',
-  },
-  centered: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-    paddingTop: 56,
-    backgroundColor: '#050505',
-    borderBottomWidth: 1,
-    borderBottomColor: '#1a1a1a',
-    gap: 12,
-  },
-  headerTextWrap: {
-    flex: 1,
-    minWidth: 0,
-    maxWidth: 250,
-  },
-  testName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#fff',
-    marginBottom: 4,
-    letterSpacing: -0.2,
-  },
-  questionCount: {
-    fontSize: 11,
-    color: '#666',
-  },
-  timerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: 'rgba(245, 158, 11, 0.1)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(245, 158, 11, 0.3)',
-    flexShrink: 0,
-  },
-  timerText: {
-    color: '#f59e0b',
-    fontWeight: '700',
-    fontSize: 12,
-    fontVariant: ['tabular-nums'],
-  },
-  questionNav: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    backgroundColor: '#0f0f0f',
-    borderBottomWidth: 1,
-    borderBottomColor: '#1a1a1a',
-  },
-  dot: {
-    width: 26,
-    height: 26,
-    borderRadius: 8,
-    backgroundColor: '#1a1a1a',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 6,
-    borderWidth: 1,
-    borderColor: '#333',
-  },
-  dotAnswered: {
-    backgroundColor: 'rgba(59, 130, 246, 0.2)',
-    borderColor: '#3b82f6',
-  },
-  dotCurrent: {
-    backgroundColor: '#fff',
-    borderColor: '#fff',
-  },
-  dotText: {
-    color: '#666',
-    fontSize: 10,
-    fontWeight: '700',
-  },
-  dotTextActive: {
-    color: '#fff',
-  },
-  dotTextCurrent: {
-    color: '#000',
-  },
-  scrollContent: {
-    padding: 16,
-    paddingBottom: 24,
-  },
-  questionContainer: {
-    marginBottom: 20,
-  },
-  questionText: {
-    fontSize: 16,
-    color: '#fff',
-    lineHeight: 24,
-    marginBottom: 16,
-  },
-  questionImage: {
-    width: '100%',
-    height: 200,
-    borderRadius: 8,
-    marginTop: 8,
-  },
-  optionsContainer: {
-    gap: 10,
-  },
-  optionCard: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    backgroundColor: '#0f0f0f',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#1a1a1a',
-  },
-  optionCardSelected: {
-    borderColor: '#3b82f6',
-    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-  },
-  optionRadio: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    borderWidth: 1.5,
-    borderColor: '#666',
-    marginRight: 8,
-    marginTop: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  optionRadioSelected: {
-    borderColor: '#3b82f6',
-    backgroundColor: '#3b82f6',
-  },
-  optionRadioDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 2.5,
-    backgroundColor: '#fff',
-  },
-  optionLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#666',
-    marginRight: 8,
-    marginTop: 1,
-    width: 12,
-  },
-  optionLabelSelected: {
-    color: '#60a5fa',
-  },
-  optionTextContainer: {
-    flex: 1,
-    minWidth: 0,
-  },
-  optionText: {
-    color: '#d4d4d4',
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  optionTextSelected: {
-    color: '#fff',
-  },
-  optionImage: {
-    width: '100%',
-    height: 120,
-    borderRadius: 4,
-    marginBottom: 8,
-  },
-  matchContainer: {
-    flexDirection: 'row',
-    gap: 12,
-    marginTop: 20,
-  },
-  matchColumn: {
-    flex: 1,
-    gap: 8,
-  },
-  matchHeader: {
-    paddingBottom: 4,
-    borderBottomWidth: 1,
-    marginBottom: 4,
-    alignSelf: 'flex-start',
-  },
-  matchHeaderText: {
-    fontSize: 10,
-    fontWeight: '700',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  matchItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 8,
-    backgroundColor: '#0f0f0f',
-    padding: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#1a1a1a',
-  },
-  matchBadge: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 2,
-  },
-  matchBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-  },
-  matchItemText: {
-    flex: 1,
-    color: '#ccc',
-    fontSize: 12,
-    lineHeight: 18,
-  },
-  footer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 16,
-    paddingTop: 6,
-    paddingBottom: 20,
-    backgroundColor: '#050505',
-    borderTopWidth: 1,
-    borderTopColor: '#1a1a1a',
-  },
-  footerBtn: {
-    height: 28,
-    borderRadius: 6,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 8,
-  },
-  footerBtnSide: {
-    flex: 1,
-    backgroundColor: '#141414',
-    borderWidth: 1,
-    borderColor: '#2a2a2a',
-  },
-  footerBtnSkip: {
-    backgroundColor: 'transparent',
-    borderColor: '#333',
-  },
-  footerBtnPrimary: {
-    flex: 1.4,
-    backgroundColor: '#fff',
-    borderWidth: 0,
-  },
-  footerBtnSubmit: {
-    backgroundColor: '#10b981',
-  },
-  footerBtnDisabled: {
-    backgroundColor: '#0d0d0d',
-    borderColor: '#1a1a1a',
-  },
-  footerBtnText: {
-    color: '#e5e5e5',
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  footerBtnTextMuted: {
-    color: '#888',
-  },
-  footerBtnTextDisabled: {
-    color: '#444',
-  },
-  footerBtnTextPrimary: {
-    color: '#000',
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  footerBtnTextSubmit: {
-    color: '#fff',
-    fontSize: 11,
-    fontWeight: '700',
-  },
-});
+function createStyles(colors: AppPalette, isDark: boolean) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    centered: {
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingBottom: 12,
+      paddingTop: 56,
+      backgroundColor: colors.backgroundElevated,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      gap: 12,
+    },
+    headerTextWrap: {
+      flex: 1,
+      minWidth: 0,
+      maxWidth: 250,
+    },
+    testName: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 4,
+      letterSpacing: -0.2,
+    },
+    questionCount: {
+      fontSize: 11,
+      color: colors.textMuted,
+    },
+    timerContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      backgroundColor: 'rgba(245, 158, 11, 0.12)',
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: 'rgba(245, 158, 11, 0.35)',
+      flexShrink: 0,
+    },
+    timerText: {
+      color: colors.warning,
+      fontWeight: '700',
+      fontSize: 12,
+      fontVariant: ['tabular-nums'],
+    },
+    questionNav: {
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+      backgroundColor: colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    dot: {
+      width: 26,
+      height: 26,
+      borderRadius: 8,
+      backgroundColor: colors.surfaceRaised,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 6,
+      borderWidth: 1,
+      borderColor: colors.borderStrong,
+    },
+    dotAnswered: {
+      backgroundColor: 'rgba(59, 130, 246, 0.2)',
+      borderColor: '#3b82f6',
+    },
+    dotCurrent: {
+      backgroundColor: colors.text,
+      borderColor: colors.text,
+    },
+    dotText: {
+      color: colors.textMuted,
+      fontSize: 10,
+      fontWeight: '700',
+    },
+    dotTextActive: {
+      color: isDark ? '#fff' : '#111',
+    },
+    dotTextCurrent: {
+      color: isDark ? '#000' : '#fff',
+    },
+    scrollContent: {
+      padding: 16,
+      paddingBottom: 24,
+    },
+    questionContainer: {
+      marginBottom: 20,
+    },
+    questionText: {
+      fontSize: 16,
+      color: colors.text,
+      lineHeight: 24,
+      marginBottom: 16,
+    },
+    questionImage: {
+      width: '100%',
+      height: 200,
+      borderRadius: Radii.md,
+      marginTop: 8,
+    },
+    optionsContainer: {
+      gap: 10,
+    },
+    optionCard: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      paddingVertical: 10,
+      paddingHorizontal: 10,
+      backgroundColor: colors.surface,
+      borderRadius: Radii.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    optionCardSelected: {
+      borderColor: '#3b82f6',
+      backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    },
+    optionRadio: {
+      width: 16,
+      height: 16,
+      borderRadius: 8,
+      borderWidth: 1.5,
+      borderColor: colors.textMuted,
+      marginRight: 8,
+      marginTop: 2,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    optionRadioSelected: {
+      borderColor: '#3b82f6',
+      backgroundColor: '#3b82f6',
+    },
+    optionRadioDot: {
+      width: 5,
+      height: 5,
+      borderRadius: 2.5,
+      backgroundColor: '#fff',
+    },
+    optionLabel: {
+      fontSize: 11,
+      fontWeight: '700',
+      color: colors.textMuted,
+      marginRight: 8,
+      marginTop: 1,
+      width: 12,
+    },
+    optionLabelSelected: {
+      color: '#60a5fa',
+    },
+    optionTextContainer: {
+      flex: 1,
+      minWidth: 0,
+    },
+    optionText: {
+      color: colors.textSecondary,
+      fontSize: 13,
+      lineHeight: 18,
+    },
+    optionTextSelected: {
+      color: colors.text,
+    },
+    optionImage: {
+      width: '100%',
+      height: 120,
+      borderRadius: 4,
+      marginBottom: 8,
+    },
+    matchContainer: {
+      flexDirection: 'row',
+      gap: 12,
+      marginTop: 20,
+    },
+    matchColumn: {
+      flex: 1,
+      gap: 8,
+    },
+    matchHeader: {
+      paddingBottom: 4,
+      borderBottomWidth: 1,
+      marginBottom: 4,
+      alignSelf: 'flex-start',
+    },
+    matchHeaderText: {
+      fontSize: 10,
+      fontWeight: '700',
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      borderRadius: 4,
+    },
+    matchItem: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      gap: 8,
+      backgroundColor: colors.surface,
+      padding: 10,
+      borderRadius: Radii.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    matchBadge: {
+      width: 20,
+      height: 20,
+      borderRadius: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 2,
+    },
+    matchBadgeText: {
+      fontSize: 10,
+      fontWeight: '700',
+    },
+    matchItemText: {
+      flex: 1,
+      color: colors.textSecondary,
+      fontSize: 12,
+      lineHeight: 18,
+    },
+    footer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      paddingHorizontal: 16,
+      paddingTop: 6,
+      paddingBottom: 20,
+      backgroundColor: colors.backgroundElevated,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    footerBtn: {
+      height: 28,
+      borderRadius: 6,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 8,
+    },
+    footerBtnSide: {
+      flex: 1,
+      backgroundColor: colors.surfaceRaised,
+      borderWidth: 1,
+      borderColor: colors.borderStrong,
+    },
+    footerBtnSkip: {
+      backgroundColor: 'transparent',
+      borderColor: colors.borderStrong,
+    },
+    footerBtnPrimary: {
+      flex: 1.4,
+      backgroundColor: colors.accent,
+      borderWidth: 0,
+    },
+    footerBtnSubmit: {
+      backgroundColor: colors.success,
+    },
+    footerBtnDisabled: {
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
+      opacity: 0.6,
+    },
+    footerBtnText: {
+      color: colors.text,
+      fontSize: 11,
+      fontWeight: '600',
+    },
+    footerBtnTextMuted: {
+      color: colors.textMuted,
+    },
+    footerBtnTextDisabled: {
+      color: colors.textMuted,
+    },
+    footerBtnTextPrimary: {
+      color: colors.primaryButtonText,
+      fontSize: 11,
+      fontWeight: '700',
+    },
+    footerBtnTextSubmit: {
+      color: '#fff',
+      fontSize: 11,
+      fontWeight: '700',
+    },
+  });
+}
