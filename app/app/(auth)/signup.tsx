@@ -8,7 +8,6 @@ import {
   ScrollView,
 } from 'react-native';
 import { Link, useRouter } from 'expo-router';
-import Toast from 'react-native-toast-message';
 
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
@@ -36,12 +35,10 @@ export default function SignupScreen() {
     const { firstName, lastName, email, password, confirmPassword } = formData;
 
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      Toast.show({ type: 'error', text1: 'Please fill all fields' });
       return;
     }
 
     if (password !== confirmPassword) {
-      Toast.show({ type: 'error', text1: 'Passwords do not match' });
       return;
     }
 
@@ -53,19 +50,12 @@ export default function SignupScreen() {
       });
 
       if (response.data.success) {
-        Toast.show({ type: 'success', text1: 'OTP Sent Successfully' });
         router.push({
           pathname: '/(auth)/verify-email',
           params: { ...formData, accountType: 'Student' },
         });
-      } else {
-        Toast.show({ type: 'error', text1: response.data.message });
       }
     } catch (error: any) {
-      Toast.show({
-        type: 'error',
-        text1: error.response?.data?.message || 'Failed to send OTP',
-      });
     } finally {
       setIsLoading(false);
     }
@@ -150,10 +140,7 @@ export default function SignupScreen() {
                 setIsLoading(false);
 
                 if (result.success) {
-                  Toast.show({ type: 'success', text1: 'Google Signup Successful' });
                   router.replace('/(tabs)');
-                } else {
-                  Toast.show({ type: 'error', text1: result.message });
                 }
               }}
               variant="secondary"

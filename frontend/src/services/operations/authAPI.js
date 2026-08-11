@@ -6,7 +6,11 @@ import { setUser } from "../../slices/profileSlice"
 import { apiConnector } from "../apiConnector"
 import { endpoints } from "../apis"
 import { loadGapiInsideDOM } from "gapi-script";
-import { setStoredToken, removeStoredToken } from "../../utils/tokenStorage"
+import { setStoredToken, removeStoredToken, getStoredToken } from "../../utils/tokenStorage"
+import {
+  enablePushNotifications,
+  disablePushNotifications,
+} from "../pushNotifications"
 
 
 const {
@@ -165,6 +169,7 @@ export function login(email, password, navigate) {
       dispatch(setUser({ ...response.data.user, image: userImage }));
       setStoredToken(response.data?.token);
       localStorage.setItem("user", JSON.stringify({ ...response.data.user, image: userImage }));
+      enablePushNotifications(response.data?.token);
 
       navigate("/dashboard/my-profile");
     } catch (error) {
@@ -281,7 +286,10 @@ export function resetPassword(password, confirmPassword, token, navigate) {
 
 // ================ Logout ================
 export function logout(navigate) {
-  return (dispatch) => {
+  return async (dispatch) => {
+    const authToken = getStoredToken()
+    await disablePushNotifications(authToken)
+
     dispatch(setToken(null))
     dispatch(setUser(null))
     dispatch(resetCart())
@@ -327,6 +335,7 @@ export const googleLogin = (credential, navigate) => {
       dispatch(setUser({ ...userData, image: userImage }));
       setStoredToken(token);
       localStorage.setItem("user", JSON.stringify({ ...userData, image: userImage }));
+      enablePushNotifications(token);
       toast.dismiss(toastId)
       toast.success('Login Successful , Enjoy The Experience', {
         style: {

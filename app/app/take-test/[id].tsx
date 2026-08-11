@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import Toast from 'react-native-toast-message';
 
 import { apiConnector } from '../../services/api';
 import { endpoints } from '../../constants/api';
@@ -79,13 +78,11 @@ export default function TakeTestScreen() {
             startTest(foundTest.duration);
           }
         } else {
-          Toast.show({ type: 'error', text1: 'Test not found' });
           router.back();
         }
       }
     } catch (error) {
       console.error('Failed to fetch test:', error);
-      Toast.show({ type: 'error', text1: 'Failed to load test' });
     } finally {
       setIsLoading(false);
     }
@@ -237,7 +234,6 @@ export default function TakeTestScreen() {
       
       if (response.data?.success) {
         resetTest();
-        Toast.show({ type: 'success', text1: 'Test Submitted Successfully' });
         router.replace({
           pathname: '/test-result',
           params: { attemptData: JSON.stringify(attemptData) }
@@ -247,7 +243,6 @@ export default function TakeTestScreen() {
       }
     } catch (error: any) {
       console.error('Submission error:', error);
-      Toast.show({ type: 'error', text1: error.message || 'Failed to submit test' });
       setIsSubmitting(false);
     }
   };

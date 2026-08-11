@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Link, useRouter, useLocalSearchParams } from 'expo-router';
-import Toast from 'react-native-toast-message';
 
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
@@ -29,17 +28,14 @@ export default function UpdatePasswordScreen() {
 
   const handleUpdatePassword = async () => {
     if (!token) {
-      Toast.show({ type: 'error', text1: 'Please provide the reset token' });
       return;
     }
 
     if (!password || !confirmPassword) {
-      Toast.show({ type: 'error', text1: 'Please fill all password fields' });
       return;
     }
 
     if (password !== confirmPassword) {
-      Toast.show({ type: 'error', text1: 'Passwords do not match' });
       return;
     }
 
@@ -52,16 +48,9 @@ export default function UpdatePasswordScreen() {
       });
 
       if (response.data.success) {
-        Toast.show({ type: 'success', text1: 'Password reset successfully' });
         router.replace('/(auth)/login');
-      } else {
-        Toast.show({ type: 'error', text1: response.data.message });
       }
     } catch (error: any) {
-      Toast.show({ 
-        type: 'error', 
-        text1: error.response?.data?.message || 'Failed to update password' 
-      });
     } finally {
       setIsLoading(false);
     }

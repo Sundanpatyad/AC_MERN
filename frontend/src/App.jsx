@@ -17,6 +17,8 @@ import PrivacyPolicy from "./pages/PrivicyPolicy";
 // import CookiePolicy from "./pages/CookiePolicy";
 import TermsOfService from "./pages/Terms";
 import { useTokenExpiry } from "./hooks/useTokenExpiry";
+import { enablePushNotifications, listenForForegroundMessages } from "./services/pushNotifications";
+import { toast } from "react-hot-toast";
 
 // Lazy-loaded components
 const Navbar = lazy(() => import("./components/common/Navbar"));
@@ -44,6 +46,9 @@ const EditCourse = lazy(() =>
   import("./components/core/Dashboard/EditCourse/EditCourse")
 );
 const Instructor = lazy(() => import("./components/core/Dashboard/Instructor"));
+const SendNotification = lazy(() =>
+  import("./components/core/Dashboard/SendNotification")
+);
 const Cart = lazy(() => import("./components/core/Dashboard/Cart/Cart"));
 const EnrolledCourses = lazy(() =>
   import("./components/core/Dashboard/EnrolledCourses")
@@ -91,6 +96,32 @@ function App() {
 
   // Check token expiry and auto-logout
   useTokenExpiry();
+
+  // Register web push when the user has a session (login or refreshed page)
+  useEffect(() => {
+    if (!token) return;
+
+    let unsubscribe = () => {};
+
+    enablePushNotifications(token).then(async (fcmToken) => {
+      if (!fcmToken) return;
+      unsubscribe = await listenForForegroundMessages((payload) => {
+        const title = payload?.notification?.title || "Awakening Classes";
+        const body = payload?.notification?.body || "";
+        toast(`${title}${body ? `: ${body}` : ""}`, {
+          style: {
+            borderRadius: "10px",
+            background: "#333",
+            color: "#fff",
+          },
+        });
+      });
+    });
+
+    return () => {
+      if (typeof unsubscribe === "function") unsubscribe();
+    };
+  }, [token]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -263,6 +294,10 @@ function App() {
                     <Route
                       path="dashboard/edit-mock-test-series/:seriesId"
                       element={<EditMockTestSeries />}
+                    />
+                    <Route
+                      path="dashboard/send-notification"
+                      element={<SendNotification />}
                     />
                     <Route
                       path="/createStudyMaterial"

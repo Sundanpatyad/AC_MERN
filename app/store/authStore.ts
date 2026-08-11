@@ -44,6 +44,12 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
   setLoading: (isLoading) => set({ isLoading }),
   logout: async () => {
+    try {
+      const { disablePushNotifications } = await import('../services/pushNotifications');
+      await disablePushNotifications();
+    } catch {
+      // Native push may be unavailable in Expo Go / unrebuilt clients
+    }
     set({ token: null, user: null });
     await SecureStore.deleteItemAsync('token');
     await AsyncStorage.removeItem('user');

@@ -4,7 +4,6 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useMemo, useState } from 'react';
 import 'react-native-reanimated';
-import Toast from 'react-native-toast-message';
 
 import { useAuthStore } from '../store/authStore';
 import { useThemeStore } from '../store/themeStore';
@@ -47,6 +46,14 @@ function RootNavigator() {
     }
   }, [token, segments, isLoading, isReady, router]);
 
+  // Register FCM device token once the user is authenticated
+  useEffect(() => {
+    if (!token || isLoading || !isReady) return;
+    import('../services/pushNotifications')
+      .then(({ enablePushNotifications }) => enablePushNotifications())
+      .catch(() => {});
+  }, [token, isLoading, isReady]);
+
   const navigationTheme = useMemo(
     () => ({
       ...(isDark ? DarkTheme : DefaultTheme),
@@ -80,7 +87,6 @@ function RootNavigator() {
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style={colors.statusBarStyle} />
-      <Toast />
     </ThemeProvider>
   );
 }

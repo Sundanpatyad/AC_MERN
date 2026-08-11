@@ -28,6 +28,7 @@
     "clsx": "^2.1.1",
     "concurrently": "^8.2.1",
     "copy-to-clipboard": "^3.3.3",
+    "firebase": "^12.17.1",
     "framer-motion": "^10.18.0",
     "fusioncharts": "^4.0.2",
     "gapi-script": "^1.2.0",

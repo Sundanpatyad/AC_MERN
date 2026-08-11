@@ -9,7 +9,6 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { Link, useRouter } from 'expo-router';
-import Toast from 'react-native-toast-message';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Input } from '../../components/ui/Input';
@@ -33,7 +32,6 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Toast.show({ type: 'error', text1: 'Please fill all fields' });
       return;
     }
 
@@ -53,16 +51,9 @@ export default function LoginScreen() {
         await setToken(token);
         await setUser({ ...user, image: userImage });
 
-        Toast.show({ type: 'success', text1: 'Login Successful' });
         router.replace('/(tabs)');
-      } else {
-        Toast.show({ type: 'error', text1: response.data.message || 'Login failed' });
       }
     } catch (error: any) {
-      Toast.show({
-        type: 'error',
-        text1: error.response?.data?.message || 'Something went wrong',
-      });
     } finally {
       setIsLoading(false);
     }
@@ -134,10 +125,7 @@ export default function LoginScreen() {
                     setIsLoading(false);
 
                     if (result.success) {
-                      Toast.show({ type: 'success', text1: 'Google Login Successful' });
                       router.replace('/(tabs)');
-                    } else {
-                      Toast.show({ type: 'error', text1: result.message });
                     }
                   }}
                   disabled={isLoading}

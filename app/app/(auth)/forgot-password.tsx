@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Link, useRouter } from 'expo-router';
-import Toast from 'react-native-toast-message';
 
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
@@ -21,7 +20,6 @@ export default function ForgotPasswordScreen() {
 
   const handleResetPassword = async () => {
     if (!email) {
-      Toast.show({ type: 'error', text1: 'Please enter your email' });
       return;
     }
 
@@ -34,23 +32,15 @@ export default function ForgotPasswordScreen() {
 
       if (response.data.success) {
         if (response.data.token) {
-          Toast.show({ type: 'success', text1: 'Bypassing email... redirecting' });
           router.push({
             pathname: '/(auth)/update-password',
             params: { token: response.data.token }
           });
         } else {
           setEmailSent(true);
-          Toast.show({ type: 'success', text1: 'Reset Email Sent' });
         }
-      } else {
-        Toast.show({ type: 'error', text1: response.data.message });
       }
     } catch (error: any) {
-      Toast.show({
-        type: 'error',
-        text1: error.response?.data?.message || 'Failed to send reset email'
-      });
     } finally {
       setIsLoading(false);
     }

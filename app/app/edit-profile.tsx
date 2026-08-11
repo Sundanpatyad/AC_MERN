@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import Toast from 'react-native-toast-message';
 import { SettingsShell, SettingsCard } from '../components/ui/SettingsShell';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
@@ -72,7 +71,6 @@ export default function EditProfileScreen() {
 
   const handleSave = async () => {
     if (!form.firstName.trim() || !form.lastName.trim()) {
-      Toast.show({ type: 'error', text1: 'First and last name are required' });
       return;
     }
 
@@ -92,15 +90,9 @@ export default function EditProfileScreen() {
             _id: updated._id || user?._id || '',
           });
         }
-        Toast.show({ type: 'success', text1: 'Profile updated' });
-      } else {
-        Toast.show({ type: 'error', text1: res.data?.message || 'Update failed' });
       }
-    } catch (error: any) {
-      Toast.show({
-        type: 'error',
-        text1: error.response?.data?.message || 'Failed to update profile',
-      });
+    } catch {
+      // ignore
     } finally {
       setIsSaving(false);
     }

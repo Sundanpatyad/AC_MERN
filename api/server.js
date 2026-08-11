@@ -17,6 +17,8 @@ const chatRoutes = require("./routes/chatRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const materialRoutes = require('./routes/studyMaterialsRoutes');
 const uploadRoutes = require('./routes/upload');
+const notificationRoutes = require('./routes/notifications');
+const { initFirebaseAdmin } = require('./config/firebase');
 
 const app = express();
 
@@ -30,32 +32,15 @@ app.use(express.urlencoded({ limit: '15mb', extended: true }));
 
 app.use(cookieParser());
 
-// CORS — website + local Vite + mobile (native apps often send no Origin)
-const ALLOWED_ORIGINS = new Set([
-  'http://localhost:5173',
-  'http://127.0.0.1:5173',
-  'http://localhost:3000',
-  'https://awakeningclasses.in',
-  'http://awakeningclasses.in',
-  'https://www.awakeningclasses.in',
-  'http://www.awakeningclasses.in',
-  'https://awakeningclasses.vercel.app',
-]);
-
+// Allow all origins
 app.use(
   cors({
-    origin: (origin, cb) => {
-      // Mobile apps / Postman / server-to-server: no Origin header
-      if (!origin) return cb(null, true);
-      if (ALLOWED_ORIGINS.has(origin)) return cb(null, true);
-      return cb(new Error(`CORS blocked for origin: ${origin}`));
-    },
-    credentials: true,
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
-app.options('*', cors());
+app.options('*', cors({ origin: '*' }));
 
 // File uploads
 app.use(fileUpload({
@@ -72,6 +57,7 @@ app.use(fileUpload({
 
 connectDB();
 cloudinaryConnect();
+initFirebaseAdmin();
 
 /* =========================
    ROUTES
@@ -86,6 +72,7 @@ app.use('/api/v1/chats', chatRoutes);
 app.use('/api/v1/materials', materialRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/upload', uploadRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
 
 /* =========================
    HEALTH / DEFAULT ROUTE

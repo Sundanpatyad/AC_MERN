@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, Switch } from 'react-native';
+import { Text, StyleSheet, Switch } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Toast from 'react-native-toast-message';
 import { SettingsShell, SettingsCard, SettingsRow } from '../components/ui/SettingsShell';
 import { AppPalette } from '../constants/theme';
 import { useTheme } from '../providers/AppThemeProvider';
@@ -43,14 +42,23 @@ export default function NotificationsScreen() {
 
   const update = async (key: keyof Prefs, value: boolean) => {
     const next = { ...prefs, [key]: value };
-    if (key === 'pushEnabled' && !value) {
-      next.testReminders = false;
-      next.rankUpdates = false;
-      next.promotions = false;
+    if (key === 'pushEnabled') {
+      try {
+        const push = await import('../services/pushNotifications');
+        if (!value) {
+          next.testReminders = false;
+          next.rankUpdates = false;
+          next.promotions = false;
+          await push.disablePushNotifications();
+        } else {
+          await push.enablePushNotifications();
+        }
+      } catch {
+        // Native push may be unavailable until a native rebuild
+      }
     }
     setPrefs(next);
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-    Toast.show({ type: 'success', text1: 'Preferences saved' });
   };
 
   const Toggle = ({ value, onChange, disabled }: { value: boolean; onChange: (v: boolean) => void; disabled?: boolean }) => (

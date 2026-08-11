@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import Toast from 'react-native-toast-message';
 import RazorpayCheckout from 'react-native-razorpay';
 
 import { useAuthStore } from '../../store/authStore';
@@ -28,7 +27,6 @@ export default function MockTestDetailScreen() {
       }
     } catch (error) {
       console.error('Failed to fetch test details:', error);
-      Toast.show({ type: 'error', text1: 'Failed to load test details' });
     } finally {
       setIsLoading(false);
     }
@@ -46,7 +44,6 @@ export default function MockTestDetailScreen() {
 
   const handleEnroll = async () => {
     if (!user) {
-      Toast.show({ type: 'info', text1: 'Please login to enroll' });
       router.push('/(auth)/login');
       return;
     }
@@ -56,14 +53,10 @@ export default function MockTestDetailScreen() {
       try {
         const response = await apiConnector.post(`${endpoints.ENROLL_MOCK_TEST}/${id}`);
         if (response.data?.success) {
-          Toast.show({ type: 'success', text1: 'Enrolled successfully' });
           fetchDetails(); // Refresh details to show Enrolled status
         }
-      } catch (error: any) {
-        Toast.show({ 
-          type: 'error', 
-          text1: error.response?.data?.message || 'Failed to enroll' 
-        });
+      } catch {
+        // enrollment failed
       } finally {
         setIsProcessing(false);
       }
@@ -118,11 +111,6 @@ export default function MockTestDetailScreen() {
       // Open Razorpay
       if (!RazorpayCheckout || !RazorpayCheckout.open) {
         console.error('Razorpay module is not available. Ensure you are running on a Development Build and not Expo Go.');
-        Toast.show({ 
-          type: 'error', 
-          text1: 'Payment Module Error', 
-          text2: 'Razorpay is not correctly integrated. Use a native dev build.' 
-        });
         setIsProcessing(false);
         return;
       }
@@ -136,39 +124,17 @@ export default function MockTestDetailScreen() {
             razorpay_signature: data.razorpay_signature,
           });
           if (verifyRes.data?.success) {
-            Toast.show({ type: 'success', text1: 'Payment Successful' });
             fetchDetails();
-          } else {
-            Toast.show({
-              type: 'error',
-              text1: verifyRes.data?.message || 'Payment verification failed',
-            });
           }
-        } catch (verifyError: any) {
-          Toast.show({
-            type: 'error',
-            text1:
-              verifyError.response?.data?.message ||
-              'Paid, but verification failed. Contact support with payment ID.',
-          });
+        } catch {
+          // verification failed; payment may still have gone through
         }
       }).catch((error: any) => {
         console.log('[Razorpay Error]', error);
-        const errorDesc =
-          error?.description ||
-          error?.error?.description ||
-          error?.message ||
-          'User cancelled or payment failed';
-        Toast.show({ type: 'error', text1: `Payment Failed: ${errorDesc}` });
       });
 
     } catch (error: any) {
       console.error('Payment Error:', error);
-      const apiError = error.response?.data?.message || error.message || 'Payment processing failed';
-      Toast.show({ 
-        type: 'error', 
-        text1: apiError
-      });
     } finally {
       setIsProcessing(false);
     }

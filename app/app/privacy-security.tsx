@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Text, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import Toast from 'react-native-toast-message';
 import { SettingsShell, SettingsCard } from '../components/ui/SettingsShell';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
@@ -26,11 +25,9 @@ export default function PrivacySecurityScreen() {
 
   const handleChangePassword = async () => {
     if (!oldPassword || !newPassword || !confirmNewPassword) {
-      Toast.show({ type: 'error', text1: 'Fill all password fields' });
       return;
     }
     if (newPassword !== confirmNewPassword) {
-      Toast.show({ type: 'error', text1: 'New passwords do not match' });
       return;
     }
 
@@ -42,18 +39,12 @@ export default function PrivacySecurityScreen() {
         confirmNewPassword,
       });
       if (res.data?.success) {
-        Toast.show({ type: 'success', text1: 'Password updated' });
         setOldPassword('');
         setNewPassword('');
         setConfirmNewPassword('');
-      } else {
-        Toast.show({ type: 'error', text1: res.data?.message || 'Update failed' });
       }
-    } catch (error: any) {
-      Toast.show({
-        type: 'error',
-        text1: error.response?.data?.message || 'Failed to change password',
-      });
+    } catch {
+      // ignore
     } finally {
       setIsSaving(false);
     }
@@ -65,16 +56,10 @@ export default function PrivacySecurityScreen() {
       const res = await apiConnector.delete(endpoints.DELETE_PROFILE_API);
       if (res.data?.success) {
         await logout();
-        Toast.show({ type: 'success', text1: 'Account deleted' });
         router.replace('/(auth)/login');
-      } else {
-        Toast.show({ type: 'error', text1: res.data?.message || 'Delete failed' });
       }
-    } catch (error: any) {
-      Toast.show({
-        type: 'error',
-        text1: error.response?.data?.message || 'Failed to delete account',
-      });
+    } catch {
+      // ignore
     } finally {
       setIsDeleting(false);
       setShowDelete(false);

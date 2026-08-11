@@ -1,6 +1,5 @@
 import React from 'react';
 import { Text, StyleSheet } from 'react-native';
-import Toast from 'react-native-toast-message';
 import { SettingsShell, SettingsCard, SettingsRow } from '../components/ui/SettingsShell';
 import { ThemePreference } from '../constants/theme';
 import { useTheme } from '../providers/AppThemeProvider';
@@ -29,7 +28,6 @@ export default function AppearanceScreen() {
   const onSelect = async (value: ThemePreference) => {
     if (value === preference) return;
     await setPreference(value);
-    Toast.show({ type: 'success', text1: 'Appearance updated' });
   };
 
   return (

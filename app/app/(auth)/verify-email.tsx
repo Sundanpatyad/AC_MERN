@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import Toast from 'react-native-toast-message';
 
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
@@ -21,7 +20,6 @@ export default function VerifyEmailScreen() {
 
   const handleVerify = async () => {
     if (!otp) {
-      Toast.show({ type: 'error', text1: 'Please enter the OTP' });
       return;
     }
 
@@ -38,16 +36,9 @@ export default function VerifyEmailScreen() {
       });
 
       if (response.data.success) {
-        Toast.show({ type: 'success', text1: 'Account Created Successfully' });
         router.replace('/(auth)/login');
-      } else {
-        Toast.show({ type: 'error', text1: response.data.message });
       }
     } catch (error: any) {
-      Toast.show({ 
-        type: 'error', 
-        text1: error.response?.data?.message || 'Invalid OTP' 
-      });
     } finally {
       setIsLoading(false);
     }
@@ -55,19 +46,11 @@ export default function VerifyEmailScreen() {
 
   const handleResendOtp = async () => {
     try {
-      const response = await apiConnector.post(endpoints.SENDOTP_API, {
+      await apiConnector.post(endpoints.SENDOTP_API, {
         email: params.email,
         checkUserPresent: true,
       });
-
-      if (response.data.success) {
-        Toast.show({ type: 'success', text1: 'OTP Resent Successfully' });
-      }
     } catch (error: any) {
-      Toast.show({ 
-        type: 'error', 
-        text1: error.response?.data?.message || 'Failed to resend OTP' 
-      });
     }
   };
 

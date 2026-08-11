@@ -50,10 +50,10 @@ export const sidebarLinks = [
     icon: "VscHistory",
   },
   {
-    id: 6,
-    name: "Admin Control",
-    path: "/adminMockTest",
+    id: 7,
+    name: "Send Notification",
+    path: "/dashboard/send-notification",
     type: ACCOUNT_TYPE.INSTRUCTOR,
-    icon: "VscDashboard",
+    icon: "VscBell",
   },
 ];

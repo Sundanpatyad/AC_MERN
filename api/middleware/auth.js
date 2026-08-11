@@ -131,3 +131,24 @@ exports.isAdmin = (req, res, next) => {
 }
 
 
+// ================ IS ADMIN OR INSTRUCTOR ================
+exports.isAdminOrInstructor = (req, res, next) => {
+    try {
+        const type = req.user?.accountType;
+        if (type !== 'Admin' && type !== 'Instructor') {
+            return res.status(401).json({
+                success: false,
+                message: 'This page is protected for Admin or Instructor only',
+            });
+        }
+        next();
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            error: error.message,
+            message: 'Error while checking Admin/Instructor accountType',
+        });
+    }
+}
+
+
