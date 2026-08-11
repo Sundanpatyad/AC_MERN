@@ -1,16 +1,19 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../store/authStore';
-import { Button } from '../../components/ui/Button';
 import { ConfirmationSheet } from '../../components/ui/ConfirmationSheet';
 import { ScreenBackground } from '../../components/ui/ScreenBackground';
-import { Palette, Radii } from '../../constants/theme';
+import { ListRow } from '../../components/ui/ListRow';
+import { AppPalette, Radii } from '../../constants/theme';
+import { useTheme } from '../../providers/AppThemeProvider';
 
 export default function ProfileScreen() {
   const { user, logout } = useAuthStore();
   const router = useRouter();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [isLogoutSheetVisible, setIsLogoutSheetVisible] = React.useState(false);
 
   const handleLogout = async () => {
@@ -20,18 +23,24 @@ export default function ProfileScreen() {
 
   const menuItems = [
     { icon: 'person-outline', label: 'Edit Profile', route: '/edit-profile' },
+    { icon: 'color-palette-outline', label: 'Appearance', route: '/appearance' },
     { icon: 'notifications-outline', label: 'Notifications', route: '/notifications' },
     { icon: 'shield-checkmark-outline', label: 'Privacy & Security', route: '/privacy-security' },
     { icon: 'help-circle-outline', label: 'Help & Support', route: '/help-support' },
-    { icon: 'information-circle-outline', label: 'About', route: '/about' },
   ];
 
   return (
     <ScreenBackground>
       <View style={styles.header}>
-        <Text style={styles.title} numberOfLines={1}>
-          Profile
-        </Text>
+        <View style={styles.headerRow}>
+          <Text style={styles.title} numberOfLines={1}>
+            Profile
+          </Text>
+          <View style={styles.settingsTab}>
+            <Ionicons name="settings-outline" size={16} color={colors.textMuted} />
+            <Text style={styles.settingsTabText}>Settings</Text>
+          </View>
+        </View>
       </View>
 
       <ConfirmationSheet
@@ -68,31 +77,33 @@ export default function ProfileScreen() {
 
         <View style={styles.menuSection}>
           {menuItems.map((item, index) => (
-            <TouchableOpacity
+            <ListRow
               key={index}
-              style={styles.menuItem}
+              iconName={item.icon as any}
+              label={item.label}
               onPress={() => router.push(item.route as any)}
-            >
-              <View style={styles.menuItemLeft}>
-                <View style={styles.menuIcon}>
-                  <Ionicons name={item.icon as any} size={18} color={Palette.text} />
-                </View>
-                <Text style={styles.menuItemLabel} numberOfLines={1}>
-                  {item.label}
-                </Text>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color={Palette.textMuted} />
-            </TouchableOpacity>
+              style={[
+                styles.menuRow,
+                index === menuItems.length - 1
+                  ? { borderBottomWidth: 0 }
+                  : {
+                      borderBottomWidth: StyleSheet.hairlineWidth,
+                      borderBottomColor: colors.border,
+                    },
+              ]}
+            />
           ))}
-        </View>
 
-        <Button
-          title="Log Out"
-          onPress={() => setIsLogoutSheetVisible(true)}
-          variant="outline"
-          style={styles.logoutButton}
-          textStyle={{ color: Palette.danger }}
-        />
+          <ListRow
+            iconName="log-out-outline"
+            label="Log Out"
+            onPress={() => setIsLogoutSheetVisible(true)}
+            iconColor={colors.danger}
+            labelColor={colors.danger}
+            showChevron={false}
+            style={{ borderBottomWidth: 0 }}
+          />
+        </View>
 
         <Text style={styles.version}>Version 1.0.0</Text>
       </ScrollView>
@@ -100,99 +111,97 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  header: {
-    padding: 20,
-    paddingTop: 64,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: Palette.text,
-    letterSpacing: -0.4,
-  },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 32,
-  },
-  profileSection: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  avatar: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    marginBottom: 16,
-    backgroundColor: Palette.surfaceRaised,
-    borderWidth: 1,
-    borderColor: Palette.borderStrong,
-  },
-  name: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: Palette.text,
-    marginBottom: 4,
-  },
-  email: {
-    fontSize: 15,
-    color: Palette.textSecondary,
-    marginBottom: 14,
-  },
-  badge: {
-    backgroundColor: Palette.surfaceRaised,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: Radii.pill,
-    borderWidth: 1,
-    borderColor: Palette.borderStrong,
-  },
-  badgeText: {
-    color: Palette.text,
-    fontWeight: '700',
-    fontSize: 12,
-  },
-  menuSection: {
-    backgroundColor: Palette.surface,
-    borderRadius: Radii.lg,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: Palette.border,
-    marginBottom: 24,
-  },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Palette.border,
-  },
-  menuItemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  menuIcon: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: Palette.surfaceRaised,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  menuItemLabel: {
-    color: Palette.text,
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  logoutButton: {
-    borderColor: 'rgba(255,69,58,0.45)',
-  },
-  version: {
-    textAlign: 'center',
-    color: Palette.textMuted,
-    marginTop: 24,
-    fontSize: 12,
-  },
-});
+function createStyles(colors: AppPalette) {
+  return StyleSheet.create({
+    header: {
+      padding: 20,
+      paddingTop: 64,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 12,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: '700',
+      color: colors.text,
+      letterSpacing: -0.4,
+    },
+    settingsTab: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: Radii.pill,
+      backgroundColor: colors.surfaceRaised,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    settingsTabText: {
+      color: colors.textMuted,
+      fontSize: 13,
+      fontWeight: '700',
+    },
+    scrollContent: {
+      padding: 20,
+      paddingBottom: 32,
+    },
+    profileSection: {
+      alignItems: 'center',
+      marginBottom: 32,
+    },
+    avatar: {
+      width: 96,
+      height: 96,
+      borderRadius: 48,
+      marginBottom: 16,
+      backgroundColor: colors.surfaceRaised,
+      borderWidth: 1,
+      borderColor: colors.borderStrong,
+    },
+    name: {
+      fontSize: 24,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 4,
+    },
+    email: {
+      fontSize: 15,
+      color: colors.textSecondary,
+      marginBottom: 14,
+    },
+    badge: {
+      backgroundColor: colors.surfaceRaised,
+      paddingHorizontal: 14,
+      paddingVertical: 6,
+      borderRadius: Radii.pill,
+      borderWidth: 1,
+      borderColor: colors.borderStrong,
+    },
+    badgeText: {
+      color: colors.text,
+      fontWeight: '700',
+      fontSize: 12,
+    },
+    menuSection: {
+      backgroundColor: colors.surface,
+      borderRadius: Radii.lg,
+      overflow: 'hidden',
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: 24,
+    },
+    menuRow: {
+      borderRadius: 0,
+    },
+    version: {
+      textAlign: 'center',
+      color: colors.textMuted,
+      marginTop: 24,
+      fontSize: 12,
+    },
+  });
+}

@@ -1,16 +1,19 @@
-import React from 'react';
-import { Text, StyleSheet, Linking, TouchableOpacity, View } from 'react-native';
+import React, { useMemo } from 'react';
+import { Text, StyleSheet, Linking, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SettingsShell, SettingsCard, SettingsRow } from '../components/ui/SettingsShell';
-import { Palette, Radii } from '../constants/theme';
+import { AppPalette, Radii } from '../constants/theme';
+import { useTheme } from '../providers/AppThemeProvider';
 
 const SUPPORT_EMAIL = 'mailto:support@awakeningclasses.com';
 const WHATSAPP = 'https://whatsapp.com/channel/0029Van0bFDDDmFZjhOoX03N';
 const YOUTUBE = 'https://www.youtube.com/@awakeningclasses';
 const TELEGRAM = 'https://t.me/awakeningclasses3103';
-const WEBSITE = 'https://awakeningclasses.com';
+const WEBSITE = 'https://awakeningclasses.in';
 
 export default function HelpSupportScreen() {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const open = (url: string) => Linking.openURL(url).catch(() => {});
 
   return (
@@ -24,7 +27,7 @@ export default function HelpSupportScreen() {
           label="Email support"
           value="support@awakeningclasses.com"
           onPress={() => open(SUPPORT_EMAIL)}
-          right={<Ionicons name="mail-outline" size={18} color={Palette.textSecondary} />}
+          right={<Ionicons name="mail-outline" size={18} color={colors.textSecondary} />}
         />
         <SettingsRow
           label="WhatsApp"
@@ -36,20 +39,20 @@ export default function HelpSupportScreen() {
           label="Telegram"
           value="t.me/awakeningclasses3103"
           onPress={() => open(TELEGRAM)}
-          right={<Ionicons name="paper-plane-outline" size={18} color={Palette.textSecondary} />}
+          right={<Ionicons name="paper-plane-outline" size={18} color={colors.textSecondary} />}
         />
         <SettingsRow
           label="Website"
-          value="awakeningclasses.com"
+          value="awakeningclasses.in"
           onPress={() => open(WEBSITE)}
-          right={<Ionicons name="globe-outline" size={18} color={Palette.textSecondary} />}
+          right={<Ionicons name="globe-outline" size={18} color={colors.textSecondary} />}
         />
         <SettingsRow
           label="YouTube lectures"
           value="@awakeningclasses"
           last
           onPress={() => open(YOUTUBE)}
-          right={<Ionicons name="logo-youtube" size={18} color="#FF0000" />}
+          right={<Ionicons name="logo-youtube" size={18} color={colors.textSecondary} />}
         />
       </SettingsCard>
 
@@ -74,43 +77,45 @@ export default function HelpSupportScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  hint: {
-    color: Palette.textSecondary,
-    fontSize: 14,
-    lineHeight: 20,
-    marginBottom: 16,
-  },
-  sectionLabel: {
-    color: Palette.textSecondary,
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
-    marginBottom: 10,
-    marginTop: 8,
-  },
-  faqCard: {
-    backgroundColor: Palette.surface,
-    borderRadius: Radii.lg,
-    borderWidth: 1,
-    borderColor: Palette.border,
-    padding: 16,
-  },
-  faqQ: {
-    color: Palette.text,
-    fontSize: 15,
-    fontWeight: '700',
-    marginBottom: 6,
-  },
-  faqA: {
-    color: Palette.textSecondary,
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  divider: {
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: Palette.border,
-    marginVertical: 14,
-  },
-});
+function createStyles(colors: AppPalette) {
+  return StyleSheet.create({
+    hint: {
+      color: colors.textSecondary,
+      fontSize: 14,
+      lineHeight: 20,
+      marginBottom: 16,
+    },
+    sectionLabel: {
+      color: colors.textSecondary,
+      fontSize: 12,
+      fontWeight: '700',
+      letterSpacing: 0.6,
+      textTransform: 'uppercase',
+      marginBottom: 10,
+      marginTop: 8,
+    },
+    faqCard: {
+      backgroundColor: colors.surface,
+      borderRadius: Radii.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: 16,
+    },
+    faqQ: {
+      color: colors.text,
+      fontSize: 15,
+      fontWeight: '700',
+      marginBottom: 6,
+    },
+    faqA: {
+      color: colors.textSecondary,
+      fontSize: 14,
+      lineHeight: 20,
+    },
+    divider: {
+      height: StyleSheet.hairlineWidth,
+      backgroundColor: colors.border,
+      marginVertical: 14,
+    },
+  });
+}

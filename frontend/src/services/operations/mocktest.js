@@ -81,6 +81,7 @@ export const fetchAllMockTests = async (token) => {
   } catch (error) {
     //console.log("ALL Mocktest API ERROR............", error)
     toast.error(error.message, toastOptions)
+    return result
   }
 }
 

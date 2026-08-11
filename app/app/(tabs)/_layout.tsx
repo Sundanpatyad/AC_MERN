@@ -1,17 +1,29 @@
 import { Tabs } from 'expo-router';
+import { NativeTabs, Icon, Label } from 'expo-router/unstable-native-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { Platform, StyleSheet } from 'react-native';
-import { Palette } from '@/constants/theme';
+import { HapticTab } from '@/components/haptic-tab';
+import { useTheme } from '@/providers/AppThemeProvider';
 
-export default function TabLayout() {
+function AndroidTabLayout() {
+  const { colors } = useTheme();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarStyle: styles.tabBar,
-        tabBarActiveTintColor: Palette.text,
-        tabBarInactiveTintColor: Palette.textMuted,
-        tabBarLabelStyle: styles.tabLabel,
+        tabBarButton: HapticTab,
+        tabBarActiveTintColor: colors.text,
+        tabBarInactiveTintColor: colors.textMuted,
+        tabBarStyle: [
+          styles.androidTabBar,
+          {
+            backgroundColor: colors.backgroundElevated,
+            borderTopColor: colors.border,
+          },
+        ],
+        tabBarLabelStyle: styles.androidTabLabel,
+        tabBarItemStyle: styles.androidTabItem,
       }}
     >
       <Tabs.Screen
@@ -19,7 +31,7 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'home' : 'home-outline'} size={22} color={color} />
+            <Ionicons name={focused ? 'home' : 'home-outline'} size={20} color={color} />
           ),
         }}
       />
@@ -29,7 +41,7 @@ export default function TabLayout() {
         options={{
           title: 'Tests',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'list' : 'list-outline'} size={22} color={color} />
+            <Ionicons name={focused ? 'list' : 'list-outline'} size={20} color={color} />
           ),
         }}
       />
@@ -38,7 +50,7 @@ export default function TabLayout() {
         options={{
           title: 'My Tests',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'book' : 'book-outline'} size={22} color={color} />
+            <Ionicons name={focused ? 'book' : 'book-outline'} size={20} color={color} />
           ),
         }}
       />
@@ -47,7 +59,7 @@ export default function TabLayout() {
         options={{
           title: 'Rankings',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'trophy' : 'trophy-outline'} size={22} color={color} />
+            <Ionicons name={focused ? 'trophy' : 'trophy-outline'} size={20} color={color} />
           ),
         }}
       />
@@ -56,7 +68,7 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'person' : 'person-outline'} size={22} color={color} />
+            <Ionicons name={focused ? 'person' : 'person-outline'} size={20} color={color} />
           ),
         }}
       />
@@ -64,18 +76,65 @@ export default function TabLayout() {
   );
 }
 
+function IOSTabLayout() {
+  const { colors } = useTheme();
+
+  return (
+    <NativeTabs
+      minimizeBehavior="onScrollDown"
+      tintColor={colors.text}
+      labelStyle={{ color: colors.textSecondary }}
+    >
+      <NativeTabs.Trigger name="index">
+        <Icon sf={{ default: 'house', selected: 'house.fill' }} />
+        <Label>Home</Label>
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="mock-tests">
+        <Icon sf={{ default: 'list.bullet', selected: 'list.bullet' }} />
+        <Label>Tests</Label>
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="my-tests">
+        <Icon sf={{ default: 'book', selected: 'book.fill' }} />
+        <Label>My Tests</Label>
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="rankings">
+        <Icon sf={{ default: 'trophy', selected: 'trophy.fill' }} />
+        <Label>Rankings</Label>
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="profile">
+        <Icon sf={{ default: 'person', selected: 'person.fill' }} />
+        <Label>Profile</Label>
+      </NativeTabs.Trigger>
+    </NativeTabs>
+  );
+}
+
+export default function TabLayout() {
+  if (Platform.OS === 'ios') {
+    return <IOSTabLayout />;
+  }
+  return <AndroidTabLayout />;
+}
+
 const styles = StyleSheet.create({
-  tabBar: {
-    backgroundColor: Palette.backgroundElevated,
-    borderTopColor: Palette.border,
+  androidTabBar: {
     borderTopWidth: StyleSheet.hairlineWidth,
-    height: Platform.OS === 'ios' ? 84 : 60,
-    paddingBottom: Platform.OS === 'ios' ? 24 : 8,
-    paddingTop: 6,
+    height: 58,
+    paddingBottom: 6,
+    paddingTop: 4,
+    elevation: 8,
   },
-  tabLabel: {
+  androidTabLabel: {
     fontSize: 10,
     fontWeight: '600',
-    letterSpacing: 0.2,
+    letterSpacing: 0.15,
+    marginTop: 1,
+  },
+  androidTabItem: {
+    paddingVertical: 2,
   },
 });

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Text, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import Toast from 'react-native-toast-message';
@@ -9,11 +9,14 @@ import { ConfirmationSheet } from '../components/ui/ConfirmationSheet';
 import { apiConnector } from '../services/api';
 import { endpoints } from '../constants/api';
 import { useAuthStore } from '../store/authStore';
-import { Palette } from '../constants/theme';
+import { AppPalette } from '../constants/theme';
+import { useTheme } from '../providers/AppThemeProvider';
 
 export default function PrivacySecurityScreen() {
   const router = useRouter();
   const { logout } = useAuthStore();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
@@ -121,8 +124,8 @@ export default function PrivacySecurityScreen() {
         title={isDeleting ? 'Deleting...' : 'Delete Account'}
         onPress={() => setShowDelete(true)}
         variant="outline"
-        style={styles.deleteBtn}
-        textStyle={{ color: Palette.danger }}
+        style={{ borderColor: `${colors.danger}73` }}
+        textStyle={{ color: colors.danger }}
         disabled={isDeleting}
       />
 
@@ -139,26 +142,25 @@ export default function PrivacySecurityScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  sectionLabel: {
-    color: Palette.textSecondary,
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
-    marginBottom: 10,
-  },
-  formPad: {
-    padding: 14,
-    paddingTop: 8,
-  },
-  hint: {
-    color: Palette.textSecondary,
-    fontSize: 14,
-    lineHeight: 20,
-    marginBottom: 12,
-  },
-  deleteBtn: {
-    borderColor: 'rgba(255,69,58,0.45)',
-  },
-});
+function createStyles(colors: AppPalette) {
+  return StyleSheet.create({
+    sectionLabel: {
+      color: colors.textSecondary,
+      fontSize: 12,
+      fontWeight: '700',
+      letterSpacing: 0.6,
+      textTransform: 'uppercase',
+      marginBottom: 10,
+    },
+    formPad: {
+      padding: 14,
+      paddingTop: 8,
+    },
+    hint: {
+      color: colors.textSecondary,
+      fontSize: 14,
+      lineHeight: 20,
+      marginBottom: 12,
+    },
+  });
+}

@@ -19,10 +19,13 @@ import { apiConnector } from '../../services/api';
 import { endpoints } from '../../constants/api';
 import { MockTestCard } from '../../components/MockTestCard';
 import { ScreenBackground } from '../../components/ui/ScreenBackground';
+import { Card } from '../../components/ui/Card';
 import { ScoreBarChart } from '../../components/ui/ScoreBarChart';
 import { HomeSkeleton } from '../../components/ui/Skeleton';
 import { BrandLogo } from '../../components/ui/BrandLogo';
-import { Palette, Radii } from '../../constants/theme';
+import { AppPalette, Radii } from '../../constants/theme';
+import { useTheme } from '../../providers/AppThemeProvider';
+import { SectionHeading } from '../../components/ui/SectionHeading';
 
 const YOUTUBE_CHANNEL = 'https://www.youtube.com/@awakeningclasses';
 const RANK_STORY_URL = 'https://youtu.be/zZqPFZo8IUo?si=MbeDgOr_YtO9bH_x';
@@ -40,6 +43,8 @@ async function openExternal(url: string) {
 export default function HomeScreen() {
   const { user } = useAuthStore();
   const router = useRouter();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { width: screenWidth } = useWindowDimensions();
   const [featuredTests, setFeaturedTests] = useState([]);
   const [attempts, setAttempts] = useState<any[]>([]);
@@ -139,7 +144,11 @@ export default function HomeScreen() {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#fff" />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.refreshTint}
+          />
         }
       >
         {isLoading ? (
@@ -157,9 +166,18 @@ export default function HomeScreen() {
             </Text>
             <Text style={styles.subtitle}>Ready to practice today?</Text>
           </View>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{user?.firstName?.[0]}</Text>
-          </View>
+          <Pressable
+            onPress={() => router.push('/(tabs)/profile')}
+            accessibilityRole="button"
+            accessibilityLabel="Open profile"
+            style={({ pressed }) => [styles.avatar, pressed && { opacity: 0.85 }]}
+          >
+            {user?.image ? (
+              <Image source={{ uri: user.image }} style={styles.avatarImage} />
+            ) : (
+              <Text style={styles.avatarText}>{user?.firstName?.[0]}</Text>
+            )}
+          </Pressable>
         </View>
 
         <Pressable
@@ -185,23 +203,37 @@ export default function HomeScreen() {
           activeOpacity={0.85}
           onPress={() => openExternal(YOUTUBE_CHANNEL)}
         >
-          <Ionicons name="logo-youtube" size={20} color="#FF0000" />
+          <Ionicons name="logo-youtube" size={20} color={colors.textSecondary} />
           <Text style={styles.lecturesRowText}>Watch lectures on YouTube</Text>
-          <Ionicons name="chevron-forward" size={16} color={Palette.textMuted} />
+          <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
         </TouchableOpacity>
 
-        {/* Rank */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Your Rank</Text>
-          <Text style={styles.seeAll} onPress={() => router.push('/(tabs)/rankings')}>
-            Leaderboard
-          </Text>
+        <SectionHeading
+          title="Featured Tests"
+          rightText="See All"
+          onPressRight={() => router.push('/(tabs)/mock-tests')}
+          style={styles.sectionHeader}
+        />
+
+        <View style={styles.testsList}>
+          {featuredTests.length > 0 ? (
+            featuredTests.map((test: any) => <MockTestCard key={test._id} test={test} />)
+          ) : (
+            <Text style={styles.emptyText}>No tests available right now.</Text>
+          )}
         </View>
 
-        <View style={styles.rankCard}>
+        <SectionHeading
+          title="Your Rank"
+          rightText="Leaderboard"
+          onPressRight={() => router.push('/(tabs)/rankings')}
+          style={styles.sectionHeader}
+        />
+
+        <Card style={styles.rankCard}>
           <View style={styles.rankHero}>
             <View style={styles.rankIcon}>
-              <Ionicons name="trophy" size={22} color={Palette.warning} />
+              <Ionicons name="trophy" size={22} color={colors.textSecondary} />
             </View>
             <View style={styles.rankHeroText}>
               <Text style={styles.rankLabel}>Current rank</Text>
@@ -236,17 +268,17 @@ export default function HomeScreen() {
               ))}
             </View>
           )}
-        </View>
+        </Card>
 
         {/* Analytics + graph */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Analytics</Text>
-          <Text style={styles.seeAll} onPress={() => router.push('/(tabs)/my-tests')}>
-            My Tests
-          </Text>
-        </View>
+        <SectionHeading
+          title="Analytics"
+          rightText="My Tests"
+          onPressRight={() => router.push('/(tabs)/my-tests')}
+          style={styles.sectionHeader}
+        />
 
-        <View style={styles.analyticsCard}>
+        <Card style={styles.analyticsCard}>
           <View style={styles.statsRow}>
             <View style={styles.statPill}>
               <Text style={styles.statPillValue}>{analytics.testsTaken}</Text>
@@ -264,22 +296,7 @@ export default function HomeScreen() {
 
           <Text style={styles.chartTitle}>Recent scores</Text>
           <ScoreBarChart data={analytics.chartData} height={150} />
-        </View>
-
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Featured Tests</Text>
-          <Text style={styles.seeAll} onPress={() => router.push('/(tabs)/mock-tests')}>
-            See All
-          </Text>
-        </View>
-
-        <View style={styles.testsList}>
-          {featuredTests.length > 0 ? (
-            featuredTests.map((test: any) => <MockTestCard key={test._id} test={test} />)
-          ) : (
-            <Text style={styles.emptyText}>No tests available right now.</Text>
-          )}
-        </View>
+        </Card>
           </>
         )}
       </ScrollView>
@@ -287,249 +304,245 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  scrollContent: {
-    paddingTop: 64,
-    paddingBottom: 32,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-    paddingHorizontal: 20,
-  },
-  headerText: {
-    flex: 1,
-    paddingRight: 12,
-  },
-  brandRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
-  },
-  brand: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: Palette.textSecondary,
-    letterSpacing: 1.2,
-    textTransform: 'uppercase',
-  },
-  greeting: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: Palette.text,
-    marginBottom: 4,
-    letterSpacing: -0.4,
-  },
-  subtitle: {
-    fontSize: 15,
-    color: Palette.textSecondary,
-  },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: Palette.surfaceRaised,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Palette.borderStrong,
-  },
-  avatarText: {
-    color: Palette.text,
-    fontSize: 17,
-    fontWeight: '700',
-  },
-  heroBanner: {
-    alignSelf: 'center',
-    backgroundColor: '#BFE4F8',
-    overflow: 'hidden',
-    borderRadius: Radii.lg,
-    borderWidth: 1,
-    borderColor: Palette.border,
-  },
-  lecturesRow: {
-    marginTop: 12,
-    marginHorizontal: 20,
-    marginBottom: 8,
-    height: 48,
-    borderRadius: Radii.pill,
-    backgroundColor: Palette.surface,
-    borderWidth: 1,
-    borderColor: Palette.border,
-    paddingHorizontal: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  lecturesRowText: {
-    flex: 1,
-    color: Palette.text,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 12,
-    paddingHorizontal: 20,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: Palette.text,
-    letterSpacing: -0.3,
-  },
-  seeAll: {
-    color: Palette.text,
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  rankCard: {
-    marginHorizontal: 20,
-    backgroundColor: Palette.surface,
-    borderRadius: Radii.lg,
-    borderWidth: 1,
-    borderColor: Palette.border,
-    padding: 16,
-    overflow: 'hidden',
-  },
-  rankHero: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  rankIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: Palette.surfaceRaised,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: Palette.border,
-  },
-  rankHeroText: {
-    flex: 1,
-  },
-  rankLabel: {
-    color: Palette.textSecondary,
-    fontSize: 12,
-    fontWeight: '600',
-    marginBottom: 2,
-  },
-  rankValue: {
-    color: Palette.text,
-    fontSize: 28,
-    fontWeight: '700',
-    letterSpacing: -0.5,
-  },
-  rankMeta: {
-    alignItems: 'flex-end',
-    maxWidth: '40%',
-  },
-  rankMetaScore: {
-    color: Palette.text,
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  rankMetaTest: {
-    color: Palette.textMuted,
-    fontSize: 11,
-    marginTop: 2,
-    textAlign: 'right',
-  },
-  topList: {
-    marginTop: 16,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: Palette.border,
-    paddingTop: 12,
-    gap: 10,
-  },
-  topRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  topRank: {
-    width: 36,
-    color: Palette.textSecondary,
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  topName: {
-    flex: 1,
-    color: Palette.text,
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  topScore: {
-    color: Palette.text,
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  analyticsCard: {
-    marginHorizontal: 20,
-    backgroundColor: Palette.surface,
-    borderRadius: Radii.lg,
-    borderWidth: 1,
-    borderColor: Palette.border,
-    padding: 16,
-    overflow: 'hidden',
-  },
-  statsRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 18,
-  },
-  statPill: {
-    flex: 1,
-    backgroundColor: Palette.surfaceRaised,
-    borderRadius: Radii.md,
-    borderWidth: 1,
-    borderColor: Palette.border,
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    alignItems: 'center',
-  },
-  statPillValue: {
-    color: Palette.text,
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 2,
-  },
-  statPillLabel: {
-    color: Palette.textSecondary,
-    fontSize: 11,
-    fontWeight: '500',
-  },
-  chartTitle: {
-    color: Palette.textSecondary,
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 0.4,
-    textTransform: 'uppercase',
-    marginBottom: 10,
-  },
-  testsList: {
-    gap: 4,
-    paddingBottom: 20,
-    paddingHorizontal: 20,
-  },
-  loadingText: {
-    color: Palette.textMuted,
-    textAlign: 'center',
-    marginTop: 20,
-    fontSize: 13,
-  },
-  emptyText: {
-    color: Palette.textMuted,
-    textAlign: 'center',
-    marginTop: 20,
-    fontSize: 13,
-  },
-});
+function createStyles(colors: AppPalette) {
+  return StyleSheet.create({
+    scrollContent: {
+      paddingTop: 64,
+      paddingBottom: 32,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 16,
+      paddingHorizontal: 20,
+    },
+    headerText: {
+      flex: 1,
+      paddingRight: 12,
+    },
+    brandRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      marginBottom: 8,
+    },
+    brand: {
+      fontSize: 11,
+      fontWeight: '700',
+      color: colors.textSecondary,
+      letterSpacing: 1.2,
+      textTransform: 'uppercase',
+    },
+    greeting: {
+      fontSize: 28,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 4,
+      letterSpacing: -0.4,
+    },
+    subtitle: {
+      fontSize: 15,
+      color: colors.textSecondary,
+    },
+    avatar: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: colors.surfaceRaised,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.borderStrong,
+      overflow: 'hidden',
+    },
+    avatarImage: {
+      width: '100%',
+      height: '100%',
+    },
+    avatarText: {
+      color: colors.text,
+      fontSize: 17,
+      fontWeight: '700',
+    },
+    heroBanner: {
+      alignSelf: 'center',
+      backgroundColor: colors.surfaceRaised,
+      overflow: 'hidden',
+      borderRadius: Radii.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    lecturesRow: {
+      marginTop: 12,
+      marginHorizontal: 20,
+      marginBottom: 8,
+      height: 48,
+      borderRadius: Radii.pill,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingHorizontal: 16,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+    },
+    lecturesRowText: {
+      flex: 1,
+      color: colors.text,
+      fontSize: 14,
+      fontWeight: '600',
+    },
+    sectionHeader: {
+      marginTop: 20,
+      marginBottom: 12,
+      paddingHorizontal: 20,
+    },
+    sectionTitle: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: colors.text,
+      letterSpacing: -0.3,
+    },
+    seeAll: {
+      color: colors.text,
+      fontSize: 13,
+      fontWeight: '600',
+    },
+    rankCard: {
+      marginHorizontal: 20,
+      padding: 16,
+      overflow: 'hidden',
+    },
+    rankHero: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    rankIcon: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: colors.surfaceRaised,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    rankHeroText: {
+      flex: 1,
+    },
+    rankLabel: {
+      color: colors.textSecondary,
+      fontSize: 12,
+      fontWeight: '600',
+      marginBottom: 2,
+    },
+    rankValue: {
+      color: colors.text,
+      fontSize: 28,
+      fontWeight: '700',
+      letterSpacing: -0.5,
+    },
+    rankMeta: {
+      alignItems: 'flex-end',
+      maxWidth: '40%',
+    },
+    rankMetaScore: {
+      color: colors.text,
+      fontSize: 14,
+      fontWeight: '700',
+    },
+    rankMetaTest: {
+      color: colors.textMuted,
+      fontSize: 11,
+      marginTop: 2,
+      textAlign: 'right',
+    },
+    topList: {
+      marginTop: 16,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: colors.border,
+      paddingTop: 12,
+      gap: 10,
+    },
+    topRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+    },
+    topRank: {
+      width: 36,
+      color: colors.textSecondary,
+      fontSize: 12,
+      fontWeight: '700',
+    },
+    topName: {
+      flex: 1,
+      color: colors.text,
+      fontSize: 13,
+      fontWeight: '600',
+    },
+    topScore: {
+      color: colors.text,
+      fontSize: 13,
+      fontWeight: '700',
+    },
+    analyticsCard: {
+      marginHorizontal: 20,
+      padding: 16,
+      overflow: 'hidden',
+    },
+    statsRow: {
+      flexDirection: 'row',
+      gap: 8,
+      marginBottom: 18,
+    },
+    statPill: {
+      flex: 1,
+      backgroundColor: colors.surfaceRaised,
+      borderRadius: Radii.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingVertical: 12,
+      paddingHorizontal: 8,
+      alignItems: 'center',
+    },
+    statPillValue: {
+      color: colors.text,
+      fontSize: 18,
+      fontWeight: '700',
+      marginBottom: 2,
+    },
+    statPillLabel: {
+      color: colors.textSecondary,
+      fontSize: 11,
+      fontWeight: '500',
+    },
+    chartTitle: {
+      color: colors.textSecondary,
+      fontSize: 12,
+      fontWeight: '700',
+      letterSpacing: 0.4,
+      textTransform: 'uppercase',
+      marginBottom: 10,
+    },
+    testsList: {
+      gap: 4,
+      paddingBottom: 20,
+      paddingHorizontal: 20,
+    },
+    loadingText: {
+      color: colors.textMuted,
+      textAlign: 'center',
+      marginTop: 20,
+      fontSize: 13,
+    },
+    emptyText: {
+      color: colors.textMuted,
+      textAlign: 'center',
+      marginTop: 20,
+      fontSize: 13,
+    },
+  });
+}

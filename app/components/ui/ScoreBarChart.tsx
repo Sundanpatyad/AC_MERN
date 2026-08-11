@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Palette, Radii } from '@/constants/theme';
+import { AppPalette, Radii } from '@/constants/theme';
+import { useTheme } from '@/providers/AppThemeProvider';
 
 type Point = {
   label: string;
@@ -15,6 +16,9 @@ type Props = {
 
 /** Lightweight bar chart — no extra native deps. */
 export function ScoreBarChart({ data, height = 140 }: Props) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   if (!data.length) {
     return (
       <View style={[styles.empty, { height }]}>
@@ -55,52 +59,54 @@ export function ScoreBarChart({ data, height = 140 }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  chart: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-    gap: 8,
-    paddingTop: 4,
-  },
-  col: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  valueLabel: {
-    color: Palette.textSecondary,
-    fontSize: 10,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  barTrack: {
-    width: '70%',
-    maxWidth: 28,
-    justifyContent: 'flex-end',
-    backgroundColor: Palette.surfaceRaised,
-    borderRadius: Radii.sm,
-    overflow: 'hidden',
-  },
-  barFill: {
-    width: '100%',
-    backgroundColor: Palette.text,
-    borderRadius: Radii.sm,
-    opacity: 0.92,
-  },
-  axisLabel: {
-    marginTop: 6,
-    color: Palette.textMuted,
-    fontSize: 10,
-    fontWeight: '600',
-  },
-  empty: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Palette.surfaceRaised,
-    borderRadius: Radii.md,
-  },
-  emptyText: {
-    color: Palette.textMuted,
-    fontSize: 13,
-  },
-});
+function createStyles(colors: AppPalette) {
+  return StyleSheet.create({
+    chart: {
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      justifyContent: 'space-between',
+      gap: 8,
+      paddingTop: 4,
+    },
+    col: {
+      flex: 1,
+      alignItems: 'center',
+    },
+    valueLabel: {
+      color: colors.textSecondary,
+      fontSize: 10,
+      fontWeight: '600',
+      marginBottom: 4,
+    },
+    barTrack: {
+      width: '70%',
+      maxWidth: 28,
+      justifyContent: 'flex-end',
+      backgroundColor: colors.surfaceRaised,
+      borderRadius: Radii.sm,
+      overflow: 'hidden',
+    },
+    barFill: {
+      width: '100%',
+      backgroundColor: colors.text,
+      borderRadius: Radii.sm,
+      opacity: 0.92,
+    },
+    axisLabel: {
+      marginTop: 6,
+      color: colors.textMuted,
+      fontSize: 10,
+      fontWeight: '600',
+    },
+    empty: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.surfaceRaised,
+      borderRadius: Radii.md,
+    },
+    emptyText: {
+      color: colors.textMuted,
+      fontSize: 13,
+    },
+  });
+}

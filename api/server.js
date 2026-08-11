@@ -30,11 +30,32 @@ app.use(express.urlencoded({ limit: '15mb', extended: true }));
 
 app.use(cookieParser());
 
-// CORS (safe for prod + auth)
-app.use(cors({
-  origin: true,
-  credentials: true,
-}));
+// CORS — website + local Vite + mobile (native apps often send no Origin)
+const ALLOWED_ORIGINS = new Set([
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:3000',
+  'https://awakeningclasses.in',
+  'http://awakeningclasses.in',
+  'https://www.awakeningclasses.in',
+  'http://www.awakeningclasses.in',
+  'https://awakeningclasses.vercel.app',
+]);
+
+app.use(
+  cors({
+    origin: (origin, cb) => {
+      // Mobile apps / Postman / server-to-server: no Origin header
+      if (!origin) return cb(null, true);
+      if (ALLOWED_ORIGINS.has(origin)) return cb(null, true);
+      return cb(new Error(`CORS blocked for origin: ${origin}`));
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
+app.options('*', cors());
 
 // File uploads
 app.use(fileUpload({

@@ -12,6 +12,12 @@ import { Button } from '../../components/ui/Button';
 import { ConfirmationSheet } from '../../components/ui/ConfirmationSheet';
 import { DetailSkeleton } from '../../components/ui/Skeleton';
 
+/** Normalise an option that may be a plain string (legacy) or {text, image} object — same as web. */
+const normaliseOption = (opt: any): { text: string; image: string } => {
+  if (typeof opt === 'string') return { text: opt, image: '' };
+  return { text: opt?.text || '', image: opt?.image || '' };
+};
+
 export default function TakeTestScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
@@ -92,7 +98,7 @@ export default function TakeTestScreen() {
   // Auto-scroll logic for question navigation dots
   useEffect(() => {
     if (navScrollViewRef.current) {
-      const dotWidth = 40; // 32 width + 8 margin
+      const dotWidth = 32; // 26 width + 6 margin
       navScrollViewRef.current.scrollTo({
         x: Math.max(0, (currentQuestionIndex * dotWidth) - 100),
         animated: true
@@ -270,15 +276,17 @@ export default function TakeTestScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.testName} numberOfLines={1}>{testData.testName}</Text>
-          <Text style={styles.questionCount}>
-            Question {currentQuestionIndex + 1} of {shuffledQuestions.length}
+        <View style={styles.headerTextWrap}>
+          <Text style={styles.testName} numberOfLines={1} ellipsizeMode="tail">
+            {testData.testName}
+          </Text>
+          <Text style={styles.questionCount} numberOfLines={1}>
+            Q {currentQuestionIndex + 1} / {shuffledQuestions.length}
             {testData.negative > 0 && ` • Neg: -${testData.negative}`}
           </Text>
         </View>
         <View style={styles.timerContainer}>
-          <Ionicons name="time-outline" size={20} color="#f59e0b" />
+          <Ionicons name="time-outline" size={18} color="#f59e0b" />
           <Text style={styles.timerText}>{formatTime(timeRemaining)}</Text>
         </View>
       </View>
@@ -328,7 +336,11 @@ export default function TakeTestScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Question */}
         <View style={styles.questionContainer}>
-          <Text style={styles.questionText}>{currentQuestion.text}</Text>
+          {!!currentQuestion.text && (
+            <Text style={styles.questionText}>
+              {String(currentQuestion.text).replace(/\\n/g, '\n')}
+            </Text>
+          )}
           {currentQuestion.questionImage && (
             <Image 
               source={{ uri: currentQuestion.questionImage }} 
@@ -378,8 +390,8 @@ export default function TakeTestScreen() {
           {currentQuestion.shuffledOptions.map((optionData: any, idx: number) => {
             const { content, originalIndex } = optionData;
             const isSelected = currentAnswer?.selectedOption === originalIndex;
-            const optionText = typeof content === 'string' ? content : content.text;
-            const optionImage = typeof content === 'object' ? content.image : null;
+            const { text: optionText, image: optionImage } = normaliseOption(content);
+            const label = String.fromCharCode(65 + idx);
 
             return (
               <TouchableOpacity
@@ -389,19 +401,27 @@ export default function TakeTestScreen() {
                   isSelected && styles.optionCardSelected
                 ]}
                 onPress={() => handleOptionSelect(originalIndex)}
+                activeOpacity={0.75}
               >
-                <View style={styles.optionContent}>
-                  <View style={[styles.optionRadio, isSelected && styles.optionRadioSelected]} />
-                  <View style={styles.optionTextContainer}>
-                    {optionText && <Text style={styles.optionText}>{optionText}</Text>}
-                    {optionImage && (
-                      <Image 
-                        source={{ uri: optionImage }} 
-                        style={styles.optionImage} 
-                        resizeMode="contain"
-                      />
-                    )}
-                  </View>
+                <View style={[styles.optionRadio, isSelected && styles.optionRadioSelected]}>
+                  {isSelected && <View style={styles.optionRadioDot} />}
+                </View>
+                <Text style={[styles.optionLabel, isSelected && styles.optionLabelSelected]}>
+                  {label}
+                </Text>
+                <View style={styles.optionTextContainer}>
+                  {!!optionImage && (
+                    <Image 
+                      source={{ uri: optionImage }} 
+                      style={styles.optionImage} 
+                      resizeMode="contain"
+                    />
+                  )}
+                  {!!optionText && (
+                    <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>
+                      {optionText}
+                    </Text>
+                  )}
                 </View>
               </TouchableOpacity>
             );
@@ -409,39 +429,57 @@ export default function TakeTestScreen() {
         </View>
       </ScrollView>
 
-      {/* Footer Navigation */}
+      {/* Footer Navigation — compact, matches web TestFooter proportions */}
       <View style={styles.footer}>
-        <Button 
-          title="Prev" 
-          onPress={handlePrev} 
+        <TouchableOpacity
+          onPress={handlePrev}
           disabled={currentQuestionIndex === 0}
-          variant="outline"
-          style={styles.navButton}
-        />
+          activeOpacity={0.7}
+          style={[
+            styles.footerBtn,
+            styles.footerBtnSide,
+            currentQuestionIndex === 0 && styles.footerBtnDisabled,
+          ]}
+        >
+          <Text
+            style={[
+              styles.footerBtnText,
+              currentQuestionIndex === 0 && styles.footerBtnTextDisabled,
+            ]}
+          >
+            Prev
+          </Text>
+        </TouchableOpacity>
 
         {currentQuestionIndex < shuffledQuestions.length - 1 && (
-          <Button 
-            title="Skip" 
-            onPress={handleSkip} 
-            variant="outline"
-            style={styles.navButton}
-          />
+          <TouchableOpacity
+            onPress={handleSkip}
+            activeOpacity={0.7}
+            style={[styles.footerBtn, styles.footerBtnSide, styles.footerBtnSkip]}
+          >
+            <Text style={[styles.footerBtnText, styles.footerBtnTextMuted]}>Skip</Text>
+          </TouchableOpacity>
         )}
-        
+
         {currentQuestionIndex === shuffledQuestions.length - 1 ? (
-          <Button 
-            title="Submit" 
+          <TouchableOpacity
             onPress={() => setIsConfirmSheetVisible(true)}
-            isLoading={isSubmitting}
-            style={[styles.navButton, { backgroundColor: '#10b981', borderColor: '#10b981' }]}
-            textStyle={{ color: '#fff' }}
-          />
+            disabled={isSubmitting}
+            activeOpacity={0.7}
+            style={[styles.footerBtn, styles.footerBtnPrimary, styles.footerBtnSubmit]}
+          >
+            <Text style={styles.footerBtnTextSubmit}>
+              {isSubmitting ? '...' : 'Submit'}
+            </Text>
+          </TouchableOpacity>
         ) : (
-          <Button 
-            title="Next" 
+          <TouchableOpacity
             onPress={handleNext}
-            style={styles.navButton}
-          />
+            activeOpacity={0.7}
+            style={[styles.footerBtn, styles.footerBtnPrimary]}
+          >
+            <Text style={styles.footerBtnTextPrimary}>Next</Text>
+          </TouchableOpacity>
         )}
       </View>
     </View>
@@ -461,11 +499,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
-    paddingTop: 60,
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+    paddingTop: 56,
     backgroundColor: '#050505',
     borderBottomWidth: 1,
     borderBottomColor: '#1a1a1a',
+    gap: 12,
+  },
+  headerTextWrap: {
+    flex: 1,
+    minWidth: 0,
+    maxWidth: 250,
   },
   testName: {
     fontSize: 16,
@@ -488,6 +533,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: 'rgba(245, 158, 11, 0.3)',
+    flexShrink: 0,
   },
   timerText: {
     color: '#f59e0b',
@@ -496,20 +542,20 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
   },
   questionNav: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
     backgroundColor: '#0f0f0f',
     borderBottomWidth: 1,
     borderBottomColor: '#1a1a1a',
   },
   dot: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 26,
+    height: 26,
+    borderRadius: 8,
     backgroundColor: '#1a1a1a',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 8,
+    marginRight: 6,
     borderWidth: 1,
     borderColor: '#333',
   },
@@ -533,11 +579,11 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   scrollContent: {
-    padding: 20,
-    paddingBottom: 40,
+    padding: 16,
+    paddingBottom: 24,
   },
   questionContainer: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
   questionText: {
     fontSize: 16,
@@ -552,14 +598,15 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   optionsContainer: {
-    gap: 12,
+    gap: 10,
   },
   optionCard: {
     flexDirection: 'row',
-    alignItems: 'center',
-    padding: 14,
+    alignItems: 'flex-start',
+    paddingVertical: 10,
+    paddingHorizontal: 10,
     backgroundColor: '#0f0f0f',
-    borderRadius: 10,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: '#1a1a1a',
   },
@@ -568,36 +615,54 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(59, 130, 246, 0.1)',
   },
   optionRadio: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    borderWidth: 2,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    borderWidth: 1.5,
     borderColor: '#666',
-    marginRight: 10,
+    marginRight: 8,
+    marginTop: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   optionRadioSelected: {
     borderColor: '#3b82f6',
     backgroundColor: '#3b82f6',
   },
-  optionContent: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    width: '100%',
+  optionRadioDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    backgroundColor: '#fff',
+  },
+  optionLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#666',
+    marginRight: 8,
+    marginTop: 1,
+    width: 12,
+  },
+  optionLabelSelected: {
+    color: '#60a5fa',
   },
   optionTextContainer: {
     flex: 1,
-    marginLeft: 12,
+    minWidth: 0,
   },
   optionText: {
+    color: '#d4d4d4',
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  optionTextSelected: {
     color: '#fff',
-    fontSize: 14,
-    lineHeight: 20,
   },
   optionImage: {
     width: '100%',
-    height: 150,
+    height: 120,
     borderRadius: 4,
-    marginTop: 8,
+    marginBottom: 8,
   },
   matchContainer: {
     flexDirection: 'row',
@@ -651,15 +716,63 @@ const styles = StyleSheet.create({
   },
   footer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 20,
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 16,
+    paddingTop: 6,
+    paddingBottom: 20,
     backgroundColor: '#050505',
     borderTopWidth: 1,
     borderTopColor: '#1a1a1a',
   },
-  navButton: {
+  footerBtn: {
+    height: 28,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 8,
+  },
+  footerBtnSide: {
     flex: 1,
-    marginHorizontal: 8,
-    marginVertical: 0,
+    backgroundColor: '#141414',
+    borderWidth: 1,
+    borderColor: '#2a2a2a',
+  },
+  footerBtnSkip: {
+    backgroundColor: 'transparent',
+    borderColor: '#333',
+  },
+  footerBtnPrimary: {
+    flex: 1.4,
+    backgroundColor: '#fff',
+    borderWidth: 0,
+  },
+  footerBtnSubmit: {
+    backgroundColor: '#10b981',
+  },
+  footerBtnDisabled: {
+    backgroundColor: '#0d0d0d',
+    borderColor: '#1a1a1a',
+  },
+  footerBtnText: {
+    color: '#e5e5e5',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  footerBtnTextMuted: {
+    color: '#888',
+  },
+  footerBtnTextDisabled: {
+    color: '#444',
+  },
+  footerBtnTextPrimary: {
+    color: '#000',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  footerBtnTextSubmit: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: '700',
   },
 });

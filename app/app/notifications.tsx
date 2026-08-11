@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Switch } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
 import { SettingsShell, SettingsCard, SettingsRow } from '../components/ui/SettingsShell';
-import { Palette } from '../constants/theme';
+import { AppPalette } from '../constants/theme';
+import { useTheme } from '../providers/AppThemeProvider';
 
 const STORAGE_KEY = 'ac_notification_prefs';
 
@@ -22,6 +23,8 @@ const DEFAULTS: Prefs = {
 };
 
 export default function NotificationsScreen() {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [prefs, setPrefs] = useState<Prefs>(DEFAULTS);
   const [ready, setReady] = useState(false);
 
@@ -55,8 +58,8 @@ export default function NotificationsScreen() {
       value={value}
       onValueChange={onChange}
       disabled={disabled || !ready}
-      trackColor={{ false: Palette.surfaceRaised, true: 'rgba(255,255,255,0.35)' }}
-      thumbColor={value ? Palette.text : Palette.textMuted}
+      trackColor={{ false: colors.surfaceRaised, true: colors.borderStrong }}
+      thumbColor={value ? colors.text : colors.textMuted}
     />
   );
 
@@ -116,11 +119,13 @@ export default function NotificationsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  hint: {
-    color: Palette.textSecondary,
-    fontSize: 14,
-    lineHeight: 20,
-    marginBottom: 16,
-  },
-});
+function createStyles(colors: AppPalette) {
+  return StyleSheet.create({
+    hint: {
+      color: colors.textSecondary,
+      fontSize: 14,
+      lineHeight: 20,
+      marginBottom: 16,
+    },
+  });
+}

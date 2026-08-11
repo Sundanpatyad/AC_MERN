@@ -8,7 +8,8 @@ import {
   TextStyle,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Palette, Radii } from '@/constants/theme';
+import { Radii } from '@/constants/theme';
+import { useTheme } from '@/providers/AppThemeProvider';
 
 interface ButtonProps {
   title: string;
@@ -29,12 +30,14 @@ export function Button({
   style,
   textStyle,
 }: ButtonProps) {
+  const { colors } = useTheme();
+
   const textColor =
     disabled
-      ? Palette.textMuted
+      ? colors.textMuted
       : variant === 'primary'
-        ? Palette.black
-        : Palette.text;
+        ? colors.primaryButtonText
+        : colors.text;
 
   const content = isLoading ? (
     <ActivityIndicator color={textColor} />
@@ -48,10 +51,20 @@ export function Button({
         onPress={onPress}
         disabled={disabled || isLoading}
         activeOpacity={0.85}
-        style={[styles.button, styles.primaryShadow, style]}
+        style={[
+          styles.button,
+          {
+            shadowColor: colors.primaryShadow,
+            shadowOpacity: 0.12,
+            shadowRadius: 16,
+            shadowOffset: { width: 0, height: 4 },
+            elevation: 4,
+          },
+          style,
+        ]}
       >
         <LinearGradient
-          colors={[Palette.text, Palette.accentMuted]}
+          colors={colors.primaryGradient}
           start={{ x: 0.5, y: 0 }}
           end={{ x: 0.5, y: 1 }}
           style={styles.gradientFill}
@@ -63,14 +76,14 @@ export function Button({
   }
 
   const backgroundColor = disabled
-    ? Palette.surface
+    ? colors.surface
     : variant === 'secondary'
-      ? Palette.surfaceRaised
+      ? colors.surfaceRaised
       : 'transparent';
 
   const borderColor =
     variant === 'outline' || variant === 'secondary'
-      ? Palette.borderStrong
+      ? colors.borderStrong
       : 'transparent';
 
   return (
@@ -97,32 +110,25 @@ export function Button({
 
 const styles = StyleSheet.create({
   button: {
-    height: 52,
+    height: 48,
     borderRadius: Radii.pill,
     marginVertical: 4,
     overflow: 'hidden',
-  },
-  primaryShadow: {
-    shadowColor: '#fff',
-    shadowOpacity: 0.12,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 4,
   },
   gradientFill: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
   },
   solidFill: {
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
   },
   text: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '700',
-    letterSpacing: 0.2,
+    letterSpacing: 0.1,
   },
 });

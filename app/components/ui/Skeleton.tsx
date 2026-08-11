@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { Animated, StyleSheet, View, ViewStyle, StyleProp, DimensionValue } from 'react-native';
-import { Palette, Radii } from '@/constants/theme';
+import { AppPalette, Radii } from '@/constants/theme';
+import { useTheme } from '@/providers/AppThemeProvider';
 
 type SkeletonProps = {
   width?: DimensionValue;
@@ -16,6 +17,8 @@ export function Skeleton({
   borderRadius = Radii.sm,
   style,
 }: SkeletonProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const opacity = useRef(new Animated.Value(0.35)).current;
 
   useEffect(() => {
@@ -58,6 +61,9 @@ export function SkeletonCircle({ size = 44, style }: { size?: number; style?: St
 }
 
 export function MockTestCardSkeleton() {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <View style={styles.card}>
       <Skeleton height={150} borderRadius={0} />
@@ -73,6 +79,9 @@ export function MockTestCardSkeleton() {
 }
 
 export function HomeSkeleton({ bannerHeight = 180 }: { bannerHeight?: number }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <View>
       <View style={[styles.homeHeader, styles.hPad]}>
@@ -128,7 +137,7 @@ export function HomeSkeleton({ bannerHeight = 180 }: { bannerHeight?: number }) 
 
 export function TestListSkeleton({ count = 4 }: { count?: number }) {
   return (
-    <View style={styles.pad}>
+    <View style={{ gap: 0 }}>
       {Array.from({ length: count }).map((_, i) => (
         <MockTestCardSkeleton key={i} />
       ))}
@@ -137,6 +146,9 @@ export function TestListSkeleton({ count = 4 }: { count?: number }) {
 }
 
 export function RankingsSkeleton({ count = 8 }: { count?: number }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <View style={styles.pad}>
       <View style={[styles.block, { marginBottom: 16 }]}>
@@ -165,6 +177,9 @@ export function RankingsSkeleton({ count = 8 }: { count?: number }) {
 }
 
 export function DetailSkeleton() {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <View style={styles.pad}>
       <Skeleton height={200} borderRadius={Radii.lg} style={{ marginBottom: 20 }} />
@@ -183,6 +198,9 @@ export function DetailSkeleton() {
 }
 
 export function MyTestsSkeleton() {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <View style={styles.pad}>
       <Skeleton height={16} width={130} style={{ marginBottom: 14 }} />
@@ -201,82 +219,84 @@ export function MyTestsSkeleton() {
   );
 }
 
-const styles = StyleSheet.create({
-  bone: {
-    backgroundColor: Palette.surfaceRaised,
-  },
-  pad: {
-    gap: 0,
-  },
-  hPad: {
-    paddingHorizontal: 20,
-  },
-  homeHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-    gap: 12,
-  },
-  block: {
-    backgroundColor: Palette.surface,
-    borderRadius: Radii.lg,
-    borderWidth: 1,
-    borderColor: Palette.border,
-    padding: 16,
-    marginBottom: 4,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 16,
-  },
-  chartRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-    height: 100,
-    paddingHorizontal: 4,
-  },
-  card: {
-    backgroundColor: Palette.surface,
-    borderRadius: Radii.lg,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: Palette.border,
-    marginBottom: 14,
-  },
-  cardBody: {
-    padding: 16,
-    gap: 14,
-  },
-  cardFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  rankRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    backgroundColor: Palette.surface,
-    borderRadius: Radii.lg,
-    borderWidth: 1,
-    borderColor: Palette.border,
-    padding: 14,
-    marginBottom: 10,
-  },
-  attemptRow: {
-    backgroundColor: Palette.surface,
-    borderRadius: Radii.lg,
-    borderWidth: 1,
-    borderColor: Palette.border,
-    padding: 16,
-    marginBottom: 10,
-    gap: 12,
-  },
-});
+function createStyles(colors: AppPalette) {
+  return StyleSheet.create({
+    bone: {
+      backgroundColor: colors.surfaceRaised,
+    },
+    pad: {
+      gap: 0,
+    },
+    hPad: {
+      paddingHorizontal: 20,
+    },
+    homeHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 20,
+      gap: 12,
+    },
+    block: {
+      backgroundColor: colors.surface,
+      borderRadius: Radii.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: 16,
+      marginBottom: 4,
+    },
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    statsRow: {
+      flexDirection: 'row',
+      gap: 8,
+      marginBottom: 16,
+    },
+    chartRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      justifyContent: 'space-between',
+      height: 100,
+      paddingHorizontal: 4,
+    },
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: Radii.lg,
+      overflow: 'hidden',
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: 14,
+    },
+    cardBody: {
+      padding: 16,
+      gap: 14,
+    },
+    cardFooter: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    rankRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      backgroundColor: colors.surface,
+      borderRadius: Radii.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: 14,
+      marginBottom: 10,
+    },
+    attemptRow: {
+      backgroundColor: colors.surface,
+      borderRadius: Radii.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: 16,
+      marginBottom: 10,
+      gap: 12,
+    },
+  });
+}

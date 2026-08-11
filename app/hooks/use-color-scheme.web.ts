@@ -1,6 +1,5 @@
-/**
- * App is locked to the Proton Pass–style dark palette.
- */
+import { useTheme } from '@/providers/AppThemeProvider';
+
 export function useColorScheme() {
-  return 'dark' as const;
+  return useTheme().colorScheme;
 }

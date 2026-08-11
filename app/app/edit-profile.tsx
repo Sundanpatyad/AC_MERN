@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { SettingsShell, SettingsCard } from '../components/ui/SettingsShell';
@@ -8,12 +8,15 @@ import { DetailSkeleton } from '../components/ui/Skeleton';
 import { apiConnector } from '../services/api';
 import { endpoints } from '../constants/api';
 import { useAuthStore } from '../store/authStore';
-import { Palette, Radii } from '../constants/theme';
+import { AppPalette, Radii } from '../constants/theme';
+import { useTheme } from '../providers/AppThemeProvider';
 
 const GENDERS = ['Male', 'Female', 'Non-Binary', 'Prefer not to say', 'Other'];
 
 export default function EditProfileScreen() {
   const { user, setUser } = useAuthStore();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [form, setForm] = useState({
@@ -173,50 +176,52 @@ export default function EditProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  sectionLabel: {
-    color: Palette.textSecondary,
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
-    marginBottom: 10,
-  },
-  formPad: {
-    padding: 14,
-    paddingTop: 8,
-  },
-  fieldLabel: {
-    color: Palette.textSecondary,
-    fontSize: 12,
-    marginBottom: 8,
-    marginTop: 6,
-    fontWeight: '600',
-  },
-  genderWrap: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 10,
-  },
-  genderChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: Radii.pill,
-    borderWidth: 1,
-    borderColor: Palette.border,
-    backgroundColor: Palette.surfaceRaised,
-  },
-  genderChipActive: {
-    backgroundColor: Palette.text,
-    borderColor: Palette.text,
-  },
-  genderText: {
-    color: Palette.textSecondary,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  genderTextActive: {
-    color: Palette.black,
-  },
-});
+function createStyles(colors: AppPalette) {
+  return StyleSheet.create({
+    sectionLabel: {
+      color: colors.textSecondary,
+      fontSize: 12,
+      fontWeight: '700',
+      letterSpacing: 0.6,
+      textTransform: 'uppercase',
+      marginBottom: 10,
+    },
+    formPad: {
+      padding: 14,
+      paddingTop: 8,
+    },
+    fieldLabel: {
+      color: colors.textSecondary,
+      fontSize: 12,
+      marginBottom: 8,
+      marginTop: 6,
+      fontWeight: '600',
+    },
+    genderWrap: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+      marginBottom: 10,
+    },
+    genderChip: {
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: Radii.pill,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surfaceRaised,
+    },
+    genderChipActive: {
+      backgroundColor: colors.text,
+      borderColor: colors.text,
+    },
+    genderText: {
+      color: colors.textSecondary,
+      fontSize: 12,
+      fontWeight: '600',
+    },
+    genderTextActive: {
+      color: colors.primaryButtonText,
+    },
+  });
+}

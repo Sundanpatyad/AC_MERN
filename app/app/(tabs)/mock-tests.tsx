@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { apiConnector } from '../../services/api';
@@ -6,9 +6,12 @@ import { endpoints } from '../../constants/api';
 import { MockTestCard } from '../../components/MockTestCard';
 import { ScreenBackground } from '../../components/ui/ScreenBackground';
 import { TestListSkeleton } from '../../components/ui/Skeleton';
-import { Palette, Radii } from '../../constants/theme';
+import { AppPalette, Radii } from '../../constants/theme';
+import { useTheme } from '../../providers/AppThemeProvider';
 
 export default function MockTestsScreen() {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [allTests, setAllTests] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshing, setRefreshing] = useState(false);
@@ -57,13 +60,13 @@ export default function MockTestsScreen() {
           <Ionicons
             name="search"
             size={18}
-            color={Palette.textMuted}
+            color={colors.textMuted}
             style={styles.searchIcon}
           />
           <TextInput
             style={styles.searchInput}
             placeholder="Search series..."
-            placeholderTextColor={Palette.textMuted}
+            placeholderTextColor={colors.textMuted}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -73,7 +76,11 @@ export default function MockTestsScreen() {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#fff" />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.refreshTint}
+          />
         }
       >
         <View style={styles.testsList}>
@@ -90,59 +97,61 @@ export default function MockTestsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  header: {
-    padding: 20,
-    paddingTop: 64,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: Palette.text,
-    marginBottom: 4,
-    letterSpacing: -0.4,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: Palette.textSecondary,
-    marginBottom: 20,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Palette.surface,
-    borderRadius: Radii.pill,
-    borderWidth: 1,
-    borderColor: Palette.border,
-    paddingHorizontal: 16,
-    height: 48,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    color: Palette.text,
-    fontSize: 15,
-  },
-  scrollContent: {
-    padding: 20,
-    paddingTop: 8,
-    paddingBottom: 32,
-  },
-  testsList: {
-    gap: 4,
-  },
-  loadingText: {
-    color: Palette.textMuted,
-    textAlign: 'center',
-    marginTop: 20,
-    fontSize: 13,
-  },
-  emptyText: {
-    color: Palette.textMuted,
-    textAlign: 'center',
-    marginTop: 40,
-    fontSize: 13,
-  },
-});
+function createStyles(colors: AppPalette) {
+  return StyleSheet.create({
+    header: {
+      padding: 20,
+      paddingTop: 64,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 4,
+      letterSpacing: -0.4,
+    },
+    subtitle: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginBottom: 20,
+    },
+    searchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.surface,
+      borderRadius: Radii.pill,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingHorizontal: 16,
+      height: 48,
+    },
+    searchIcon: {
+      marginRight: 8,
+    },
+    searchInput: {
+      flex: 1,
+      color: colors.text,
+      fontSize: 15,
+    },
+    scrollContent: {
+      padding: 20,
+      paddingTop: 8,
+      paddingBottom: 32,
+    },
+    testsList: {
+      gap: 4,
+    },
+    loadingText: {
+      color: colors.textMuted,
+      textAlign: 'center',
+      marginTop: 20,
+      fontSize: 13,
+    },
+    emptyText: {
+      color: colors.textMuted,
+      textAlign: 'center',
+      marginTop: 40,
+      fontSize: 13,
+    },
+  });
+}

@@ -8,18 +8,15 @@ import {
   GOOGLE_IOS_CLIENT_ID,
 } from '../constants/google';
 
-// iOS uses iosClientId + URL scheme from GoogleService-Info.
-// webClientId is required on Android for id/access tokens; it must be a Web
-// client from the SAME Google Cloud project as the Android OAuth client.
-// Our current web client (217412…) is a different project than iOS/Android
-// (100401… / thematic-bonus) — do not force it on iOS.
+// Android: webClientId from thematic-bonus Android client JSON
+// (1004017212123-5go5m596…). iOS uses iosClientId only.
+// offlineAccess needs a true Web client — keep off while using Android client ID.
 GoogleSignin.configure({
   iosClientId: GOOGLE_IOS_CLIENT_ID,
   ...(Platform.OS === 'android'
     ? {
         webClientId: GOOGLE_WEB_CLIENT_ID,
-        offlineAccess: true,
-        forceCodeForRefreshToken: true,
+        offlineAccess: false,
       }
     : {
         offlineAccess: false,
@@ -43,9 +40,28 @@ export const handleGoogleLogin = async () => {
     const signInResult = await GoogleSignin.signIn();
     console.log('[Google Sign-In] result type:', signInResult?.type || 'ok');
 
-    const tokens = await GoogleSignin.getTokens();
-    const accessToken = tokens?.accessToken || null;
-    const idToken = tokens?.idToken || signInResult?.data?.idToken || null;
+    if (signInResult?.type === 'cancelled') {
+      return { success: false, message: 'User cancelled the login flow' };
+    }
+
+    // Prefer tokens from sign-in payload; fall back to getTokens only when signed in
+    let accessToken: string | null = null;
+    let idToken: string | null =
+      signInResult?.data?.idToken ||
+      (signInResult as any)?.idToken ||
+      null;
+
+    try {
+      const tokens = await GoogleSignin.getTokens();
+      accessToken = tokens?.accessToken || null;
+      idToken = tokens?.idToken || idToken;
+    } catch (tokenError: any) {
+      // getTokens fails if sign-in did not complete — surface a clearer message
+      if (!idToken) {
+        throw tokenError;
+      }
+      console.warn('[Google Sign-In] getTokens failed, using idToken from signIn:', tokenError?.message);
+    }
 
     console.log('[Google Sign-In] has accessToken:', !!accessToken, 'has idToken:', !!idToken);
 

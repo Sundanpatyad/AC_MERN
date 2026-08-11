@@ -84,22 +84,36 @@ export default function MockTestDetailScreen() {
       }
 
       const orderData = orderResponse.data.data;
-      
-      // Setup options for Razorpay
+      const razorpayKey = orderData.key;
+      const orderId = orderData.orderId || orderData.id;
+      const amount = orderData.amount;
+
+      if (!razorpayKey || !orderId || amount == null) {
+        throw new Error('Invalid payment order from server');
+      }
+
+      // Must use the same key that created the order on the backend
       const options = {
         description: `Purchase ${testDetails.seriesName}`,
-        image: 'https://ac-62i9.onrender.com/assets/Logo/rzp_logo.png', // Replace with valid URL
+        image: 'https://ac-62i9.onrender.com/assets/Logo/rzp_logo.png',
         currency: orderData.currency || 'INR',
-        key: 'rzp_live_imp33n49GSozfS', // Should ideally come from env
-        amount: orderData.amount,
+        key: razorpayKey,
+        amount,
         name: 'Awakening Classes',
-        order_id: orderData.id || orderData.orderId,
+        order_id: orderId,
         prefill: {
-          email: user?.email,
-          name: `${user?.firstName} ${user?.lastName}`,
+          email: user?.email || '',
+          name: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
+          contact: user?.additionalDetails?.contactNumber || '',
         },
-        theme: { color: '#3b82f6' }
+        theme: { color: '#000000' },
       };
+
+      console.log('[Payment] Opening Razorpay', {
+        keyPrefix: String(razorpayKey).slice(0, 12),
+        orderId,
+        amount,
+      });
 
       // Open Razorpay
       if (!RazorpayCheckout || !RazorpayCheckout.open) {
@@ -115,14 +129,36 @@ export default function MockTestDetailScreen() {
 
       // Open Razorpay
       RazorpayCheckout.open(options).then(async (data: any) => {
-        // Handle success
-        Toast.show({ type: 'success', text1: 'Payment Successful' });
-        // Optionally verify payment on backend here if needed
-        fetchDetails();
+        try {
+          const verifyRes = await apiConnector.post(endpoints.VERIFY_MOCK_PAYMENT, {
+            razorpay_order_id: data.razorpay_order_id,
+            razorpay_payment_id: data.razorpay_payment_id,
+            razorpay_signature: data.razorpay_signature,
+          });
+          if (verifyRes.data?.success) {
+            Toast.show({ type: 'success', text1: 'Payment Successful' });
+            fetchDetails();
+          } else {
+            Toast.show({
+              type: 'error',
+              text1: verifyRes.data?.message || 'Payment verification failed',
+            });
+          }
+        } catch (verifyError: any) {
+          Toast.show({
+            type: 'error',
+            text1:
+              verifyError.response?.data?.message ||
+              'Paid, but verification failed. Contact support with payment ID.',
+          });
+        }
       }).catch((error: any) => {
-        // Handle failure
         console.log('[Razorpay Error]', error);
-        const errorDesc = error.description || error.message || 'User cancelled or payment failed';
+        const errorDesc =
+          error?.description ||
+          error?.error?.description ||
+          error?.message ||
+          'User cancelled or payment failed';
         Toast.show({ type: 'error', text1: `Payment Failed: ${errorDesc}` });
       });
 

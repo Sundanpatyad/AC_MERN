@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Palette, Radii } from '@/constants/theme';
+import { Radii } from '@/constants/theme';
+import { useTheme } from '@/providers/AppThemeProvider';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -17,22 +18,27 @@ interface InputProps extends TextInputProps {
 }
 
 export function Input({ label, error, isPassword, style, ...props }: InputProps) {
+  const { colors } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   return (
     <View style={styles.container}>
-      {label && <Text style={styles.label}>{label}</Text>}
+      {label && (
+        <Text style={[styles.label, { color: colors.textSecondary }]}>{label}</Text>
+      )}
       <View
         style={[
           styles.inputContainer,
-          isFocused && styles.focusedInput,
-          error && styles.errorInput,
+          {
+            backgroundColor: isFocused ? colors.surfaceRaised : colors.surface,
+            borderColor: error ? colors.danger : isFocused ? colors.borderStrong : colors.border,
+          },
         ]}
       >
         <TextInput
-          style={[styles.input, style]}
-          placeholderTextColor={Palette.textMuted}
+          style={[styles.input, { color: colors.text }, style]}
+          placeholderTextColor={colors.textMuted}
           secureTextEntry={isPassword && !showPassword}
           onFocus={(e) => {
             setIsFocused(true);
@@ -52,12 +58,12 @@ export function Input({ label, error, isPassword, style, ...props }: InputProps)
             <Ionicons
               name={showPassword ? 'eye-off-outline' : 'eye-outline'}
               size={20}
-              color={Palette.textSecondary}
+              color={colors.textSecondary}
             />
           </TouchableOpacity>
         )}
       </View>
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error && <Text style={[styles.errorText, { color: colors.danger }]}>{error}</Text>}
     </View>
   );
 }
@@ -67,39 +73,27 @@ const styles = StyleSheet.create({
     marginVertical: 6,
   },
   label: {
-    color: Palette.textSecondary,
-    fontSize: 12,
-    marginBottom: 8,
+    fontSize: 11,
+    marginBottom: 6,
     fontWeight: '600',
     letterSpacing: 0.3,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Palette.surface,
     borderWidth: 1,
-    borderColor: Palette.border,
     borderRadius: Radii.lg,
-    minHeight: 52,
-  },
-  focusedInput: {
-    borderColor: Palette.borderStrong,
-    backgroundColor: Palette.surfaceRaised,
-  },
-  errorInput: {
-    borderColor: Palette.danger,
+    minHeight: 48,
   },
   input: {
     flex: 1,
-    color: Palette.text,
-    paddingHorizontal: 16,
-    fontSize: 15,
+    paddingHorizontal: 14,
+    fontSize: 14,
   },
   eyeIcon: {
     padding: 12,
   },
   errorText: {
-    color: Palette.danger,
     fontSize: 12,
     marginTop: 4,
     marginLeft: 4,

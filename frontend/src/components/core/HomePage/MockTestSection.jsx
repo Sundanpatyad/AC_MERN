@@ -34,7 +34,7 @@ const MockTestsSection = ({ setShowLoginModal }) => {
     const loadMockTests = async () => {
       try {
         const data = await fetchAllMockTests(token);
-        setMockTests(data.filter(test => test.status !== 'draft'));
+        setMockTests((data || []).filter(test => test.status !== 'draft'));
       } catch (error) {
         console.error("Error fetching mock tests:", error);
         toast.error("Failed to load mock tests. Please try again.");

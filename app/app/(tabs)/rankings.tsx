@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList, RefreshControl, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { apiConnector } from '../../services/api';
 import { endpoints } from '../../constants/api';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuthStore } from '../../store/authStore';
 import { ScreenBackground } from '../../components/ui/ScreenBackground';
-import { Palette, Radii } from '../../constants/theme';
+import { Card } from '../../components/ui/Card';
+import { AppPalette, Radii } from '../../constants/theme';
+import { useTheme } from '../../providers/AppThemeProvider';
 import { RankingsSkeleton, Skeleton } from '../../components/ui/Skeleton';
 
 export default function RankingsScreen() {
-  const { user } = useAuthStore();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [rankings, setRankings] = useState<any[]>([]);
   const [personalRank, setPersonalRank] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -97,11 +99,11 @@ export default function RankingsScreen() {
       );
 
   const renderRankCard = ({ item, index }: { item: any, index: number }) => (
-    <View style={styles.rankCard}>
+    <Card style={styles.rankCard}>
       <View style={styles.rankBadge}>
-        {item.rank === 1 && <Ionicons name="trophy" size={20} color="#fbbf24" />}
-        {item.rank === 2 && <Ionicons name="trophy" size={20} color="#9ca3af" />}
-        {item.rank === 3 && <Ionicons name="trophy" size={20} color="#b45309" />}
+        {item.rank === 1 && <Ionicons name="trophy" size={20} color={colors.text} />}
+        {item.rank === 2 && <Ionicons name="trophy" size={20} color={colors.textSecondary} />}
+        {item.rank === 3 && <Ionicons name="trophy" size={20} color={colors.textMuted} />}
         {item.rank > 3 && <Text style={styles.rankNumber}>{item.rank}</Text>}
       </View>
       
@@ -115,7 +117,7 @@ export default function RankingsScreen() {
         <Text style={styles.score}>{item.score}</Text>
         <Text style={styles.totalScore}>/ {item.totalQuestions}</Text>
       </View>
-    </View>
+    </Card>
   );
 
   return (
@@ -125,17 +127,17 @@ export default function RankingsScreen() {
         <Text style={styles.subtitle}>Top performers across all tests</Text>
         
         <View style={styles.searchContainer}>
-          <Ionicons name="search" size={18} color={Palette.textMuted} style={styles.searchIcon} />
+          <Ionicons name="search" size={18} color={colors.textMuted} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search by user or test..."
-            placeholderTextColor={Palette.textMuted}
+            placeholderTextColor={colors.textMuted}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
           {searchQuery !== '' && (
             <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Ionicons name="close-circle" size={18} color={Palette.textMuted} />
+              <Ionicons name="close-circle" size={18} color={colors.textMuted} />
             </TouchableOpacity>
           )}
         </View>
@@ -172,15 +174,19 @@ export default function RankingsScreen() {
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.3}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#fff" />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.refreshTint}
+          />
         }
         ListHeaderComponent={
           personalRank ? (
             <View style={styles.personalRankSection}>
               <Text style={styles.sectionLabel}>Your Ranking</Text>
-              <View style={[styles.rankCard, styles.userRankCard]}>
+              <Card style={[styles.rankCard, styles.userRankCard]}>
                 <View style={styles.rankBadge}>
-                  <Text style={[styles.rankNumber, { color: Palette.text }]}>{personalRank.rank}</Text>
+                  <Text style={[styles.rankNumber, { color: colors.text }]}>{personalRank.rank}</Text>
                 </View>
                 <View style={styles.userInfo}>
                   <Text style={styles.userName} numberOfLines={1}>You</Text>
@@ -190,7 +196,7 @@ export default function RankingsScreen() {
                   <Text style={styles.score}>{personalRank.score}</Text>
                   <Text style={styles.totalScore}>/ {personalRank.totalQuestions}</Text>
                 </View>
-              </View>
+              </Card>
               <View style={styles.divider} />
               <Text style={styles.sectionLabel}>All Rankings</Text>
             </View>
@@ -216,157 +222,155 @@ export default function RankingsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  header: {
-    padding: 20,
-    paddingTop: 64,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: Palette.text,
-    marginBottom: 4,
-    letterSpacing: -0.4,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: Palette.textSecondary,
-    marginBottom: 16,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Palette.surface,
-    borderRadius: Radii.pill,
-    paddingHorizontal: 16,
-    height: 48,
-    borderWidth: 1,
-    borderColor: Palette.border,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    color: Palette.text,
-    fontSize: 15,
-  },
-  filterContainer: {
-    marginTop: 14,
-  },
-  filterContent: {
-    paddingRight: 20,
-    gap: 8,
-  },
-  filterBadge: {
-    backgroundColor: Palette.surface,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: Radii.pill,
-    borderWidth: 1,
-    borderColor: Palette.border,
-  },
-  filterBadgeActive: {
-    backgroundColor: Palette.text,
-    borderColor: Palette.text,
-  },
-  filterText: {
-    color: Palette.textSecondary,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  filterTextActive: {
-    color: Palette.black,
-  },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 32,
-  },
-  personalRankSection: {
-    marginBottom: 20,
-  },
-  sectionLabel: {
-    color: Palette.textMuted,
-    fontSize: 11,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    marginBottom: 8,
-    letterSpacing: 1.2,
-  },
-  userRankCard: {
-    borderColor: Palette.borderStrong,
-    backgroundColor: Palette.surfaceRaised,
-  },
-  divider: {
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: Palette.border,
-    marginVertical: 16,
-  },
-  list: {
-    gap: 10,
-  },
-  rankCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Palette.surface,
-    padding: 14,
-    borderRadius: Radii.lg,
-    borderWidth: 1,
-    borderColor: Palette.border,
-    marginBottom: 10,
-  },
-  rankBadge: {
-    width: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  rankNumber: {
-    color: Palette.textMuted,
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  userInfo: {
-    flex: 1,
-    paddingHorizontal: 12,
-  },
-  userName: {
-    color: Palette.text,
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 2,
-  },
-  testName: {
-    color: Palette.textSecondary,
-    fontSize: 11,
-    marginBottom: 1,
-  },
-  seriesName: {
-    color: Palette.textMuted,
-    fontSize: 10,
-  },
-  scoreInfo: {
-    alignItems: 'flex-end',
-    minWidth: 40,
-  },
-  score: {
-    color: Palette.text,
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  totalScore: {
-    color: Palette.textMuted,
-    fontSize: 11,
-  },
-  loadingText: {
-    color: Palette.textMuted,
-    textAlign: 'center',
-    marginTop: 20,
-    fontSize: 13,
-  },
-  emptyText: {
-    color: Palette.textMuted,
-    textAlign: 'center',
-    marginTop: 40,
-    fontSize: 13,
-  },
-});
+function createStyles(colors: AppPalette) {
+  return StyleSheet.create({
+    header: {
+      padding: 20,
+      paddingTop: 64,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 4,
+      letterSpacing: -0.4,
+    },
+    subtitle: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginBottom: 16,
+    },
+    searchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.surface,
+      borderRadius: Radii.pill,
+      paddingHorizontal: 16,
+      height: 48,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    searchIcon: {
+      marginRight: 8,
+    },
+    searchInput: {
+      flex: 1,
+      color: colors.text,
+      fontSize: 15,
+    },
+    filterContainer: {
+      marginTop: 14,
+    },
+    filterContent: {
+      paddingRight: 20,
+      gap: 8,
+    },
+    filterBadge: {
+      backgroundColor: colors.surface,
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+      borderRadius: Radii.pill,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    filterBadgeActive: {
+      backgroundColor: colors.text,
+      borderColor: colors.text,
+    },
+    filterText: {
+      color: colors.textSecondary,
+      fontSize: 12,
+      fontWeight: '600',
+    },
+    filterTextActive: {
+      color: colors.primaryButtonText,
+    },
+    scrollContent: {
+      padding: 20,
+      paddingBottom: 32,
+    },
+    personalRankSection: {
+      marginBottom: 20,
+    },
+    sectionLabel: {
+      color: colors.textMuted,
+      fontSize: 11,
+      fontWeight: '700',
+      textTransform: 'uppercase',
+      marginBottom: 8,
+      letterSpacing: 1.2,
+    },
+    userRankCard: {
+      borderColor: colors.borderStrong,
+      backgroundColor: colors.surfaceRaised,
+    },
+    divider: {
+      height: StyleSheet.hairlineWidth,
+      backgroundColor: colors.border,
+      marginVertical: 16,
+    },
+    list: {
+      gap: 10,
+    },
+    rankCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 14,
+      marginBottom: 10,
+    },
+    rankBadge: {
+      width: 28,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    rankNumber: {
+      color: colors.textMuted,
+      fontSize: 13,
+      fontWeight: '700',
+    },
+    userInfo: {
+      flex: 1,
+      paddingHorizontal: 12,
+    },
+    userName: {
+      color: colors.text,
+      fontSize: 14,
+      fontWeight: '600',
+      marginBottom: 2,
+    },
+    testName: {
+      color: colors.textSecondary,
+      fontSize: 11,
+      marginBottom: 1,
+    },
+    seriesName: {
+      color: colors.textMuted,
+      fontSize: 10,
+    },
+    scoreInfo: {
+      alignItems: 'flex-end',
+      minWidth: 40,
+    },
+    score: {
+      color: colors.text,
+      fontSize: 16,
+      fontWeight: '700',
+    },
+    totalScore: {
+      color: colors.textMuted,
+      fontSize: 11,
+    },
+    loadingText: {
+      color: colors.textMuted,
+      textAlign: 'center',
+      marginTop: 20,
+      fontSize: 13,
+    },
+    emptyText: {
+      color: colors.textMuted,
+      textAlign: 'center',
+      marginTop: 40,
+      fontSize: 13,
+    },
+  });
+}

@@ -1,6 +1,6 @@
 // export const BASE_URL = 'https://ac-62i9.onrender.com';
-export const BASE_URL = 'https://ac-mern-569448299007.europe-west1.run.app';
-// export const BASE_URL = 'http://localhost:8000';
+// export const BASE_URL = 'https://ac-mern-569448299007.europe-west1.run.app';
+export const BASE_URL = 'https://f163-223-178-210-23.ngrok-free.app';
 
 export const endpoints = {
   // Auth

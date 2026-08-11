@@ -1,13 +1,18 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { apiConnector } from '../../services/api';
 import { endpoints } from '../../constants/api';
 import { MockTestCard } from '../../components/MockTestCard';
 import { ScreenBackground } from '../../components/ui/ScreenBackground';
+import { Card } from '../../components/ui/Card';
 import { MyTestsSkeleton } from '../../components/ui/Skeleton';
-import { Palette, Radii } from '../../constants/theme';
+import { AppPalette, Radii } from '../../constants/theme';
+import { useTheme } from '../../providers/AppThemeProvider';
+import { SectionHeading } from '../../components/ui/SectionHeading';
 
 export default function MyTestsScreen() {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [enrolledTests, setEnrolledTests] = useState([]);
   const [attempts, setAttempts] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -55,7 +60,11 @@ export default function MyTestsScreen() {
       <ScrollView 
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#fff" />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.refreshTint}
+          />
         }
       >
         {isLoading ? (
@@ -63,7 +72,7 @@ export default function MyTestsScreen() {
         ) : (
           <>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Enrolled Series</Text>
+          <SectionHeading title="Enrolled Series" style={{ marginBottom: 16 }} />
           {enrolledTests.length > 0 ? (
             <View style={styles.testsList}>
               {enrolledTests.map((test: any) => (
@@ -71,18 +80,18 @@ export default function MyTestsScreen() {
               ))}
             </View>
           ) : (
-            <View style={styles.emptyCard}>
+            <Card style={styles.emptyCard}>
               <Text style={styles.emptyText}>You haven't enrolled in any tests yet.</Text>
-            </View>
+            </Card>
           )}
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recent Attempts</Text>
+          <SectionHeading title="Recent Attempts" style={{ marginBottom: 16 }} />
           {attempts.length > 0 ? (
             <View style={styles.testsList}>
               {attempts.slice(0, 5).map((attempt: any, index) => (
-                <View key={index} style={styles.attemptCard}>
+                <Card key={index} style={styles.attemptCard}>
                   <Text style={styles.attemptTestName}>{attempt.testName}</Text>
                   <View style={styles.attemptStats}>
                     <Text style={styles.attemptScore}>Score: {attempt.score} / {attempt.totalQuestions}</Text>
@@ -90,13 +99,13 @@ export default function MyTestsScreen() {
                       {new Date(attempt.createdAt).toLocaleDateString()}
                     </Text>
                   </View>
-                </View>
+                </Card>
               ))}
             </View>
           ) : (
-            <View style={styles.emptyCard}>
+            <Card style={styles.emptyCard}>
               <Text style={styles.emptyText}>No test attempts yet.</Text>
-            </View>
+            </Card>
           )}
         </View>
           </>
@@ -106,81 +115,75 @@ export default function MyTestsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  header: {
-    padding: 20,
-    paddingTop: 64,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: Palette.text,
-    marginBottom: 4,
-    letterSpacing: -0.4,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: Palette.textSecondary,
-  },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 32,
-  },
-  section: {
-    marginBottom: 32,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: Palette.text,
-    marginBottom: 16,
-    letterSpacing: -0.2,
-  },
-  testsList: {
-    gap: 12,
-  },
-  loadingText: {
-    color: Palette.textMuted,
-    fontSize: 13,
-  },
-  emptyCard: {
-    backgroundColor: Palette.surface,
-    padding: 24,
-    borderRadius: Radii.lg,
-    borderWidth: 1,
-    borderColor: Palette.border,
-    alignItems: 'center',
-  },
-  emptyText: {
-    color: Palette.textMuted,
-    textAlign: 'center',
-    fontSize: 13,
-  },
-  attemptCard: {
-    backgroundColor: Palette.surface,
-    padding: 16,
-    borderRadius: Radii.lg,
-    borderWidth: 1,
-    borderColor: Palette.border,
-  },
-  attemptTestName: {
-    color: Palette.text,
-    fontSize: 15,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  attemptStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  attemptScore: {
-    color: Palette.text,
-    fontWeight: '700',
-    fontSize: 13,
-  },
-  attemptDate: {
-    color: Palette.textMuted,
-    fontSize: 12,
-  },
-});
+function createStyles(colors: AppPalette) {
+  return StyleSheet.create({
+    header: {
+      padding: 20,
+      paddingTop: 64,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 4,
+      letterSpacing: -0.4,
+    },
+    subtitle: {
+      fontSize: 14,
+      color: colors.textSecondary,
+    },
+    scrollContent: {
+      padding: 20,
+      paddingBottom: 32,
+    },
+    section: {
+      marginBottom: 32,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 16,
+      letterSpacing: -0.2,
+    },
+    testsList: {
+      gap: 12,
+    },
+    loadingText: {
+      color: colors.textMuted,
+      fontSize: 13,
+    },
+    emptyCard: {
+      padding: 24,
+      alignItems: 'center',
+    },
+    emptyText: {
+      color: colors.textMuted,
+      textAlign: 'center',
+      fontSize: 13,
+    },
+    attemptCard: {
+      padding: 16,
+    },
+    attemptTestName: {
+      color: colors.text,
+      fontSize: 15,
+      fontWeight: '600',
+      marginBottom: 8,
+    },
+    attemptStats: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    attemptScore: {
+      color: colors.text,
+      fontWeight: '700',
+      fontSize: 13,
+    },
+    attemptDate: {
+      color: colors.textMuted,
+      fontSize: 12,
+    },
+  });
+}

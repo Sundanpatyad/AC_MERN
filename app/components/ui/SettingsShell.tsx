@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ViewStyle } from 
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenBackground } from './ScreenBackground';
-import { Palette, Radii } from '@/constants/theme';
+import { Radii } from '@/constants/theme';
+import { useTheme } from '@/providers/AppThemeProvider';
 
 type Props = {
   title: string;
@@ -13,21 +14,25 @@ type Props = {
 
 export function SettingsShell({ title, children, contentStyle }: Props) {
   const router = useRouter();
+  const { colors } = useTheme();
 
   return (
     <ScreenBackground>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}
-          style={styles.backBtn}
+          style={[
+            styles.backBtn,
+            { backgroundColor: colors.surface, borderColor: colors.border },
+          ]}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Ionicons name="chevron-back" size={22} color={Palette.text} />
+          <Ionicons name="chevron-back" size={22} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.title} numberOfLines={1}>
+        <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
           {title}
         </Text>
-        <View style={styles.backBtn} />
+        <View style={styles.backBtnSpacer} />
       </View>
       <ScrollView
         contentContainerStyle={[styles.content, contentStyle]}
@@ -40,7 +45,17 @@ export function SettingsShell({ title, children, contentStyle }: Props) {
 }
 
 export function SettingsCard({ children }: { children: React.ReactNode }) {
-  return <View style={styles.card}>{children}</View>;
+  const { colors } = useTheme();
+  return (
+    <View
+      style={[
+        styles.card,
+        { backgroundColor: colors.surface, borderColor: colors.border },
+      ]}
+    >
+      {children}
+    </View>
+  );
 }
 
 export function SettingsRow({
@@ -49,27 +64,37 @@ export function SettingsRow({
   onPress,
   right,
   last,
+  selected,
 }: {
   label: string;
   value?: string;
   onPress?: () => void;
   right?: React.ReactNode;
   last?: boolean;
+  selected?: boolean;
 }) {
+  const { colors } = useTheme();
   const Comp: any = onPress ? TouchableOpacity : View;
   return (
     <Comp
-      style={[styles.row, !last && styles.rowBorder]}
+      style={[
+        styles.row,
+        !last && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.border },
+      ]}
       onPress={onPress}
       activeOpacity={0.75}
     >
       <View style={{ flex: 1 }}>
-        <Text style={styles.rowLabel}>{label}</Text>
-        {value ? <Text style={styles.rowValue}>{value}</Text> : null}
+        <Text style={[styles.rowLabel, { color: colors.text }]}>{label}</Text>
+        {value ? (
+          <Text style={[styles.rowValue, { color: colors.textSecondary }]}>{value}</Text>
+        ) : null}
       </View>
       {right}
-      {onPress && !right ? (
-        <Ionicons name="chevron-forward" size={18} color={Palette.textMuted} />
+      {selected ? (
+        <Ionicons name="checkmark-circle" size={22} color={colors.text} />
+      ) : onPress && !right ? (
+        <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
       ) : null}
     </Comp>
   );
@@ -90,16 +115,17 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Palette.surface,
     borderWidth: 1,
-    borderColor: Palette.border,
+  },
+  backBtnSpacer: {
+    width: 40,
+    height: 40,
   },
   title: {
     flex: 1,
     textAlign: 'center',
     fontSize: 18,
     fontWeight: '700',
-    color: Palette.text,
     marginHorizontal: 8,
   },
   content: {
@@ -107,10 +133,8 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   card: {
-    backgroundColor: Palette.surface,
     borderRadius: Radii.lg,
     borderWidth: 1,
-    borderColor: Palette.border,
     overflow: 'hidden',
     marginBottom: 16,
   },
@@ -121,17 +145,11 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     gap: 12,
   },
-  rowBorder: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Palette.border,
-  },
   rowLabel: {
-    color: Palette.text,
     fontSize: 15,
     fontWeight: '500',
   },
   rowValue: {
-    color: Palette.textSecondary,
     fontSize: 13,
     marginTop: 3,
   },

@@ -1,42 +1,33 @@
-import { DarkTheme, ThemeProvider } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 
 import { useAuthStore } from '../store/authStore';
-import { Palette } from '../constants/theme';
+import { useThemeStore } from '../store/themeStore';
+import { AppThemeProvider, useTheme } from '../providers/AppThemeProvider';
 
 SplashScreen.preventAutoHideAsync();
 
-const AppDarkTheme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    primary: Palette.text,
-    background: Palette.background,
-    card: Palette.surface,
-    text: Palette.text,
-    border: Palette.border,
-    notification: Palette.danger,
-  },
-};
-
-export default function RootLayout() {
-  const { hydrate, isLoading, token } = useAuthStore();
+function RootNavigator() {
+  const { colors, isDark } = useTheme();
+  const { isLoading, token } = useAuthStore();
   const segments = useSegments();
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
+  const hydrateAuth = useAuthStore((s) => s.hydrate);
+  const hydrateTheme = useThemeStore((s) => s.hydrate);
 
   useEffect(() => {
     const init = async () => {
-      await hydrate();
+      await Promise.all([hydrateAuth(), hydrateTheme()]);
       setIsReady(true);
     };
     init();
-  }, []);
+  }, [hydrateAuth, hydrateTheme]);
 
   useEffect(() => {
     if (isReady && !isLoading) {
@@ -54,26 +45,50 @@ export default function RootLayout() {
     } else if (token && inAuthGroup) {
       router.replace('/(tabs)');
     }
-  }, [token, segments, isLoading, isReady]);
+  }, [token, segments, isLoading, isReady, router]);
+
+  const navigationTheme = useMemo(
+    () => ({
+      ...(isDark ? DarkTheme : DefaultTheme),
+      colors: {
+        ...(isDark ? DarkTheme.colors : DefaultTheme.colors),
+        primary: colors.text,
+        background: colors.background,
+        card: colors.surface,
+        text: colors.text,
+        border: colors.border,
+        notification: colors.danger,
+      },
+    }),
+    [colors, isDark]
+  );
 
   if (!isReady || isLoading) {
     return null;
   }
 
   return (
-    <ThemeProvider value={AppDarkTheme}>
+    <ThemeProvider value={navigationTheme}>
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: Palette.background },
+          contentStyle: { backgroundColor: colors.background },
         }}
       >
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
-      <StatusBar style="light" />
+      <StatusBar style={colors.statusBarStyle} />
       <Toast />
     </ThemeProvider>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <AppThemeProvider>
+      <RootNavigator />
+    </AppThemeProvider>
   );
 }

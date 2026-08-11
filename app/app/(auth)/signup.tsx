@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,8 @@ import { ScreenBackground } from '../../components/ui/ScreenBackground';
 import { BrandLogo } from '../../components/ui/BrandLogo';
 import { apiConnector } from '../../services/api';
 import { endpoints } from '../../constants/api';
-import { Palette } from '../../constants/theme';
+import { AppPalette } from '../../constants/theme';
+import { useTheme } from '../../providers/AppThemeProvider';
 
 export default function SignupScreen() {
   const [formData, setFormData] = useState({
@@ -28,6 +29,8 @@ export default function SignupScreen() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const handleSignup = async () => {
     const { firstName, lastName, email, password, confirmPassword } = formData;
@@ -79,8 +82,10 @@ export default function SignupScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.header}>
-            <BrandLogo size={88} style={styles.logo} />
-            <Text style={styles.brand}>Awakening Classes</Text>
+            <View style={styles.brandRow}>
+              <BrandLogo size={32} />
+              <Text style={styles.brand}>Awakening Classes</Text>
+            </View>
             <Text style={styles.title}>Create account</Text>
             <Text style={styles.subtitle}>Join us and start learning today</Text>
           </View>
@@ -168,81 +173,85 @@ export default function SignupScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  flex: { flex: 1 },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: 24,
-    paddingVertical: 48,
-  },
-  header: {
-    marginBottom: 36,
-  },
-  logo: {
-    marginBottom: 18,
-  },
-  brand: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: Palette.textSecondary,
-    letterSpacing: 1.4,
-    textTransform: 'uppercase',
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 34,
-    fontWeight: '700',
-    color: Palette.text,
-    marginBottom: 8,
-    letterSpacing: -0.6,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: Palette.textSecondary,
-    lineHeight: 22,
-  },
-  form: {
-    gap: 2,
-  },
-  row: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  halfWidth: {
-    flex: 1,
-  },
-  cta: {
-    marginTop: 16,
-  },
-  dividerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 18,
-  },
-  divider: {
-    flex: 1,
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: Palette.borderStrong,
-  },
-  dividerText: {
-    color: Palette.textMuted,
-    paddingHorizontal: 16,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 28,
-  },
-  footerText: {
-    color: Palette.textSecondary,
-    fontSize: 14,
-  },
-  loginText: {
-    color: Palette.text,
-    fontSize: 14,
-    fontWeight: '700',
-  },
-});
+function createStyles(colors: AppPalette) {
+  return StyleSheet.create({
+    flex: { flex: 1 },
+    scrollContent: {
+      flexGrow: 1,
+      justifyContent: 'center',
+      padding: 24,
+      paddingVertical: 40,
+    },
+    header: {
+      marginBottom: 28,
+    },
+    brandRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      marginBottom: 20,
+    },
+    brand: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: colors.textSecondary,
+      letterSpacing: 1.2,
+      textTransform: 'uppercase',
+    },
+    title: {
+      fontSize: 30,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 8,
+      letterSpacing: -0.6,
+    },
+    subtitle: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      lineHeight: 20,
+    },
+    form: {
+      gap: 2,
+    },
+    row: {
+      flexDirection: 'row',
+      gap: 12,
+    },
+    halfWidth: {
+      flex: 1,
+    },
+    cta: {
+      marginTop: 16,
+    },
+    dividerContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginVertical: 18,
+    },
+    divider: {
+      flex: 1,
+      height: StyleSheet.hairlineWidth,
+      backgroundColor: colors.borderStrong,
+    },
+    dividerText: {
+      color: colors.textMuted,
+      paddingHorizontal: 16,
+      fontSize: 12,
+      fontWeight: '600',
+    },
+    footer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      marginTop: 20,
+    },
+    footerText: {
+      color: colors.textSecondary,
+      fontSize: 14,
+    },
+    loginText: {
+      color: colors.text,
+      fontSize: 14,
+      fontWeight: '700',
+    },
+  });
+}

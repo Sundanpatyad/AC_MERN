@@ -6,6 +6,10 @@ import ReviewSlider from "../components/common/ReviewSlider";
 import ConfirmationModal from "../components/common/ConfirmationModal";
 import HeroSection from "../components/core/HomePage/HeroSection";
 import RankOneStoryBlack from "../components/core/HomePage/Rank1";
+import LandingFeaturesSection from "../components/core/HomePage/LandingFeaturesSection";
+import LandingHowItWorksSection from "../components/core/HomePage/LandingHowItWorksSection";
+import LandingCategoriesSection from "../components/core/HomePage/LandingCategoriesSection";
+import LandingFAQSection from "../components/core/HomePage/LandingFAQSection";
 import { FaTelegram, FaWhatsapp, FaInstagram } from "react-icons/fa";
 
 const MockTestSection = lazy(() =>
@@ -42,11 +46,17 @@ const Home = () => {
         <MockTestSection setShowLoginModal={setShowLoginModal} />
       </Suspense>
 
+      <LandingFeaturesSection />
+      <LandingHowItWorksSection />
+
       <RankOneStoryBlack />
 
       <Suspense fallback={<div className="h-64" />}>
         <InstructorSection />
       </Suspense>
+
+      <LandingCategoriesSection />
+      <LandingFAQSection />
 
       <ReviewSlider />
 

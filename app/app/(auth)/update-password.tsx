@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Link, useRouter, useLocalSearchParams } from 'expo-router';
 import Toast from 'react-native-toast-message';
@@ -6,7 +6,8 @@ import Toast from 'react-native-toast-message';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { ScreenBackground } from '../../components/ui/ScreenBackground';
-import { Palette } from '../../constants/theme';
+import { AppPalette } from '../../constants/theme';
+import { useTheme } from '../../providers/AppThemeProvider';
 import { apiConnector } from '../../services/api';
 import { endpoints } from '../../constants/api';
 
@@ -17,6 +18,8 @@ export default function UpdatePasswordScreen() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   useEffect(() => {
     if (tokenParam) {
@@ -120,41 +123,43 @@ export default function UpdatePasswordScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: 24,
-  },
-  header: {
-    marginBottom: 40,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: Palette.text,
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: Palette.textSecondary,
-    lineHeight: 24,
-  },
-  form: {
-    gap: 4,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 24,
-  },
-  loginText: {
-    color: Palette.text,
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-});
+function createStyles(colors: AppPalette) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: 'transparent',
+    },
+    scrollContent: {
+      flexGrow: 1,
+      justifyContent: 'center',
+      padding: 24,
+    },
+    header: {
+      marginBottom: 40,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 8,
+    },
+    subtitle: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      lineHeight: 20,
+    },
+    form: {
+      gap: 4,
+    },
+    footer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      marginTop: 24,
+    },
+    loginText: {
+      color: colors.text,
+      fontSize: 14,
+      fontWeight: 'bold',
+    },
+  });
+}

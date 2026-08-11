@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Text, StyleSheet, View, Linking } from 'react-native';
 import { SettingsShell, SettingsCard, SettingsRow } from '../components/ui/SettingsShell';
 import { BrandLogo } from '../components/ui/BrandLogo';
-import { Palette, Radii } from '../constants/theme';
+import { AppPalette, Radii } from '../constants/theme';
+import { useTheme } from '../providers/AppThemeProvider';
 
-const WEBSITE = 'https://awakeningclasses.com';
+const WEBSITE = 'https://awakeningclasses.in';
 const YOUTUBE = 'https://www.youtube.com/@awakeningclasses';
 
 export default function AboutScreen() {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <SettingsShell title="About">
       <View style={styles.hero}>
@@ -22,7 +26,7 @@ export default function AboutScreen() {
       <SettingsCard>
         <SettingsRow
           label="Website"
-          value="awakeningclasses.com"
+          value="awakeningclasses.in"
           onPress={() => Linking.openURL(WEBSITE)}
         />
         <SettingsRow
@@ -44,51 +48,53 @@ export default function AboutScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  hero: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  logo: {
-    marginBottom: 14,
-  },
-  name: {
-    color: Palette.text,
-    fontSize: 22,
-    fontWeight: '700',
-    marginBottom: 6,
-  },
-  tagline: {
-    color: Palette.textSecondary,
-    fontSize: 14,
-    textAlign: 'center',
-    marginBottom: 12,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-  },
-  versionPill: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: Radii.pill,
-    backgroundColor: Palette.surfaceRaised,
-    borderWidth: 1,
-    borderColor: Palette.border,
-  },
-  versionText: {
-    color: Palette.text,
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  copy: {
-    color: Palette.textSecondary,
-    fontSize: 14,
-    lineHeight: 21,
-    marginTop: 8,
-    marginBottom: 16,
-  },
-  legal: {
-    color: Palette.textMuted,
-    fontSize: 12,
-    textAlign: 'center',
-  },
-});
+function createStyles(colors: AppPalette) {
+  return StyleSheet.create({
+    hero: {
+      alignItems: 'center',
+      marginBottom: 24,
+    },
+    logo: {
+      marginBottom: 14,
+    },
+    name: {
+      color: colors.text,
+      fontSize: 22,
+      fontWeight: '700',
+      marginBottom: 6,
+    },
+    tagline: {
+      color: colors.textSecondary,
+      fontSize: 14,
+      textAlign: 'center',
+      marginBottom: 12,
+      letterSpacing: 1,
+      textTransform: 'uppercase',
+    },
+    versionPill: {
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: Radii.pill,
+      backgroundColor: colors.surfaceRaised,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    versionText: {
+      color: colors.text,
+      fontSize: 12,
+      fontWeight: '700',
+    },
+    copy: {
+      color: colors.textSecondary,
+      fontSize: 14,
+      lineHeight: 21,
+      marginTop: 8,
+      marginBottom: 16,
+    },
+    legal: {
+      color: colors.textMuted,
+      fontSize: 12,
+      textAlign: 'center',
+    },
+  });
+}

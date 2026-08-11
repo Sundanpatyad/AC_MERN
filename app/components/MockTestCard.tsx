@@ -8,7 +8,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Palette, Radii } from '@/constants/theme';
+import { Radii } from '@/constants/theme';
+import { useTheme } from '@/providers/AppThemeProvider';
 
 interface MockTestCardProps {
   test: any;
@@ -18,6 +19,7 @@ interface MockTestCardProps {
 
 export function MockTestCard({ test, onPress, showStatus = false }: MockTestCardProps) {
   const router = useRouter();
+  const { colors } = useTheme();
 
   const handlePress = () => {
     if (onPress) {
@@ -30,37 +32,62 @@ export function MockTestCard({ test, onPress, showStatus = false }: MockTestCard
   const isFree = test.price === 0;
 
   return (
-    <TouchableOpacity style={styles.card} activeOpacity={0.85} onPress={handlePress}>
-      <View style={styles.imageContainer}>
+    <TouchableOpacity
+      style={[
+        styles.card,
+        { backgroundColor: colors.surface, borderColor: colors.border },
+      ]}
+      activeOpacity={0.85}
+      onPress={handlePress}
+    >
+      <View style={[styles.imageContainer, { backgroundColor: colors.surfaceRaised }]}>
         {test.thumbnail ? (
           <Image source={{ uri: test.thumbnail }} style={styles.image} />
         ) : (
           <View style={styles.placeholderImage}>
-            <Ionicons name="book" size={36} color={Palette.textMuted} />
+            <Ionicons name="book" size={36} color={colors.textMuted} />
           </View>
         )}
         <View style={styles.badges}>
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{test.mockTests?.length || 0} Tests</Text>
+          <View
+            style={[
+              styles.badge,
+              { backgroundColor: colors.overlay, borderColor: colors.borderStrong },
+            ]}
+          >
+            <Text style={[styles.badgeText, { color: colors.text }]}>{test.mockTests?.length || 0} Tests</Text>
           </View>
           {showStatus && (
-            <View style={[styles.badge, styles.enrolledBadge]}>
-              <Text style={styles.badgeText}>Enrolled</Text>
+            <View
+              style={[
+                styles.badge,
+                styles.enrolledBadge,
+                { backgroundColor: colors.glow, borderColor: colors.borderStrong },
+              ]}
+            >
+              <Text style={[styles.badgeText, { color: colors.text }]}>Enrolled</Text>
             </View>
           )}
         </View>
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.title} numberOfLines={2}>
+        <Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
           {test.seriesName}
         </Text>
 
         <View style={styles.footer}>
-          <Text style={styles.price}>{isFree ? 'Free' : `₹${test.price}`}</Text>
+          <Text style={[styles.price, { color: colors.text }]}>
+            {isFree ? 'Free' : `₹${test.price}`}
+          </Text>
 
-          <TouchableOpacity style={styles.actionButton} onPress={handlePress}>
-            <Text style={styles.actionText}>{showStatus ? 'View' : 'Details'}</Text>
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: colors.text }]}
+            onPress={handlePress}
+          >
+            <Text style={[styles.actionText, { color: colors.primaryButtonText }]}>
+              {showStatus ? 'View' : 'Details'}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -70,17 +97,14 @@ export function MockTestCard({ test, onPress, showStatus = false }: MockTestCard
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: Palette.surface,
     borderRadius: Radii.lg,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: Palette.border,
     marginBottom: 14,
   },
   imageContainer: {
     width: '100%',
     aspectRatio: 16 / 9,
-    backgroundColor: Palette.surfaceRaised,
     position: 'relative',
   },
   image: {
@@ -101,18 +125,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   badge: {
-    backgroundColor: 'rgba(0,0,0,0.72)',
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: Radii.pill,
     borderWidth: 1,
-    borderColor: Palette.borderStrong,
   },
   enrolledBadge: {
-    backgroundColor: 'rgba(255,255,255,0.18)',
   },
   badgeText: {
-    color: Palette.text,
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 0.3,
@@ -121,7 +141,6 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   title: {
-    color: Palette.text,
     fontSize: 15,
     fontWeight: '600',
     marginBottom: 14,
@@ -133,18 +152,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   price: {
-    color: Palette.text,
     fontSize: 16,
     fontWeight: '700',
   },
   actionButton: {
-    backgroundColor: Palette.text,
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: Radii.pill,
   },
   actionText: {
-    color: Palette.black,
     fontSize: 12,
     fontWeight: '700',
   },
