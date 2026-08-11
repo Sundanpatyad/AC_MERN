@@ -3,7 +3,7 @@ import { Link, matchPath, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, useMotionValueEvent, useScroll, AnimatePresence } from 'framer-motion';
 import { NavbarLinks } from '../../../data/navbar-links';
-import { fetchCourseCategories } from './../../services/operations/courseDetailsAPI';
+import { useCategories } from '../../hooks/useCategories';
 import { logout } from '../../services/operations/authAPI';
 import ProfileDropDown from '../core/Auth/ProfileDropDown';
 import ConfirmationModal from './ConfirmationModal';
@@ -36,8 +36,7 @@ const Navbar = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const [subLinks, setSubLinks] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const { data: subLinks = [], isLoading: loading } = useCategories();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
     const { totalItems } = useSelector((state) => state.cart);
@@ -59,22 +58,6 @@ const Navbar = () => {
         setIsScrolled(latest > 20);
         lastScrollY.current = latest;
     });
-
-    const fetchSublinks = useCallback(async () => {
-        try {
-            setLoading(true);
-            const res = await fetchCourseCategories();
-            setSubLinks(res || []);
-        } catch (error) {
-            console.error("Error fetching sublinks", error);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        fetchSublinks();
-    }, [fetchSublinks]);
 
     const matchRoute = useCallback(
         (route) => matchPath({ path: route }, location.pathname),

@@ -6,6 +6,7 @@ import { setUser } from "../../slices/profileSlice"
 import { apiConnector } from "../apiConnector"
 import { endpoints } from "../apis"
 import { loadGapiInsideDOM } from "gapi-script";
+import { setStoredToken, removeStoredToken } from "../../utils/tokenStorage"
 
 
 const {
@@ -162,7 +163,7 @@ export function login(email, password, navigate) {
         : `https://api.dicebear.com/5.x/initials/svg?seed=${response.data.user.firstName} ${response.data.user.lastName}`
 
       dispatch(setUser({ ...response.data.user, image: userImage }));
-      localStorage.setItem("token", JSON.stringify(response.data?.token));
+      setStoredToken(response.data?.token);
       localStorage.setItem("user", JSON.stringify({ ...response.data.user, image: userImage }));
 
       navigate("/dashboard/my-profile");
@@ -284,7 +285,7 @@ export function logout(navigate) {
     dispatch(setToken(null))
     dispatch(setUser(null))
     dispatch(resetCart())
-    localStorage.removeItem("token")
+    removeStoredToken()
     localStorage.removeItem("user")
     toast.success("Logged Out", {
       style: {
@@ -324,7 +325,7 @@ export const googleLogin = (credential, navigate) => {
         : `https://api.dicebear.com/5.x/initials/svg?seed=${userData.firstName} ${userData.lastName}`;
 
       dispatch(setUser({ ...userData, image: userImage }));
-      localStorage.setItem("token", JSON.stringify(token));
+      setStoredToken(token);
       localStorage.setItem("user", JSON.stringify({ ...userData, image: userImage }));
       toast.dismiss(toastId)
       toast.success('Login Successful , Enjoy The Experience', {

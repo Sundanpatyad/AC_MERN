@@ -87,13 +87,13 @@ exports.deleteAccount = async (req, res) => {
         // if any student delete their account && enrollded in any course then ,
         // student entrolled in particular course sholud be decreae by one
         // user - courses - studentsEnrolled
-        const userEnrolledCoursesId = userDetails.courses
-        //console.log('userEnrolledCourses ids = ', userEnrolledCoursesId)
+        const userEnrolledCoursesId = userDetails.courses || []
 
-        for (const courseId of userEnrolledCoursesId) {
-            await Course.findByIdAndUpdate(courseId, {
-                $pull: { studentsEnrolled: userId }
-            })
+        if (userEnrolledCoursesId.length > 0) {
+            await Course.updateMany(
+                { _id: { $in: userEnrolledCoursesId } },
+                { $pull: { studentsEnrolled: userId } }
+            )
         }
 
         // first - delete profie (profileDetails)
@@ -131,7 +131,11 @@ exports.getUserDetails = async (req, res) => {
         //console.log('id - ', userId);
 
         // get user details
-        const userDetails = await User.findById(userId).populate('additionalDetails').exec();
+        const userDetails = await User.findById(userId)
+            .select('-password -token -resetPasswordExpires')
+            .populate('additionalDetails')
+            .lean()
+            .exec();
 
         // return response
         res.status(200).json({
@@ -203,60 +207,74 @@ exports.updateUserProfileImage = async (req, res) => {
 exports.getEnrolledCourses = async (req, res) => {
     try {
         const userId = req.user.id
-        let userDetails = await User.findOne({ _id: userId, })
+        const userDetails = await User.findOne({ _id: userId })
             .populate({
                 path: "courses",
                 populate: {
                     path: "courseContent",
+                    select: "sectionName subSection",
                     populate: {
                         path: "subSection",
+                        select: "title timeDuration description videoUrl",
                     },
                 },
             })
+            .lean()
             .exec()
-
-        userDetails = userDetails.toObject()
-
-        var SubsectionLength = 0
-        for (var i = 0; i < userDetails.courses.length; i++) {
-            let totalDurationInSeconds = 0
-            SubsectionLength = 0
-            for (var j = 0; j < userDetails.courses[i].courseContent.length; j++) {
-                totalDurationInSeconds += userDetails.courses[i].courseContent[
-                    j
-                ].subSection.reduce((acc, curr) => acc + parseInt(curr.timeDuration), 0)
-
-                userDetails.courses[i].totalDuration = convertSecondsToDuration(totalDurationInSeconds)
-                SubsectionLength += userDetails.courses[i].courseContent[j].subSection.length
-            }
-
-            let courseProgressCount = await CourseProgress.findOne({
-                courseID: userDetails.courses[i]._id,
-                userId: userId,
-            })
-
-            courseProgressCount = courseProgressCount?.completedVideos.length
-
-            if (SubsectionLength === 0) {
-                userDetails.courses[i].progressPercentage = 100
-            } else {
-                // To make it up to 2 decimal point
-                const multiplier = Math.pow(10, 2)
-                userDetails.courses[i].progressPercentage =
-                    Math.round((courseProgressCount / SubsectionLength) * 100 * multiplier) / multiplier
-            }
-        }
 
         if (!userDetails) {
             return res.status(400).json({
                 success: false,
-                message: `Could not find user with id: ${userDetails}`,
+                message: `Could not find user with id: ${userId}`,
             })
+        }
+
+        const courses = userDetails.courses || []
+
+        // One query for every enrolled course instead of one query per course.
+        const progressDocs = await CourseProgress.find({
+            userId,
+            courseID: { $in: courses.map((course) => course._id) },
+        })
+            .select("courseID completedVideos")
+            .lean()
+
+        const completedCountByCourse = new Map(
+            progressDocs.map((doc) => [
+                String(doc.courseID),
+                doc.completedVideos?.length || 0,
+            ])
+        )
+
+        for (const course of courses) {
+            let totalDurationInSeconds = 0
+            let subsectionLength = 0
+
+            for (const section of course.courseContent || []) {
+                totalDurationInSeconds += (section.subSection || []).reduce(
+                    (acc, curr) => acc + (parseInt(curr.timeDuration, 10) || 0),
+                    0
+                )
+                subsectionLength += (section.subSection || []).length
+            }
+
+            course.totalDuration = convertSecondsToDuration(totalDurationInSeconds)
+
+            const completedCount = completedCountByCourse.get(String(course._id)) || 0
+
+            if (subsectionLength === 0) {
+                course.progressPercentage = 100
+            } else {
+                // To make it up to 2 decimal point
+                const multiplier = Math.pow(10, 2)
+                course.progressPercentage =
+                    Math.round((completedCount / subsectionLength) * 100 * multiplier) / multiplier
+            }
         }
 
         return res.status(200).json({
             success: true,
-            data: userDetails.courses,
+            data: courses,
         })
     } catch (error) {
         return res.status(500).json({
@@ -325,6 +343,8 @@ exports.getEnrolledMockTests = async (req, res) => {
 exports.instructorDashboard = async (req, res) => {
     try {
         const courseDetails = await Course.find({ instructor: req.user.id })
+            .select('courseName courseDescription price studentsEnrolled')
+            .lean()
 
         const courseData = courseDetails.map((course) => {
             const totalStudentsEnrolled = course.studentsEnrolled.length
@@ -345,6 +365,7 @@ exports.instructorDashboard = async (req, res) => {
 
         res.status(200).json(
             {
+                success: true,
                 courses: courseData,
                 message: 'Instructor Dashboard Data fetched successfully'
             },

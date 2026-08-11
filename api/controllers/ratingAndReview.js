@@ -87,8 +87,15 @@ exports.createRating = async (req, res) => {
 // ================ Get Average Rating ================
 exports.getAverageRating = async (req, res) => {
     try {
-            //get course ID
-            const courseId = req.body.courseId;
+            // Route is a GET, so the id arrives as a query param; body is kept for older callers.
+            const courseId = req.query.courseId || req.body?.courseId;
+
+            if (!courseId || !mongoose.Types.ObjectId.isValid(courseId)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'A valid courseId is required',
+                })
+            }
             //calculate avg rating
 
             const result = await RatingAndReview.aggregate([
@@ -138,7 +145,12 @@ exports.getAverageRating = async (req, res) => {
 // ================ Get All Rating And Reviews ================
 exports.getAllRatingReview = async(req, res)=>{
     try{
-        const allReviews = await RatingAndReview.find({})
+        // Pagination is opt-in: without ?page the full list is returned as before.
+        const page = parseInt(req.query.page, 10)
+        const isPaginated = Number.isInteger(page) && page > 0
+        const limit = Math.min(parseInt(req.query.limit, 10) || 20, 100)
+
+        const query = RatingAndReview.find({})
         .sort({rating:'desc'})
         .populate({
             path:'user',
@@ -148,11 +160,23 @@ exports.getAllRatingReview = async(req, res)=>{
             path:'course',
             select:'courseName'
         })
-        .exec();
+        .lean()
+
+        if (isPaginated) {
+            query.skip((page - 1) * limit).limit(limit)
+        }
+
+        const [allReviews, total] = await Promise.all([
+            query.exec(),
+            isPaginated ? RatingAndReview.countDocuments({}) : Promise.resolve(null),
+        ])
 
         return res.status(200).json({
             success:true,
             data:allReviews,
+            ...(isPaginated && {
+                pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+            }),
             message:"All reviews fetched successfully"
         });
     }

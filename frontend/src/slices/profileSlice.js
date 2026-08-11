@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from 'axios';
 import { endpoints } from "../services/apis";
 import toast from 'react-hot-toast';
+import { getStoredToken, setStoredToken, removeStoredToken } from "../utils/tokenStorage";
 
 const { MOBILE_NUMBER } = endpoints;
 
@@ -15,7 +16,7 @@ const toastOptions = {
 
 const initialState = {
     user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null,
-    token: localStorage.getItem('token') || null,
+    token: getStoredToken(),
     loading: false,
     error: null
 };
@@ -50,7 +51,7 @@ const profileSlice = createSlice({
         },
         setToken(state, action) {
             state.token = action.payload;
-            localStorage.setItem('token', action.payload);
+            setStoredToken(action.payload);
         },
         setLoading(state, action) {
             state.loading = action.payload;
@@ -62,7 +63,7 @@ const profileSlice = createSlice({
             state.user = null;
             state.token = null;
             localStorage.removeItem('user');
-            localStorage.removeItem('token');
+            removeStoredToken();
         }
     },
     extraReducers: (builder) => {

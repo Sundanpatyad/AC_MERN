@@ -5,7 +5,8 @@ import { HiOutlineCurrencyRupee } from "react-icons/hi"
 import { MdNavigateNext } from "react-icons/md"
 import { useDispatch, useSelector } from "react-redux"
 
-import { addCourseDetails, editCourseDetails, fetchCourseCategories } from "../../../../../services/operations/courseDetailsAPI"
+import { addCourseDetails, editCourseDetails } from "../../../../../services/operations/courseDetailsAPI"
+import { useCategories } from "../../../../../hooks/useCategories"
 import { setCourse, setStep } from "../../../../../slices/courseSlice"
 import { COURSE_STATUS } from "../../../../../utils/constants"
 import IconBtn from "../../../../common/IconBtn"
@@ -21,18 +22,9 @@ export default function CourseInformationForm() {
   const { token } = useSelector((state) => state.auth)
   const { course, editCourse } = useSelector((state) => state.course)
   const [loading, setLoading] = useState(false)
-  const [courseCategories, setCourseCategories] = useState([])
+  const { data: courseCategories = [], isLoading: categoriesLoading } = useCategories()
 
   useEffect(() => {
-    const getCategories = async () => {
-      setLoading(true)
-      const categories = await fetchCourseCategories();
-      if (categories.length > 0) {
-        // //console.log("categories", categories)
-        setCourseCategories(categories)
-      }
-      setLoading(false)
-    }
     // if form is in edit mode 
     // It will add value in input field
     if (editCourse) {
@@ -46,8 +38,6 @@ export default function CourseInformationForm() {
       setValue("courseRequirements", course.instructions)
       setValue("courseImage", course.thumbnail)
     }
-
-    getCategories()
   }, [])
 
   const isFormUpdated = () => {
@@ -223,7 +213,7 @@ export default function CourseInformationForm() {
           <option value="" disabled className="bg-zinc-800">
             Choose a Category
           </option>
-          {!loading &&
+          {!categoriesLoading &&
             courseCategories?.map((category, indx) => (
               <option key={indx} value={category?._id} className="bg-zinc-800">
                 {category?.name}

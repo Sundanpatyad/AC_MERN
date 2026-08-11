@@ -77,10 +77,11 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
                 throw new Error("Order data is missing from the response");
             }
 
-            // Get Razorpay key from environment
-            const RAZORPAY_KEY = 'rzp_live_imp33n49GSozfS'
-                ;
-            console.log("Razorpay Key exists:", !!RAZORPAY_KEY);
+            // Prefer the key returned with the order so checkout always matches
+            // the account that created the order (avoids live/test key mismatch).
+            const RAZORPAY_KEY =
+                orderData.key ||
+                import.meta.env.VITE_APP_RAZORPAY_KEY;
 
             if (!RAZORPAY_KEY) {
                 toast.error("Razorpay key is not configured. Please contact support.", toastOptions);
@@ -92,11 +93,19 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
                 throw new Error("Order ID is missing from the response");
             }
 
+            const orderId = orderData.orderId || orderData.id;
+            // Razorpay expects amount in paise; backend returns paymentResponse.amount.
+            const amountInPaise = Number(orderData.amount);
+
+            if (!Number.isFinite(amountInPaise) || amountInPaise <= 0) {
+                throw new Error("Invalid payment amount from server");
+            }
+
             const options = {
                 key: RAZORPAY_KEY,
                 currency: orderData.currency || "INR",
-                amount: orderData.amount,
-                order_id: orderData.orderId || orderData.id,
+                amount: amountInPaise,
+                order_id: orderId,
                 name: "Awakening Classes",
                 description: `Thank You for Purchasing the ${itemType}`,
                 image: rzpLogo,
@@ -104,19 +113,39 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
                     name: userDetails.firstName || userDetails.name,
                     email: userDetails.email
                 },
-                handler: function (response) {
+                handler: async function (response) {
                     console.log("Payment Success Response:", response);
-                    const itemTypeName = itemType === 'course' ? 'course' : 'mock test';
-                    toast.success(`Payment Successful, you are added to the ${itemTypeName}`, toastOptions);
+                    try {
+                        if (itemType !== 'course') {
+                            await apiConnector(
+                                "POST",
+                                MockTestPaymentEndpoints.MOCK_TEST_VERIFY_API,
+                                {
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_signature: response.razorpay_signature,
+                                },
+                                { Authorization: `Bearer ${token}` }
+                            );
+                        }
+                        const itemTypeName = itemType === 'course' ? 'course' : 'mock test';
+                        toast.success(`Payment Successful, you are added to the ${itemTypeName}`, toastOptions);
 
-                    if (itemType === 'course') {
-                        dispatch(resetCart());
+                        if (itemType === 'course') {
+                            dispatch(resetCart());
+                        }
+
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } catch (verifyError) {
+                        console.error("Payment verify failed:", verifyError);
+                        toast.error(
+                            verifyError.response?.data?.message ||
+                            "Payment received but verification failed. Contact support if access is missing.",
+                            toastOptions
+                        );
                     }
-
-                    // Reload after a short delay to show the success message
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1500);
                 },
                 modal: {
                     ondismiss: function () {

@@ -17,7 +17,7 @@ const courseProgressSchema = new mongoose.Schema({
     ],
 })
 
-
+courseProgressSchema.index({ courseID: 1, userId: 1 })
 
 module.exports = mongoose.model("CourseProgress", courseProgressSchema)
 

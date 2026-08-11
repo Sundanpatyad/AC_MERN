@@ -3,7 +3,16 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { studyMaterialEndPoints } from '../services/apis';
 
-const { FETCH_EXAMS , STUDY_MATERIALS , CREATE_EXAM ,CREATE_STUDY_MATERIAL , DELETE_EXAM ,DELETE_STUDY_MATERIALS } = studyMaterialEndPoints;
+const {
+    FETCH_EXAMS,
+    STUDY_MATERIALS,
+    CREATE_EXAM,
+    CREATE_STUDY_MATERIAL,
+    UPDATE_EXAM,
+    UPDATE_STUDY_MATERIAL,
+    DELETE_EXAM,
+    DELETE_STUDY_MATERIALS,
+} = studyMaterialEndPoints;
 
 
 export const fetchExams = createAsyncThunk('content/fetchExams', async () => {
@@ -41,7 +50,7 @@ export const updateExam = createAsyncThunk(
     'content/updateExam',
     async ({ id, name, description, token }) => {
         const response = await axios.put(
-            `${API_BASE_URL}/updateExam/${id}`,
+            `${UPDATE_EXAM}/${id}`,
             { name, description },
             {
                 headers: { Authorization: `Bearer ${token}` },
@@ -55,7 +64,7 @@ export const updateStudyMaterial = createAsyncThunk(
     'content/updateStudyMaterial',
     async ({ id, title, content, exam, token }) => {
         const response = await axios.put(
-            `${API_BASE_URL}/updateStudyMaterial/${id}`,
+            `${UPDATE_STUDY_MATERIAL}/${id}`,
             { title, content, exam },
             {
                 headers: { Authorization: `Bearer ${token}` },

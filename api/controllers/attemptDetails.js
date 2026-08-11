@@ -77,7 +77,9 @@ exports.getAttemptsByUser = async (req, res) => {
 
     // Calculate some statistics
     const totalAttempts = attempts.length;
-    const averageScore = attempts.reduce((sum, attempt) => sum + attempt.score, 0) / totalAttempts;
+    const averageScore = totalAttempts
+      ? attempts.reduce((sum, attempt) => sum + (attempt.score || 0), 0) / totalAttempts
+      : 0;
 
     res.status(200).json({
       success: true,

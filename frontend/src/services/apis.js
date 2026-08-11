@@ -1,6 +1,6 @@
-
-const BASE_URL = 'https://ac-mern-569448299007.europe-west1.run.app';
-// const BASE_URL = 'http://localhost:8000';
+// Override per environment with VITE_API_BASE_URL (see .env.example).
+export const BASE_URL = 'https://ac-mern-569448299007.europe-west1.run.app';
+// export const BASE_URL = 'http://localhost:8000';
 
 
 export const studyMaterialEndPoints = {
@@ -9,6 +9,8 @@ export const studyMaterialEndPoints = {
   FETCH_STUDY_MATERIALS: `${BASE_URL}/api/v1/materials/getStudyMaterials`,
   CREATE_EXAM: `${BASE_URL}/api/v1/materials/createExam`,
   CREATE_STUDY_MATERIAL: `${BASE_URL}/api/v1/materials/createStudyMaterial`,
+  UPDATE_EXAM: `${BASE_URL}/api/v1/materials/updateExam`,
+  UPDATE_STUDY_MATERIAL: `${BASE_URL}/api/v1/materials/updateStudyMaterial`,
   DELETE_EXAM: `${BASE_URL}/api/v1/materials/deleteExam`,
   DELETE_STUDY_MATERIALS: `${BASE_URL}/api/v1/materials/deleteStudyMaterial`,
   ADMIN_MOCK_LIST: `${BASE_URL}/api/v1/admin/users-by-mock-test`,
@@ -109,6 +111,7 @@ export const mocktestEndpoints = {
   GET_MCOKTEST_SERIES_BY_ID: `${BASE_URL}/api/v1/mock/getMockTestSeriesById`,
   CREATE_ATTEMPT_DETAILS: `${BASE_URL}/api/v1/mock/createAttemptDetails`,
   TEXT_EDIT_MOCKTEST: `${BASE_URL}/api/v1/mock/addMocktestToSeries`,
+  ATTACHMENTS_API: `${BASE_URL}/api/v1/mock/series`,
   SEARCH_API: `${BASE_URL}/api/v1/course/search`
 }
 

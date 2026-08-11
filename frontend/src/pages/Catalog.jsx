@@ -5,7 +5,7 @@ import { useQuery } from "react-query";
 import Footer from "../components/common/Footer";
 import ConfirmationModal from "../components/common/ConfirmationModal";
 import { getCatalogPageData } from "../services/operations/pageAndComponentData";
-import { fetchCourseCategories } from "./../services/operations/courseDetailsAPI";
+import { useCategories } from "../hooks/useCategories";
 import { addToCart } from "../slices/cartSlice";
 import { buyItem } from "../services/operations/studentFeaturesAPI";
 import toast from "react-hot-toast";
@@ -161,14 +161,7 @@ function Catalog() {
   const isLoggedIn = !!token;
 
   // Fetch categories
-  const { data: categories = [], isLoading: isCategoriesLoading } = useQuery(
-    "categories",
-    fetchCourseCategories,
-    {
-      staleTime: Infinity,
-      cacheTime: Infinity,
-    }
-  );
+  const { data: categories = [], isLoading: isCategoriesLoading } = useCategories();
 
   const categoryId = useMemo(() => {
     return categories.find(

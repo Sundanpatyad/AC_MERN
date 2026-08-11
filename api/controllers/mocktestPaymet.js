@@ -17,7 +17,7 @@ function verifyRazorpaySignature(orderId, paymentId, signature) {
     try {
         const text = `${orderId}|${paymentId}`;
         const generatedSignature = crypto
-            .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+            .createHmac('sha256', process.env.RAZORPAY_SECRET)
             .update(text)
             .digest('hex');
         return generatedSignature === signature;
@@ -66,7 +66,12 @@ exports.captureMockTestPayment = async (req, res) => {
             return res.status(200).json({
                 success: true,
                 message: "Order already processed",
-                order: existingOrder
+                data: {
+                    orderId: existingOrder.razorpayOrderId,
+                    amount: Math.round(Number(existingOrder.amount) * 100),
+                    currency: existingOrder.metadata?.currency || "INR",
+                    key: process.env.RAZORPAY_KEY,
+                }
             });
         }
 
@@ -127,14 +132,16 @@ exports.captureMockTestPayment = async (req, res) => {
 
         console.log('[Payment Capture] Order saved to database:', order._id);
 
+        // amount must be in paise — same value Razorpay stored on the order —
+        // otherwise checkout preferences returns 400 (amount mismatch).
         res.status(200).json({
             success: true,
             message: "Order created successfully",
             data: {
                 orderId: paymentResponse.id,
-                amount: totalAmount,
-                currency,
-                key: process.env.RAZORPAY_KEY_ID
+                amount: paymentResponse.amount,
+                currency: paymentResponse.currency || currency,
+                key: process.env.RAZORPAY_KEY,
             }
         });
 

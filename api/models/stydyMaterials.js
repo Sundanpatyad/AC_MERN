@@ -7,5 +7,6 @@ const studyMaterialSchema = new mongoose.Schema({
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
   });
 
+studyMaterialSchema.index({ exam: 1 });
 
 module.exports  = mongoose.model('StudyMaterial', studyMaterialSchema)

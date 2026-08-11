@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { fetchSeries } from '../services/operations/mocktest';
 import axios from 'axios';
+import { mocktestEndpoints } from '../services/apis';
 
 export const fetchSeriesAsync = createAsyncThunk(
   'editMock/fetchSeries',
@@ -14,7 +15,7 @@ export const addMockTest = createAsyncThunk(
   'editMock/addMockTest',
   async ({ seriesId, testName, testData, duration, token }, { rejectWithValue }) => {
     try {
-      const response = await axios.post('http://localhost:8000/api/v1/mock/addMocktestToSeries', {
+      const response = await axios.post(mocktestEndpoints.TEXT_EDIT_MOCKTEST, {
         seriesId,
         testName,
         testData,

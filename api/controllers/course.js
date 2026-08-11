@@ -110,7 +110,12 @@ exports.createCourse = async (req, res) => {
 // ================ show all courses ================
 exports.getAllCourses = async (req, res) => {
     try {
-        const allCourses = await Course.find({},
+        // Pagination is opt-in: without ?page the full list is returned as before.
+        const page = parseInt(req.query.page, 10)
+        const isPaginated = Number.isInteger(page) && page > 0
+        const limit = Math.min(parseInt(req.query.limit, 10) || 20, 100)
+
+        const query = Course.find({},
             {
                 courseName: true, courseDescription: true, price: true, thumbnail: true, instructor: true,
                 ratingAndReviews: true, studentsEnrolled: true
@@ -119,11 +124,23 @@ exports.getAllCourses = async (req, res) => {
                 path: 'instructor',
                 select: 'firstName lastName email image'
             })
-            .exec();
+            .lean()
+
+        if (isPaginated) {
+            query.skip((page - 1) * limit).limit(limit)
+        }
+
+        const [allCourses, total] = await Promise.all([
+            query.exec(),
+            isPaginated ? Course.countDocuments({}) : Promise.resolve(null),
+        ])
 
         return res.status(200).json({
             success: true,
             data: allCourses,
+            ...(isPaginated && {
+                pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+            }),
             message: 'Data for all courses fetched successfully'
         });
     }
@@ -153,6 +170,7 @@ exports.getCourseDetails = async (req, res) => {
         })
             .populate({
                 path: "instructor",
+                select: "-password -token -resetPasswordExpires",
                 populate: {
                     path: "additionalDetails",
                 },
@@ -167,6 +185,7 @@ exports.getCourseDetails = async (req, res) => {
                     select: "-videoUrl",
                 },
             })
+            .lean()
             .exec()
 
 
@@ -226,31 +245,32 @@ exports.getFullCourseDetails = async (req, res) => {
         const userId = req.user.id
         // //console.log('courseId userId  = ', courseId, " == ", userId)
 
-        const courseDetails = await Course.findOne({
-            _id: courseId,
-        })
-            .populate({
-                path: "instructor",
-                populate: {
-                    path: "additionalDetails",
-                },
+        const [courseDetails, courseProgressCount] = await Promise.all([
+            Course.findOne({ _id: courseId })
+                .populate({
+                    path: "instructor",
+                    select: "-password -token -resetPasswordExpires",
+                    populate: {
+                        path: "additionalDetails",
+                    },
+                })
+                .populate("category")
+                .populate("ratingAndReviews")
+                .populate({
+                    path: "courseContent",
+                    populate: {
+                        path: "subSection",
+                    },
+                })
+                .lean()
+                .exec(),
+            CourseProgress.findOne({
+                courseID: courseId,
+                userId: userId,
             })
-            .populate("category")
-            .populate("ratingAndReviews")
-            .populate({
-                path: "courseContent",
-                populate: {
-                    path: "subSection",
-                },
-            })
-            .exec()
-
-        let courseProgressCount = await CourseProgress.findOne({
-            courseID: courseId,
-            userId: userId,
-        })
-
-        //   //console.log("courseProgressCount : ", courseProgressCount)
+                .select("completedVideos")
+                .lean(),
+        ])
 
         if (!courseDetails) {
             return res.status(404).json({
@@ -378,7 +398,9 @@ exports.getInstructorCourses = async (req, res) => {
         const instructorId = req.user.id
 
         // Find all courses belonging to the instructor
-        const instructorCourses = await Course.find({ instructor: instructorId, }).sort({ createdAt: -1 })
+        const instructorCourses = await Course.find({ instructor: instructorId, })
+            .sort({ createdAt: -1 })
+            .lean()
 
 
         // Return the instructor's courses
@@ -412,34 +434,43 @@ exports.deleteCourse = async (req, res) => {
         }
 
         // Unenroll students from the course
-        const studentsEnrolled = course.studentsEnrolled
-        for (const studentId of studentsEnrolled) {
-            await User.findByIdAndUpdate(studentId, {
-                $pull: { courses: courseId },
-            })
+        const studentsEnrolled = course.studentsEnrolled || []
+        if (studentsEnrolled.length > 0) {
+            await User.updateMany(
+                { _id: { $in: studentsEnrolled } },
+                { $pull: { courses: courseId } }
+            )
         }
 
         // delete course thumbnail From Cloudinary
         await deleteResourceFromCloudinary(course?.thumbnail);
 
-        // Delete sections and sub-sections
-        const courseSections = course.courseContent
-        for (const sectionId of courseSections) {
-            // Delete sub-sections of the section
-            const section = await Section.findById(sectionId)
-            if (section) {
-                const subSections = section.subSection
-                for (const subSectionId of subSections) {
-                    const subSection = await SubSection.findById(subSectionId)
-                    if (subSection) {
-                        await deleteResourceFromCloudinary(subSection.videoUrl) // delete course videos From Cloudinary
-                    }
-                    await SubSection.findByIdAndDelete(subSectionId)
-                }
-            }
+        // Collect the whole section/sub-section tree up front so the deletes can be
+        // issued as a handful of batched queries instead of one per document.
+        const courseSectionIds = course.courseContent || []
+        const sections = await Section.find({ _id: { $in: courseSectionIds } })
+            .select("subSection")
+            .lean()
 
-            // Delete the section
-            await Section.findByIdAndDelete(sectionId)
+        const subSectionIds = sections.flatMap((section) => section.subSection || [])
+
+        if (subSectionIds.length > 0) {
+            const subSections = await SubSection.find({ _id: { $in: subSectionIds } })
+                .select("videoUrl")
+                .lean()
+
+            // delete course videos From Cloudinary
+            await Promise.allSettled(
+                subSections.map((subSection) =>
+                    deleteResourceFromCloudinary(subSection.videoUrl)
+                )
+            )
+
+            await SubSection.deleteMany({ _id: { $in: subSectionIds } })
+        }
+
+        if (courseSectionIds.length > 0) {
+            await Section.deleteMany({ _id: { $in: courseSectionIds } })
         }
 
         // Delete the course

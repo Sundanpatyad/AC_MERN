@@ -82,6 +82,11 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Login and signup both hit findOne({ email }) on every request.
+userSchema.index({ email: 1 });
+userSchema.index({ accountType: 1 });
+userSchema.index({ mocktests: 1 });
+
 const User = mongoose.model('User', userSchema);
 
 

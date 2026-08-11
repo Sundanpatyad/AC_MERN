@@ -53,7 +53,13 @@ exports.capturePayment = async (req, res) => {
         const paymentResponse = await instance.instance.orders.create(options);
         res.status(200).json({
             success: true,
-            message: paymentResponse,
+            message: "Order created successfully",
+            data: {
+                orderId: paymentResponse.id,
+                amount: paymentResponse.amount,
+                currency: paymentResponse.currency || currency,
+                key: process.env.RAZORPAY_KEY,
+            },
         })
     } catch (error) {
         //console.log(error);

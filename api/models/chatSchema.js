@@ -15,4 +15,7 @@ const chatSchema = new mongoose.Schema({
   lastUpdated: { type: Date, default: Date.now }
 });
 
+chatSchema.index({ user: 1, instructor: 1 });
+chatSchema.index({ lastUpdated: -1 });
+
 module.exports = mongoose.model('Chat', chatSchema);

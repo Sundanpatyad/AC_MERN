@@ -16,32 +16,30 @@ exports.updateCourseProgress = async (req, res) => {
       return res.status(404).json({ error: "Invalid subsection" })
     }
 
-    // Find the course progress document for the user and course
-    let courseProgress = await CourseProgress.findOne({
+    const existingProgress = await CourseProgress.findOne({
       courseID: courseId,
       userId: userId,
     })
+      .select("completedVideos")
+      .lean()
 
-    if (!courseProgress) {
-      // If course progress doesn't exist, create a new one
-      return res.status(404).json({
-        success: false,
-        message: "Course progress Does Not Exist",
-      })
-    } else {
-      // If course progress exists, check if the subsection is already completed
-      if (courseProgress.completedVideos.includes(subsectionId)) {
-        return res.status(400).json({ error: "Subsection already completed" })
-      }
+    const alreadyCompleted = existingProgress?.completedVideos?.some(
+      (id) => String(id) === String(subsectionId)
+    )
 
-      // Push the subsection into the completedVideos array
-      courseProgress.completedVideos.push(subsectionId)
+    if (alreadyCompleted) {
+      return res.status(400).json({ error: "Subsection already completed" })
     }
 
-    // Save the updated course progress
-    await courseProgress.save()
+    // Upsert so the first completed lecture works even when no progress document
+    // was created at enrollment time.
+    await CourseProgress.findOneAndUpdate(
+      { courseID: courseId, userId: userId },
+      { $addToSet: { completedVideos: subsectionId } },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    )
 
-    return res.status(200).json({ message: "Course progress updated" })
+    return res.status(200).json({ success: true, message: "Course progress updated" })
   }
   catch (error) {
     console.error(error)

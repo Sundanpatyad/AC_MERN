@@ -92,6 +92,10 @@ const MockTestSeriesSchema = new mongoose.Schema({
   timestamps: true
 });
 
+MockTestSeriesSchema.index({ studentsEnrolled: 1 });
+MockTestSeriesSchema.index({ creator: 1 });
+MockTestSeriesSchema.index({ status: 1 });
+
 const MockTestSeries = mongoose.model('MockTestSeries', MockTestSeriesSchema);
 
 module.exports = { MockTestSeries };

@@ -25,29 +25,29 @@ export default function EnrolledCourses() {
   const [showMockAttempts, setShowMockAttempts] = useState(false)
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!enrolledCourses && !loading.courses) {
-        dispatch(setEnrolledCoursesStart())
-        try {
-          const res = await getUserEnrolledCourses(token)
-          dispatch(setEnrolledCoursesSuccess(res))
-        } catch (error) {
-          dispatch(setEnrolledCoursesFailure(error.message))
-        }
-      }
-
-      if (!enrolledMockTests && !loading.mockTests) {
-        dispatch(setEnrolledMockTestsStart())
-        try {
-          const res = await getUserEnrolledMockTests(token)
-          dispatch(setEnrolledMockTestsSuccess(res))
-        } catch (error) {
-          dispatch(setEnrolledMockTestsFailure(error.message))
-        }
+    const loadCourses = async () => {
+      if (enrolledCourses || loading.courses) return
+      dispatch(setEnrolledCoursesStart())
+      try {
+        const res = await getUserEnrolledCourses(token)
+        dispatch(setEnrolledCoursesSuccess(res))
+      } catch (error) {
+        dispatch(setEnrolledCoursesFailure(error.message))
       }
     }
 
-    fetchData()
+    const loadMockTests = async () => {
+      if (enrolledMockTests || loading.mockTests) return
+      dispatch(setEnrolledMockTestsStart())
+      try {
+        const res = await getUserEnrolledMockTests(token)
+        dispatch(setEnrolledMockTestsSuccess(res))
+      } catch (error) {
+        dispatch(setEnrolledMockTestsFailure(error.message))
+      }
+    }
+
+    Promise.all([loadCourses(), loadMockTests()])
   }, [token, dispatch, enrolledCourses, enrolledMockTests, loading.courses, loading.mockTests])
 
   const getMockAttempts = async () => {

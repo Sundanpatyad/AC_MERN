@@ -54,7 +54,9 @@ exports.createMockTestSeries = async (req, res) => {
 
 exports.getAllMockTestSeries = async (req, res) => {
     try {
-        const series = await MockTestSeries.find().populate('creator', 'name email');
+        const series = await MockTestSeries.find()
+            .populate('creator', 'firstName lastName email')
+            .lean();
         res.status(200).json({
             success: true,
             data: series
@@ -69,7 +71,9 @@ exports.getAllMockTestSeries = async (req, res) => {
 
 exports.getAllMockTestSeriesStudent = async (req, res) => {
     try {
-        const series = await MockTestSeries.find().populate('creator', 'name email');
+        const series = await MockTestSeries.find()
+            .populate('creator', 'firstName lastName email')
+            .lean();
         res.status(200).json({
             success: true,
             data: series
@@ -85,8 +89,9 @@ exports.getAllMockTestSeriesStudent = async (req, res) => {
 exports.getMockTestSeriesById = async (req, res) => {
     try {
         const series = await MockTestSeries.findById(req.params.id)
-            .populate('creator', 'name email')
-            .populate('mockTests');
+            .populate('creator', 'firstName lastName email')
+            .populate('mockTests')
+            .lean();
 
         if (!series) {
             return res.status(404).json({
