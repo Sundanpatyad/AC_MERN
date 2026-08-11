@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Animated, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { Button } from './Button';
+import { Palette, Radii } from '@/constants/theme';
 
 interface ConfirmationSheetProps {
   isVisible: boolean;
@@ -64,41 +65,39 @@ export function ConfirmationSheet({
   );
 }
 
-const { width } = Dimensions.get('window');
-
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: Palette.overlay,
     justifyContent: 'flex-end',
   },
   sheet: {
-    backgroundColor: '#121212',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    backgroundColor: Palette.surface,
+    borderTopLeftRadius: Radii.xl,
+    borderTopRightRadius: Radii.xl,
+    borderWidth: 1,
+    borderColor: Palette.borderStrong,
     padding: 24,
     paddingTop: 12,
     width: '100%',
-    borderWidth: 1,
-    borderColor: '#222',
   },
   indicator: {
     width: 40,
     height: 4,
-    backgroundColor: '#333',
+    backgroundColor: Palette.borderStrong,
     borderRadius: 2,
     alignSelf: 'center',
     marginBottom: 24,
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: '700',
+    color: Palette.text,
     marginBottom: 12,
   },
   message: {
     fontSize: 14,
-    color: '#a1a1aa',
+    color: Palette.textSecondary,
     marginBottom: 24,
     lineHeight: 20,
   },

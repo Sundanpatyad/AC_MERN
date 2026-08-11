@@ -5,6 +5,8 @@ import Toast from 'react-native-toast-message';
 
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
+import { ScreenBackground } from '../../components/ui/ScreenBackground';
+import { Palette } from '../../constants/theme';
 import { apiConnector } from '../../services/api';
 import { endpoints } from '../../constants/api';
 
@@ -63,6 +65,7 @@ export default function UpdatePasswordScreen() {
   };
 
   return (
+    <ScreenBackground>
     <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
@@ -113,13 +116,14 @@ export default function UpdatePasswordScreen() {
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#080808',
+    backgroundColor: 'transparent',
   },
   scrollContent: {
     flexGrow: 1,
@@ -132,12 +136,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#ffffff',
+    color: Palette.text,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#a1a1aa',
+    color: Palette.textSecondary,
     lineHeight: 24,
   },
   form: {
@@ -149,7 +153,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   loginText: {
-    color: '#ffffff',
+    color: Palette.text,
     fontSize: 14,
     fontWeight: 'bold',
   },

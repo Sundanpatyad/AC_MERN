@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native
 import { apiConnector } from '../services/api';
 import { endpoints } from '../constants/api';
 import { Ionicons } from '@expo/vector-icons';
+import { RankingsSkeleton } from '../components/ui/Skeleton';
 
 export default function RankingsScreen() {
   const [rankings, setRankings] = useState([]);
@@ -47,7 +48,7 @@ export default function RankingsScreen() {
         }
       >
         {isLoading ? (
-          <Text style={styles.loadingText}>Loading rankings...</Text>
+          <RankingsSkeleton count={8} />
         ) : rankings.length > 0 ? (
           <View style={styles.list}>
             {rankings.map((rank: any, index: number) => (

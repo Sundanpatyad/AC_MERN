@@ -1,5 +1,14 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
+import {
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  ViewStyle,
+  TextStyle,
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Palette, Radii } from '@/constants/theme';
 
 interface ButtonProps {
   title: string;
@@ -11,53 +20,69 @@ interface ButtonProps {
   textStyle?: TextStyle;
 }
 
-export function Button({ 
-  title, 
-  onPress, 
-  variant = 'primary', 
-  isLoading = false, 
+export function Button({
+  title,
+  onPress,
+  variant = 'primary',
+  isLoading = false,
   disabled = false,
   style,
-  textStyle
+  textStyle,
 }: ButtonProps) {
-  
-  const getBackgroundColor = () => {
-    if (disabled) return '#333';
-    switch (variant) {
-      case 'primary': return '#ffffff';
-      case 'secondary': return '#1a1a1a';
-      case 'outline': return 'transparent';
-      case 'ghost': return 'transparent';
-      default: return '#ffffff';
-    }
-  };
+  const textColor =
+    disabled
+      ? Palette.textMuted
+      : variant === 'primary'
+        ? Palette.black
+        : Palette.text;
 
-  const getTextColor = () => {
-    if (disabled) return '#888';
-    switch (variant) {
-      case 'primary': return '#000000';
-      case 'secondary': return '#ffffff';
-      case 'outline': return '#ffffff';
-      case 'ghost': return '#a1a1aa';
-      default: return '#000000';
-    }
-  };
+  const content = isLoading ? (
+    <ActivityIndicator color={textColor} />
+  ) : (
+    <Text style={[styles.text, { color: textColor }, textStyle]}>{title}</Text>
+  );
 
-  const getBorderColor = () => {
-    if (disabled) return '#333';
-    if (variant === 'outline') return '#333';
-    if (variant === 'secondary') return '#333';
-    return 'transparent';
-  };
+  if (variant === 'primary' && !disabled) {
+    return (
+      <TouchableOpacity
+        onPress={onPress}
+        disabled={disabled || isLoading}
+        activeOpacity={0.85}
+        style={[styles.button, styles.primaryShadow, style]}
+      >
+        <LinearGradient
+          colors={[Palette.text, Palette.accentMuted]}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+          style={styles.gradientFill}
+        >
+          {content}
+        </LinearGradient>
+      </TouchableOpacity>
+    );
+  }
+
+  const backgroundColor = disabled
+    ? Palette.surface
+    : variant === 'secondary'
+      ? Palette.surfaceRaised
+      : 'transparent';
+
+  const borderColor =
+    variant === 'outline' || variant === 'secondary'
+      ? Palette.borderStrong
+      : 'transparent';
 
   return (
     <TouchableOpacity
       style={[
         styles.button,
+        styles.solidFill,
         {
-          backgroundColor: getBackgroundColor(),
-          borderColor: getBorderColor(),
+          backgroundColor,
+          borderColor,
           borderWidth: variant === 'outline' || variant === 'secondary' ? 1 : 0,
+          opacity: disabled ? 0.55 : 1,
         },
         style,
       ]}
@@ -65,29 +90,39 @@ export function Button({
       disabled={disabled || isLoading}
       activeOpacity={0.8}
     >
-      {isLoading ? (
-        <ActivityIndicator color={getTextColor()} />
-      ) : (
-        <Text style={[styles.text, { color: getTextColor() }, textStyle]}>
-          {title}
-        </Text>
-      )}
+      {content}
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   button: {
-    height: 38,
-    borderRadius: 10,
+    height: 52,
+    borderRadius: Radii.pill,
+    marginVertical: 4,
+    overflow: 'hidden',
+  },
+  primaryShadow: {
+    shadowColor: '#fff',
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+  },
+  gradientFill: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    marginVertical: 4,
+    paddingHorizontal: 20,
+  },
+  solidFill: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
   },
   text: {
-    fontSize: 13,
-    fontWeight: '600',
-    letterSpacing: 0.5,
+    fontSize: 15,
+    fontWeight: '700',
+    letterSpacing: 0.2,
   },
 });

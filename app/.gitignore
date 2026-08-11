@@ -41,3 +41,7 @@ app-example
 # generated native folders
 /ios
 /android
+
+# Google OAuth downloaded secrets (do not commit)
+client_secret_*.json
+client_*.apps.googleusercontent.com.plist

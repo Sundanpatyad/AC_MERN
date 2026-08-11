@@ -7,9 +7,22 @@ import 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 
 import { useAuthStore } from '../store/authStore';
+import { Palette } from '../constants/theme';
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+const AppDarkTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    primary: Palette.text,
+    background: Palette.background,
+    card: Palette.surface,
+    text: Palette.text,
+    border: Palette.border,
+    notification: Palette.danger,
+  },
+};
 
 export default function RootLayout() {
   const { hydrate, isLoading, token } = useAuthStore();
@@ -37,10 +50,8 @@ export default function RootLayout() {
     const inAuthGroup = segments[0] === '(auth)';
 
     if (!token && !inAuthGroup) {
-      // Redirect to the sign-in page.
       router.replace('/(auth)/login');
     } else if (token && inAuthGroup) {
-      // Redirect away from the sign-in page.
       router.replace('/(tabs)');
     }
   }, [token, segments, isLoading, isReady]);
@@ -50,8 +61,13 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={DarkTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
+    <ThemeProvider value={AppDarkTheme}>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: Palette.background },
+        }}
+      >
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />

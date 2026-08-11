@@ -1,5 +1,6 @@
 // export const BASE_URL = 'https://ac-62i9.onrender.com';
-export const BASE_URL = 'http://192.168.1.7:8000';
+export const BASE_URL = 'https://ac-mern-569448299007.europe-west1.run.app';
+// export const BASE_URL = 'http://localhost:8000';
 
 export const endpoints = {
   // Auth
@@ -20,6 +21,9 @@ export const endpoints = {
   // Profile
   GET_USER_DETAILS: `${BASE_URL}/api/v1/profile/getUserDetails`,
   GET_ENROLLED_MOCK_TESTS: `${BASE_URL}/api/v1/profile/getEnrolledMockTests`,
+  UPDATE_PROFILE_API: `${BASE_URL}/api/v1/profile/updateProfile`,
+  DELETE_PROFILE_API: `${BASE_URL}/api/v1/profile/deleteProfile`,
+  CHANGE_PASSWORD_API: `${BASE_URL}/api/v1/auth/changepassword`,
   GET_USER_ATTEMPTS: `${BASE_URL}/api/v1/mock/getAttemptsByUser`,
 
   // Payment

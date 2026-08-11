@@ -10,6 +10,7 @@ import { useTestStore } from '../../store/testStore';
 import { useAuthStore } from '../../store/authStore';
 import { Button } from '../../components/ui/Button';
 import { ConfirmationSheet } from '../../components/ui/ConfirmationSheet';
+import { DetailSkeleton } from '../../components/ui/Skeleton';
 
 export default function TakeTestScreen() {
   const { id } = useLocalSearchParams();
@@ -247,8 +248,8 @@ export default function TakeTestScreen() {
 
   if (isLoading) {
     return (
-      <View style={[styles.container, styles.centered]}>
-        <Text style={{ color: '#fff' }}>Loading Test...</Text>
+      <View style={[styles.container, { paddingTop: 60 }]}>
+        <DetailSkeleton />
       </View>
     );
   }

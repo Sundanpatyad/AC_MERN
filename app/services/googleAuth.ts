@@ -1,64 +1,106 @@
+import { Platform } from 'react-native';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { apiConnector } from './api';
 import { endpoints } from '../constants/api';
 import { useAuthStore } from '../store/authStore';
+import {
+  GOOGLE_WEB_CLIENT_ID,
+  GOOGLE_IOS_CLIENT_ID,
+} from '../constants/google';
 
-// Configure Google Sign-In
-// Note: You MUST update webClientId with your actual Android/iOS client ID from Google Cloud Console
+// iOS uses iosClientId + URL scheme from GoogleService-Info.
+// webClientId is required on Android for id/access tokens; it must be a Web
+// client from the SAME Google Cloud project as the Android OAuth client.
+// Our current web client (217412…) is a different project than iOS/Android
+// (100401… / thematic-bonus) — do not force it on iOS.
 GoogleSignin.configure({
-  webClientId: '217412143147-6l1q2l190t36rp0452f3hl5mtl3nrhjq.apps.googleusercontent.com', // Using the web client ID from frontend for now, but native needs its own
-  offlineAccess: true,
+  iosClientId: GOOGLE_IOS_CLIENT_ID,
+  ...(Platform.OS === 'android'
+    ? {
+        webClientId: GOOGLE_WEB_CLIENT_ID,
+        offlineAccess: true,
+        forceCodeForRefreshToken: true,
+      }
+    : {
+        offlineAccess: false,
+      }),
+  scopes: ['profile', 'email', 'openid'],
 });
 
 export const handleGoogleLogin = async () => {
   try {
-    // 1. Check if device supports Google Play services
-    await GoogleSignin.hasPlayServices();
-    
-    // 2. Trigger native Google Sign-in modal
-    const userInfo = await GoogleSignin.signIn();
-    
-    // 3. Extract the token
-    const { accessToken, idToken } = await GoogleSignin.getTokens();
-    
+    if (Platform.OS === 'android') {
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+    }
+
+    // Clear any stale session that can break simulator sign-in
+    try {
+      await GoogleSignin.signOut();
+    } catch {
+      // ignore — no prior session
+    }
+
+    const signInResult = await GoogleSignin.signIn();
+    console.log('[Google Sign-In] result type:', signInResult?.type || 'ok');
+
+    const tokens = await GoogleSignin.getTokens();
+    const accessToken = tokens?.accessToken || null;
+    const idToken = tokens?.idToken || signInResult?.data?.idToken || null;
+
+    console.log('[Google Sign-In] has accessToken:', !!accessToken, 'has idToken:', !!idToken);
+
     if (!accessToken && !idToken) {
       throw new Error('No Google token received');
     }
 
-    // 4. Send to backend
     const response = await apiConnector.post(endpoints.GOOGLE_API, {
-      accessToken: accessToken || idToken, // Try access_token first, fallback to id_token
+      accessToken,
+      idToken,
     });
 
     if (response.data.success) {
       const { token: jwtToken, user: userData } = response.data;
-      
-      const userImage = userData?.image 
-        ? userData.image 
+
+      const userImage = userData?.image
+        ? userData.image
         : `https://api.dicebear.com/5.x/initials/svg?seed=${userData.firstName} ${userData.lastName}`;
 
-      // 5. Save to Zustand store
       const authStore = useAuthStore.getState();
       await authStore.setToken(jwtToken);
       await authStore.setUser({ ...userData, image: userImage });
-      
+
       return { success: true };
-    } else {
-      return { success: false, message: response.data.message || 'Google Login failed on server' };
     }
+
+    return {
+      success: false,
+      message: response.data.message || 'Google Login failed on server',
+    };
   } catch (error: any) {
     let message = 'An unknown error occurred';
-    
+    const raw = String(error?.message || error?.code || '');
+
     if (error.code === statusCodes.SIGN_IN_CANCELLED) {
       message = 'User cancelled the login flow';
     } else if (error.code === statusCodes.IN_PROGRESS) {
       message = 'Sign in is in progress already';
     } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
       message = 'Play services not available or outdated';
+    } else if (raw.includes('URL schemes') || raw.includes('missing support')) {
+      message =
+        'Google URL scheme missing. Rebuild the iOS app (not just reload): npx expo run:ios';
+    } else if (
+      raw.includes('DEVELOPER_ERROR') ||
+      error.code === '10' ||
+      error.code === 10
+    ) {
+      message =
+        'Google Sign-In misconfigured. Check package name, SHA-1, and webClientId.';
     } else {
-      message = error.response?.data?.message || error.message || 'Google Sign-In failed';
+      message =
+        error.response?.data?.message || error.message || 'Google Sign-In failed';
     }
-    
+
     console.error('Google Sign-In Error:', error);
     return { success: false, message };
   }

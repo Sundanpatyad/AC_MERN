@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, RefreshControl, TextInput, TouchableOpacity, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, RefreshControl, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { apiConnector } from '../../services/api';
 import { endpoints } from '../../constants/api';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../store/authStore';
+import { ScreenBackground } from '../../components/ui/ScreenBackground';
+import { Palette, Radii } from '../../constants/theme';
+import { RankingsSkeleton, Skeleton } from '../../components/ui/Skeleton';
 
 export default function RankingsScreen() {
   const { user } = useAuthStore();
@@ -33,7 +36,7 @@ export default function RankingsScreen() {
       };
       if (selectedTest !== 'All') params.testName = selectedTest;
       
-      const response = await apiConnector.get(endpoints.GET_RANKINGS, null, null, params);
+      const response = await apiConnector.get(endpoints.GET_RANKINGS, { params });
       if (response.data?.success) {
         const newData = response.data.data || [];
         const pagination = response.data.pagination;
@@ -116,23 +119,23 @@ export default function RankingsScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <View style={styles.header}>
         <Text style={styles.title}>Leaderboard</Text>
         <Text style={styles.subtitle}>Top performers across all tests</Text>
         
         <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
+          <Ionicons name="search" size={18} color={Palette.textMuted} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search by user or test..."
-            placeholderTextColor="#666"
+            placeholderTextColor={Palette.textMuted}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
           {searchQuery !== '' && (
             <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Ionicons name="close-circle" size={20} color="#666" />
+              <Ionicons name="close-circle" size={18} color={Palette.textMuted} />
             </TouchableOpacity>
           )}
         </View>
@@ -177,7 +180,7 @@ export default function RankingsScreen() {
               <Text style={styles.sectionLabel}>Your Ranking</Text>
               <View style={[styles.rankCard, styles.userRankCard]}>
                 <View style={styles.rankBadge}>
-                  <Text style={[styles.rankNumber, { color: '#3b82f6' }]}>{personalRank.rank}</Text>
+                  <Text style={[styles.rankNumber, { color: Palette.text }]}>{personalRank.rank}</Text>
                 </View>
                 <View style={styles.userInfo}>
                   <Text style={styles.userName} numberOfLines={1}>You</Text>
@@ -195,112 +198,108 @@ export default function RankingsScreen() {
         }
         ListEmptyComponent={
           isLoading ? (
-            <ActivityIndicator size="large" color="#3b82f6" style={{ marginTop: 40 }} />
+            <RankingsSkeleton count={8} />
           ) : (
             <Text style={styles.emptyText}>No rankings found matching your filters.</Text>
           )
         }
         ListFooterComponent={
           isLoadingMore ? (
-            <ActivityIndicator size="small" color="#3b82f6" style={{ marginVertical: 20 }} />
+            <View style={{ paddingVertical: 16, gap: 10 }}>
+              <Skeleton height={56} borderRadius={Radii.lg} />
+              <Skeleton height={56} borderRadius={Radii.lg} />
+            </View>
           ) : null
         }
       />
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#080808',
-  },
   header: {
     padding: 20,
-    paddingTop: 60,
-    backgroundColor: '#121212',
-    borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    paddingTop: 64,
   },
   title: {
-    fontSize: 20,
+    fontSize: 28,
     fontWeight: '700',
-    color: '#fff',
-    marginBottom: 2,
-    letterSpacing: -0.2,
+    color: Palette.text,
+    marginBottom: 4,
+    letterSpacing: -0.4,
   },
   subtitle: {
-    fontSize: 11,
-    color: '#666',
+    fontSize: 14,
+    color: Palette.textSecondary,
     marginBottom: 16,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0f0f0f',
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    height: 36,
+    backgroundColor: Palette.surface,
+    borderRadius: Radii.pill,
+    paddingHorizontal: 16,
+    height: 48,
     borderWidth: 1,
-    borderColor: '#1a1a1a',
+    borderColor: Palette.border,
   },
   searchIcon: {
-    marginRight: 6,
+    marginRight: 8,
   },
   searchInput: {
     flex: 1,
-    color: '#fff',
-    fontSize: 12,
+    color: Palette.text,
+    fontSize: 15,
   },
   filterContainer: {
-    marginTop: 12,
+    marginTop: 14,
   },
   filterContent: {
     paddingRight: 20,
     gap: 8,
   },
   filterBadge: {
-    backgroundColor: '#0f0f0f',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 12,
+    backgroundColor: Palette.surface,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: Radii.pill,
     borderWidth: 1,
-    borderColor: '#1a1a1a',
+    borderColor: Palette.border,
   },
   filterBadgeActive: {
-    backgroundColor: '#3b82f6',
-    borderColor: '#3b82f6',
+    backgroundColor: Palette.text,
+    borderColor: Palette.text,
   },
   filterText: {
-    color: '#666',
-    fontSize: 11,
+    color: Palette.textSecondary,
+    fontSize: 12,
     fontWeight: '600',
   },
   filterTextActive: {
-    color: '#fff',
+    color: Palette.black,
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 40,
+    paddingBottom: 32,
   },
   personalRankSection: {
     marginBottom: 20,
   },
   sectionLabel: {
-    color: '#666',
-    fontSize: 10,
+    color: Palette.textMuted,
+    fontSize: 11,
     fontWeight: '700',
     textTransform: 'uppercase',
     marginBottom: 8,
     letterSpacing: 1.2,
   },
   userRankCard: {
-    borderColor: '#3b82f6',
-    backgroundColor: 'rgba(59, 130, 246, 0.05)',
+    borderColor: Palette.borderStrong,
+    backgroundColor: Palette.surfaceRaised,
   },
   divider: {
-    height: 1,
-    backgroundColor: '#1a1a1a',
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: Palette.border,
     marginVertical: 16,
   },
   list: {
@@ -309,12 +308,12 @@ const styles = StyleSheet.create({
   rankCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0f0f0f',
-    padding: 10,
-    borderRadius: 12,
+    backgroundColor: Palette.surface,
+    padding: 14,
+    borderRadius: Radii.lg,
     borderWidth: 1,
-    borderColor: '#1a1a1a',
-    marginBottom: 0,
+    borderColor: Palette.border,
+    marginBottom: 10,
   },
   rankBadge: {
     width: 28,
@@ -322,7 +321,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   rankNumber: {
-    color: '#666',
+    color: Palette.textMuted,
     fontSize: 13,
     fontWeight: '700',
   },
@@ -331,44 +330,43 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   userName: {
-    color: '#fff',
-    fontSize: 13,
+    color: Palette.text,
+    fontSize: 14,
     fontWeight: '600',
     marginBottom: 2,
   },
   testName: {
-    color: '#888',
-    fontSize: 10,
+    color: Palette.textSecondary,
+    fontSize: 11,
     marginBottom: 1,
   },
   seriesName: {
-    color: '#555',
-    fontSize: 9,
+    color: Palette.textMuted,
+    fontSize: 10,
   },
   scoreInfo: {
     alignItems: 'flex-end',
     minWidth: 40,
   },
   score: {
-    color: '#3b82f6',
-    fontSize: 15,
+    color: Palette.text,
+    fontSize: 16,
     fontWeight: '700',
   },
   totalScore: {
-    color: '#555',
-    fontSize: 10,
+    color: Palette.textMuted,
+    fontSize: 11,
   },
   loadingText: {
-    color: '#666',
+    color: Palette.textMuted,
     textAlign: 'center',
     marginTop: 20,
-    fontSize: 12,
+    fontSize: 13,
   },
   emptyText: {
-    color: '#666',
+    color: Palette.textMuted,
     textAlign: 'center',
     marginTop: 40,
-    fontStyle: 'italic',
-    fontSize: 12,
+    fontSize: 13,
   },
 });

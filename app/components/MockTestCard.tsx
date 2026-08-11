@@ -1,7 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { Palette, Radii } from '@/constants/theme';
 
 interface MockTestCardProps {
   test: any;
@@ -23,17 +30,13 @@ export function MockTestCard({ test, onPress, showStatus = false }: MockTestCard
   const isFree = test.price === 0;
 
   return (
-    <TouchableOpacity 
-      style={styles.card} 
-      activeOpacity={0.8}
-      onPress={handlePress}
-    >
+    <TouchableOpacity style={styles.card} activeOpacity={0.85} onPress={handlePress}>
       <View style={styles.imageContainer}>
         {test.thumbnail ? (
           <Image source={{ uri: test.thumbnail }} style={styles.image} />
         ) : (
           <View style={styles.placeholderImage}>
-            <Ionicons name="book" size={40} color="#333" />
+            <Ionicons name="book" size={36} color={Palette.textMuted} />
           </View>
         )}
         <View style={styles.badges}>
@@ -41,9 +44,9 @@ export function MockTestCard({ test, onPress, showStatus = false }: MockTestCard
             <Text style={styles.badgeText}>{test.mockTests?.length || 0} Tests</Text>
           </View>
           {showStatus && (
-             <View style={[styles.badge, { backgroundColor: 'rgba(59, 130, 246, 0.8)' }]}>
-               <Text style={styles.badgeText}>Enrolled</Text>
-             </View>
+            <View style={[styles.badge, styles.enrolledBadge]}>
+              <Text style={styles.badgeText}>Enrolled</Text>
+            </View>
           )}
         </View>
       </View>
@@ -52,19 +55,12 @@ export function MockTestCard({ test, onPress, showStatus = false }: MockTestCard
         <Text style={styles.title} numberOfLines={2}>
           {test.seriesName}
         </Text>
-        
+
         <View style={styles.footer}>
-          <Text style={styles.price}>
-            {isFree ? 'Free' : `₹${test.price}`}
-          </Text>
-          
-          <TouchableOpacity 
-            style={styles.actionButton}
-            onPress={handlePress}
-          >
-            <Text style={styles.actionText}>
-              {showStatus ? 'View' : 'Details'}
-            </Text>
+          <Text style={styles.price}>{isFree ? 'Free' : `₹${test.price}`}</Text>
+
+          <TouchableOpacity style={styles.actionButton} onPress={handlePress}>
+            <Text style={styles.actionText}>{showStatus ? 'View' : 'Details'}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -74,17 +70,17 @@ export function MockTestCard({ test, onPress, showStatus = false }: MockTestCard
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#0f0f0f',
-    borderRadius: 12,
+    backgroundColor: Palette.surface,
+    borderRadius: Radii.lg,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#1a1a1a',
+    borderColor: Palette.border,
     marginBottom: 14,
   },
   imageContainer: {
     width: '100%',
     aspectRatio: 16 / 9,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: Palette.surfaceRaised,
     position: 'relative',
   },
   image: {
@@ -105,28 +101,31 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   badge: {
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    backgroundColor: 'rgba(0,0,0,0.72)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: Radii.pill,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: Palette.borderStrong,
+  },
+  enrolledBadge: {
+    backgroundColor: 'rgba(255,255,255,0.18)',
   },
   badgeText: {
-    color: '#fff',
-    fontSize: 9,
+    color: Palette.text,
+    fontSize: 10,
     fontWeight: '700',
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
   },
   content: {
     padding: 16,
   },
   title: {
-    color: '#fff',
-    fontSize: 14,
+    color: Palette.text,
+    fontSize: 15,
     fontWeight: '600',
-    marginBottom: 12,
-    lineHeight: 20,
+    marginBottom: 14,
+    lineHeight: 21,
   },
   footer: {
     flexDirection: 'row',
@@ -134,19 +133,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   price: {
-    color: '#fff',
-    fontSize: 15,
+    color: Palette.text,
+    fontSize: 16,
     fontWeight: '700',
   },
   actionButton: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
+    backgroundColor: Palette.text,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: Radii.pill,
   },
   actionText: {
-    color: '#000',
-    fontSize: 11,
+    color: Palette.black,
+    fontSize: 12,
     fontWeight: '700',
   },
 });

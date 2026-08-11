@@ -9,6 +9,7 @@ import { useAuthStore } from '../../store/authStore';
 import { apiConnector } from '../../services/api';
 import { endpoints } from '../../constants/api';
 import { Button } from '../../components/ui/Button';
+import { DetailSkeleton } from '../../components/ui/Skeleton';
 
 export default function MockTestDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -139,8 +140,8 @@ export default function MockTestDetailScreen() {
 
   if (isLoading) {
     return (
-      <View style={[styles.container, styles.centered]}>
-        <Text style={{ color: '#fff' }}>Loading...</Text>
+      <View style={[styles.container, { paddingTop: 60 }]}>
+        <DetailSkeleton />
       </View>
     );
   }

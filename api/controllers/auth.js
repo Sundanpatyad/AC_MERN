@@ -384,34 +384,60 @@ exports.changePassword = async (req, res) => {
 
 exports.googleAuth = async (req, res) => {
     try {
-        const { accessToken } = req.body;
+        const { accessToken, idToken } = req.body;
 
-        if (!accessToken) {
+        if (!accessToken && !idToken) {
             return res.status(400).json({
                 success: false,
-                message: 'Access token is required'
+                message: 'Google access token or id token is required'
             });
         }
 
-        // Fetch user info from Google using access token
-        const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-            headers: {
-                Authorization: `Bearer ${accessToken}`
-            }
-        });
+        let name;
+        let email;
+        let picture;
 
-        if (!response.ok) {
-            throw new Error('Failed to fetch user info from Google');
+        // Prefer access token → userinfo API (same as web flow)
+        if (accessToken) {
+            const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                }
+            });
+
+            if (response.ok) {
+                const googleUser = await response.json();
+                name = googleUser.name;
+                email = googleUser.email;
+                picture = googleUser.picture;
+            }
         }
 
-        const googleUser = await response.json();
-        const { name, email, picture } = googleUser;
+        // Fallback: verify id token with Google (common on mobile when only idToken is available)
+        if (!email && idToken) {
+            const tokenRes = await fetch(
+                `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`
+            );
+
+            if (!tokenRes.ok) {
+                throw new Error('Failed to verify Google id token');
+            }
+
+            const tokenInfo = await tokenRes.json();
+            email = tokenInfo.email;
+            name = tokenInfo.name || [tokenInfo.given_name, tokenInfo.family_name].filter(Boolean).join(' ');
+            picture = tokenInfo.picture;
+        }
 
         if (!email) {
             return res.status(400).json({
                 success: false,
                 message: 'Email not provided by Google'
             });
+        }
+
+        if (!name) {
+            name = email.split('@')[0];
         }
 
         // Check if user exists
