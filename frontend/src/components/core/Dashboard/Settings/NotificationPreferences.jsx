@@ -4,11 +4,11 @@ import { toast } from "react-hot-toast"
 import {
   disablePushNotifications,
   enablePushNotifications,
-} from "../../../services/pushNotifications"
+} from "../../../../services/pushNotifications"
 import {
   fetchNotificationPrefs,
   saveNotificationPrefs,
-} from "../../../services/operations/notificationAPI"
+} from "../../../../services/operations/notificationAPI"
 
 const DEFAULTS = {
   pushEnabled: true,
