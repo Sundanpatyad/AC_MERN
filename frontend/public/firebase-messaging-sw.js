@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 // Firebase Cloud Messaging service worker — handles background push on the website.
-importScripts('https://www.gstatic.com/firebasejs/11.10.1/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/11.10.1/firebase-messaging-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/12.17.1/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/12.17.1/firebase-messaging-compat.js');
 
 firebase.initializeApp({
   apiKey: 'AIzaSyB8uwBnEelfhcri8OA3cQii_SHvFnq4YHg',
@@ -14,6 +14,14 @@ firebase.initializeApp({
 });
 
 const messaging = firebase.messaging();
+
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
+});
 
 messaging.onBackgroundMessage((payload) => {
   const notification = payload.notification || {};

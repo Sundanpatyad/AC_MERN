@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Constants from 'expo-constants';
+import Constants, { ExecutionEnvironment } from 'expo-constants';
+import { requireOptionalNativeModule } from 'expo-modules-core';
 import { apiConnector } from './api';
 import { endpoints } from '../constants/api';
 
@@ -10,19 +11,49 @@ type NotificationsModule = typeof import('expo-notifications');
 
 let notificationsModule: NotificationsModule | null | undefined;
 let handlerConfigured = false;
+let warnedUnavailable = false;
+
+function warnOnce(message: string) {
+  if (warnedUnavailable) return;
+  warnedUnavailable = true;
+  console.warn(message);
+}
+
+/** True only in a custom/dev/production binary that includes FCM native code. */
+function isNativePushSupported(): boolean {
+  // Expo Go (storeClient) does not ship ExpoPushTokenManager / custom FCM.
+  if (Constants.executionEnvironment === ExecutionEnvironment.StoreClient) {
+    return false;
+  }
+
+  // Avoid require('expo-notifications') when the native binary was not rebuilt.
+  const pushManager = requireOptionalNativeModule('ExpoPushTokenManager');
+  return pushManager != null;
+}
 
 /**
- * Lazy-load expo-notifications so Expo Go / unrebuilt native clients
- * don't crash the whole app on import.
+ * Lazy-load expo-notifications only when the native module exists.
+ * Never call require() in Expo Go — that throws ExpoPushTokenManager errors.
  */
 function getNotifications(): NotificationsModule | null {
   if (notificationsModule !== undefined) return notificationsModule;
 
+  if (!isNativePushSupported()) {
+    warnOnce(
+      '[FCM] Push disabled in this client. Use a native build: npx expo run:android'
+    );
+    notificationsModule = null;
+    return null;
+  }
+
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const mod = require('expo-notifications') as NotificationsModule;
-    // Touch a native export so missing native binaries throw here, not later.
-    void mod.getPermissionsAsync;
+    if (!mod?.getPermissionsAsync || !mod?.getDevicePushTokenAsync) {
+      notificationsModule = null;
+      return null;
+    }
+
     notificationsModule = mod;
 
     if (!handlerConfigured) {
@@ -39,10 +70,7 @@ function getNotifications(): NotificationsModule | null {
 
     return notificationsModule;
   } catch (error: any) {
-    console.warn(
-      '[FCM] Native push unavailable (rebuild with `npx expo run:android`):',
-      error?.message || error
-    );
+    warnOnce(`[FCM] Native push unavailable: ${error?.message || error}`);
     notificationsModule = null;
     return null;
   }
@@ -63,9 +91,8 @@ async function ensureAndroidChannel(Notifications: NotificationsModule) {
 }
 
 async function requestPermission(Notifications: NotificationsModule): Promise<boolean> {
-  // Simulators / Expo Go without native FCM still reach here; token fetch will no-op.
   if (Constants.isDevice === false) {
-    console.warn('[FCM] Push notifications require a physical device');
+    warnOnce('[FCM] Push notifications require a physical device');
     return false;
   }
 
@@ -82,7 +109,7 @@ async function requestPermission(Notifications: NotificationsModule): Promise<bo
 
 /**
  * Get the native FCM / APNs device token (not an Expo push token).
- * Requires a dev/production build with google-services.json.
+ * No-ops safely in Expo Go / unrebuilt clients.
  */
 export async function getNativePushToken(): Promise<string | null> {
   try {
@@ -95,29 +122,36 @@ export async function getNativePushToken(): Promise<string | null> {
     const devicePush = await Notifications.getDevicePushTokenAsync();
     return typeof devicePush.data === 'string' ? devicePush.data : null;
   } catch (error: any) {
-    console.warn('[FCM] Failed to get device push token:', error?.message || error);
+    warnOnce(`[FCM] Failed to get device push token: ${error?.message || error}`);
     return null;
   }
 }
 
-/** Request permission, obtain FCM token, and register it with the API. */
+/**
+ * Request permission, obtain FCM token, and register it with the API.
+ * Safe to call after login; returns null when native push is unavailable.
+ */
 export async function enablePushNotifications(): Promise<string | null> {
   try {
+    if (!isNativePushSupported()) {
+      warnOnce(
+        '[FCM] Skipping token registration (Expo Go / missing native module). Rebuild with npx expo run:android'
+      );
+      return null;
+    }
+
     const fcmToken = await getNativePushToken();
     if (!fcmToken) return null;
 
-    const prev = await AsyncStorage.getItem(FCM_TOKEN_KEY);
-    if (prev !== fcmToken) {
-      await apiConnector.post(endpoints.REGISTER_FCM_TOKEN, {
-        token: fcmToken,
-        platform: pushPlatform(),
-      });
-      await AsyncStorage.setItem(FCM_TOKEN_KEY, fcmToken);
-    }
-
+    await apiConnector.post(endpoints.REGISTER_FCM_TOKEN, {
+      token: fcmToken,
+      platform: pushPlatform(),
+    });
+    await AsyncStorage.setItem(FCM_TOKEN_KEY, fcmToken);
+    console.log('[FCM] Token registered with backend');
     return fcmToken;
   } catch (error: any) {
-    console.warn('[FCM] Failed to enable push notifications:', error?.message || error);
+    warnOnce(`[FCM] Failed to enable push notifications: ${error?.message || error}`);
     return null;
   }
 }

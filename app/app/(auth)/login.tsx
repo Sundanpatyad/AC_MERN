@@ -51,6 +51,14 @@ export default function LoginScreen() {
         await setToken(token);
         await setUser({ ...user, image: userImage });
 
+        // Register FCM device token with backend after login
+        try {
+          const { enablePushNotifications } = await import('../../services/pushNotifications');
+          await enablePushNotifications();
+        } catch {
+          // Push may be unavailable until a native rebuild
+        }
+
         router.replace('/(tabs)');
       }
     } catch (error: any) {

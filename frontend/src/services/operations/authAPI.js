@@ -169,7 +169,7 @@ export function login(email, password, navigate) {
       dispatch(setUser({ ...response.data.user, image: userImage }));
       setStoredToken(response.data?.token);
       localStorage.setItem("user", JSON.stringify({ ...response.data.user, image: userImage }));
-      enablePushNotifications(response.data?.token);
+      await enablePushNotifications(response.data?.token);
 
       navigate("/dashboard/my-profile");
     } catch (error) {
@@ -335,7 +335,7 @@ export const googleLogin = (credential, navigate) => {
       dispatch(setUser({ ...userData, image: userImage }));
       setStoredToken(token);
       localStorage.setItem("user", JSON.stringify({ ...userData, image: userImage }));
-      enablePushNotifications(token);
+      await enablePushNotifications(token);
       toast.dismiss(toastId)
       toast.success('Login Successful , Enjoy The Experience', {
         style: {

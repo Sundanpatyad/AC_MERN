@@ -85,6 +85,14 @@ export const handleGoogleLogin = async () => {
       await authStore.setToken(jwtToken);
       await authStore.setUser({ ...userData, image: userImage });
 
+      // Register FCM device token with backend after Google login
+      try {
+        const { enablePushNotifications } = await import('./pushNotifications');
+        await enablePushNotifications();
+      } catch {
+        // Push may be unavailable until a native rebuild
+      }
+
       return { success: true };
     }
 

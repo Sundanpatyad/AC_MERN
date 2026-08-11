@@ -36,5 +36,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   </QueryClientProvider>
 );
 
-// Register the service worker for PWA
-serviceWorkerRegistration.register();
+// PWA offline SW conflicts with Firebase messaging SW — do not register it.
+// FCM registers /firebase-messaging-sw.js on login instead.
+serviceWorkerRegistration.unregister();

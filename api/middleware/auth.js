@@ -8,9 +8,11 @@ require('dotenv').config();
 // user Authentication by checking token validating
 exports.auth = (req, res, next) => {
     try {
-        // Extract token from body, cookies, or headers
-        const authHeader = req.header('Authorization');
-        const token = req.body?.token || req.cookies?.token || authHeader?.replace('Bearer ', '');
+        // Prefer Authorization header. Body `token` is often an FCM device token
+        // (e.g. POST /notifications/register), not a JWT.
+        const authHeader = req.header('Authorization') || req.header('authorization');
+        const headerToken = authHeader?.replace(/^Bearer\s+/i, '').trim();
+        const token = headerToken || req.cookies?.token || null;
         
         console.log(`[Auth Middleware] URL: ${req.originalUrl}, Method: ${req.method}`);
         console.log(`[Auth Middleware] Auth Header Present: ${!!authHeader}`);
