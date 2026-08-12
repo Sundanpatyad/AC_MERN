@@ -20,7 +20,7 @@ const MockTestCard = React.memo(({
         setIsInCart(cart.some(item => item._id === mockTest._id));
     }, [cart, mockTest._id]);
 
-    const isEnrolled = mockTest.studentsEnrolled?.includes(userId) || isPurchased;
+    const isEnrolled = Boolean(mockTest.isEnrolled) || Boolean(isPurchased);
 
     const handleButtonClick = (action) => {
         if (!isLoggedIn) {
@@ -30,7 +30,9 @@ const MockTestCard = React.memo(({
         }
     };
 
-    const testCount = mockTest.mockTests?.length + (mockTest.attachments?.length || 0);
+    const testCount =
+        (mockTest.mockTestsCount ?? mockTest.mockTests?.length ?? 0) +
+        (mockTest.attachmentsCount ?? mockTest.attachments?.length ?? 0);
 
     return (
         <div

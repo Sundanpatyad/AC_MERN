@@ -29,7 +29,7 @@ const MockTestDetails = () => {
   const fetchTestDetails = useCallback(async () => {
     try {
       setIsLoading(true);
-      const res = await fetchMockTestDetails(mockId);
+      const res = await fetchMockTestDetails(mockId, token);
       setTestDetails(res);
     } catch (error) {
       console.error("Could not fetch Mock Test Details:", error);
@@ -37,7 +37,7 @@ const MockTestDetails = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [mockId]);
+  }, [mockId, token]);
 
   useEffect(() => {
     fetchTestDetails();
@@ -49,7 +49,7 @@ const MockTestDetails = () => {
     }
   }, [cart, testDetails]);
 
-  const isEnrolled = testDetails?.studentsEnrolled?.includes(user?._id);
+  const isEnrolled = Boolean(testDetails?.isEnrolled);
   const isLoggedIn = !!token;
 
   const handleAddToCart = () => {
@@ -84,7 +84,7 @@ const MockTestDetails = () => {
       return;
     }
 
-    if (testDetails.studentsEnrolled.includes(user?._id) || testDetails.price === 0) {
+    if (testDetails.isEnrolled || testDetails.price === 0) {
       navigate(`/view-mock/${mockId}`);
       return;
     }
@@ -207,7 +207,7 @@ const MockTestDetails = () => {
               </div>
               <div className="flex items-center">
                 <FaBookOpen className="mr-2" />
-                <span>{testDetails.mockTests?.length || 0} Tests</span>
+                <span>{testDetails.mockTestsCount ?? testDetails.mockTests?.length ?? 0} Tests</span>
               </div>
             </div>
 
@@ -222,7 +222,7 @@ const MockTestDetails = () => {
                       <span className="text-zinc-400 text-sm">{test.duration} mins</span>
                     </div>
                     <p className="text-zinc-400 text-sm mt-1">
-                      {test.questions.length} questions
+                      {test.totalQuestions ?? test.questions?.length ?? 0} questions
                     </p>
                   </div>
                 ))}

@@ -75,11 +75,13 @@ exports.getCategoryPageDetails = async (req, res) => {
             .populate({
                 path: "courses",
                 match: { status: "Published" },
-                populate: [
-                    { path: "ratingAndReviews" },
-                    { path: "courseContent" }
-                ],
+                select: "courseName courseDescription thumbnail price studentsEnrolled instructor",
+                populate: {
+                    path: "instructor",
+                    select: "firstName lastName image",
+                },
             })
+            .lean()
             .exec();
 
         // Handle the case when the category is not found

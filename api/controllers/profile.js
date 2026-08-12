@@ -2,6 +2,7 @@ const Profile = require('../models/profile');
 const User = require('../models/user');
 const CourseProgress = require('../models/courseProgress')
 const Course = require('../models/course')
+const mongoose = require('mongoose');
 
 const { uploadImageToCloudinary, deleteResourceFromCloudinary } = require('../utils/imageUploader');
 const { convertSecondsToDuration } = require('../utils/secToDuration');
@@ -208,14 +209,16 @@ exports.getEnrolledCourses = async (req, res) => {
     try {
         const userId = req.user.id
         const userDetails = await User.findOne({ _id: userId })
+            .select('courses')
             .populate({
                 path: "courses",
+                select: "courseName courseDescription thumbnail courseContent",
                 populate: {
                     path: "courseContent",
                     select: "sectionName subSection",
                     populate: {
                         path: "subSection",
-                        select: "title timeDuration description videoUrl",
+                        select: "title timeDuration",
                     },
                 },
             })
@@ -298,35 +301,39 @@ exports.getEnrolledMockTests = async (req, res) => {
             });
         }
 
-        const enrolledMockTestSeries = await MockTestSeries.find({
-            studentsEnrolled: userId
-        }).lean();
-
-        const processedMockTestSeries = enrolledMockTestSeries.map((series) => {
-            return {
-                _id: series._id,
-                seriesName: series.seriesName,
-                description: series.description,
-                totalTests: series.totalTests,
-                thumbnail: series.thumbnail,
-                price: series.price,
-                status: series.status,
-                mockTests: series.mockTests.map(test => ({
-                    _id: test._id,
-                    testName: test.testName,
-                    duration: test.duration,
-                    price: test.price,
-                    status: test.status,
-                    totalQuestions: test.questions.length,
-                    createdAt: test.createdAt,
-                    updatedAt: test.updatedAt
-                }))
-            };
-        });
+        const enrolledMockTestSeries = await MockTestSeries.aggregate([
+            { $match: { studentsEnrolled: new mongoose.Types.ObjectId(userId) } },
+            {
+                $project: {
+                    seriesName: 1,
+                    description: 1,
+                    totalTests: 1,
+                    thumbnail: 1,
+                    price: 1,
+                    status: 1,
+                    mockTests: {
+                        $map: {
+                            input: { $ifNull: ['$mockTests', []] },
+                            as: 't',
+                            in: {
+                                _id: '$$t._id',
+                                testName: '$$t.testName',
+                                duration: '$$t.duration',
+                                price: '$$t.price',
+                                status: '$$t.status',
+                                createdAt: '$$t.createdAt',
+                                updatedAt: '$$t.updatedAt',
+                                totalQuestions: { $size: { $ifNull: ['$$t.questions', []] } },
+                            },
+                        },
+                    },
+                },
+            },
+        ]);
 
         res.status(200).json({
             success: true,
-            data: processedMockTestSeries,
+            data: enrolledMockTestSeries,
         });
 
     } catch (error) {

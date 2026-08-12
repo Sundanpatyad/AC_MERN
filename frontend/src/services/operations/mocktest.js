@@ -60,26 +60,27 @@ export const fetchInstructorMockTest = async (token) => {
   return result
 }
 
-export const fetchAllMockTests = async (token) => {
+export const fetchAllMockTests = async (token, options = {}) => {
   let result = []
   try {
+    const params = new URLSearchParams()
+    if (options.view) params.set('view', options.view)
+    if (options.limit) params.set('limit', String(options.limit))
+    const query = params.toString()
+    const url = query ? `${GET_MOCK_TEST_API}?${query}` : GET_MOCK_TEST_API
+
     const response = await apiConnector(
       "GET",
-      GET_MOCK_TEST_API,
+      url,
       null,
-      {
-        Authorization: `Bearer ${token}`
-      }
+      token ? { Authorization: `Bearer ${token}` } : undefined
     )
-    //console.log("ALL Mocktest API RESPONSE", response)
     if (!response?.data?.success) {
       throw new Error("Could Not Fetch Mocktest")
     }
     result = response?.data?.data
-    //console.log("ALL Mocktest API RESPONSE", result)
     return result
   } catch (error) {
-    //console.log("ALL Mocktest API ERROR............", error)
     toast.error(error.message, toastOptions)
     return result
   }
@@ -87,23 +88,18 @@ export const fetchAllMockTests = async (token) => {
 
 export const fetchMockTestDetails = async (mockTestId, token) => {
   let result = null;
-  //console.log(mockTestId)
   try {
     const response = await apiConnector(
       "GET",
       `${FETCH_MOCKTEST_BY_ID}/${mockTestId}`,
       null,
-      {
-        Authorization: `Bearer ${token}`,
-      }
+      token ? { Authorization: `Bearer ${token}` } : undefined
     )
-    //console.log("MockTest Details API RESPONSE", response)
     if (!response?.data?.success) {
       throw new Error("Could Not Fetch Mock Test Details")
     }
     result = response?.data?.data
   } catch (error) {
-    //console.log("MockTest Details API ERROR............", error)
     toast.error(error.message, toastOptions)
   }
   return result
@@ -143,7 +139,7 @@ export const fetchSeries = async (seriesId, token) => {
   try {
     const response = await apiConnector(
       "GET",
-      `${GET_MCOKTEST_SERIES_BY_ID}/${seriesId}`,
+      `${GET_MCOKTEST_SERIES_BY_ID}/${seriesId}?full=true`,
       null,
       {
         Authorization: `Bearer ${token}`,
