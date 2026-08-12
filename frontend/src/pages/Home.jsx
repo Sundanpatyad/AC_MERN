@@ -88,7 +88,7 @@ const Home = () => {
       )}
 
       {/* Desktop-only social links; mobile uses bottom nav and footer */}
-      <div className="hidden md:flex fixed right-5 bottom-8 z-40 flex-col gap-2.5">
+      <div className="hidden md:flex fixed right-5 bottom-20 z-40 flex-col gap-2.5">
         {socials.map(({ href, label, Icon }) => (
           <a
             key={label}

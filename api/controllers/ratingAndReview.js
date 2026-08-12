@@ -145,38 +145,34 @@ exports.getAverageRating = async (req, res) => {
 // ================ Get All Rating And Reviews ================
 exports.getAllRatingReview = async(req, res)=>{
     try{
-        // Pagination is opt-in: without ?page the full list is returned as before.
-        const page = parseInt(req.query.page, 10)
-        const isPaginated = Number.isInteger(page) && page > 0
-        const limit = Math.min(parseInt(req.query.limit, 10) || 20, 100)
+        // Always paginate in production; default to first page for Home carousel.
+        const page = Math.max(1, parseInt(req.query.page, 10) || 1)
+        const limit = Math.min(parseInt(req.query.limit, 10) || 12, 50)
 
         const query = RatingAndReview.find({})
+        .select('rating review user course')
         .sort({rating:'desc'})
         .populate({
             path:'user',
-            select:'firstName lastName email image'
+            select:'firstName lastName image'
         })
         .populate({
             path:'course',
             select:'courseName'
         })
+        .skip((page - 1) * limit)
+        .limit(limit)
         .lean()
-
-        if (isPaginated) {
-            query.skip((page - 1) * limit).limit(limit)
-        }
 
         const [allReviews, total] = await Promise.all([
             query.exec(),
-            isPaginated ? RatingAndReview.countDocuments({}) : Promise.resolve(null),
+            RatingAndReview.countDocuments({}),
         ])
 
         return res.status(200).json({
             success:true,
             data:allReviews,
-            ...(isPaginated && {
-                pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
-            }),
+            pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
             message:"All reviews fetched successfully"
         });
     }

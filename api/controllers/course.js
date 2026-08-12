@@ -118,11 +118,11 @@ exports.getAllCourses = async (req, res) => {
         const query = Course.find({},
             {
                 courseName: true, courseDescription: true, price: true, thumbnail: true, instructor: true,
-                ratingAndReviews: true, studentsEnrolled: true
+                studentsEnrolled: true, status: true
             })
             .populate({
                 path: 'instructor',
-                select: 'firstName lastName email image'
+                select: 'firstName lastName image'
             })
             .lean()
 
@@ -170,19 +170,27 @@ exports.getCourseDetails = async (req, res) => {
         })
             .populate({
                 path: "instructor",
-                select: "-password -token -resetPasswordExpires",
+                select: "firstName lastName image additionalDetails",
                 populate: {
                     path: "additionalDetails",
+                    select: "about",
                 },
             })
-            .populate("category")
-            .populate("ratingAndReviews")
-
+            .populate("category", "name")
+            .populate({
+                path: "ratingAndReviews",
+                select: "rating review user",
+                populate: {
+                    path: "user",
+                    select: "firstName lastName image",
+                },
+            })
             .populate({
                 path: "courseContent",
+                select: "sectionName subSection",
                 populate: {
                     path: "subSection",
-                    select: "-videoUrl",
+                    select: "title timeDuration",
                 },
             })
             .lean()

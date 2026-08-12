@@ -36,7 +36,7 @@ const MockTestTable = ({ filteredMockTests, handleAddToCart, handleBuyNow, handl
         seriesId: series._id,
         seriesName: series.seriesName,
         price: series.price,
-        isEnrolled: series.studentsEnrolled?.includes(user?._id),
+        isEnrolled: Boolean(series.isEnrolled),
         isInCart: cart.some(item => item._id === series._id),
         thumbnail: series.thumbnail
       }))
@@ -76,7 +76,7 @@ const MockTestTable = ({ filteredMockTests, handleAddToCart, handleBuyNow, handl
                 </div>
               </td>
               <td className="px-8 py-6 text-center">
-                <span className="text-sm font-bold text-zinc-300">{test.questions?.length || 0}</span>
+                <span className="text-sm font-bold text-zinc-300">{test.totalQuestions ?? test.questions?.length ?? 0}</span>
               </td>
               <td className="px-8 py-6 text-center">
                 <span className="text-sm font-bold text-zinc-300">{test.duration}m</span>
@@ -134,10 +134,11 @@ const MockTestCard = React.memo(({ mockTest, handleAddToCart, handleBuyNow, hand
         {/* Subtle Stats Overlay */}
         <div className="absolute top-3 right-3 flex gap-2">
           <span className="bg-black/50 backdrop-blur-md text-[10px] text-zinc-300 px-3 py-1 rounded-full border border-white/5">
-            {mockTest.mockTests?.length + mockTest.attachments?.length || 0} Tests
+            {(mockTest.mockTestsCount ?? mockTest.mockTests?.length ?? 0) +
+              (mockTest.attachmentsCount ?? mockTest.attachments?.length ?? 0)} Tests
           </span>
           <span className="bg-black/50 backdrop-blur-md text-[10px] text-zinc-300 px-3 py-1 rounded-full border border-white/5">
-            {mockTest.studentsEnrolled?.length || 0} Students
+            {mockTest.studentsEnrolledCount ?? mockTest.studentsEnrolled?.length ?? 0} Students
           </span>
         </div>
       </div>
@@ -225,10 +226,9 @@ const MockTestComponent = () => {
   const dispatch = useDispatch()
 
   const { data: mockTests, isLoading } = useQuery(
-    'mockTests',
-    () => fetchAllMockTests(token),
+    ['mockTests', token],
+    () => fetchAllMockTests(token, { view: 'list' }),
     {
-      select: (data) => data.filter(test => test.status !== 'draft'),
       staleTime: 5 * 60 * 1000, // 5 minutes
     }
   )
@@ -345,7 +345,7 @@ const MockTestComponent = () => {
                   handleBuyNow={handleBuyNow}
                   handleStartTest={handleStartTest}
                   isLoggedIn={isLoggedIn}
-                  isEnrolled={mockTest.studentsEnrolled?.includes(user?._id)}
+                  isEnrolled={Boolean(mockTest.isEnrolled)}
                   isInCart={cart.some(item => item._id === mockTest._id)}
                 />
               ))}
@@ -363,7 +363,7 @@ const MockTestComponent = () => {
                     handleBuyNow={handleBuyNow}
                     handleStartTest={handleStartTest}
                     isLoggedIn={isLoggedIn}
-                    isEnrolled={mockTest.studentsEnrolled?.includes(user?._id)}
+                    isEnrolled={Boolean(mockTest.isEnrolled)}
                     isInCart={cart.some(item => item._id === mockTest._id)}
                   />
                 ))}

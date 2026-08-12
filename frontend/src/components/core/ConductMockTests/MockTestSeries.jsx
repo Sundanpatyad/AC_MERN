@@ -37,7 +37,7 @@ const MockTestSeries = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(`${GET_MCOKTEST_SERIES_BY_ID}/${mockId}`, {
+      const response = await axios.get(`${GET_MCOKTEST_SERIES_BY_ID}/${mockId}?full=true`, {
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });
       const series = response.data.data;

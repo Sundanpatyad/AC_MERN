@@ -23,4 +23,6 @@ const ratingAndReviewSchema = new mongoose.Schema({
 
 });
 
+ratingAndReviewSchema.index({ rating: -1 });
+
 module.exports = mongoose.model('RatingAndReview', ratingAndReviewSchema);

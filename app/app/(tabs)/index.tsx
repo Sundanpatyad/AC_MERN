@@ -10,6 +10,7 @@ import {
   useWindowDimensions,
   Pressable,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
@@ -30,6 +31,8 @@ const YOUTUBE_CHANNEL = 'https://www.youtube.com/@awakeningclasses';
 const RANK_STORY_URL = 'https://youtu.be/zZqPFZo8IUo?si=MbeDgOr_YtO9bH_x';
 const BANNER_ASPECT = 1024 / 535;
 const H_PAD = 20;
+const BLOCK_GAP = 12;
+const SECTION_GAP = 8;
 
 async function openExternal(url: string) {
   try {
@@ -45,19 +48,14 @@ function greetingForHour(hour: number) {
   return 'Good evening';
 }
 
-type QuickAction = {
-  key: string;
-  label: string;
-  icon: keyof typeof Ionicons.glyphMap;
-  onPress: () => void;
-};
-
 export default function HomeScreen() {
   const { user } = useAuthStore();
   const router = useRouter();
   const { colors } = useTheme();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const [featuredTests, setFeaturedTests] = useState([]);
   const [attempts, setAttempts] = useState<any[]>([]);
   const [personalRank, setPersonalRank] = useState<any | null>(null);
@@ -84,7 +82,7 @@ export default function HomeScreen() {
             (a: any, b: any) =>
               new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           )
-          .slice(0, 5);
+          .slice(0, 4);
         setFeaturedTests(tests);
       }
 
@@ -93,11 +91,7 @@ export default function HomeScreen() {
       }
 
       if (ranksRes?.data?.success) {
-        if (ranksRes.data.loggedInUserRank?.length) {
-          setPersonalRank(ranksRes.data.loggedInUserRank[0]);
-        } else {
-          setPersonalRank(null);
-        }
+        setPersonalRank(ranksRes.data.loggedInUserRank?.[0] ?? null);
       }
     } catch (error) {
       console.error('Failed to fetch home data:', error);
@@ -111,17 +105,11 @@ export default function HomeScreen() {
     fetchHomeData();
   }, [fetchHomeData]);
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    fetchHomeData();
-  };
-
   const analytics = useMemo(() => {
     const list = [...attempts].sort(
       (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     );
-    const recent = list.slice(-6);
-    const chartData = recent.map((a, i) => ({
+    const chartData = list.slice(-6).map((a, i) => ({
       label: `T${i + 1}`,
       value: Number(a.score) || 0,
       max: Number(a.totalQuestions) || Number(a.totalScore) || 100,
@@ -135,58 +123,45 @@ export default function HomeScreen() {
       })
       .filter((n) => !Number.isNaN(n));
 
-    const avg =
-      scores.length > 0
-        ? Math.round(scores.reduce((s, n) => s + n, 0) / scores.length)
-        : 0;
-    const best = scores.length > 0 ? Math.round(Math.max(...scores)) : 0;
-
     return {
       chartData,
       testsTaken: attempts.length,
-      avgScore: avg,
-      bestScore: best,
+      avgScore:
+        scores.length > 0
+          ? Math.round(scores.reduce((s, n) => s + n, 0) / scores.length)
+          : 0,
+      bestScore: scores.length > 0 ? Math.round(Math.max(...scores)) : 0,
     };
   }, [attempts]);
 
-  const greeting = `${greetingForHour(new Date().getHours())}, ${user?.firstName || 'there'}`;
-
-  const quickActions: QuickAction[] = [
+  const metrics = [
+    { label: 'Attempts', value: String(analytics.testsTaken) },
+    { label: 'Avg', value: `${analytics.avgScore}%` },
     {
-      key: 'tests',
-      label: 'Browse tests',
-      icon: 'library-outline',
-      onPress: () => router.push('/(tabs)/mock-tests'),
+      label: 'Rank',
+      value: personalRank?.rank != null ? `#${personalRank.rank}` : '-',
     },
-    {
-      key: 'mine',
-      label: 'My tests',
-      icon: 'document-text-outline',
-      onPress: () => router.push('/(tabs)/my-tests'),
-    },
-    {
-      key: 'rank',
-      label: 'Rankings',
-      icon: 'trophy-outline',
-      onPress: () => router.push('/(tabs)/rankings'),
-    },
-    {
-      key: 'lectures',
-      label: 'Lectures',
-      icon: 'play-circle-outline',
-      onPress: () => openExternal(YOUTUBE_CHANNEL),
-    },
+    { label: 'Best', value: `${analytics.bestScore}%` },
   ];
 
   return (
     <ScreenBackground>
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.content,
+          {
+            paddingTop: Math.max(insets.top, 20) + 8,
+            paddingBottom: 40,
+          },
+        ]}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={onRefresh}
+            onRefresh={() => {
+              setRefreshing(true);
+              fetchHomeData();
+            }}
             tintColor={colors.refreshTint}
           />
         }
@@ -195,175 +170,187 @@ export default function HomeScreen() {
           <HomeSkeleton bannerHeight={bannerHeight} />
         ) : (
           <>
-            <View style={styles.appBar}>
-              <View style={styles.brandRow}>
-                <BrandLogo size={26} />
-                <Text style={styles.brand}>Awakening Classes</Text>
-              </View>
-              <Pressable
-                onPress={() => router.push('/(tabs)/profile')}
-                accessibilityRole="button"
-                accessibilityLabel="Open profile"
-                hitSlop={8}
-                style={({ pressed }) => [styles.avatarHit, pressed && { opacity: 0.85 }]}
-              >
-                <View style={styles.avatar}>
-                  {user?.image ? (
-                    <Image source={{ uri: user.image }} style={styles.avatarImage} />
-                  ) : (
-                    <Text style={styles.avatarText}>{user?.firstName?.[0]}</Text>
-                  )}
+            <View style={styles.topBlock}>
+              <View style={styles.header}>
+                <View style={styles.brandRow}>
+                  <BrandLogo size={28} />
+                  <Text style={styles.brand}>Awakening Classes</Text>
                 </View>
+                <Pressable
+                  onPress={() => router.push('/(tabs)/profile')}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel="Open profile"
+                  style={({ pressed }) => pressed && { opacity: 0.85 }}
+                >
+                  <View style={styles.avatar}>
+                    {user?.image ? (
+                      <Image source={{ uri: user.image }} style={styles.avatarImage} />
+                    ) : (
+                      <Text style={styles.avatarLetter}>{user?.firstName?.[0]}</Text>
+                    )}
+                  </View>
+                </Pressable>
+              </View>
+
+              <View style={styles.hero}>
+                <Text style={styles.greeting} numberOfLines={1}>
+                  {greetingForHour(new Date().getHours())}, {user?.firstName || 'there'}
+                </Text>
+                <Text style={styles.heroSub}>Ready for your next mock test?</Text>
+              </View>
+
+              <View style={styles.metrics}>
+                {metrics.map((m, i) => (
+                  <React.Fragment key={m.label}>
+                    {i > 0 ? <View style={styles.metricRule} /> : null}
+                    <View style={styles.metric}>
+                      <Text
+                        style={styles.metricValue}
+                        numberOfLines={1}
+                        adjustsFontSizeToFit
+                        minimumFontScale={0.8}
+                      >
+                        {m.value}
+                      </Text>
+                      <Text style={styles.metricLabel}>{m.label}</Text>
+                    </View>
+                  </React.Fragment>
+                ))}
+              </View>
+
+              <View style={styles.actions}>
+                <Pressable
+                  onPress={() => router.push('/(tabs)/mock-tests')}
+                  style={({ pressed }) => [
+                    styles.primaryAction,
+                    pressed && { opacity: 0.9 },
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityLabel="Browse tests"
+                >
+                  <Text style={styles.primaryActionText}>Browse tests</Text>
+                  <Ionicons name="arrow-forward" size={16} color={colors.primaryButtonText} />
+                </Pressable>
+                <Pressable
+                  onPress={() => openExternal(YOUTUBE_CHANNEL)}
+                  style={({ pressed }) => [
+                    styles.secondaryAction,
+                    pressed && { opacity: 0.9 },
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityLabel="Watch lectures"
+                >
+                  <Ionicons name="play-circle-outline" size={18} color={colors.text} />
+                  <Text style={styles.secondaryActionText}>Lectures</Text>
+                </Pressable>
+              </View>
+            </View>
+
+            <View style={styles.section}>
+              <SectionHeading
+                title="Featured"
+                rightText="See all"
+                onPressRight={() => router.push('/(tabs)/mock-tests')}
+              />
+              <View style={styles.list}>
+                {featuredTests.length > 0 ? (
+                  featuredTests.map((test: any) => (
+                    <MockTestCard key={test._id} test={test} variant="row" />
+                  ))
+                ) : (
+                  <Text style={styles.empty}>No tests available right now.</Text>
+                )}
+              </View>
+            </View>
+
+            <View style={styles.section}>
+              <SectionHeading
+                title="Progress"
+                rightText="History"
+                onPressRight={() => router.push('/(tabs)/my-tests')}
+              />
+              <Card padding={14}>
+                {analytics.chartData.length > 0 ? (
+                  <>
+                    <Text style={styles.chartLabel}>Recent scores</Text>
+                    <ScoreBarChart data={analytics.chartData} height={112} />
+                  </>
+                ) : (
+                  <Pressable
+                    onPress={() => router.push('/(tabs)/mock-tests')}
+                    style={({ pressed }) => [
+                      styles.emptyRow,
+                      pressed && { opacity: 0.88 },
+                    ]}
+                  >
+                    <View style={styles.emptyIcon}>
+                      <Ionicons name="bar-chart-outline" size={18} color={colors.textSecondary} />
+                    </View>
+                    <Text style={styles.emptyRowText}>
+                      Take a test to unlock your score trend
+                    </Text>
+                    <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
+                  </Pressable>
+                )}
+              </Card>
+            </View>
+
+            <View style={styles.section}>
+              <SectionHeading
+                title="Standing"
+                rightText="Leaderboard"
+                onPressRight={() => router.push('/(tabs)/rankings')}
+              />
+              <Pressable
+                onPress={() => router.push('/(tabs)/rankings')}
+                style={({ pressed }) => pressed && { opacity: 0.92 }}
+              >
+                <Card padding={12}>
+                  <View style={styles.standing}>
+                    <View style={styles.standingIcon}>
+                      <Ionicons name="trophy-outline" size={18} color={colors.textSecondary} />
+                    </View>
+                    <View style={styles.standingCopy}>
+                      <Text style={styles.standingTitle} numberOfLines={1}>
+                        {personalRank?.rank != null
+                          ? `Ranked #${personalRank.rank}`
+                          : 'No rank yet'}
+                      </Text>
+                      <Text style={styles.standingSub} numberOfLines={1}>
+                        {personalRank?.testName
+                          ? `${personalRank.score}${
+                              personalRank.totalQuestions
+                                ? `/${personalRank.totalQuestions}`
+                                : ''
+                            } · ${personalRank.testName}`
+                          : 'Appear on the board after your first attempt'}
+                      </Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
+                  </View>
+                </Card>
               </Pressable>
             </View>
 
-            <View style={styles.welcome}>
-              <Text style={styles.greeting} numberOfLines={1}>
-                {greeting}
-              </Text>
-              <Text style={styles.subtitle}>Pick up where you left off</Text>
+            <View style={styles.section}>
+              <SectionHeading title="Spotlight" />
+              <Pressable
+                onPress={() => openExternal(RANK_STORY_URL)}
+                style={({ pressed }) => [
+                  styles.banner,
+                  { height: bannerHeight, opacity: pressed ? 0.94 : 1 },
+                ]}
+                accessibilityRole="button"
+                accessibilityLabel="Open spotlight"
+              >
+                <Image
+                  source={require('../../assets/images/rank1-banner.png')}
+                  style={styles.bannerImage}
+                  resizeMode="cover"
+                />
+              </Pressable>
             </View>
-
-            <Card style={styles.snapshotCard} padding={14}>
-              <View style={styles.snapshotRow}>
-                <View style={styles.snapshotItem}>
-                  <Text style={styles.snapshotValue}>{analytics.testsTaken}</Text>
-                  <Text style={styles.snapshotLabel}>Attempts</Text>
-                </View>
-                <View style={styles.snapshotDivider} />
-                <View style={styles.snapshotItem}>
-                  <Text style={styles.snapshotValue}>{analytics.avgScore}%</Text>
-                  <Text style={styles.snapshotLabel}>Avg score</Text>
-                </View>
-                <View style={styles.snapshotDivider} />
-                <View style={styles.snapshotItem}>
-                  <Text style={styles.snapshotValue}>
-                    {personalRank?.rank != null ? `#${personalRank.rank}` : '—'}
-                  </Text>
-                  <Text style={styles.snapshotLabel}>Rank</Text>
-                </View>
-                <View style={styles.snapshotDivider} />
-                <View style={styles.snapshotItem}>
-                  <Text style={styles.snapshotValue}>{analytics.bestScore}%</Text>
-                  <Text style={styles.snapshotLabel}>Best</Text>
-                </View>
-              </View>
-            </Card>
-
-            <View style={styles.quickGrid}>
-              {quickActions.map((action) => (
-                <Pressable
-                  key={action.key}
-                  onPress={action.onPress}
-                  style={({ pressed }) => [
-                    styles.quickActionWrap,
-                    pressed && { opacity: 0.88 },
-                  ]}
-                >
-                  <View style={styles.quickAction}>
-                    <View style={styles.quickIcon}>
-                      <Ionicons name={action.icon} size={18} color={colors.text} />
-                    </View>
-                    <Text style={styles.quickLabel} numberOfLines={1}>
-                      {action.label}
-                    </Text>
-                  </View>
-                </Pressable>
-              ))}
-            </View>
-
-            <SectionHeading
-              title="Featured tests"
-              rightText="See all"
-              onPressRight={() => router.push('/(tabs)/mock-tests')}
-              style={styles.sectionHeader}
-            />
-            <View style={styles.testsList}>
-              {featuredTests.length > 0 ? (
-                featuredTests.map((test: any) => (
-                  <MockTestCard key={test._id} test={test} />
-                ))
-              ) : (
-                <Text style={styles.emptyText}>No tests available right now.</Text>
-              )}
-            </View>
-
-            <SectionHeading
-              title="Your progress"
-              rightText="History"
-              onPressRight={() => router.push('/(tabs)/my-tests')}
-              style={styles.sectionHeader}
-            />
-            <Card style={styles.progressCard} padding={16}>
-              {analytics.chartData.length > 0 ? (
-                <>
-                  <Text style={styles.chartTitle}>Recent scores</Text>
-                  <ScoreBarChart data={analytics.chartData} height={132} />
-                </>
-              ) : (
-                <View style={styles.emptyProgress}>
-                  <Ionicons name="bar-chart-outline" size={22} color={colors.textMuted} />
-                  <Text style={styles.emptyProgressText}>
-                    Complete a mock test to see your score trend here.
-                  </Text>
-                </View>
-              )}
-            </Card>
-
-            <SectionHeading
-              title="Standing"
-              rightText="Leaderboard"
-              onPressRight={() => router.push('/(tabs)/rankings')}
-              style={styles.sectionHeader}
-            />
-            <Pressable
-              onPress={() => router.push('/(tabs)/rankings')}
-              style={({ pressed }) => [pressed && { opacity: 0.92 }]}
-            >
-              <Card style={styles.standingCard} padding={14}>
-                <View style={styles.standingRow}>
-                  <View style={styles.standingIcon}>
-                    <Ionicons name="trophy-outline" size={18} color={colors.textSecondary} />
-                  </View>
-                  <View style={styles.standingCopy}>
-                    <Text style={styles.standingTitle}>
-                      {personalRank?.rank != null
-                        ? `You're ranked #${personalRank.rank}`
-                        : 'No rank yet'}
-                    </Text>
-                    <Text style={styles.standingSub} numberOfLines={1}>
-                      {personalRank?.testName
-                        ? `${personalRank.score}${
-                            personalRank.totalQuestions
-                              ? ` / ${personalRank.totalQuestions}`
-                              : ''
-                          } · ${personalRank.testName}`
-                        : 'Take a mock test to appear on the leaderboard'}
-                    </Text>
-                  </View>
-                  <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
-                </View>
-              </Card>
-            </Pressable>
-
-            <SectionHeading title="Spotlight" style={styles.sectionHeader} />
-            <Pressable
-              onPress={() => openExternal(RANK_STORY_URL)}
-              style={({ pressed }) => [
-                styles.heroBanner,
-                {
-                  width: contentWidth,
-                  height: bannerHeight,
-                  opacity: pressed ? 0.94 : 1,
-                },
-              ]}
-            >
-              <Image
-                source={require('../../assets/images/rank1-banner.png')}
-                style={{ width: contentWidth, height: bannerHeight }}
-                resizeMode="cover"
-              />
-            </Pressable>
           </>
         )}
       </ScrollView>
@@ -373,125 +360,172 @@ export default function HomeScreen() {
 
 function createStyles(colors: AppPalette) {
   return StyleSheet.create({
-    scrollContent: {
-      paddingTop: 58,
-      paddingBottom: 40,
+    content: {
+      paddingHorizontal: H_PAD,
+      gap: BLOCK_GAP,
     },
-    appBar: {
+    topBlock: {
+      gap: 12,
+    },
+    header: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      paddingHorizontal: H_PAD,
-      marginBottom: 18,
+      minHeight: 36,
     },
     brandRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 8,
+      gap: 10,
       flex: 1,
       paddingRight: 12,
+      minWidth: 0,
     },
     brand: {
       fontSize: 12,
       fontWeight: '700',
       color: colors.textSecondary,
-      letterSpacing: 0.8,
+      letterSpacing: 0.7,
       textTransform: 'uppercase',
-    },
-    avatarHit: {
-      padding: 2,
+      flexShrink: 1,
     },
     avatar: {
-      width: 32,
-      height: 32,
+      width: 36,
+      height: 36,
       borderRadius: 999,
       backgroundColor: colors.surfaceRaised,
-      justifyContent: 'center',
-      alignItems: 'center',
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: colors.borderStrong,
+      alignItems: 'center',
+      justifyContent: 'center',
       overflow: 'hidden',
     },
     avatarImage: {
-      width: 32,
-      height: 32,
-      borderRadius: 999,
+      width: 36,
+      height: 36,
     },
-    avatarText: {
-      color: colors.text,
-      fontSize: 13,
+    avatarLetter: {
+      fontSize: 14,
       fontWeight: '700',
+      color: colors.text,
     },
-    welcome: {
-      paddingHorizontal: H_PAD,
-      marginBottom: 16,
+    hero: {
+      gap: 2,
     },
     greeting: {
-      fontSize: 24,
+      fontSize: 26,
       fontWeight: '700',
       color: colors.text,
-      letterSpacing: -0.4,
-      marginBottom: 4,
+      letterSpacing: -0.5,
     },
-    subtitle: {
+    heroSub: {
       fontSize: 14,
       color: colors.textSecondary,
       lineHeight: 20,
     },
-    snapshotCard: {
-      marginHorizontal: H_PAD,
-      marginBottom: 14,
-    },
-    snapshotRow: {
+    metrics: {
       flexDirection: 'row',
-      alignItems: 'center',
-    },
-    snapshotItem: {
-      flex: 1,
-      alignItems: 'center',
-      gap: 2,
-    },
-    snapshotValue: {
-      fontSize: 16,
-      fontWeight: '700',
-      color: colors.text,
-      letterSpacing: -0.2,
-    },
-    snapshotLabel: {
-      fontSize: 11,
-      color: colors.textMuted,
-      fontWeight: '500',
-    },
-    snapshotDivider: {
-      width: StyleSheet.hairlineWidth,
-      height: 28,
-      backgroundColor: colors.borderStrong,
-    },
-    quickGrid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      paddingHorizontal: H_PAD - 4,
-      marginBottom: 4,
-    },
-    quickActionWrap: {
-      width: '50%',
-      paddingHorizontal: 4,
-      paddingVertical: 4,
-    },
-    quickAction: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 10,
+      alignItems: 'stretch',
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
-      borderRadius: Radii.md,
+      borderRadius: Radii.lg,
       paddingVertical: 12,
-      paddingHorizontal: 12,
     },
-    quickIcon: {
-      width: 32,
-      height: 32,
+    metric: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 2,
+      paddingHorizontal: 4,
+    },
+    metricValue: {
+      fontSize: 17,
+      fontWeight: '700',
+      color: colors.text,
+      letterSpacing: -0.3,
+      textAlign: 'center',
+      width: '100%',
+    },
+    metricLabel: {
+      fontSize: 11,
+      fontWeight: '500',
+      color: colors.textMuted,
+      textAlign: 'center',
+    },
+    metricRule: {
+      width: StyleSheet.hairlineWidth,
+      height: 28,
+      alignSelf: 'center',
+      backgroundColor: colors.borderStrong,
+    },
+    actions: {
+      flexDirection: 'row',
+      gap: 8,
+    },
+    primaryAction: {
+      flex: 1.35,
+      minHeight: 44,
+      borderRadius: Radii.md,
+      backgroundColor: colors.text,
+      paddingHorizontal: 14,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+    },
+    primaryActionText: {
+      color: colors.primaryButtonText,
+      fontSize: 14,
+      fontWeight: '700',
+    },
+    secondaryAction: {
+      flex: 1,
+      minHeight: 44,
+      borderRadius: Radii.md,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingHorizontal: 12,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 6,
+    },
+    secondaryActionText: {
+      color: colors.text,
+      fontSize: 14,
+      fontWeight: '600',
+    },
+    section: {
+      gap: SECTION_GAP,
+    },
+    list: {
+      gap: 8,
+    },
+    chartLabel: {
+      fontSize: 11,
+      fontWeight: '700',
+      letterSpacing: 0.4,
+      textTransform: 'uppercase',
+      color: colors.textSecondary,
+      marginBottom: 8,
+    },
+    empty: {
+      textAlign: 'center',
+      color: colors.textMuted,
+      fontSize: 13,
+      paddingVertical: 8,
+    },
+    emptyRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      paddingVertical: 2,
+    },
+    emptyIcon: {
+      width: 36,
+      height: 36,
       borderRadius: 10,
       backgroundColor: colors.surfaceRaised,
       borderWidth: 1,
@@ -499,56 +533,21 @@ function createStyles(colors: AppPalette) {
       alignItems: 'center',
       justifyContent: 'center',
     },
-    quickLabel: {
+    emptyRowText: {
       flex: 1,
       fontSize: 13,
-      fontWeight: '600',
-      color: colors.text,
-    },
-    sectionHeader: {
-      marginTop: 18,
-      marginBottom: 12,
-      paddingHorizontal: H_PAD,
-    },
-    testsList: {
-      gap: 4,
-      paddingHorizontal: H_PAD,
-    },
-    progressCard: {
-      marginHorizontal: H_PAD,
-    },
-    chartTitle: {
       color: colors.textSecondary,
-      fontSize: 11,
-      fontWeight: '700',
-      letterSpacing: 0.5,
-      textTransform: 'uppercase',
-      marginBottom: 10,
-    },
-    emptyProgress: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 12,
-      paddingVertical: 8,
-    },
-    emptyProgressText: {
-      flex: 1,
-      color: colors.textSecondary,
-      fontSize: 13,
       lineHeight: 18,
     },
-    standingCard: {
-      marginHorizontal: H_PAD,
-    },
-    standingRow: {
+    standing: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 12,
     },
     standingIcon: {
-      width: 40,
-      height: 40,
-      borderRadius: 12,
+      width: 38,
+      height: 38,
+      borderRadius: 11,
       backgroundColor: colors.surfaceRaised,
       borderWidth: 1,
       borderColor: colors.border,
@@ -558,32 +557,28 @@ function createStyles(colors: AppPalette) {
     standingCopy: {
       flex: 1,
       minWidth: 0,
+      gap: 2,
     },
     standingTitle: {
       fontSize: 14,
       fontWeight: '700',
       color: colors.text,
-      marginBottom: 2,
     },
     standingSub: {
       fontSize: 12,
       color: colors.textSecondary,
     },
-    heroBanner: {
-      alignSelf: 'center',
-      backgroundColor: colors.surfaceRaised,
-      overflow: 'hidden',
+    banner: {
+      width: '100%',
       borderRadius: Radii.lg,
+      overflow: 'hidden',
       borderWidth: 1,
       borderColor: colors.border,
-      marginBottom: 8,
+      backgroundColor: colors.surfaceRaised,
     },
-    emptyText: {
-      color: colors.textMuted,
-      textAlign: 'center',
-      marginTop: 12,
-      marginBottom: 8,
-      fontSize: 13,
+    bannerImage: {
+      width: '100%',
+      height: '100%',
     },
   });
 }

@@ -6,6 +6,21 @@ import { notificationEndpoints } from './apis';
 const FCM_TOKEN_KEY = 'ac_fcm_token';
 const FCM_SW_URL = '/firebase-messaging-sw.js';
 const FCM_SW_SCOPE = '/firebase-cloud-messaging-push-scope';
+const FCM_SKIP_KEY = 'ac_fcm_skip';
+
+let inFlight = null;
+
+function isPushServiceError(error) {
+  return /push service error|registration failed/i.test(error?.message || String(error || ''));
+}
+
+async function isBraveBrowser() {
+  try {
+    return Boolean(navigator.brave && (await navigator.brave.isBrave()));
+  } catch {
+    return false;
+  }
+}
 
 /** Wait until a service worker registration has an active worker. */
 async function waitForActiveServiceWorker(registration, timeoutMs = 10000) {
@@ -40,7 +55,6 @@ async function waitForActiveServiceWorker(registration, timeoutMs = 10000) {
 async function getMessagingSwRegistration() {
   if (!('serviceWorker' in navigator)) return null;
 
-  // Prefer an existing FCM registration if present
   const existing = await navigator.serviceWorker.getRegistration(FCM_SW_SCOPE);
   if (existing) {
     return waitForActiveServiceWorker(existing);
@@ -54,74 +68,86 @@ async function getMessagingSwRegistration() {
   return waitForActiveServiceWorker(registration);
 }
 
-/**
- * Request notification permission, obtain an FCM token, and register it with the API.
- * Always POSTs to the backend so login / session restore stay in sync.
- * Safe to call multiple times; no-ops when unsupported or denied.
- */
-export async function enablePushNotifications(authToken) {
-  try {
-    if (!authToken || typeof window === 'undefined') return null;
-    if (!('Notification' in window) || !('serviceWorker' in navigator)) return null;
-
-    // Secure context required (localhost / https)
-    if (!window.isSecureContext) {
-      console.warn('[FCM] Push requires HTTPS or localhost');
-      return null;
-    }
-
-    const permission =
-      Notification.permission === 'granted'
-        ? 'granted'
-        : await Notification.requestPermission();
-
-    if (permission !== 'granted') {
-      console.warn('[FCM] Notification permission not granted');
-      return null;
-    }
-
-    const messaging = await getFirebaseMessaging();
-    if (!messaging) {
-      console.warn('[FCM] Messaging not supported in this browser');
-      return null;
-    }
-
-    const registration = await getMessagingSwRegistration();
-    if (!registration?.active) {
-      console.warn('[FCM] Service worker not active');
-      return null;
-    }
-
-    const fcmToken = await getToken(messaging, {
-      vapidKey: FIREBASE_VAPID_KEY,
-      serviceWorkerRegistration: registration,
-    });
-
-    if (!fcmToken) return null;
-
-    await apiConnector(
-      'POST',
-      notificationEndpoints.REGISTER_TOKEN,
-      { token: fcmToken, platform: 'web' },
-      { Authorization: `Bearer ${authToken}` }
-    );
-    localStorage.setItem(FCM_TOKEN_KEY, fcmToken);
-    console.log('[FCM] Web token registered with backend');
-
-    return fcmToken;
-  } catch (error) {
-    const message = error?.message || String(error);
-    console.warn('[FCM] Failed to enable push notifications:', message);
-
-    // Common Chrome/Brave issue — nudge actionable fix
-    if (/push service error/i.test(message)) {
-      console.warn(
-        '[FCM] Tip: In Chrome, open chrome://settings/privacy → Site settings → Notifications, allow this site. In Brave, enable "Use Google services for push messaging". Also clear Site data for this origin and retry.'
-      );
-    }
-
+async function enablePushNotificationsOnce(authToken) {
+  if (!authToken || typeof window === 'undefined') return null;
+  if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
     return null;
   }
+
+  if (!window.isSecureContext) {
+    console.warn('[FCM] Push requires HTTPS or localhost');
+    return null;
+  }
+
+  if (sessionStorage.getItem(FCM_SKIP_KEY) === '1') {
+    return null;
+  }
+
+  if (await isBraveBrowser()) {
+    // Brave blocks Google's FCM endpoint unless "Use Google services for push messaging" is on.
+    sessionStorage.setItem(FCM_SKIP_KEY, '1');
+    console.info(
+      '[FCM] Skipped in Brave. Enable Settings → Privacy → Use Google services for push messaging, then reload.'
+    );
+    return null;
+  }
+
+  const permission =
+    Notification.permission === 'granted'
+      ? 'granted'
+      : await Notification.requestPermission();
+
+  if (permission !== 'granted') {
+    return null;
+  }
+
+  const messaging = await getFirebaseMessaging();
+  if (!messaging) return null;
+
+  const registration = await getMessagingSwRegistration();
+  if (!registration?.active) return null;
+
+  const fcmToken = await getToken(messaging, {
+    vapidKey: FIREBASE_VAPID_KEY,
+    serviceWorkerRegistration: registration,
+  });
+
+  if (!fcmToken) return null;
+
+  await apiConnector(
+    'POST',
+    notificationEndpoints.REGISTER_TOKEN,
+    { token: fcmToken, platform: 'web' },
+    { Authorization: `Bearer ${authToken}` }
+  );
+  localStorage.setItem(FCM_TOKEN_KEY, fcmToken);
+  return fcmToken;
+}
+
+/**
+ * Request notification permission, obtain an FCM token, and register it with the API.
+ * Dedupes concurrent calls (React StrictMode / login + App).
+ */
+export async function enablePushNotifications(authToken) {
+  if (inFlight) return inFlight;
+
+  inFlight = enablePushNotificationsOnce(authToken)
+    .catch((error) => {
+      if (isPushServiceError(error)) {
+        sessionStorage.setItem(FCM_SKIP_KEY, '1');
+        console.info(
+          '[FCM] Browser push service unavailable. Allow notifications for this site, or in Brave enable Google push messaging.'
+        );
+      } else {
+        console.warn('[FCM] Failed to enable push notifications:', error?.message || error);
+      }
+      return null;
+    })
+    .finally(() => {
+      inFlight = null;
+    });
+
+  return inFlight;
 }
 
 /** Remove this browser's FCM token from the backend (e.g. on logout). */
@@ -142,6 +168,7 @@ export async function disablePushNotifications(authToken) {
     console.warn('[FCM] Failed to unregister push token:', error?.message || error);
   } finally {
     localStorage.removeItem(FCM_TOKEN_KEY);
+    sessionStorage.removeItem(FCM_SKIP_KEY);
   }
 }
 

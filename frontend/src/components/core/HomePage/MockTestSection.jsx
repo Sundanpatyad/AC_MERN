@@ -33,8 +33,8 @@ const MockTestsSection = ({ setShowLoginModal }) => {
   useEffect(() => {
     const loadMockTests = async () => {
       try {
-        const data = await fetchAllMockTests(token);
-        setMockTests((data || []).filter(test => test.status !== 'draft'));
+        const data = await fetchAllMockTests(token, { view: 'home', limit: 4 });
+        setMockTests(data || []);
       } catch (error) {
         console.error("Error fetching mock tests:", error);
         toast.error("Failed to load mock tests. Please try again.");
@@ -101,10 +101,7 @@ const MockTestsSection = ({ setShowLoginModal }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">
           {isLoading
             ? Array(4).fill(null).map((_, i) => <MockTestSkeleton key={i} />)
-            : mockTests
-                .slice(0, 4)
-                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                .map((mockTest) => (
+            : mockTests.map((mockTest) => (
                   <MockTestCard
                     key={mockTest._id}
                     mockTest={mockTest}

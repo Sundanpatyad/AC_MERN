@@ -122,7 +122,7 @@ const AttemptMockTest = () => {
         const fetchAndStart = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get(`${GET_MCOKTEST_SERIES_BY_ID}/${mockId}`, {
+                const response = await axios.get(`${GET_MCOKTEST_SERIES_BY_ID}/${mockId}?full=true`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 const series = response.data.data;
@@ -163,7 +163,7 @@ const AttemptMockTest = () => {
             // Always verify access when opening via URL / refresh / shared link
             try {
                 setLoading(true);
-                const response = await axios.get(`${GET_MCOKTEST_SERIES_BY_ID}/${mockId}`, {
+                const response = await axios.get(`${GET_MCOKTEST_SERIES_BY_ID}/${mockId}?full=true`, {
                     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
                 });
                 const series = response.data.data;

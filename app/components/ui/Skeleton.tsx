@@ -83,66 +83,63 @@ export function HomeSkeleton({ bannerHeight = 180 }: { bannerHeight?: number }) 
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   return (
-    <View>
-      <View style={[styles.homeHeader, styles.hPad]}>
+    <View style={styles.homeColumn}>
+      <View style={styles.homeHeader}>
+        <Skeleton height={12} width={150} />
+        <SkeletonCircle size={36} />
+      </View>
+
+      <View style={{ gap: 8 }}>
+        <Skeleton height={28} width="72%" />
+        <Skeleton height={14} width="55%" />
+      </View>
+
+      <View style={[styles.block, { marginBottom: 0, paddingVertical: 16 }]}>
+        <View style={[styles.statsRow, { marginBottom: 0 }]}>
+          <Skeleton height={42} style={{ flex: 1 }} borderRadius={Radii.sm} />
+          <Skeleton height={42} style={{ flex: 1 }} borderRadius={Radii.sm} />
+          <Skeleton height={42} style={{ flex: 1 }} borderRadius={Radii.sm} />
+          <Skeleton height={42} style={{ flex: 1 }} borderRadius={Radii.sm} />
+        </View>
+      </View>
+
+      <View style={styles.homeGrid}>
+        <Skeleton height={48} style={{ flex: 1.35 }} borderRadius={Radii.md} />
+        <Skeleton height={48} style={{ flex: 1 }} borderRadius={Radii.md} />
+      </View>
+
+      <Skeleton height={18} width={90} />
+      {[0, 1, 2].map((i) => (
+        <View key={i} style={[styles.block, styles.homeRow, { marginBottom: 0 }]}>
+          <Skeleton height={64} width={64} borderRadius={Radii.md} />
+          <View style={{ flex: 1, gap: 8 }}>
+            <Skeleton height={14} width="78%" />
+            <Skeleton height={11} width="48%" />
+          </View>
+        </View>
+      ))}
+
+      <Skeleton height={18} width={80} />
+      <View style={[styles.block, { marginBottom: 0 }]}>
+        <Skeleton height={12} width={100} style={{ marginBottom: 12 }} />
+        <View style={styles.chartRow}>
+          {[40, 70, 55, 90, 60, 75].map((h, i) => (
+            <Skeleton key={i} height={h} width={28} borderRadius={Radii.sm} />
+          ))}
+        </View>
+      </View>
+
+      <Skeleton height={18} width={90} />
+      <View style={[styles.block, styles.homeRow, { marginBottom: 0 }]}>
+        <Skeleton height={40} width={40} borderRadius={12} />
         <View style={{ flex: 1, gap: 8 }}>
-          <Skeleton height={12} width={140} />
+          <Skeleton height={14} width="45%" />
+          <Skeleton height={11} width="70%" />
         </View>
-        <SkeletonCircle size={32} />
       </View>
 
-      <View style={[styles.hPad, { marginBottom: 16 }]}>
-        <Skeleton height={24} width="65%" style={{ marginBottom: 8 }} />
-        <Skeleton height={14} width="45%" />
-      </View>
-
-      <View style={styles.hPad}>
-        <View style={[styles.block, { marginBottom: 14, paddingVertical: 14 }]}>
-          <View style={styles.statsRow}>
-            <Skeleton height={36} style={{ flex: 1 }} borderRadius={Radii.sm} />
-            <Skeleton height={36} style={{ flex: 1 }} borderRadius={Radii.sm} />
-            <Skeleton height={36} style={{ flex: 1 }} borderRadius={Radii.sm} />
-            <Skeleton height={36} style={{ flex: 1 }} borderRadius={Radii.sm} />
-          </View>
-        </View>
-
-        <View style={[styles.statsRow, { marginBottom: 20 }]}>
-          <Skeleton height={56} style={{ flex: 1 }} borderRadius={Radii.md} />
-          <Skeleton height={56} style={{ flex: 1 }} borderRadius={Radii.md} />
-        </View>
-        <View style={[styles.statsRow, { marginBottom: 20 }]}>
-          <Skeleton height={56} style={{ flex: 1 }} borderRadius={Radii.md} />
-          <Skeleton height={56} style={{ flex: 1 }} borderRadius={Radii.md} />
-        </View>
-
-        <Skeleton height={18} width={130} style={{ marginBottom: 12 }} />
-        <MockTestCardSkeleton />
-        <MockTestCardSkeleton />
-
-        <Skeleton height={18} width={120} style={{ marginTop: 20, marginBottom: 12 }} />
-        <View style={styles.block}>
-          <Skeleton height={12} width={100} style={{ marginBottom: 12 }} />
-          <View style={styles.chartRow}>
-            {[40, 70, 55, 90, 60, 75].map((h, i) => (
-              <Skeleton key={i} height={h} width={28} borderRadius={Radii.sm} />
-            ))}
-          </View>
-        </View>
-
-        <Skeleton height={18} width={90} style={{ marginTop: 20, marginBottom: 12 }} />
-        <View style={[styles.block, { marginBottom: 16 }]}>
-          <View style={styles.row}>
-            <Skeleton height={40} width={40} borderRadius={12} />
-            <View style={{ flex: 1, gap: 8 }}>
-              <Skeleton height={14} width="55%" />
-              <Skeleton height={10} width="75%" />
-            </View>
-          </View>
-        </View>
-
-        <Skeleton height={18} width={80} style={{ marginBottom: 12 }} />
-        <Skeleton height={bannerHeight} borderRadius={Radii.lg} />
-      </View>
+      <Skeleton height={18} width={80} />
+      <Skeleton height={bannerHeight} borderRadius={Radii.lg} />
     </View>
   );
 }
@@ -242,11 +239,28 @@ function createStyles(colors: AppPalette) {
     hPad: {
       paddingHorizontal: 20,
     },
+    homeColumn: {
+      width: '100%',
+      gap: 12,
+    },
+    homeGrid: {
+      flexDirection: 'row',
+      gap: 8,
+      width: '100%',
+    },
     homeHeader: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: 20,
+      justifyContent: 'space-between',
       gap: 12,
+      width: '100%',
+      minHeight: 36,
+    },
+    homeRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      padding: 12,
     },
     block: {
       backgroundColor: colors.surface,

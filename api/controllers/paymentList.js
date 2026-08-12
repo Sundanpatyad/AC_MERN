@@ -5,15 +5,18 @@ const mockTestPurchasersController = {
   listPurchasers: async (req, res) => {
     try {
       // Find all payment verifications
-      const paymentVerifications = await PaymentVerification.find().populate('userId');
+      const paymentVerifications = await PaymentVerification.find()
+        .populate('userId', 'firstName lastName email')
+        .lean();
 
       // Get unique user IDs who have made payments
-      const userIds = [...new Set(paymentVerifications.map(pv => pv.userId._id))];
+      const userIds = [...new Set(paymentVerifications.map(pv => pv.userId?._id).filter(Boolean))];
 
       // Find users with these IDs and populate their mock tests
       const users = await User.find({ _id: { $in: userIds } })
         .select('firstName lastName email mocktests')
-        .populate('mocktests');
+        .populate('mocktests', 'seriesName totalTests')
+        .lean();
 
       // Format the response
       const formattedUsers = users.map(user => ({

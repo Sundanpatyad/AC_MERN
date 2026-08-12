@@ -1,6 +1,83 @@
 const Mocktest = require("../models/mocktest");
 const { MockTestSeries } = require("../models/mockTestSeries");
 const { uploadImageToCloudinary } = require('../utils/imageUploader');
+const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
+
+/** Optional JWT user id for public list/detail endpoints (never 401s). */
+function getOptionalUserId(req) {
+    try {
+        const authHeader = req.header('Authorization') || req.header('authorization');
+        const token = authHeader?.replace(/^Bearer\s+/i, '').trim();
+        if (!token || !process.env.JWT_SECRET) return null;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        return decoded?.id || decoded?._id || null;
+    } catch {
+        return null;
+    }
+}
+
+function toObjectIdOrNull(id) {
+    if (!id) return null;
+    try {
+        return new mongoose.Types.ObjectId(String(id));
+    } catch {
+        return null;
+    }
+}
+
+/** Shared projection: never load question banks for list/detail/home. */
+function buildSeriesSummaryStages({ userObjectId = null, view = 'list' } = {}) {
+    const isHome = view === 'home';
+
+    const projectFields = {
+        seriesName: 1,
+        thumbnail: 1,
+        price: 1,
+        status: 1,
+        createdAt: 1,
+        totalTests: 1,
+        studentsEnrolledCount: { $size: { $ifNull: ['$studentsEnrolled', []] } },
+        isEnrolled: userObjectId
+            ? { $in: [userObjectId, { $ifNull: ['$studentsEnrolled', []] }] }
+            : { $literal: false },
+        attachmentsCount: { $size: { $ifNull: ['$attachments', []] } },
+        mockTestsCount: { $size: { $ifNull: ['$mockTests', []] } },
+    };
+
+    if (!isHome) {
+        projectFields.description = 1;
+        projectFields.updatedAt = 1;
+        projectFields.attachments = {
+            $map: {
+                input: { $ifNull: ['$attachments', []] },
+                as: 'a',
+                in: { name: '$$a.name' },
+            },
+        };
+        projectFields.mockTests = {
+            $map: {
+                input: { $ifNull: ['$mockTests', []] },
+                as: 't',
+                in: {
+                    _id: '$$t._id',
+                    testName: '$$t.testName',
+                    duration: '$$t.duration',
+                    price: '$$t.price',
+                    status: '$$t.status',
+                    createdAt: '$$t.createdAt',
+                    updatedAt: '$$t.updatedAt',
+                    totalQuestions: { $size: { $ifNull: ['$$t.questions', []] } },
+                },
+            },
+        };
+    }
+
+    return [
+        { $project: projectFields },
+        { $sort: { createdAt: -1 } },
+    ];
+}
 
 exports.createMockTestSeries = async (req, res) => {
     try {
@@ -54,9 +131,10 @@ exports.createMockTestSeries = async (req, res) => {
 
 exports.getAllMockTestSeries = async (req, res) => {
     try {
-        const series = await MockTestSeries.find()
-            .populate('creator', 'firstName lastName email')
-            .lean();
+        const userObjectId = toObjectIdOrNull(getOptionalUserId(req));
+        const series = await MockTestSeries.aggregate([
+            ...buildSeriesSummaryStages({ userObjectId, view: 'list' }),
+        ]);
         res.status(200).json({
             success: true,
             data: series
@@ -71,9 +149,21 @@ exports.getAllMockTestSeries = async (req, res) => {
 
 exports.getAllMockTestSeriesStudent = async (req, res) => {
     try {
-        const series = await MockTestSeries.find()
-            .populate('creator', 'firstName lastName email')
-            .lean();
+        const view = String(req.query.view || 'list').toLowerCase() === 'home' ? 'home' : 'list';
+        const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || (view === 'home' ? 4 : 0), 0), 100);
+        const userObjectId = toObjectIdOrNull(getOptionalUserId(req));
+
+        const pipeline = [
+            { $match: { status: 'published' } },
+            ...buildSeriesSummaryStages({ userObjectId, view }),
+        ];
+
+        if (limit > 0) {
+            pipeline.push({ $limit: limit });
+        }
+
+        const series = await MockTestSeries.aggregate(pipeline);
+
         res.status(200).json({
             success: true,
             data: series
@@ -88,10 +178,42 @@ exports.getAllMockTestSeriesStudent = async (req, res) => {
 
 exports.getMockTestSeriesById = async (req, res) => {
     try {
-        const series = await MockTestSeries.findById(req.params.id)
-            .populate('creator', 'firstName lastName email')
-            .populate('mockTests')
-            .lean();
+        const wantFull = String(req.query.full || '').toLowerCase() === 'true'
+            || String(req.query.full || '') === '1';
+        const seriesObjectId = toObjectIdOrNull(req.params.id);
+
+        if (!seriesObjectId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid mock test series id'
+            });
+        }
+
+        // Attempt / instructor edit: full document including questions.
+        if (wantFull) {
+            const series = await MockTestSeries.findById(seriesObjectId)
+                .populate('creator', 'firstName lastName')
+                .lean();
+
+            if (!series) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Mock test series not found'
+                });
+            }
+
+            return res.status(200).json({
+                success: true,
+                data: series
+            });
+        }
+
+        // Detail / marketing page: project in Mongo — never load question banks.
+        const userObjectId = toObjectIdOrNull(getOptionalUserId(req));
+        const [series] = await MockTestSeries.aggregate([
+            { $match: { _id: seriesObjectId } },
+            ...buildSeriesSummaryStages({ userObjectId, view: 'list' }),
+        ]);
 
         if (!series) {
             return res.status(404).json({
@@ -99,6 +221,7 @@ exports.getMockTestSeriesById = async (req, res) => {
                 message: 'Mock test series not found'
             });
         }
+
         res.status(200).json({
             success: true,
             data: series

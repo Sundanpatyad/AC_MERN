@@ -89,7 +89,10 @@ const ReviewCarousel = () => {
   const fetchReviews = useMemo(() => {
     return async () => {
       try {
-        const { data } = await apiConnector("GET", ratingsEndpoints.REVIEWS_DETAILS_API);
+        const { data } = await apiConnector(
+          "GET",
+          `${ratingsEndpoints.REVIEWS_DETAILS_API}?limit=12`
+        );
         if (data?.success && data?.data?.length > 0) {
           setReviews(data?.data);
         }

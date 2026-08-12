@@ -71,7 +71,8 @@ exports.getAttemptsByUser = async (req, res) => {
 
     // Fetch attempts with populated fields
     const attempts = await AttemptDetails.find({ user: userId })
-      .populate('mockTestSeries', 'seriesName totalQuestions duration') // Adjust fields as needed
+      .select('testName score totalQuestions timeTaken incorrectAnswers correctAnswers createdAt attemptDate mockTestSeries')
+      .populate('mockTestSeries', 'seriesName')
       .sort({ createdAt: -1 })
       .lean();
 
@@ -242,7 +243,8 @@ exports.getRankings = async (req, res) => {
                 from: 'mocktestseries',
                 localField: 'mockTestSeries',
                 foreignField: '_id',
-                as: 'seriesDetails'
+                as: 'seriesDetails',
+                pipeline: [{ $project: { seriesName: 1 } }],
               }
             },
             { $unwind: { path: '$seriesDetails', preserveNullAndEmptyArrays: true } },
@@ -290,7 +292,8 @@ exports.getRankings = async (req, res) => {
                 from: 'mocktestseries',
                 localField: 'mockTestSeries',
                 foreignField: '_id',
-                as: 'seriesDetails'
+                as: 'seriesDetails',
+                pipeline: [{ $project: { seriesName: 1 } }],
               }
             },
             { $unwind: { path: '$seriesDetails', preserveNullAndEmptyArrays: true } },
@@ -458,7 +461,8 @@ exports.getUserRankingByName = async (req, res) => {
           from: 'mocktestseries',
           localField: 'mockTestSeries',
           foreignField: '_id',
-          as: 'seriesDetails'
+          as: 'seriesDetails',
+          pipeline: [{ $project: { seriesName: 1 } }],
         }
       },
       { $unwind: { path: '$seriesDetails', preserveNullAndEmptyArrays: true } },
@@ -518,7 +522,18 @@ exports.getAllAttemptedTestNames = async (req, res) => {
           from: mongoose.model('MockTestSeries').collection.name,
           localField: '_id.mockTestSeriesId',
           foreignField: '_id',
-          as: 'seriesDetails'
+          as: 'seriesDetails',
+          pipeline: [
+            {
+              $project: {
+                seriesName: 1,
+                mockTests: {
+                  _id: 1,
+                  testName: 1,
+                },
+              },
+            },
+          ],
         }
       },
       {
