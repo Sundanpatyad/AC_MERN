@@ -8,6 +8,7 @@ import ProtectedRoute from "./components/core/Auth/ProtectedRoute";
 import OpenRoute from "./components/core/Auth/OpenRoute";
 import { ACCOUNT_TYPE } from "../src/utils/constants";
 import BottomBar from "./components/common/ButtomBar";
+import FloatingInquiryButton from "./components/common/FloatingInquiryButton";
 import YourComponent from "./components/ui/InitialLoader";
 import InstallApp from "./components/core/HomePage/installApp";
 import PhoneWizardPage from "./components/core/HomePage/Phone";
@@ -366,6 +367,8 @@ function App() {
       >
         <HiArrowNarrowUp />
       </button>
+
+      {location.pathname === "/" && <FloatingInquiryButton />}
     </div>
   );
 }
