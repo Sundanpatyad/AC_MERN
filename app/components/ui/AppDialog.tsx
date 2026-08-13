@@ -112,7 +112,6 @@ export function AppDialog({
             {
               backgroundColor: colors.surface,
               borderColor: colors.borderStrong,
-              shadowColor: colors.primaryShadow,
             },
             cardStyle,
           ]}
@@ -167,10 +166,6 @@ const styles = StyleSheet.create({
     paddingTop: 26,
     paddingBottom: 18,
     alignItems: 'center',
-    shadowOpacity: 0.18,
-    shadowRadius: 28,
-    shadowOffset: { width: 0, height: 12 },
-    elevation: 16,
   },
   iconWrap: {
     width: 52,
