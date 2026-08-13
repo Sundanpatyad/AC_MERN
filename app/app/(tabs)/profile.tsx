@@ -51,6 +51,7 @@ export default function ProfileScreen() {
         message="Are you sure you want to log out from your account?"
         confirmText="Yes, Log out"
         confirmVariant="outline"
+        tone="danger"
       />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>

@@ -41,10 +41,29 @@ function verifyWebhookSignature(body, signature) {
     }
 }
 
+function normalizeItemIds(itemId) {
+    const raw = Array.isArray(itemId) ? itemId.flat(Infinity) : [itemId];
+    return [...new Set(
+        raw
+            .map((id) => (id == null ? '' : String(id).trim()))
+            .filter(Boolean)
+    )];
+}
+
+function toObjectIdOrNull(id) {
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) return null;
+    const oid = new mongoose.Types.ObjectId(String(id));
+    return String(oid) === String(id) ? oid : null;
+}
+
+function isUserEnrolled(studentsEnrolled, userId) {
+    const uid = String(userId);
+    return (studentsEnrolled || []).some((enrolled) => String(enrolled?._id || enrolled) === uid);
+}
+
 // Capture the payment and Initiate the 'Razorpay order' for mock tests
 exports.captureMockTestPayment = async (req, res) => {
-    const { itemId } = req.body;
-    const mockTestIds = Array.isArray(itemId) ? itemId : [itemId];
+    const mockTestIds = normalizeItemIds(req.body?.itemId);
     const userId = req.user.id;
     const idempotencyKey = req.headers['idempotency-key'] || generateIdempotencyKey(userId, mockTestIds);
 
@@ -54,7 +73,17 @@ exports.captureMockTestPayment = async (req, res) => {
     if (mockTestIds.length === 0) {
         return res.status(400).json({
             success: false,
+            code: 'MISSING_ITEM_ID',
             message: "Please provide Mock Test Series Id"
+        });
+    }
+
+    const objectIds = mockTestIds.map(toObjectIdOrNull);
+    if (objectIds.some((id) => !id)) {
+        return res.status(400).json({
+            success: false,
+            code: 'INVALID_ITEM_ID',
+            message: "Invalid mock test series id"
         });
     }
 
@@ -75,31 +104,36 @@ exports.captureMockTestPayment = async (req, res) => {
             });
         }
 
-        // Validate mock tests and calculate total amount
-        const result = await MockTestSeries.aggregate([
-            {
-                $match: {
-                    _id: { $in: mockTestIds.map(id => new mongoose.Types.ObjectId(id)) },
-                    studentsEnrolled: { $ne: new mongoose.Types.ObjectId(userId) }
-                }
-            },
-            {
-                $group: {
-                    _id: null,
-                    totalAmount: { $sum: "$price" },
-                    count: { $sum: 1 }
-                }
-            }
-        ]);
+        const seriesList = await MockTestSeries.find({ _id: { $in: objectIds } })
+            .select('price studentsEnrolled status')
+            .lean();
 
-        if (result.length === 0 || result[0].count !== mockTestIds.length) {
+        if (seriesList.length !== mockTestIds.length) {
             return res.status(400).json({
                 success: false,
-                message: "One or more mock tests are unavailable or already purchased"
+                code: 'NOT_FOUND',
+                message: "One or more mock tests were not found"
             });
         }
 
-        const totalAmount = result[0].totalAmount;
+        if (seriesList.some((series) => isUserEnrolled(series.studentsEnrolled, userId))) {
+            return res.status(400).json({
+                success: false,
+                code: 'ALREADY_ENROLLED',
+                message: "You already have access to this mock test"
+            });
+        }
+
+        const totalAmount = seriesList.reduce((sum, series) => sum + (Number(series.price) || 0), 0);
+
+        if (!(totalAmount > 0)) {
+            return res.status(400).json({
+                success: false,
+                code: 'FREE_ITEM',
+                message: "This mock test is free. Enroll without payment."
+            });
+        }
+
         const currency = "INR";
 
         // Create Razorpay order with metadata
