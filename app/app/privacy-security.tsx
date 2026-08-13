@@ -5,6 +5,7 @@ import { SettingsShell, SettingsCard } from '../components/ui/SettingsShell';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { ConfirmationSheet } from '../components/ui/ConfirmationSheet';
+import { showMessage } from '../providers/DialogProvider';
 import { apiConnector } from '../services/api';
 import { endpoints } from '../constants/api';
 import { useAuthStore } from '../store/authStore';
@@ -25,9 +26,19 @@ export default function PrivacySecurityScreen() {
 
   const handleChangePassword = async () => {
     if (!oldPassword || !newPassword || !confirmNewPassword) {
+      showMessage({
+        title: 'Missing fields',
+        message: 'Please fill in your current and new password.',
+        tone: 'danger',
+      });
       return;
     }
     if (newPassword !== confirmNewPassword) {
+      showMessage({
+        title: 'Passwords do not match',
+        message: 'New password and confirmation must be the same.',
+        tone: 'danger',
+      });
       return;
     }
 
@@ -42,9 +53,24 @@ export default function PrivacySecurityScreen() {
         setOldPassword('');
         setNewPassword('');
         setConfirmNewPassword('');
+        showMessage({
+          title: 'Password updated',
+          message: 'Your password has been changed successfully.',
+          tone: 'success',
+        });
+      } else {
+        showMessage({
+          title: 'Update failed',
+          message: res.data?.message || 'Could not update your password.',
+          tone: 'danger',
+        });
       }
-    } catch {
-      // ignore
+    } catch (error: any) {
+      showMessage({
+        title: 'Update failed',
+        message: error.response?.data?.message || 'Could not update your password.',
+        tone: 'danger',
+      });
     } finally {
       setIsSaving(false);
     }
@@ -122,6 +148,7 @@ export default function PrivacySecurityScreen() {
         message="This cannot be undone. All your data will be permanently removed."
         confirmText="Yes, delete"
         confirmVariant="outline"
+        tone="danger"
       />
     </SettingsShell>
   );

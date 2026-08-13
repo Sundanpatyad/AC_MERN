@@ -21,14 +21,30 @@ import { Button } from '../../components/ui/Button';
 import { DetailSkeleton } from '../../components/ui/Skeleton';
 import { AppPalette, Fonts, Radii } from '../../constants/theme';
 import { useTheme } from '../../providers/AppThemeProvider';
+import { showMessage } from '../../providers/DialogProvider';
 
 function stripHtml(value?: string) {
   if (!value) return '';
   return value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
+function paramValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function hasAccess(testDetails: any, userId?: string) {
+  if (!testDetails) return false;
+  if (Number(testDetails.price) === 0) return true;
+  if (testDetails.isEnrolled) return true;
+  if (!userId || !Array.isArray(testDetails.studentsEnrolled)) return false;
+  return testDetails.studentsEnrolled.some(
+    (entry: any) => String(entry?._id || entry) === String(userId)
+  );
+}
+
 export default function MockTestDetailScreen() {
-  const { id } = useLocalSearchParams();
+  const { id: rawId } = useLocalSearchParams();
+  const id = paramValue(rawId);
   const router = useRouter();
   const { user } = useAuthStore();
   const { colors, isDark } = useTheme();
@@ -43,6 +59,7 @@ export default function MockTestDetailScreen() {
   const heroHeight = Math.round(screenHeight * 0.42);
 
   const fetchDetails = useCallback(async () => {
+    if (!id) return;
     try {
       const response = await apiConnector.get(`${endpoints.GET_MOCK_TEST_SERIES_BY_ID}/${id}`);
       if (response.data?.success) {
@@ -59,13 +76,12 @@ export default function MockTestDetailScreen() {
     fetchDetails();
   }, [fetchDetails]);
 
-  const isEnrolled = testDetails?.studentsEnrolled?.includes(user?._id);
-  const canAccess = Boolean(isEnrolled || testDetails?.price === 0);
+  const canAccess = hasAccess(testDetails, user?._id);
 
   const totalQuestions = useMemo(() => {
     if (!testDetails?.mockTests?.length) return 0;
     return testDetails.mockTests.reduce(
-      (sum: number, t: any) => sum + (t.questions?.length || 0),
+      (sum: number, t: any) => sum + (t.questions?.length || t.totalQuestions || 0),
       0
     );
   }, [testDetails]);
@@ -81,7 +97,7 @@ export default function MockTestDetailScreen() {
     testDetails?.price === 0 ? 'Free' : `₹${testDetails?.price ?? 0}`;
 
   const handleStartTest = (testId: string) => {
-    router.push(`/take-test/${testId}`);
+    router.push(`/take-test/${testId}?seriesId=${id}`);
   };
 
   const handleEnroll = async () => {
@@ -90,15 +106,26 @@ export default function MockTestDetailScreen() {
       return;
     }
 
-    if (testDetails.price === 0) {
+    if (Number(testDetails.price) === 0) {
       setIsProcessing(true);
       try {
         const response = await apiConnector.post(`${endpoints.ENROLL_MOCK_TEST}/${id}`);
         if (response.data?.success) {
           fetchDetails();
+        } else {
+          showMessage({
+            title: 'Enrollment failed',
+            message: response.data?.message || 'Could not enroll in this test.',
+            tone: 'danger',
+          });
         }
-      } catch {
-        // enrollment failed
+      } catch (error: any) {
+        showMessage({
+          title: 'Enrollment failed',
+          message:
+            error.response?.data?.message || error.message || 'Could not enroll in this test.',
+          tone: 'danger',
+        });
       } finally {
         setIsProcessing(false);
       }
@@ -108,10 +135,19 @@ export default function MockTestDetailScreen() {
   };
 
   const handlePayment = async () => {
+    if (!id) {
+      showMessage({
+        title: 'Payment failed',
+        message: 'Missing mock test id.',
+        tone: 'danger',
+      });
+      return;
+    }
+
     setIsProcessing(true);
     try {
       const orderResponse = await apiConnector.post(endpoints.CAPTURE_MOCK_PAYMENT, {
-        itemId: id,
+        itemId: [String(id)],
       });
 
       if (!orderResponse.data?.success) {
@@ -144,9 +180,11 @@ export default function MockTestDetailScreen() {
       };
 
       if (!RazorpayCheckout || !RazorpayCheckout.open) {
-        console.error(
-          'Razorpay module is not available. Ensure you are running on a Development Build and not Expo Go.'
-        );
+        showMessage({
+          title: 'Payment unavailable',
+          message: 'Razorpay is not available in Expo Go. Use a development build to pay.',
+          tone: 'danger',
+        });
         setIsProcessing(false);
         return;
       }
@@ -160,17 +198,59 @@ export default function MockTestDetailScreen() {
               razorpay_signature: data.razorpay_signature,
             });
             if (verifyRes.data?.success) {
+              showMessage({
+                title: 'Payment successful',
+                message: 'You now have access to this mock test.',
+                tone: 'success',
+              });
               fetchDetails();
+            } else {
+              showMessage({
+                title: 'Verification pending',
+                message:
+                  verifyRes.data?.message ||
+                  'Payment received. Contact support if access is missing.',
+              });
             }
-          } catch {
-            // verification failed; payment may still have gone through
+          } catch (verifyError: any) {
+            showMessage({
+              title: 'Verification pending',
+              message:
+                verifyError.response?.data?.message ||
+                'Payment received. Contact support if access is missing.',
+            });
           }
         })
         .catch((error: any) => {
           console.log('[Razorpay Error]', error);
+          const description = error?.description || error?.error?.description;
+          if (description && description !== 'undefined') {
+            showMessage({
+              title: 'Payment cancelled',
+              message: String(description),
+            });
+          }
         });
     } catch (error: any) {
-      console.error('Payment Error:', error);
+      const payload = error.response?.data;
+      const message =
+        payload?.message || error.message || 'Could not start payment. Please try again.';
+      console.error('Payment Error:', message, payload || error);
+
+      if (payload?.code === 'ALREADY_ENROLLED' || /already/i.test(String(message))) {
+        showMessage({
+          title: 'Already purchased',
+          message: 'You already have access to this mock test.',
+        });
+        fetchDetails();
+        return;
+      }
+
+      showMessage({
+        title: 'Payment failed',
+        message: String(message),
+        tone: 'danger',
+      });
     } finally {
       setIsProcessing(false);
     }
@@ -214,7 +294,7 @@ export default function MockTestDetailScreen() {
 
   const ctaTitle = canAccess
     ? 'Start learning'
-    : testDetails.price === 0
+    : Number(testDetails.price) === 0
       ? 'Enroll free'
       : 'Buy now';
 

@@ -19,8 +19,24 @@ const normaliseOption = (opt: any): { text: string; image: string } => {
   return { text: opt?.text || '', image: opt?.image || '' };
 };
 
+function paramValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function hasSeriesAccess(series: any, userId?: string) {
+  if (!series) return false;
+  if (Number(series.price) === 0) return true;
+  if (series.isEnrolled) return true;
+  if (!userId || !Array.isArray(series.studentsEnrolled)) return false;
+  return series.studentsEnrolled.some(
+    (entry: any) => String(entry?._id || entry) === String(userId)
+  );
+}
+
 export default function TakeTestScreen() {
-  const { id } = useLocalSearchParams();
+  const { id: rawId, seriesId: rawSeriesId } = useLocalSearchParams();
+  const id = paramValue(rawId);
+  const seriesIdParam = paramValue(rawSeriesId);
   const router = useRouter();
   const { user } = useAuthStore();
   const { colors, isDark } = useTheme();
@@ -46,68 +62,84 @@ export default function TakeTestScreen() {
   };
 
   const fetchTest = useCallback(async () => {
+    if (!id) {
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const response = await apiConnector.get(endpoints.GET_ALL_MOCK_TESTS);
-      if (response.data?.success) {
-        let foundTest: any = null;
-        let parentSeries: any = null;
+      let seriesId = seriesIdParam;
 
-        for (const series of response.data.data) {
-          const test = series.mockTests?.find((t: any) => t._id === id);
-          if (test) {
-            foundTest = { ...test, seriesId: series._id };
-            parentSeries = series;
-            break;
-          }
-        }
-
-        if (!foundTest || !parentSeries) {
-          router.back();
-          return;
-        }
-
-        // Gate: unpaid users must buy/enroll first via detail page
-        const price = Number(parentSeries.price) || 0;
-        const enrolledIds = (parentSeries.studentsEnrolled || []).map((e: any) =>
-          String(e?._id || e)
+      if (!seriesId) {
+        const listRes = await apiConnector.get(endpoints.GET_ALL_MOCK_TESTS);
+        const series = (listRes.data?.data || []).find((item: any) =>
+          item.mockTests?.some((t: any) => String(t._id) === String(id))
         );
-        const isEnrolled = !!user?._id && enrolledIds.includes(String(user._id));
-        const canAccess = price === 0 || isEnrolled;
+        seriesId = series?._id;
+      }
 
-        if (!canAccess) {
-          resetTest();
-          router.replace(`/mock-test/${parentSeries._id}`);
-          return;
-        }
+      if (!seriesId) {
+        router.back();
+        return;
+      }
 
-        const questionsWithOriginalData = foundTest.questions.map((q: any) => {
-          const optionsToProcess =
-            q.questionType === 'MATCH' ? q.options.slice(0, 4) : q.options;
-          const optionsWithOriginalIndex = optionsToProcess.map((opt: any, idx: number) => ({
-            content: opt,
-            originalIndex: idx,
-          }));
-          const shuffledOptions = shuffle(optionsWithOriginalIndex);
-          return {
-            ...q,
-            shuffledOptions,
-          };
-        });
+      const response = await apiConnector.get(
+        `${endpoints.GET_MOCK_TEST_SERIES_BY_ID}/${seriesId}`,
+        { params: { full: true }, timeout: 30000 }
+      );
 
-        const randomizedQuestions = shuffle(questionsWithOriginalData);
-        setTestData(foundTest);
-        setShuffledQuestions(randomizedQuestions);
+      if (!response.data?.success) {
+        router.back();
+        return;
+      }
 
-        if (!isTestActive) {
-          startTest(foundTest.duration);
-        }
+      const parentSeries = response.data.data;
+      const foundNested = parentSeries?.mockTests?.find(
+        (t: any) => String(t._id) === String(id)
+      );
+
+      if (!foundNested || !parentSeries) {
+        router.back();
+        return;
+      }
+
+      if (!hasSeriesAccess(parentSeries, user?._id)) {
+        resetTest();
+        router.replace(`/mock-test/${parentSeries._id}`);
+        return;
+      }
+
+      const foundTest = { ...foundNested, seriesId: parentSeries._id };
+      const questions = Array.isArray(foundTest.questions) ? foundTest.questions : [];
+
+      const questionsWithOriginalData = questions.map((q: any) => {
+        const rawOptions = Array.isArray(q.options) ? q.options : [];
+        const optionsToProcess =
+          q.questionType === 'MATCH' ? rawOptions.slice(0, 4) : rawOptions;
+        const optionsWithOriginalIndex = optionsToProcess.map((opt: any, idx: number) => ({
+          content: opt,
+          originalIndex: idx,
+        }));
+        const shuffledOptions = shuffle(optionsWithOriginalIndex);
+        return {
+          ...q,
+          shuffledOptions,
+        };
+      });
+
+      const randomizedQuestions = shuffle(questionsWithOriginalData);
+      setTestData(foundTest);
+      setShuffledQuestions(randomizedQuestions);
+
+      if (!isTestActive && foundTest.duration) {
+        startTest(foundTest.duration);
       }
     } catch (error) {
       console.error('Failed to fetch test:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [id, user?._id, isTestActive, resetTest, router, startTest]);
+  }, [id, seriesIdParam, user?._id, isTestActive, resetTest, router, startTest]);
 
   useEffect(() => {
     fetchTest();

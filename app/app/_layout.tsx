@@ -16,6 +16,7 @@ import {
 import { useAuthStore } from '../store/authStore';
 import { useThemeStore } from '../store/themeStore';
 import { AppThemeProvider, useTheme } from '../providers/AppThemeProvider';
+import { DialogProvider } from '../providers/DialogProvider';
 import { Fonts } from '../constants/theme';
 
 SplashScreen.preventAutoHideAsync();
@@ -121,7 +122,9 @@ function RootNavigator() {
 export default function RootLayout() {
   return (
     <AppThemeProvider>
-      <RootNavigator />
+      <DialogProvider>
+        <RootNavigator />
+      </DialogProvider>
     </AppThemeProvider>
   );
 }
