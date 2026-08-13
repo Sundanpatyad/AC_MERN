@@ -33,9 +33,9 @@ const RankingTable = ({
 
   const medalColor = (rank) => {
     if (rank === 1) return 'text-yellow-400';
-    if (rank === 2) return 'text-zinc-400';
+    if (rank === 2) return 'text-muted';
     if (rank === 3) return 'text-orange-400';
-    return 'text-zinc-600';
+    return 'text-subtle';
   };
 
   return (
@@ -43,7 +43,7 @@ const RankingTable = ({
 
       {/* ── Test name heading ── */}
       {testName && (
-        <h2 className="text-base font-semibold text-zinc-400 mb-4 truncate">
+        <h2 className="text-base font-semibold text-muted mb-4 truncate">
           {testName}
         </h2>
       )}
@@ -55,15 +55,15 @@ const RankingTable = ({
           placeholder="Search by name…"
           value={nameSearchQuery}
           onChange={e => onNameSearch?.(e.target.value)}
-          className="w-full px-4 py-2.5 pl-10 rounded-lg bg-zinc-900 border border-zinc-800 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-zinc-600 transition-colors"
+          className="w-full px-4 py-2.5 pl-10 rounded-lg bg-page border border-line text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-muted transition-colors"
         />
         {isSearching ? (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-zinc-400 border-t-transparent rounded-full animate-spin" />
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-line border-t-transparent rounded-full animate-spin" />
         ) : (
-          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" size={13} />
+          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-subtle" size={13} />
         )}
         {nameSearchQuery && searchResults !== null && (
-          <p className="mt-1.5 text-xs text-zinc-600 pl-1">
+          <p className="mt-1.5 text-xs text-subtle pl-1">
             {searchResults.length === 0
               ? `No results for "${nameSearchQuery}"`
               : `${searchResults.length} result${searchResults.length > 1 ? 's' : ''}`}
@@ -72,9 +72,9 @@ const RankingTable = ({
       </div>
 
       {/* ── Table ── */}
-      <div className="rounded-xl border border-zinc-800 overflow-hidden">
+      <div className="rounded-xl border border-line overflow-hidden">
         {/* Header */}
-        <div className="grid grid-cols-[2rem_1fr_auto] sm:grid-cols-[3rem_1fr_auto_auto] gap-x-3 px-4 py-2.5 bg-zinc-900/80 border-b border-zinc-800 text-xs font-medium text-zinc-500 uppercase tracking-wider">
+        <div className="grid grid-cols-[2rem_1fr_auto] sm:grid-cols-[3rem_1fr_auto_auto] gap-x-3 px-4 py-2.5 bg-page border-b border-line text-xs font-medium text-subtle uppercase tracking-wider">
           <span>#</span>
           <span>Name</span>
           <span className="hidden sm:block text-center">Date</span>
@@ -83,7 +83,7 @@ const RankingTable = ({
 
         {/* Rows */}
         {displayList.length === 0 && !isSearching ? (
-          <div className="text-center py-12 text-zinc-600 text-sm">
+          <div className="text-center py-12 text-subtle text-sm">
             {searchResults !== null ? `No results for "${nameSearchQuery}"` : 'No data on this page.'}
           </div>
         ) : (
@@ -93,8 +93,8 @@ const RankingTable = ({
               return (
                 <div
                   key={r.userId ? String(r.userId) : r.rank}
-                  className={`grid grid-cols-[2rem_1fr_auto] sm:grid-cols-[3rem_1fr_auto_auto] gap-x-3 px-4 py-3 border-b border-zinc-800/60 last:border-0 items-center transition-colors ${
-                    isMe ? 'bg-blue-950/40' : 'hover:bg-zinc-900/60'
+                  className={`grid grid-cols-[2rem_1fr_auto] sm:grid-cols-[3rem_1fr_auto_auto] gap-x-3 px-4 py-3 border-b border-line last:border-0 items-center transition-colors ${
+                    isMe ? 'bg-blue-950/40' : 'hover:bg-page'
                   }`}
                 >
                   {/* Rank */}
@@ -111,17 +111,17 @@ const RankingTable = ({
                       onError={e => {
                         e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(r.userName)}&background=3f3f46&color=fff`;
                       }}
-                      className="w-8 h-8 rounded-full object-cover border border-zinc-700 flex-shrink-0"
+                      className="w-8 h-8 rounded-full object-cover border border-line flex-shrink-0"
                     />
                     <div className="min-w-0">
-                      <p className={`text-sm font-medium truncate ${isMe ? 'text-blue-300' : 'text-zinc-200'}`}>
+                      <p className={`text-sm font-medium truncate ${isMe ? 'text-blue-300' : 'text-fg'}`}>
                         {r.userName} {isMe && <span className="text-xs text-blue-400">(you)</span>}
                       </p>
                     </div>
                   </div>
 
                   {/* Date (hidden on small screens) */}
-                  <div className="hidden sm:block text-xs text-zinc-600 text-center whitespace-nowrap">
+                  <div className="hidden sm:block text-xs text-subtle text-center whitespace-nowrap">
                     {r.attemptDate
                       ? new Date(r.attemptDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
                       : '—'}
@@ -130,7 +130,7 @@ const RankingTable = ({
                   {/* Score */}
                   <div className="text-right">
                     <span className="text-sm font-bold text-white">{r.score}</span>
-                    <span className="text-xs text-zinc-600 ml-1">pts</span>
+                    <span className="text-xs text-subtle ml-1">pts</span>
                   </div>
                 </div>
               );
@@ -145,17 +145,17 @@ const RankingTable = ({
           <button
             onClick={() => onPageChange?.(-1)}
             disabled={!hasPrevPage}
-            className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm bg-page border border-line text-muted hover:bg-surface disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
             <ChevronLeft size={16} /> Prev
           </button>
-          <span className="text-sm text-zinc-500">
+          <span className="text-sm text-subtle">
             <span className="text-white font-semibold">{page}</span> / {totalPages}
           </span>
           <button
             onClick={() => onPageChange?.(1)}
             disabled={!hasNextPage}
-            className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm bg-page border border-line text-muted hover:bg-surface disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
             Next <ChevronRight size={16} />
           </button>

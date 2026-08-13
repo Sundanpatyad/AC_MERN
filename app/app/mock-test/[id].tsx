@@ -5,10 +5,13 @@ import {
   StyleSheet,
   ScrollView,
   Image,
-  TouchableOpacity,
+  Pressable,
+  useWindowDimensions,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import RazorpayCheckout from 'react-native-razorpay';
 
 import { useAuthStore } from '../../store/authStore';
@@ -16,19 +19,28 @@ import { apiConnector } from '../../services/api';
 import { endpoints } from '../../constants/api';
 import { Button } from '../../components/ui/Button';
 import { DetailSkeleton } from '../../components/ui/Skeleton';
-import { AppPalette, Radii } from '../../constants/theme';
+import { AppPalette, Fonts, Radii } from '../../constants/theme';
 import { useTheme } from '../../providers/AppThemeProvider';
+
+function stripHtml(value?: string) {
+  if (!value) return '';
+  return value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
 
 export default function MockTestDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const { user } = useAuthStore();
   const { colors, isDark } = useTheme();
+  const insets = useSafeAreaInsets();
+  const { height: screenHeight } = useWindowDimensions();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   const [testDetails, setTestDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const heroHeight = Math.round(screenHeight * 0.42);
 
   const fetchDetails = useCallback(async () => {
     try {
@@ -48,6 +60,25 @@ export default function MockTestDetailScreen() {
   }, [fetchDetails]);
 
   const isEnrolled = testDetails?.studentsEnrolled?.includes(user?._id);
+  const canAccess = Boolean(isEnrolled || testDetails?.price === 0);
+
+  const totalQuestions = useMemo(() => {
+    if (!testDetails?.mockTests?.length) return 0;
+    return testDetails.mockTests.reduce(
+      (sum: number, t: any) => sum + (t.questions?.length || 0),
+      0
+    );
+  }, [testDetails]);
+
+  const avgDuration = useMemo(() => {
+    const tests = testDetails?.mockTests || [];
+    if (!tests.length) return 0;
+    const total = tests.reduce((sum: number, t: any) => sum + (Number(t.duration) || 0), 0);
+    return Math.round(total / tests.length);
+  }, [testDetails]);
+
+  const priceLabel =
+    testDetails?.price === 0 ? 'Free' : `₹${testDetails?.price ?? 0}`;
 
   const handleStartTest = (testId: string) => {
     router.push(`/take-test/${testId}`);
@@ -147,7 +178,7 @@ export default function MockTestDetailScreen() {
 
   if (isLoading) {
     return (
-      <View style={[styles.container, { paddingTop: 60 }]}>
+      <View style={[styles.container, { paddingTop: insets.top + 20 }]}>
         <DetailSkeleton />
       </View>
     );
@@ -156,73 +187,157 @@ export default function MockTestDetailScreen() {
   if (!testDetails) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <Text style={{ color: colors.text }}>Test not found.</Text>
+        <Text style={styles.notFound}>Test not found.</Text>
         <Button title="Go Back" onPress={() => router.back()} style={{ marginTop: 20 }} />
       </View>
     );
   }
 
+  const attrCards = [
+    {
+      label: 'Tests',
+      value: String(testDetails.mockTests?.length || 0),
+    },
+    {
+      label: 'Avg duration',
+      value: avgDuration > 0 ? `${avgDuration} mins` : '—',
+    },
+    {
+      label: 'Questions',
+      value: totalQuestions > 0 ? String(totalQuestions) : '—',
+    },
+    {
+      label: 'Access',
+      value: canAccess ? 'Unlocked' : 'Premium',
+    },
+  ];
+
+  const ctaTitle = canAccess
+    ? 'Start learning'
+    : testDetails.price === 0
+      ? 'Enroll free'
+      : 'Buy now';
+
+  const onCtaPress = () => {
+    if (canAccess) {
+      const firstId = testDetails.mockTests?.[0]?._id;
+      if (firstId) handleStartTest(firstId);
+      return;
+    }
+    handleEnroll();
+  };
+
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.imageContainer}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: 110 + insets.bottom },
+        ]}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+      >
+        <View style={[styles.hero, { height: heroHeight }]}>
           {testDetails.thumbnail ? (
-            <Image source={{ uri: testDetails.thumbnail }} style={styles.image} />
+            <Image
+              source={{ uri: testDetails.thumbnail }}
+              style={styles.heroImage}
+              resizeMode="cover"
+            />
           ) : (
-            <View style={styles.placeholderImage}>
-              <Ionicons name="book" size={60} color={colors.textMuted} />
+            <View style={[styles.heroPlaceholder, { backgroundColor: colors.surfaceRaised }]}>
+              <Ionicons name="book-outline" size={48} color={colors.textMuted} />
             </View>
           )}
-          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-            <Ionicons name="arrow-back" size={24} color="#fff" />
-          </TouchableOpacity>
+
+          <LinearGradient
+            colors={[
+              'rgba(0,0,0,0.72)',
+              'rgba(0,0,0,0.35)',
+              'rgba(0,0,0,0.08)',
+              'transparent',
+            ]}
+            locations={[0, 0.28, 0.55, 0.78]}
+            style={styles.heroFadeTop}
+            pointerEvents="none"
+          />
+
+          <View style={[styles.heroTop, { paddingTop: insets.top + 8 }]}>
+            <Pressable
+              onPress={() => router.back()}
+              style={({ pressed }) => [styles.circleBtn, pressed && { opacity: 0.85 }]}
+              accessibilityRole="button"
+              accessibilityLabel="Go back"
+            >
+              <Ionicons name="chevron-back" size={22} color="#111" />
+            </Pressable>
+
+            <Text style={styles.heroTitle} numberOfLines={1}>
+              Mock series
+            </Text>
+
+            <Pressable
+              onPress={() => router.push('/notifications')}
+              style={({ pressed }) => [styles.circleBtn, pressed && { opacity: 0.85 }]}
+              accessibilityRole="button"
+              accessibilityLabel="Notifications"
+            >
+              <Ionicons name="notifications-outline" size={18} color="#111" />
+            </Pressable>
+          </View>
         </View>
 
-        <View style={styles.content}>
+        <View style={[styles.sheet, { marginTop: -36 }]}>
           <Text style={styles.title}>{testDetails.seriesName}</Text>
+          <Text style={styles.priceLine}>
+            {testDetails.price === 0 ? 'Free access' : `${priceLabel} one-time`}
+          </Text>
 
-          <View style={styles.metaInfo}>
-            <View style={styles.metaItem}>
-              <Ionicons name="book-outline" size={20} color="#3b82f6" />
-              <Text style={styles.metaText}>{testDetails.mockTests?.length || 0} Tests</Text>
-            </View>
-            <View style={styles.metaItem}>
-              <Ionicons name="people-outline" size={20} color="#10b981" />
-              <Text style={styles.metaText}>
-                {testDetails.studentsEnrolled?.length || 0} Enrolled
-              </Text>
-            </View>
-            <View style={styles.metaItem}>
-              <Ionicons name="cash-outline" size={20} color="#f59e0b" />
-              <Text style={styles.metaText}>
-                {testDetails.price === 0 ? 'Free' : `₹${testDetails.price}`}
-              </Text>
-            </View>
-          </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.attrRow}
+          >
+            {attrCards.map((card) => (
+              <View key={card.label} style={styles.attrCard}>
+                <Text style={styles.attrLabel}>{card.label}</Text>
+                <Text style={styles.attrValue} numberOfLines={1}>
+                  {card.value}
+                </Text>
+              </View>
+            ))}
+          </ScrollView>
 
-          <Text style={styles.sectionTitle}>Description</Text>
-          <Text style={styles.description}>{testDetails.description}</Text>
+          <Text style={styles.description}>
+            {stripHtml(testDetails.description) ||
+              'Focused mock tests to help you prepare with real exam patterns and clear performance feedback.'}
+          </Text>
 
-          <Text style={styles.sectionTitle}>Tests in this Series</Text>
+          <Text style={styles.sectionTitle}>Tests in this series</Text>
           <View style={styles.testList}>
             {testDetails.mockTests?.map((test: any, index: number) => (
               <View key={test._id || index} style={styles.testItem}>
                 <View style={styles.testItemInfo}>
-                  <Text style={styles.testItemTitle}>{test.testName}</Text>
+                  <Text style={styles.testItemTitle} numberOfLines={2}>
+                    {test.testName}
+                  </Text>
                   <Text style={styles.testItemMeta}>
-                    {test.duration} mins • {test.questions?.length || 0} questions
+                    {test.duration} mins · {test.questions?.length || 0} questions
                   </Text>
                 </View>
 
-                {isEnrolled || testDetails.price === 0 ? (
-                  <TouchableOpacity
-                    style={styles.startButton}
+                {canAccess ? (
+                  <Pressable
+                    style={({ pressed }) => [
+                      styles.startButton,
+                      pressed && { opacity: 0.9 },
+                    ]}
                     onPress={() => handleStartTest(test._id)}
                   >
                     <Text style={styles.startButtonText}>Start</Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 ) : (
-                  <Ionicons name="lock-closed" size={20} color={colors.textMuted} />
+                  <Ionicons name="lock-closed" size={18} color={colors.textMuted} />
                 )}
               </View>
             ))}
@@ -230,28 +345,15 @@ export default function MockTestDetailScreen() {
         </View>
       </ScrollView>
 
-      <View style={styles.actionBar}>
-        {isEnrolled || testDetails.price === 0 ? (
-          <Button
-            title="Start Learning"
-            onPress={() => handleStartTest(testDetails.mockTests?.[0]?._id)}
-            disabled={!testDetails.mockTests?.length}
-            style={styles.actionButton}
-          />
-        ) : (
-          <View style={styles.buyContainer}>
-            <View>
-              <Text style={styles.priceLabel}>Price</Text>
-              <Text style={styles.priceValue}>₹{testDetails.price}</Text>
-            </View>
-            <Button
-              title="Buy Now"
-              onPress={handleEnroll}
-              isLoading={isProcessing}
-              style={[styles.actionButton, { flex: 1, marginLeft: 20 }]}
-            />
-          </View>
-        )}
+      <View style={[styles.ctaBar, { paddingBottom: Math.max(insets.bottom, 16) }]}>
+        <Button
+          title={isProcessing ? 'Please wait…' : ctaTitle}
+          onPress={onCtaPress}
+          isLoading={isProcessing}
+          disabled={canAccess && !testDetails.mockTests?.length}
+          style={styles.ctaButton}
+          textStyle={styles.ctaButtonText}
+        />
       </View>
     </View>
   );
@@ -267,143 +369,184 @@ function createStyles(colors: AppPalette) {
       justifyContent: 'center',
       alignItems: 'center',
     },
+    notFound: {
+      color: colors.text,
+      fontFamily: Fonts.medium,
+      fontSize: 15,
+    },
     scrollContent: {
-      paddingBottom: 100,
+      flexGrow: 1,
     },
-    imageContainer: {
+    hero: {
       width: '100%',
-      aspectRatio: 16 / 9,
       backgroundColor: colors.surfaceRaised,
-      position: 'relative',
+      overflow: 'hidden',
     },
-    image: {
+    heroImage: {
+      ...StyleSheet.absoluteFillObject,
       width: '100%',
       height: '100%',
     },
-    placeholderImage: {
-      width: '100%',
-      height: '100%',
-      justifyContent: 'center',
+    heroPlaceholder: {
+      ...StyleSheet.absoluteFillObject,
       alignItems: 'center',
+      justifyContent: 'center',
     },
-    backButton: {
+    heroFadeTop: {
       position: 'absolute',
-      top: 40,
-      left: 20,
+      top: 0,
+      left: 0,
+      right: 0,
+      height: '58%',
+    },
+    heroTop: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      paddingHorizontal: 16,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    circleBtn: {
       width: 40,
       height: 40,
-      borderRadius: 20,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      justifyContent: 'center',
+      borderRadius: 999,
+      backgroundColor: '#FFFFFF',
       alignItems: 'center',
+      justifyContent: 'center',
     },
-    content: {
-      padding: 20,
+    heroTitle: {
+      flex: 1,
+      textAlign: 'center',
+      color: '#FFFFFF',
+      fontSize: 16,
+      fontFamily: Fonts.semiBold,
+      marginHorizontal: 10,
+      textShadowColor: 'rgba(0,0,0,0.35)',
+      textShadowOffset: { width: 0, height: 1 },
+      textShadowRadius: 4,
+    },
+    sheet: {
+      backgroundColor: colors.background,
+      borderTopLeftRadius: 32,
+      borderTopRightRadius: 32,
+      paddingTop: 28,
+      paddingHorizontal: 22,
+      paddingBottom: 24,
+      minHeight: 420,
     },
     title: {
-      fontSize: 24,
-      fontWeight: 'bold',
       color: colors.text,
-      marginBottom: 16,
+      fontSize: 28,
+      lineHeight: 34,
+      fontFamily: Fonts.semiBold,
+      letterSpacing: -0.4,
+      marginBottom: 8,
     },
-    metaInfo: {
-      flexDirection: 'row',
-      gap: 16,
-      marginBottom: 24,
-      flexWrap: 'wrap',
-    },
-    metaItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 8,
-      backgroundColor: colors.surface,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: Radii.pill,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    metaText: {
+    priceLine: {
       color: colors.text,
-      fontSize: 14,
-      fontWeight: '500',
+      fontSize: 15,
+      fontFamily: Fonts.medium,
+      marginBottom: 18,
     },
-    sectionTitle: {
-      fontSize: 18,
-      fontWeight: 'bold',
+    attrRow: {
+      gap: 10,
+      paddingBottom: 4,
+      marginBottom: 18,
+    },
+    attrCard: {
+      minWidth: 132,
+      backgroundColor: colors.surfaceRaised,
+      borderRadius: 18,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      justifyContent: 'center',
+      gap: 4,
+    },
+    attrLabel: {
+      color: colors.textMuted,
+      fontSize: 12,
+      fontFamily: Fonts.sans,
+    },
+    attrValue: {
       color: colors.text,
-      marginBottom: 12,
-      marginTop: 8,
+      fontSize: 16,
+      fontFamily: Fonts.semiBold,
     },
     description: {
-      fontSize: 15,
       color: colors.textSecondary,
-      lineHeight: 24,
-      marginBottom: 24,
+      fontSize: 14,
+      lineHeight: 22,
+      fontFamily: Fonts.sans,
+      marginBottom: 28,
+    },
+    sectionTitle: {
+      color: colors.text,
+      fontSize: 18,
+      fontFamily: Fonts.semiBold,
+      marginBottom: 12,
     },
     testList: {
-      gap: 12,
+      gap: 10,
     },
     testItem: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
       backgroundColor: colors.surface,
-      padding: 16,
-      borderRadius: Radii.md,
-      borderWidth: 1,
+      paddingVertical: 14,
+      paddingHorizontal: 14,
+      borderRadius: 18,
+      borderWidth: StyleSheet.hairlineWidth,
       borderColor: colors.border,
+      gap: 12,
     },
     testItemInfo: {
       flex: 1,
+      minWidth: 0,
+      gap: 3,
     },
     testItemTitle: {
       color: colors.text,
-      fontSize: 16,
-      fontWeight: '600',
-      marginBottom: 4,
+      fontSize: 15,
+      fontFamily: Fonts.semiBold,
     },
     testItemMeta: {
       color: colors.textSecondary,
       fontSize: 12,
+      fontFamily: Fonts.sans,
     },
     startButton: {
-      backgroundColor: '#3b82f6',
-      paddingHorizontal: 16,
+      backgroundColor: colors.text,
+      paddingHorizontal: 14,
       paddingVertical: 8,
       borderRadius: Radii.pill,
     },
     startButtonText: {
-      color: '#fff',
+      color: colors.primaryButtonText,
       fontSize: 12,
-      fontWeight: 'bold',
+      fontFamily: Fonts.semiBold,
     },
-    actionBar: {
+    ctaBar: {
       position: 'absolute',
-      bottom: 0,
       left: 0,
       right: 0,
-      backgroundColor: colors.surface,
-      padding: 20,
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
+      bottom: 0,
+      paddingHorizontal: 20,
+      paddingTop: 12,
+      backgroundColor: colors.background,
     },
-    actionButton: {
+    ctaButton: {
       marginVertical: 0,
+      borderRadius: Radii.pill,
+      minHeight: 54,
+      overflow: 'hidden',
     },
-    buyContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-    },
-    priceLabel: {
-      color: colors.textSecondary,
-      fontSize: 12,
-    },
-    priceValue: {
-      color: colors.text,
-      fontSize: 24,
-      fontWeight: 'bold',
+    ctaButtonText: {
+      fontFamily: Fonts.semiBold,
+      fontSize: 16,
     },
   });
 }

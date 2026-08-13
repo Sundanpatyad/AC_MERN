@@ -45,16 +45,16 @@ const ViewMockTest = () => {
   }
 
   return (
-    <div className="flex flex-col items-center bg-richblack-900 min-h-screen p-8">
-      <h1 className="mb-8 text-3xl font-medium text-richblack-5 font-boogaloo text-center">View Mock Test</h1>
-      <div className="mb-6 p-4 w-full max-w-2xl bg-richblack-800 rounded-md shadow-md">
+    <div className="flex flex-col items-center bg-page min-h-screen p-8">
+      <h1 className="mb-8 text-3xl font-medium text-fg font-boogaloo text-center">View Mock Test</h1>
+      <div className="mb-6 p-4 w-full max-w-2xl bg-surface rounded-md shadow-md">
         <h2 className="text-xl font-semibold text-yellow-500 mb-4">{mockTest.testName}</h2>
-        <p className="text-richblack-5 mb-2"><strong>Duration:</strong> {mockTest.duration} minutes</p>
+        <p className="text-fg mb-2"><strong>Duration:</strong> {mockTest.duration} minutes</p>
         <div className="space-y-4">
           {mockTest.questions?.map((question, index) => (
-            <div key={index} className="p-4 bg-richblack-700 rounded-lg border border-richblack-600">
-              <p className="text-richblack-5 mb-2"><strong>Question {index + 1}:</strong> {question.text}</p>
-              <ul className="list-disc ml-5 space-y-2 text-richblack-5">
+            <div key={index} className="p-4 bg-elevated rounded-lg border border-line">
+              <p className="text-fg mb-2"><strong>Question {index + 1}:</strong> {question.text}</p>
+              <ul className="list-disc ml-5 space-y-2 text-fg">
                 {question.options.map((option, optionIndex) => (
                   <li key={optionIndex} className={option === question.correctAnswer ? 'text-green-500' : ''}>
                     {option}

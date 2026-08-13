@@ -11,7 +11,7 @@ const Modal = ({ isOpen, onClose, children }) => {
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          className="absolute top-4 right-4 text-muted hover:text-gray-600 dark:hover:text-muted transition-colors"
         >
           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -60,7 +60,7 @@ const AddAttachments = ({ seriesId, onClose }) => {
       <h2 className="text-3xl font-bold mb-8 text-gray-800 dark:text-gray-100">Add Attachments to Mock Test Series</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-muted mb-2">
             Name
           </label>
           <input
@@ -72,7 +72,7 @@ const AddAttachments = ({ seriesId, onClose }) => {
           />
         </div>
         <div>
-          <label htmlFor="questionPaper" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="questionPaper" className="block text-sm font-medium text-gray-700 dark:text-muted mb-2">
             Question Paper URL
           </label>
           <input
@@ -84,7 +84,7 @@ const AddAttachments = ({ seriesId, onClose }) => {
           />
         </div>
         <div>
-          <label htmlFor="answerKey" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="answerKey" className="block text-sm font-medium text-gray-700 dark:text-muted mb-2">
             Answer Key URL
           </label>
           <input
@@ -96,7 +96,7 @@ const AddAttachments = ({ seriesId, onClose }) => {
           />
         </div>
         <div>
-          <label htmlFor="omrSheet" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="omrSheet" className="block text-sm font-medium text-gray-700 dark:text-muted mb-2">
             OMR Sheet URL
           </label>
           <input

@@ -8,9 +8,10 @@ import { logout } from '../../services/operations/authAPI';
 import ProfileDropDown from '../core/Auth/ProfileDropDown';
 import ConfirmationModal from './ConfirmationModal';
 import Img from './Img';
+import ThemeToggle from './ThemeToggle';
 import { BsFiletypePdf } from "react-icons/bs";
 import { FaRankingStar } from 'react-icons/fa6';
-import { VscDashboard, VscSignOut } from 'react-icons/vsc';
+import { VscDashboard, VscShield, VscSignOut } from 'react-icons/vsc';
 import {
     AiOutlineSearch,
     AiOutlineHome,
@@ -168,6 +169,7 @@ const Navbar = () => {
                     </ul>
 
                     <div className="flex items-center gap-1 sm:gap-2 relative z-[101]">
+                        <ThemeToggle />
                         <button
                             onClick={() => setIsSearchModalOpen(true)}
                             aria-label="Search"
@@ -322,6 +324,17 @@ const Navbar = () => {
                                             <VscDashboard size={18} />
                                             <span className="text-sm font-medium">Dashboard</span>
                                         </Link>
+
+                                        {user?.accountType === 'Instructor' && (
+                                            <Link
+                                                to="/adminMockTest"
+                                                className="flex items-center gap-3 px-3 py-3 rounded-xl text-muted hover:text-fg hover:bg-elevated transition-colors"
+                                                onClick={() => setIsMobileMenuOpen(false)}
+                                            >
+                                                <VscShield size={18} />
+                                                <span className="text-sm font-medium">Admin Console</span>
+                                            </Link>
+                                        )}
 
                                         <button
                                             onClick={() => {

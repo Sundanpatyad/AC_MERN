@@ -19,7 +19,7 @@ const LoadingSpinner = ({ title }) => {
   }, []);
 
   return (
-    <div className="flex flex-col mt-20 items-center h-screen bg-black text-gray-200 p-4">
+    <div className="flex flex-col mt-20 items-center h-screen bg-page text-fg p-4">
       <div className="flex flex-col items-center">
         {/* Spinner container */}
         <motion.div
@@ -27,14 +27,14 @@ const LoadingSpinner = ({ title }) => {
           transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
           className="relative w-10 h-10"
         >
-          <div className="absolute top-0 left-0 w-full h-full border-4 border-t-4 border-gray-300 border-t-gray-800 rounded-full"></div>
+          <div className="absolute top-0 left-0 w-full h-full border-4 border-t-4 border-line border-t-muted rounded-full"></div>
         </motion.div>
 
-        <div className="mt-4 text-md md:text-xl text-gray-300 text-center font-semibold tracking-wider">
+        <div className="mt-4 text-md md:text-xl text-fg text-center font-semibold tracking-wider">
           Loading your experience
         </div>
 
-        <div className="mt-2 text-sm md:text-lg text-gray-400 text-center italic animate-pulse">
+        <div className="mt-2 text-sm md:text-lg text-subtle text-center italic animate-pulse">
           {title || 'Awakening Classes 😉'}
         </div>
 

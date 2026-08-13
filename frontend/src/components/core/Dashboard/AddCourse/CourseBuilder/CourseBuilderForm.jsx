@@ -72,14 +72,14 @@ export default function CourseBuilderForm() {
   };
 
   return (
-    <div className="space-y-8 rounded-2xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-8 shadow-2xl">
-      <p className="text-2xl font-bold text-white">Course Builder</p>
+    <div className="space-y-8 rounded-2xl border border-line bg-surface p-8 shadow-2xl">
+      <p className="text-2xl font-bold text-fg">Course Builder</p>
 
       {/* Section Form */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Section Name */}
         <div className="flex flex-col space-y-2">
-          <label className="text-sm font-medium text-gray-200" htmlFor="sectionName">
+          <label className="text-sm font-medium text-fg" htmlFor="sectionName">
             Section Name <sup className="text-pink-400">*</sup>
           </label>
           <input
@@ -87,7 +87,7 @@ export default function CourseBuilderForm() {
             disabled={loading}
             placeholder="Add a section to build your course"
             {...register("sectionName", { required: true })}
-            className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:opacity-50"
+            className="w-full px-4 py-3 rounded-lg bg-page border border-line text-fg placeholder-muted focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:opacity-50"
           />
           {errors.sectionName && (
             <span className="ml-2 text-xs tracking-wide text-pink-400 flex items-center gap-1">
@@ -110,7 +110,7 @@ export default function CourseBuilderForm() {
             <button
               type="button"
               onClick={cancelEdit}
-              className="text-sm text-gray-400 hover:text-white underline transition-colors duration-200"
+              className="text-sm text-muted hover:text-white underline transition-colors duration-200"
             >
               Cancel Edit
             </button>
@@ -123,10 +123,10 @@ export default function CourseBuilderForm() {
       )}
 
       {/* Next and Back Button */}
-      <div className="flex justify-end gap-x-3 pt-4 border-t border-zinc-700/50">
+      <div className="flex justify-end gap-x-3 pt-4 border-t border-line">
         <button
           onClick={goBack}
-          className="flex items-center gap-x-2 rounded-lg px-6 py-3 font-semibold text-white bg-zinc-700 hover:bg-zinc-600 transition-all duration-200"
+          className="flex items-center gap-x-2 rounded-lg px-6 py-3 font-semibold text-white bg-elevated hover:bg-elevated transition-all duration-200"
         >
           Back
         </button>

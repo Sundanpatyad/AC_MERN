@@ -106,14 +106,14 @@ function CourseDetails() {
   }
 
   return (
-    <div className="bg-black text-richblack-5">
+    <div className="bg-page text-fg min-h-screen">
       {/* Hero Section */}
-      <section className="bg-black py-12">
+      <section className="bg-page py-12">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row gap-8">
             <div className="md:w-2/3">
               <h1 className="text-3xl md:text-4xl font-bold mb-4">{course.courseName}</h1>
-              <p className="text-richblack-200 mb-6">{course.courseDescription}</p>
+              <p className="text-muted mb-6">{course.courseDescription}</p>
               <div className="flex flex-wrap items-center gap-4 text-sm mb-6">
                 <span className="flex items-center">
                   <RatingStars Review_Count={5} Star_Size={20} />
@@ -128,7 +128,7 @@ function CourseDetails() {
               </div>
             </div>
             <div className="md:w-1/3 p-4">
-              <div className="bg-richblack-700 rounded-lg p-6">
+              <div className="bg-surface border border-line rounded-lg p-6">
                 <Img
                   src={course.thumbnail}
                   alt={course.courseName}
@@ -140,14 +140,14 @@ function CourseDetails() {
                 {course.price === 0 ? (
                   <Link
                     to={`/view-course/${course._id}/section/${course.courseContent[0]._id}/sub-section/${course.courseContent[0].subSection[0]._id}`}
-                    className="block w-full text-black bg-white rounded-md py-3 font-semibold text-center  transition duration-300 mb-4"
+                    className="btn-primary w-full mb-4"
                   >
                     Start
                   </Link>
                 ) : isUserEnrolled ? (
                   <button
                     onClick={() => navigate(`/view-course/${course._id}/section/${course.courseContent[0]._id}/sub-section/${course.courseContent[0].subSection[0]._id}`)}
-                    className="w-full text-black bg-white rounded-md py-3 font-semibold transition duration-300"
+                    className="btn-primary w-full"
                   >
                     Go to Course
                   </button>
@@ -155,13 +155,13 @@ function CourseDetails() {
                   <>
                     <button
                       onClick={handleBuyCourse}
-                      className="w-full bg-slate-50 text-richblack-900 rounded-md py-3 font-semibold hover:bg-slate-100 transition duration-300 mb-2"
+                      className="btn-primary w-full mb-2"
                     >
                       Buy Now
                     </button>
                     <button
                       onClick={handleAddToCart}
-                      className="w-full bg-richblack-800 text-richblack-5 rounded-md py-3 font-semibold hover:bg-richblack-700 transition duration-300"
+                      className="btn-secondary w-full"
                     >
                       Add to Cart
                     </button>
@@ -181,7 +181,7 @@ function CourseDetails() {
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
             {course.whatYouWillLearn.split('\n').map((item, index) => (
               <li key={index} className="flex items-start">
-                <span className="text-slate-50 mr-2">✓</span>
+                <span className="text-fg mr-2">✓</span>
                 {item}
               </li>
             ))}
@@ -192,7 +192,7 @@ function CourseDetails() {
             <p>{course.courseContent.length} sections • {totalNoOfLectures} lectures • {course.totalDuration} total length</p>
           </div>
           {course.courseContent.map((section, index) => (
-            <div key={index} className="border border-richblack-600 rounded-md mb-4">
+            <div key={index} className="border border-line rounded-md mb-4">
               <button
                 className="flex justify-between items-center w-full p-4 text-left"
                 onClick={() => toggleSection(section._id)}
@@ -201,7 +201,7 @@ function CourseDetails() {
                 <span>{expandedSections.includes(section._id) ? '−' : '+'}</span>
               </button>
               {expandedSections.includes(section._id) && (
-                <div className="p-4 bg-richblack-900">
+                <div className="p-4 bg-page">
                   {section.subSection.map((lecture, lectureIndex) => (
                     <div key={lectureIndex} className="flex items-center py-2">
                       <BiTime className="mr-2" />
@@ -216,7 +216,7 @@ function CourseDetails() {
       </section>
 
       {/* Instructor */}
-      <section className="py-12 bg-richblack-800">
+      <section className="py-12 bg-surface">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold mb-6">Instructor</h2>
           <div className="flex items-center gap-4">
@@ -228,9 +228,9 @@ function CourseDetails() {
             <div>
               <p className="font-semibold text-xl flex items-center">
                 {course.instructor.firstName} {course.instructor.lastName}
-                <MdOutlineVerified className="text-slate-50 ml-2" />
+                <MdOutlineVerified className="text-fg ml-2" />
               </p>
-              <p className="text-richblack-300">{course.instructor.additionalDetails?.about || "Instructor at Awakening Classes"}</p>
+              <p className="text-subtle">{course.instructor.additionalDetails?.about || "Instructor at Awakening Classes"}</p>
             </div>
           </div>
         </div>

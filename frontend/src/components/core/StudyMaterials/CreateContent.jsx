@@ -69,13 +69,13 @@ function CreateContent() {
   };
 
   return (
-    <div className="min-h-screen bg-transparent text-zinc-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-transparent text-fg py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
        
         {/* Create/Edit Form */}
-        <div className="bg-zinc-800 shadow-lg rounded-lg overflow-hidden mb-12">
-          <div className="bg-gradient-to-r bg-zinc-900  py-8 px-6 sm:px-10">
-            <h3 className="text-3xl font-semibold text-white">
+        <div className="bg-surface shadow-lg rounded-lg overflow-hidden mb-12 border border-line">
+          <div className="bg-gradient-to-r bg-page py-8 px-6 sm:px-10 border-b border-line">
+            <h3 className="text-3xl font-semibold text-fg">
               {editMode.type ? `Edit ${editMode.type === 'exam' ? 'Exam' : 'Study Material'}` : 'Create New Content'}
             </h3>
           </div>
@@ -84,29 +84,29 @@ function CreateContent() {
               <label className="inline-flex items-center">
                 <input
                   type="radio"
-                  className="form-radio text-indigo-500 border-zinc-700 focus:ring-indigo-500 focus:ring-offset-zinc-900"
+                  className="form-radio text-indigo-500 border-line focus:ring-indigo-500 focus:ring-offset-zinc-900"
                   value="exam"
                   checked={contentType === 'exam'}
                   onChange={() => dispatch(setContentType('exam'))}
                 />
-                <span className="ml-2 text-zinc-300">Exam</span>
+                <span className="ml-2 text-muted">Exam</span>
               </label>
               <label className="inline-flex items-center">
                 <input
                   type="radio"
-                  className="form-radio text-indigo-500 border-zinc-700 focus:ring-indigo-500 focus:ring-offset-zinc-900"
+                  className="form-radio text-indigo-500 border-line focus:ring-indigo-500 focus:ring-offset-zinc-900"
                   value="studyMaterial"
                   checked={contentType === 'studyMaterial'}
                   onChange={() => dispatch(setContentType('studyMaterial'))}
                 />
-                <span className="ml-2 text-zinc-300">Study Material</span>
+                <span className="ml-2 text-muted">Study Material</span>
               </label>
             </div>
             <form onSubmit={handleSubmit} className="space-y-8">
               {contentType === 'exam' ? (
                 <>
                   <div>
-                    <label htmlFor="examName" className="block text-sm font-medium text-zinc-300">
+                    <label htmlFor="examName" className="block text-sm font-medium text-muted">
                       Exam Name
                     </label>
                     <input
@@ -115,18 +115,18 @@ function CreateContent() {
                       value={examName}
                       onChange={(e) => dispatch(setExamName(e.target.value))}
                       required
-                      className="mt-2 block w-full rounded-md bg-zinc-700 border-zinc-600 text-white placeholder-zinc-400 focus:border-indigo-500 focus:ring-indigo-500 focus:ring-opacity-50"
+                      className="mt-2 block w-full rounded-md bg-elevated border-line text-fg placeholder-muted focus:border-indigo-500 focus:ring-indigo-500 focus:ring-opacity-50"
                     />
                   </div>
                   <div>
-                    <label htmlFor="examDescription" className="block text-sm font-medium text-zinc-300">
+                    <label htmlFor="examDescription" className="block text-sm font-medium text-muted">
                       Description
                     </label>
                     <textarea
                       id="examDescription"
                       value={examDescription}
                       onChange={(e) => dispatch(setExamDescription(e.target.value))}
-                      className="mt-2 block w-full rounded-md bg-zinc-700 border-zinc-600 text-white placeholder-zinc-400 focus:border-indigo-500 focus:ring-indigo-500 focus:ring-opacity-50"
+                      className="mt-2 block w-full rounded-md bg-elevated border-line text-fg placeholder-muted focus:border-indigo-500 focus:ring-indigo-500 focus:ring-opacity-50"
                       rows="4"
                     />
                   </div>
@@ -134,7 +134,7 @@ function CreateContent() {
               ) : (
                 <>
                   <div>
-                    <label htmlFor="materialTitle" className="block text-sm font-medium text-zinc-300">
+                    <label htmlFor="materialTitle" className="block text-sm font-medium text-muted">
                       Title
                     </label>
                     <input
@@ -143,11 +143,11 @@ function CreateContent() {
                       value={materialTitle}
                       onChange={(e) => dispatch(setMaterialTitle(e.target.value))}
                       required
-                      className="mt-2 block w-full rounded-md bg-zinc-700 border-zinc-600 text-white placeholder-zinc-400 focus:border-indigo-500 focus:ring-indigo-500 focus:ring-opacity-50"
+                      className="mt-2 block w-full rounded-md bg-elevated border-line text-fg placeholder-muted focus:border-indigo-500 focus:ring-indigo-500 focus:ring-opacity-50"
                     />
                   </div>
                   <div>
-                    <label htmlFor="materialContent" className="block text-sm font-medium text-zinc-300">
+                    <label htmlFor="materialContent" className="block text-sm font-medium text-muted">
                       Attachment Link
                     </label>
                     <input
@@ -155,11 +155,11 @@ function CreateContent() {
                       value={materialContent}
                       onChange={(e) => dispatch(setMaterialContent(e.target.value))}
                       required
-                      className="mt-2 block w-full rounded-md bg-zinc-700 border-zinc-600 text-white placeholder-zinc-400 focus:border-indigo-500 focus:ring-indigo-500 focus:ring-opacity-50"
+                      className="mt-2 block w-full rounded-md bg-elevated border-line text-fg placeholder-muted focus:border-indigo-500 focus:ring-indigo-500 focus:ring-opacity-50"
                     />
                   </div>
                   <div>
-                    <label htmlFor="exam" className="block text-sm font-medium text-zinc-300">
+                    <label htmlFor="exam" className="block text-sm font-medium text-muted">
                       Exam
                     </label>
                     <select
@@ -167,7 +167,7 @@ function CreateContent() {
                       value={selectedExamId}
                       onChange={(e) => dispatch(setSelectedExamId(e.target.value))}
                       required
-                      className="mt-2 block w-full rounded-md bg-zinc-700 border-zinc-600 text-white focus:border-indigo-500 focus:ring-indigo-500 focus:ring-opacity-50"
+                      className="mt-2 block w-full rounded-md bg-elevated border-line text-fg focus:border-indigo-500 focus:ring-indigo-500 focus:ring-opacity-50"
                     >
                       <option value="">Select an exam</option>
                       {exams.map((exam) => (
@@ -182,7 +182,7 @@ function CreateContent() {
               <div>
                 <button
                   type="submit"
-                  className="w-full flex justify-center py-3 px-6 border border-transparent rounded-md shadow-sm text-base font-medium text-zinc-700 bg-slate-200 hover:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-900 focus:ring-indigo-500 transition duration-150 ease-in-out"
+                  className="w-full flex justify-center py-3 px-6 border border-transparent rounded-md shadow-sm text-base font-medium text-solid-fg bg-solid hover:bg-solid-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-900 focus:ring-indigo-500 transition duration-150 ease-in-out"
                 >
                   {editMode.type ? 'Update' : 'Create'} {contentType === 'exam' ? 'Exam' : 'Study Material'}
                 </button>
@@ -192,13 +192,13 @@ function CreateContent() {
         </div>
 
         {/* Exams List */}
-        <div className="bg-zinc-800 shadow-lg rounded-lg overflow-hidden mb-12">
-          <div className="bg-gradient-to-r bg-zinc-900 py-5 px-6">
-            <h3 className="text-2xl font-semibold text-white">Exams</h3>
+        <div className="bg-surface shadow-lg rounded-lg overflow-hidden mb-12 border border-line">
+          <div className="bg-gradient-to-r bg-page py-5 px-6 border-b border-line">
+            <h3 className="text-2xl font-semibold text-fg">Exams</h3>
           </div>
           <div className="p-8">
             {exams.map((exam) => (
-              <div key={exam._id} className="flex justify-between items-center py-3 border-b border-zinc-700">
+              <div key={exam._id} className="flex justify-between items-center py-3 border-b border-line">
                 <span className="text-lg">{exam.name}</span>
                 <div>
                   <button
@@ -214,13 +214,13 @@ function CreateContent() {
         </div>
 
         {/* Study Materials List */}
-        <div className="bg-zinc-800 shadow-lg rounded-lg overflow-hidden">
-          <div className="bg-gradient-to-r bg-zinc-900 py-5 px-6">
-            <h3 className="text-2xl font-semibold text-white">Study Materials</h3>
+        <div className="bg-surface shadow-lg rounded-lg overflow-hidden border border-line">
+          <div className="bg-gradient-to-r bg-page py-5 px-6 border-b border-line">
+            <h3 className="text-2xl font-semibold text-fg">Study Materials</h3>
           </div>
           <div className="p-8">
             {studyMaterials.map((material) => (
-              <div key={material._id} className="flex justify-between items-center py-3 border-b border-zinc-700">
+              <div key={material._id} className="flex justify-between items-center py-3 border-b border-line">
                 <span className="text-lg">{material.title}</span>
                 <div>
                   <button

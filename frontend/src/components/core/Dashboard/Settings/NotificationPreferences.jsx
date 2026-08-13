@@ -81,16 +81,16 @@ export default function NotificationPreferences() {
   }
 
   return (
-    <div className="my-10 flex flex-col gap-y-6 rounded-md border-[1px] border-richblack-700 bg-richblack-800 p-8 px-12">
+    <div className="my-10 flex flex-col gap-y-6 rounded-md border-[1px] border-line bg-surface p-8 px-12">
       <div>
-        <h2 className="text-lg font-semibold text-richblack-5">Notifications</h2>
-        <p className="mt-1 text-sm text-richblack-300">
+        <h2 className="text-lg font-semibold text-fg">Notifications</h2>
+        <p className="mt-1 text-sm text-subtle">
           Control which alerts you receive on web and mobile. Preferences sync to your account.
           {saving ? " Saving…" : ""}
         </p>
       </div>
 
-      <div className="flex flex-col divide-y divide-richblack-700">
+      <div className="flex flex-col divide-y divide-line">
         {ROWS.map((row) => {
           const disabled =
             !ready || (row.key !== "pushEnabled" && !prefs.pushEnabled)
@@ -100,8 +100,8 @@ export default function NotificationPreferences() {
               className="flex items-center justify-between gap-4 py-4 first:pt-0 last:pb-0"
             >
               <div>
-                <p className="font-medium text-richblack-5">{row.label}</p>
-                <p className="text-sm text-richblack-300">{row.hint}</p>
+                <p className="font-medium text-fg">{row.label}</p>
+                <p className="text-sm text-subtle">{row.hint}</p>
               </div>
               <button
                 type="button"
@@ -110,11 +110,11 @@ export default function NotificationPreferences() {
                 disabled={disabled}
                 onClick={() => update(row.key, !prefs[row.key])}
                 className={`relative h-7 w-12 shrink-0 rounded-full transition-colors disabled:opacity-40 ${
-                  prefs[row.key] ? "bg-yellow-50" : "bg-richblack-600"
+                  prefs[row.key] ? "bg-yellow-50" : "bg-elevated"
                 }`}
               >
                 <span
-                  className={`absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-richblack-900 transition-transform ${
+                  className={`absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-page transition-transform ${
                     prefs[row.key] ? "translate-x-5" : "translate-x-0"
                   }`}
                 />

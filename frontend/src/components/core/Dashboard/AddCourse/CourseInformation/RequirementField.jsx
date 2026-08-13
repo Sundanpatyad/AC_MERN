@@ -39,7 +39,7 @@ export default function RequirementsField({ name, label, register, setValue, err
 
   return (
     <div className="flex flex-col space-y-2">
-      <label className="text-sm text-richblack-5" htmlFor={name}>
+      <label className="text-sm text-fg" htmlFor={name}>
         {label} <sup className="text-pink-200">*</sup>
       </label>
 
@@ -63,7 +63,7 @@ export default function RequirementsField({ name, label, register, setValue, err
       {requirementsList.length > 0 && (
         <ul className="mt-2 list-inside list-disc">
           {requirementsList.map((requirement, index) => (
-            <li key={index} className="flex items-center text-richblack-5">
+            <li key={index} className="flex items-center text-fg">
               <span>{requirement}</span>
               <button
                 type="button"

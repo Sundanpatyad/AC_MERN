@@ -151,23 +151,17 @@ export const Spacing = {
   xl: 32,
 } as const;
 
-export const Fonts = Platform.select({
-  ios: {
-    sans: 'System',
-    serif: 'ui-serif',
-    rounded: 'ui-rounded',
-    mono: 'ui-monospace',
-  },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', sans-serif",
-    mono: 'SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-  },
-});
+export const Fonts = {
+  sans: 'Poppins_400Regular',
+  medium: 'Poppins_500Medium',
+  semiBold: 'Poppins_600SemiBold',
+  bold: 'Poppins_700Bold',
+  /** Display / headings — Poppins SemiBold */
+  serif: 'Poppins_600SemiBold',
+  rounded: 'Poppins_500Medium',
+  mono: Platform.select({
+    ios: 'ui-monospace',
+    default: 'monospace',
+    web: 'SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+  }) as string,
+} as const;

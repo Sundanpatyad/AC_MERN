@@ -24,10 +24,10 @@ function ForgotPassword() {
         <div className="spinner"></div>
       ) : (
         <div className="max-w-[500px] p-4 lg:p-8">
-          <h1 className="text-[1.875rem] font-semibold leading-[2.375rem] text-richblack-5">
+          <h1 className="text-[1.875rem] font-semibold leading-[2.375rem] text-fg">
             {!emailSent ? "Reset your password" : "Check email"}
           </h1>
-          <div className="my-4 text-[1.125rem] leading-[1.625rem] text-richblack-100">
+          <div className="my-4 text-[1.125rem] leading-[1.625rem] text-muted">
             {!emailSent
               ? "Have no fear. We'll email you instructions to reset your password. If you dont have access to your email we can try account recovery"
               : <p>We have sent the reset email to <span className="text-white-200">{email}</span></p>}
@@ -36,7 +36,7 @@ function ForgotPassword() {
           <form onSubmit={handleOnSubmit}>
             {!emailSent && (
               <label className="w-full">
-                <p className="mb-1 text-[0.875rem] leading-[1.375rem] text-richblack-5">
+                <p className="mb-1 text-[0.875rem] leading-[1.375rem] text-fg">
                   Email Address <sup className="text-pink-200">*</sup>
                 </p>
                 <input
@@ -49,14 +49,14 @@ function ForgotPassword() {
                   style={{
                     boxShadow: "inset 0px -1px 0px rgba(255, 255, 255, 0.18)",
                   }}
-                  className="w-full rounded-[0.5rem] bg-richblack-800 p-[12px] text-richblack-5 "
+                  className="w-full rounded-[0.5rem] bg-surface p-[12px] text-fg "
                 />
               </label>
             )}
 
             <button
               type="submit"
-              className="mt-6 w-full rounded-[8px] bg-white py-[12px] px-[12px] font-medium text-richblack-900"
+              className="mt-6 w-full rounded-[8px] bg-white py-[12px] px-[12px] font-medium text-fg"
             >
               {!emailSent ? "Sumbit" : "Resend Email"}
             </button>
@@ -64,7 +64,7 @@ function ForgotPassword() {
 
           <div className="mt-6 flex items-center justify-between">
             <Link to="/login">
-              <p className="flex items-center gap-x-2 text-richblack-5">
+              <p className="flex items-center gap-x-2 text-fg">
                 <BiArrowBack /> Back To Login
               </p>
             </Link>

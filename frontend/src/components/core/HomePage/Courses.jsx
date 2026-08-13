@@ -26,7 +26,7 @@ const CourseCard = ({ course, handleAddToCart, handleBuyNow, isInCart, isEnrolle
  
 
   return (
-    <div onClick={handleNavigae} className="bg-zinc-900 border-2 border-gray-800 rounded-lg overflow-hidden shadow-lg">
+    <div onClick={handleNavigae} className="bg-page border-2 border-gray-800 rounded-lg overflow-hidden shadow-lg">
       <img src={course.thumbnail} alt={course.courseName} className="w-full h-48 object-cover" />
       <div className="p-4">
         <h3 className="text-xl font-semibold text-white mb-2">{course.courseName}</h3>
@@ -88,18 +88,18 @@ const CourseCard = ({ course, handleAddToCart, handleBuyNow, isInCart, isEnrolle
 }
 
 const SkeletonCard = () => (
-  <div className="bg-zinc-900 w-72 rounded-xl overflow-hidden shadow-lg flex flex-col animate-pulse">
-  <div className="h-36 bg-zinc-700"></div>
+  <div className="bg-page w-72 rounded-xl overflow-hidden shadow-lg flex flex-col animate-pulse">
+  <div className="h-36 bg-elevated"></div>
   <div className="p-4 flex-grow flex flex-col justify-between">
-    <div className="h-4 bg-zinc-700 rounded w-3/4 mb-3"></div>
-    <div className="h-4 bg-zinc-700 rounded w-1/2 mb-3"></div>
+    <div className="h-4 bg-elevated rounded w-3/4 mb-3"></div>
+    <div className="h-4 bg-elevated rounded w-1/2 mb-3"></div>
     <div className="flex justify-between items-center mb-3">
-      <div className="h-4 bg-zinc-700 rounded w-1/4"></div>
-      <div className="h-4 bg-zinc-700 rounded w-1/4"></div>
+      <div className="h-4 bg-elevated rounded w-1/4"></div>
+      <div className="h-4 bg-elevated rounded w-1/4"></div>
     </div>
     <div className="space-y-2">
-      <div className="h-8 bg-zinc-700 rounded"></div>
-      <div className="h-8 bg-zinc-700 rounded"></div>
+      <div className="h-8 bg-elevated rounded"></div>
+      <div className="h-8 bg-elevated rounded"></div>
     </div>
   </div>
 </div>
@@ -222,11 +222,11 @@ const Courses = ({ catalogPageData, isLoading , setShowLoginModal }) => {
 
       {/* View all courses link */}
       <div className="text-center mt-12">
-        <Link to={"/catalog/mock-tests"} className="bg-zinc-900 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-full p-px text-xs font-semibold leading-6  text-white inline-block">
+        <Link to={"/catalog/mock-tests"} className="bg-page no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-full p-px text-xs font-semibold leading-6  text-white inline-block">
           <span className="absolute inset-0 overflow-hidden rounded-full">
             <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
           </span>
-          <div className="relative flex space-x-2 items-center z-10 rounded-full bg-zinc-950 py-0.5 px-4 ring-1 ring-white/10 ">
+          <div className="relative flex space-x-2 items-center z-10 rounded-full bg-page py-0.5 px-4 ring-1 ring-white/10 ">
             <span>
               View All Courses
             </span>

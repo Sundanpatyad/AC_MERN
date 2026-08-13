@@ -5,6 +5,30 @@
 @tailwind utilities;
 
 :root {
+  --c-bg: #ffffff;
+  --c-surface: #f9f9f9;
+  --c-elevated: #f1f1f1;
+  --c-fg: #0f0f0f;
+  --c-muted: #555555;
+  --c-subtle: #888888;
+  --c-line: #e5e5e5;
+  --c-brand: #ff0000;
+  --c-brand-hover: #cc0000;
+  --c-brand-fg: #ffffff;
+
+  /* Solid pair used for primary buttons */
+  --c-solid: #0f0f0f;
+  --c-solid-hover: #000000;
+  --c-solid-fg: #ffffff;
+
+  --c-overlay: rgba(255, 255, 255, 0.6);
+  --c-glass: rgba(0, 0, 0, 0.05);
+
+  --radius: 12px;
+  color-scheme: light;
+}
+
+.dark {
   --c-bg: #0f0f0f;
   --c-surface: #212121;
   --c-elevated: #272727;
@@ -24,7 +48,6 @@
   --c-overlay: rgba(0, 0, 0, 0.6);
   --c-glass: rgba(255, 255, 255, 0.05);
 
-  --radius: 12px;
   color-scheme: dark;
 }
 
@@ -138,6 +161,22 @@ body {
 .field:focus {
   outline: none;
   border-color: var(--c-muted);
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--c-elevated) 0%,
+    var(--c-line) 45%,
+    var(--c-elevated) 90%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
 }
 
 :focus-visible {

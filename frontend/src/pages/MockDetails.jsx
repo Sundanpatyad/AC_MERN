@@ -121,17 +121,17 @@ const MockTestDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black mt-10">
+    <div className="min-h-screen bg-page mt-10">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Mobile Purchase Card - Shows only on small screens */}
         <div className="lg:hidden mb-6">
-          <div className="bg-zinc-900 rounded-lg p-4 sm:p-6">
+          <div className="bg-surface border border-line rounded-lg p-4 sm:p-6">
             <div className="flex justify-between items-center mb-4">
-              <span className="text-2xl sm:text-3xl font-bold text-white">
+              <span className="text-2xl sm:text-3xl font-bold text-fg">
                 {testDetails.price === 0 ? "Free" : `₹${testDetails.price}`}
               </span>
               {testDetails.price > 0 && (
-                <span className="text-zinc-400 line-through">₹{testDetails.price * 2}</span>
+                <span className="text-muted line-through">₹{testDetails.price * 2}</span>
               )}
             </div>
 
@@ -139,7 +139,7 @@ const MockTestDetails = () => {
               isEnrolled || testDetails.price === 0 ? (
                 <button
                   onClick={handleStartTest}
-                  className="w-full py-3 px-4 bg-white text-black rounded-lg hover:bg-zinc-200 transition duration-300 font-medium"
+                  className="w-full py-3 px-4 bg-solid text-solid-fg rounded-lg hover:bg-solid-hover transition duration-300 font-medium"
                 >
                   Start Test
                 </button>
@@ -148,21 +148,21 @@ const MockTestDetails = () => {
                   {isInCart ? (
                     <Link
                       to="/dashboard/cart"
-                      className="block w-full py-3 px-4 bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition duration-300 text-center font-medium"
+                      className="block w-full py-3 px-4 bg-elevated text-fg border border-line rounded-lg hover:bg-surface transition duration-300 text-center font-medium"
                     >
                       Go to Cart
                     </Link>
                   ) : (
                     <button
                       onClick={handleAddToCart}
-                      className="w-full py-3 px-4 bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition duration-300 font-medium"
+                      className="w-full py-3 px-4 bg-elevated text-fg border border-line rounded-lg hover:bg-surface transition duration-300 font-medium"
                     >
                       <FaShoppingCart className="inline-block mr-2" />
                     </button>
                   )}
                   <button
                     onClick={handleBuyNow}
-                    className="w-full py-3 px-4 bg-white text-black rounded-lg hover:bg-zinc-200 transition duration-300 font-medium"
+                    className="w-full py-3 px-4 bg-solid text-solid-fg rounded-lg hover:bg-solid-hover transition duration-300 font-medium"
                   >
                     Buy Now
                   </button>
@@ -171,7 +171,7 @@ const MockTestDetails = () => {
             ) : (
               <button
                 onClick={setShowLoginModal}
-                className="w-full py-3 px-4 bg-white text-black rounded-lg hover:bg-zinc-200 transition duration-300 font-medium"
+                className="w-full py-3 px-4 bg-solid text-solid-fg rounded-lg hover:bg-solid-hover transition duration-300 font-medium"
               >
                 Login to {testDetails.price === 0 ? 'Start' : 'Purchase'}
               </button>
@@ -183,7 +183,7 @@ const MockTestDetails = () => {
           {/* Main Content Section */}
           <div className="lg:w-8/12">
             {testDetails.thumbnail && (
-              <div className="w-full mb-6 rounded-lg overflow-hidden border border-zinc-800" style={{ aspectRatio: '16/9' }}>
+              <div className="w-full mb-6 rounded-lg overflow-hidden border border-line" style={{ aspectRatio: '16/9' }}>
                 <img
                   src={testDetails.thumbnail}
                   alt={testDetails.seriesName}
@@ -192,15 +192,15 @@ const MockTestDetails = () => {
               </div>
             )}
 
-            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+            <h1 className="text-2xl sm:text-3xl font-bold text-fg mb-4">
               {testDetails.seriesName}
             </h1>
 
-            <div className="text-zinc-300 mb-6 text-sm sm:text-base">
+            <div className="text-muted mb-6 text-sm sm:text-base">
               {testDetails.description}
             </div>
 
-            <div className="flex flex-wrap items-center gap-4 mb-8 text-zinc-300 text-sm sm:text-base">
+            <div className="flex flex-wrap items-center gap-4 mb-8 text-muted text-sm sm:text-base">
               <div className="flex items-center">
                 <BiCalendar className="mr-2" />
                 <span>{new Date(testDetails.createdAt).toLocaleDateString()}</span>
@@ -212,16 +212,16 @@ const MockTestDetails = () => {
             </div>
 
             {/* Course Content Section */}
-            <div className="bg-zinc-900 rounded-lg p-4 sm:p-6 mb-8">
-              <h2 className="text-lg sm:text-xl font-bold text-white mb-4">Test Content</h2>
+            <div className="bg-surface border border-line rounded-lg p-4 sm:p-6 mb-8">
+              <h2 className="text-lg sm:text-xl font-bold text-fg mb-4">Test Content</h2>
               <div className="space-y-4">
                 {testDetails.mockTests?.map((test, index) => (
-                  <div key={index} className="border-b border-zinc-700 last:border-b-0 pb-4">
+                  <div key={index} className="border-b border-line last:border-b-0 pb-4">
                     <div className="flex justify-between items-center">
-                      <h3 className="text-white font-medium">{test.testName}</h3>
-                      <span className="text-zinc-400 text-sm">{test.duration} mins</span>
+                      <h3 className="text-fg font-medium">{test.testName}</h3>
+                      <span className="text-muted text-sm">{test.duration} mins</span>
                     </div>
-                    <p className="text-zinc-400 text-sm mt-1">
+                    <p className="text-muted text-sm mt-1">
                       {test.totalQuestions ?? test.questions?.length ?? 0} questions
                     </p>
                   </div>
@@ -232,13 +232,13 @@ const MockTestDetails = () => {
 
           {/* Desktop Sidebar - Purchase Card */}
           <div className="hidden lg:block lg:w-4/12">
-            <div className="bg-zinc-900 rounded-lg p-6 sticky top-4">
+            <div className="bg-surface border border-line rounded-lg p-6 sticky top-4">
               <div className="mb-4">
-                <span className="text-3xl font-bold text-white">
+                <span className="text-3xl font-bold text-fg">
                   {testDetails.price === 0 ? "Free" : `₹${testDetails.price}`}
                 </span>
                 {testDetails.price > 0 && (
-                 "" // <span className="text-zinc-400 line-through ml-2">₹{testDetails.price * 2}</span>
+                 "" // <span className="text-muted line-through ml-2">₹{testDetails.price * 2}</span>
                 )}
               </div>
 
@@ -246,7 +246,7 @@ const MockTestDetails = () => {
                 isEnrolled || testDetails.price === 0 ? (
                   <button
                     onClick={handleStartTest}
-                    className="w-full py-3 px-4 bg-white text-black rounded-lg hover:bg-zinc-200 transition duration-300 font-medium"
+                    className="w-full py-3 px-4 bg-solid text-solid-fg rounded-lg hover:bg-solid-hover transition duration-300 font-medium"
                   >
                     Start Test
                   </button>
@@ -255,21 +255,21 @@ const MockTestDetails = () => {
                     {isInCart ? (
                       <Link
                         to="/dashboard/cart"
-                        className="block w-full py-3 px-4 bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition duration-300 text-center font-medium"
+                        className="block w-full py-3 px-4 bg-elevated text-fg border border-line rounded-lg hover:bg-surface transition duration-300 text-center font-medium"
                       >
                         Go to Cart
                       </Link>
                     ) : (
                       <button
                         onClick={handleAddToCart}
-                        className="w-full py-3 px-4 bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition duration-300 font-medium"
+                        className="w-full py-3 px-4 bg-elevated text-fg border border-line rounded-lg hover:bg-surface transition duration-300 font-medium"
                       >
                         <FaShoppingCart className="inline-block mr-2" />
                       </button>
                     )}
                     <button
                       onClick={handleBuyNow}
-                      className="w-full py-3 px-4 bg-white text-black rounded-lg hover:bg-zinc-200 transition duration-300 font-medium"
+                      className="w-full py-3 px-4 bg-solid text-solid-fg rounded-lg hover:bg-solid-hover transition duration-300 font-medium"
                     >
                       Buy Now
                     </button>
@@ -278,26 +278,26 @@ const MockTestDetails = () => {
               ) : (
                 <button
                   onClick={setShowLoginModal}
-                  className="w-full py-3 px-4 bg-white text-black rounded-lg hover:bg-zinc-200 transition duration-300 font-medium"
+                  className="w-full py-3 px-4 bg-solid text-solid-fg rounded-lg hover:bg-solid-hover transition duration-300 font-medium"
                 >
                   Login to {testDetails.price === 0 ? 'Start' : 'Purchase'}
                 </button>
               )}
 
               <div className="mt-6 space-y-3">
-                <div className="flex items-center text-zinc-300">
+                <div className="flex items-center text-muted">
                   <span className="mr-2">✓</span>
                   <span>Full mock test access</span>
                 </div>
-                <div className="flex items-center text-zinc-300">
+                <div className="flex items-center text-muted">
                   <span className="mr-2">✓</span>
                   <span>Detailed solutions</span>
                 </div>
-                <div className="flex items-center text-zinc-300">
+                <div className="flex items-center text-muted">
                   <span className="mr-2">✓</span>
                   <span>Performance analytics</span>
                 </div>
-                <div className="flex items-center text-zinc-300">
+                <div className="flex items-center text-muted">
                   <span className="mr-2">✓</span>
                   <span>24/7 Support</span>
                 </div>

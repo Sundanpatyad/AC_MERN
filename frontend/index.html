@@ -11,6 +11,22 @@
 
   <title>Awakening Classes</title>
 
+  <!-- Theme Initialization Script to prevent FOUC -->
+  <script>
+    (function() {
+      try {
+        var theme = localStorage.getItem('theme');
+        if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+          if (!theme) localStorage.setItem('theme', 'dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          if (!theme) localStorage.setItem('theme', 'light');
+        }
+      } catch (e) {}
+    })();
+  </script>
+
   <!-- Google AdSense -->
   <script
     async

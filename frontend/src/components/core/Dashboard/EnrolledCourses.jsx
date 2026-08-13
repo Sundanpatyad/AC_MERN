@@ -75,7 +75,7 @@ export default function EnrolledCourses() {
   };
 
   return (
-    <div className="min-h-screen rounded-md bg-zinc-900 text-white py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen rounded-md bg-page text-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl md:text-5xl font-extrabold text-center mb-12 bg-gradient-to-r from-white to-slate-400 text-transparent bg-clip-text">
           Your Learning Dashboard
@@ -86,20 +86,20 @@ export default function EnrolledCourses() {
           <h2 className="text-3xl text-center font-semibold mb-8 text-white">Enrolled Courses</h2>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {loading.courses ? (
-              <p className="col-span-full text-center text-gray-400 py-8">Loading enrolled courses...</p>
+              <p className="col-span-full text-center text-muted py-8">Loading enrolled courses...</p>
             ) : error.courses ? (
               <p className="col-span-full text-center text-red-500 py-8">Error: {error.courses}</p>
             ) : !enrolledCourses || enrolledCourses.length === 0 ? (
-              <p className="col-span-full text-center text-gray-400 py-8">You haven't enrolled in any courses yet.</p>
+              <p className="col-span-full text-center text-muted py-8">You haven't enrolled in any courses yet.</p>
             ) : (
               enrolledCourses.map((course, i) => (
-                <div key={i} className="bg-zinc-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300">
+                <div key={i} className="bg-surface rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300">
                   <div className="p-6 cursor-pointer" onClick={() => navigate(`/view-course/${course?._id}/section/${course.courseContent?.[0]?._id}/sub-section/${course.courseContent?.[0]?.subSection?.[0]?._id}`)}>
                     <Img src={course.thumbnail && course.thumbnail} alt="course_img" className="h-48 w-full rounded-lg object-cover mb-4" />
                     <h3 className="font-bold text-xl mb-2 text-white">{course.courseName}</h3>
-                    <p className="text-gray-400 mb-4">{course.courseDescription.slice(0, 100)}...</p>
+                    <p className="text-muted mb-4">{course.courseDescription.slice(0, 100)}...</p>
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm text-gray-400">Duration: {course?.totalDuration}</span>
+                      <span className="text-sm text-muted">Duration: {course?.totalDuration}</span>
                       <span className="text-sm font-semibold text-blue-400">Progress: {course.progressPercentage || 0}%</span>
                     </div>
                     <ProgressBar completed={course.progressPercentage || 0} height="8px" isLabelVisible={false} bgColor="#60A5FA" baseBgColor="#4B5563" />
@@ -115,19 +115,19 @@ export default function EnrolledCourses() {
           <h2 className="text-3xl text-center font-semibold mb-8 text-white">Enrolled Mock Tests</h2>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {loading.mockTests ? (
-              <p className="col-span-full text-center text-gray-400 py-8">Loading enrolled mock tests...</p>
+              <p className="col-span-full text-center text-muted py-8">Loading enrolled mock tests...</p>
             ) : error.mockTests ? (
               <p className="col-span-full text-center text-red-500 py-8">Error: {error.mockTests}</p>
             ) : !enrolledMockTests || enrolledMockTests.length === 0 ? (
-              <p className="col-span-full text-center text-gray-400 py-8">You haven't enrolled in any mock tests yet.</p>
+              <p className="col-span-full text-center text-muted py-8">You haven't enrolled in any mock tests yet.</p>
             ) : (
               enrolledMockTests.map((mockTest, i) => (
                 <div
                   onClick={() => navigate(`/mock-test/${mockTest._id}`)}
-                  key={i} className="bg-zinc-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300">
+                  key={i} className="bg-surface rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300">
                   <div className="p-6">
                     <h3 className="font-bold text-xl flex flex-wrap mb-2 text-white">{mockTest.seriesName}</h3>
-                    <p className="text-gray-400 mb-4">{mockTest.description.slice(0, 100)}...</p>
+                    <p className="text-muted mb-4">{mockTest.description.slice(0, 100)}...</p>
                     <div className="flex justify-between items-center">
                       <span className="text-lg font-semibold text-green-400">Rs. {mockTest.price}</span>
                       <span className={`text-sm font-medium px-3 py-1 rounded-full ${mockTest.status === 'completed' ? 'bg-green-500 text-green-100' : 'bg-yellow-500 text-yellow-100'}`}>
@@ -157,11 +157,11 @@ export default function EnrolledCourses() {
             <div className="mt-12">
               <h2 className="text-3xl font-semibold mb-6 text-white">Mock Test Attempts</h2>
               {loading.attempts ? (
-                <p className="text-center text-gray-400 py-8">Loading mock test attempts...</p>
+                <p className="text-center text-muted py-8">Loading mock test attempts...</p>
               ) : error.attempts ? (
                 <p className="text-center text-red-500 py-8">Error: {error.attempts}</p>
               ) : !mockAttempts || mockAttempts.length === 0 ? (
-                <p className="text-center text-gray-400 py-8">You haven't attempted any mock tests yet.</p>
+                <p className="text-center text-muted py-8">You haven't attempted any mock tests yet.</p>
               ) : (
                 Object.entries(groupAttemptsBySeriesName(mockAttempts)).map(([seriesName, attempts]) => (
                   <div key={seriesName} className="mt-8 bg-gray-800 rounded-xl p-6 shadow-lg">
@@ -170,7 +170,7 @@ export default function EnrolledCourses() {
                       {attempts.map((attempt, index) => (
                         <div key={index} className="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition-all duration-300">
                           <h4 className="text-lg text-white font-semibold mb-2">{attempt.testName}</h4>
-                          <p className="text-gray-400 text-sm mb-3">{new Date(attempt.createdAt).toLocaleDateString()}</p>
+                          <p className="text-muted text-sm mb-3">{new Date(attempt.createdAt).toLocaleDateString()}</p>
                           <div className="flex justify-between items-center mb-2">
                             <span className="text-blue-400 font-medium">Score: {attempt.score} / {attempt.totalQuestions}</span>
                             <span className="text-purple-400 font-medium">Time: {attempt.timeTaken}</span>

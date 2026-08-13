@@ -34,16 +34,16 @@ const InstallApp = ({ handleInstall }) => {
           transition={{ duration: 0.3 }}
           className={`fixed z-40 ${token ? 'bottom-16 ' : 'bottom-0'}  left-0 right-0 mx-auto p-4 sm:p-0 sm:bottom-6 sm:left-6 sm:right-6 max-w-sm`}
         >
-          <div className="bg-black rounded-xl shadow-lg overflow-hidden border border-gray-800">
+          <div className="bg-surface rounded-xl shadow-lg overflow-hidden border border-line">
             <div className="relative p-4 sm:p-6">
               <button
                 onClick={handleClose}
-                className="absolute top-2 right-2 text-gray-400 hover:text-gray-200 transition-colors duration-200"
+                className="absolute top-2 right-2 text-muted hover:text-fg transition-colors duration-200"
               >
                 <X className="w-4 h-4" />
               </button>
               <div className="flex items-center space-x-4">
-                <div className="flex-shrink-0 bg-gray-800 p-3 rounded-full">
+                <div className="flex-shrink-0 bg-elevated p-3 rounded-full">
                   <img
                     src={rzpLogo}
                     alt="App Logo"
@@ -51,8 +51,8 @@ const InstallApp = ({ handleInstall }) => {
                   />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-white font-bold text-lg">Get Our App</h3>
-                  <p className="text-gray-400 text-sm mt-1">
+                  <h3 className="text-fg font-bold text-lg">Get Our App</h3>
+                  <p className="text-muted text-sm mt-1">
                     Experience the full power of our platform
                   </p>
                 </div>
@@ -60,7 +60,7 @@ const InstallApp = ({ handleInstall }) => {
               <div className="mt-4">
                 <button
                   onClick={handleInstall}
-                  className="w-full bg-slate-200 text-zinc-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-700 hover:text-white transition-colors duration-200 flex items-center justify-center space-x-2 group"
+                  className="w-full bg-elevated text-fg font-semibold py-2 px-4 rounded-lg hover:bg-page transition-colors duration-200 flex items-center justify-center space-x-2 group border border-line"
                 >
                   <span>Install Now</span>
                   <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />

@@ -2,16 +2,33 @@ import React from 'react';
 import FusionCharts from 'fusioncharts';
 import Charts from 'fusioncharts/fusioncharts.charts';
 import ReactFC from 'react-fusioncharts';
-import FusionTheme from 'fusioncharts/themes/fusioncharts.theme.candy';
+import FusionThemeCandy from 'fusioncharts/themes/fusioncharts.theme.candy';
+import FusionThemeFusion from 'fusioncharts/themes/fusioncharts.theme.fusion';
 
-ReactFC.fcRoot(FusionCharts, Charts, FusionTheme);
+ReactFC.fcRoot(FusionCharts, Charts, FusionThemeCandy, FusionThemeFusion);
 
 const RankingsGraph = ({ rankings }) => {
+  const [isDark, setIsDark] = React.useState(true);
+
+  React.useEffect(() => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          setIsDark(document.documentElement.classList.contains('dark'));
+        }
+      });
+    });
+    
+    setIsDark(document.documentElement.classList.contains('dark'));
+    observer.observe(document.documentElement, { attributes: true });
+    
+    return () => observer.disconnect();
+  }, []);
   // Ensure we have data to display
   if (!rankings || rankings.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64 bg-zinc-900/50 rounded-xl border border-zinc-800">
-        <p className="text-zinc-500 font-medium">No ranking data available yet.</p>
+      <div className="flex items-center justify-center h-64 bg-surface rounded-xl border border-line">
+        <p className="text-muted font-medium">No ranking data available yet.</p>
       </div>
     );
   }
@@ -38,27 +55,27 @@ const RankingsGraph = ({ rankings }) => {
         subCaption: "Score Comparison (Top 10)",
         xAxisName: "Explorers",
         yAxisName: "Score",
-        theme: "candy", // Pre-built dark theme
-
-        // Customizing the dark theme look
-        bgColor: "#000000",
+        theme: isDark ? "candy" : "fusion", // Pre-built themes
+        
+        // Customizing the theme look
+        bgColor: "transparent",
         bgAlpha: "0", // Transparent to show parent bg if needed, or set to 100
         canvasBgAlpha: "0",
 
         // Fonts & Colors
         baseFont: "Inter",
         baseFontSize: "12",
-        baseFontColor: "#9CA3AF", // gray-400
-        captionFontColor: "#F3F4F6", // gray-100
+        baseFontColor: isDark ? "#9CA3AF" : "#4B5563",
+        captionFontColor: isDark ? "#F3F4F6" : "#111827",
         captionFontSize: "18",
-        subCaptionFontColor: "#6B7280", // gray-500
+        subCaptionFontColor: isDark ? "#6B7280" : "#6B7280",
 
         // Axis & Div Lines
-        divLineColor: "#374151", // gray-700
+        divLineColor: isDark ? "#374151" : "#E5E7EB",
         divLineAlpha: "50",
         showYAxisValues: "1",
-        xAxisNameFontColor: "#9CA3AF",
-        yAxisNameFontColor: "#9CA3AF",
+        xAxisNameFontColor: isDark ? "#9CA3AF" : "#4B5563",
+        yAxisNameFontColor: isDark ? "#9CA3AF" : "#4B5563",
 
         // Columns & Values
         paletteColors: "#3B82F6", // Blue primary color
@@ -68,13 +85,13 @@ const RankingsGraph = ({ rankings }) => {
         plotBorderAlpha: "0",
         radius3D: "0",
         showValues: "1",
-        valueFontColor: "#FFFFFF",
+        valueFontColor: isDark ? "#FFFFFF" : "#000000",
         placeValuesInside: "1",
 
         // Tooltip
-        toolTipBgColor: "#111827", // gray-900
-        toolTipBorderColor: "#4B5563", // gray-600
-        toolTipColor: "#F3F4F6",
+        toolTipBgColor: isDark ? "#111827" : "#FFFFFF",
+        toolTipBorderColor: isDark ? "#4B5563" : "#E5E7EB",
+        toolTipColor: isDark ? "#F3F4F6" : "#111827",
         toolTipBorderThickness: "1",
 
         // Hover Effects
@@ -85,7 +102,7 @@ const RankingsGraph = ({ rankings }) => {
   };
 
   return (
-    <div className="w-full p-4 bg-zinc-900/30 backdrop-blur-sm rounded-xl border border-zinc-800 shadow-xl overflow-hidden">
+    <div className="w-full p-4 bg-surface backdrop-blur-sm rounded-xl border border-line shadow-xl overflow-hidden">
       <ReactFC {...chartConfigs} />
     </div>
   );

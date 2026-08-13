@@ -8,7 +8,8 @@ import {
   Calendar,
   Users,
   Edit,
-  LayoutDashboard
+  LayoutDashboard,
+  Shield
 } from 'lucide-react';
 
 const MyProfile = () => {
@@ -66,6 +67,16 @@ const MyProfile = () => {
               <LayoutDashboard className="w-4 h-4" />
               Dashboard
             </button>
+
+            {user?.accountType === 'Instructor' && (
+              <button
+                onClick={() => navigate("/adminMockTest")}
+                className="btn-primary"
+              >
+                <Shield className="w-4 h-4" />
+                Admin Console
+              </button>
+            )}
           </div>
         </div>
       </div>

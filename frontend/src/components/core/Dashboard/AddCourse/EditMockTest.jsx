@@ -376,10 +376,10 @@ const EditMockTestSeries = () => {
     if (!isOpen) return null;
     return (
       <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex justify-center items-center z-50 p-4">
-        <div className="bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-zinc-700/50 shadow-2xl">
+        <div className="bg-surface rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-line shadow-2xl">
           <button
             onClick={onClose}
-            className="float-right text-gray-400 hover:text-white text-3xl font-light transition-colors duration-200"
+            className="float-right text-muted hover:text-white text-3xl font-light transition-colors duration-200"
           >
             &times;
           </button>
@@ -407,21 +407,21 @@ const EditMockTestSeries = () => {
   return (
     <div className="flex w-full items-start gap-x-8">
       <div className="flex flex-1 flex-col">
-        <h1 className="mb-8 text-4xl font-bold text-white text-center lg:text-left bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+        <h1 className="mb-8 text-4xl font-bold text-fg text-center lg:text-left">
           Edit Mock Test Series
         </h1>
-        <p className="mb-10 text-sm text-gray-400 text-center lg:text-left">
+        <p className="mb-10 text-sm text-muted text-center lg:text-left">
           Update your mock test series details and manage tests
         </p>
 
         <div className="flex-1">
           <form onSubmit={(e) => { e.preventDefault(); handleSaveSeries(); }} className="space-y-8">
             {/* Series Information Card */}
-            <div className="rounded-2xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-8 shadow-2xl space-y-6">
-              <h2 className="text-2xl font-bold text-white mb-6">Series Information</h2>
+            <div className="rounded-2xl border border-line bg-surface p-8 shadow-2xl space-y-6">
+              <h2 className="text-2xl font-bold text-fg mb-6">Series Information</h2>
 
               <div className="space-y-2">
-                <label htmlFor="seriesName" className="block text-sm font-medium text-gray-200">
+                <label htmlFor="seriesName" className="block text-sm font-medium text-fg">
                   Series Name <sup className="text-pink-400">*</sup>
                 </label>
                 <input
@@ -430,12 +430,12 @@ const EditMockTestSeries = () => {
                   name="seriesName"
                   value={series.seriesName}
                   onChange={handleSeriesChange}
-                  className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  className="w-full px-4 py-3 rounded-lg bg-page border border-line text-fg placeholder-muted focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 />
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="description" className="block text-sm font-medium text-gray-200">
+                <label htmlFor="description" className="block text-sm font-medium text-fg">
                   Description <sup className="text-pink-400">*</sup>
                 </label>
                 <textarea
@@ -444,13 +444,13 @@ const EditMockTestSeries = () => {
                   value={series.description}
                   onChange={handleSeriesChange}
                   rows="4"
-                  className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
+                  className="w-full px-4 py-3 rounded-lg bg-page border border-line text-fg placeholder-muted focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label htmlFor="price" className="block text-sm font-medium text-gray-200">
+                  <label htmlFor="price" className="block text-sm font-medium text-fg">
                     Price (₹) <sup className="text-pink-400">*</sup>
                   </label>
                   <input
@@ -459,12 +459,12 @@ const EditMockTestSeries = () => {
                     name="price"
                     value={series.price}
                     onChange={handleSeriesChange}
-                    className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-3 rounded-lg bg-page border border-line text-fg placeholder-muted focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="seriesStatus" className="block text-sm font-medium text-gray-200">
+                  <label htmlFor="seriesStatus" className="block text-sm font-medium text-fg">
                     Series Status <sup className="text-pink-400">*</sup>
                   </label>
                   <select
@@ -472,7 +472,7 @@ const EditMockTestSeries = () => {
                     name="status"
                     value={series.status}
                     onChange={handleSeriesStatusChange}
-                    className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer"
+                    className="w-full px-4 py-3 rounded-lg bg-page border border-line text-fg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer"
                   >
                     <option value="draft">Draft</option>
                     <option value="published">Published</option>
@@ -484,9 +484,9 @@ const EditMockTestSeries = () => {
             {/* OMR Based Tests */}
             {series.attachments && series.attachments.length > 0 && (
               <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-white">OMR Based Tests</h2>
+                <h2 className="text-2xl font-bold text-fg">OMR Based Tests</h2>
                 {series.attachments.map((item, index) => (
-                  <div key={item._id} className="rounded-2xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-6 shadow-2xl relative">
+                  <div key={item._id} className="rounded-2xl border border-line bg-surface p-6 shadow-2xl relative">
                     <button
                       type="button"
                       onClick={() => deleteAttachment(index)}
@@ -495,19 +495,19 @@ const EditMockTestSeries = () => {
                       <FaTrash size={18} />
                     </button>
 
-                    <h3 className="text-xl font-semibold text-white mb-6">OMR Test #{index + 1}</h3>
+                    <h3 className="text-xl font-semibold text-fg mb-6">OMR Test #{index + 1}</h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {['name', 'answerKey', 'omrSheet', 'questionPaper'].map((field) => (
                         <div key={field} className="space-y-2">
-                          <label className="block text-sm font-medium text-gray-200 capitalize">
+                          <label className="block text-sm font-medium text-fg capitalize">
                             {field.replace(/([A-Z])/g, ' $1').trim()}
                           </label>
                           <input
                             type="text"
                             value={item[field]}
                             onChange={(e) => handleAttachmentChange(index, field, e.target.value)}
-                            className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            className="w-full px-4 py-3 rounded-lg bg-page border border-line text-fg placeholder-muted focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                           />
                         </div>
                       ))}
@@ -520,7 +520,7 @@ const EditMockTestSeries = () => {
             {/* Tests Section */}
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold text-white">Mock Tests</h2>
+                <h2 className="text-2xl font-bold text-fg">Mock Tests</h2>
                 <button
                   type="button"
                   onClick={addTest}
@@ -531,9 +531,9 @@ const EditMockTestSeries = () => {
               </div>
 
               {series.mockTests && series.mockTests.map((test, testIndex) => (
-                <div key={testIndex} className="rounded-2xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 shadow-2xl overflow-hidden">
+                <div key={testIndex} className="rounded-2xl border border-line bg-surface shadow-2xl overflow-hidden">
                   <div
-                    className="flex justify-between items-center cursor-pointer p-6 hover:bg-zinc-800/50 transition-all duration-200"
+                    className="flex justify-between items-center cursor-pointer p-6 hover:bg-surface transition-all duration-200"
                     onClick={() => toggleTest(testIndex)}
                   >
                     <div className="flex items-center gap-3">
@@ -561,10 +561,10 @@ const EditMockTestSeries = () => {
                   </div>
 
                   {expandedTests[testIndex] && (
-                    <div className="p-6 pt-0 space-y-6 border-t border-zinc-700/50">
+                    <div className="p-6 pt-0 space-y-6 border-t border-line">
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
                         <div className="space-y-2">
-                          <label className="block text-sm font-medium text-gray-200">
+                          <label className="block text-sm font-medium text-fg">
                             Test Name <sup className="text-pink-400">*</sup>
                           </label>
                           <input
@@ -572,12 +572,12 @@ const EditMockTestSeries = () => {
                             name="testName"
                             value={test.testName}
                             onChange={(e) => handleTestChange(e, testIndex)}
-                            className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            className="w-full px-4 py-3 rounded-lg bg-page border border-line text-fg placeholder-muted focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                           />
                         </div>
 
                         <div className="space-y-2">
-                          <label className="block text-sm font-medium text-gray-200">
+                          <label className="block text-sm font-medium text-fg">
                             Duration (minutes) <sup className="text-pink-400">*</sup>
                           </label>
                           <input
@@ -585,12 +585,12 @@ const EditMockTestSeries = () => {
                             name="duration"
                             value={test.duration}
                             onChange={(e) => handleTestChange(e, testIndex)}
-                            className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            className="w-full px-4 py-3 rounded-lg bg-page border border-line text-fg placeholder-muted focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                           />
                         </div>
 
                         <div className="space-y-2">
-                          <label className="block text-sm font-medium text-gray-200">
+                          <label className="block text-sm font-medium text-fg">
                             Negative Marking <sup className="text-pink-400">*</sup>
                           </label>
                           <input
@@ -599,20 +599,20 @@ const EditMockTestSeries = () => {
                             step="0.25"
                             value={test.negative || 0}
                             onChange={(e) => handleTestChange(e, testIndex)}
-                            className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            className="w-full px-4 py-3 rounded-lg bg-page border border-line text-fg placeholder-muted focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                             placeholder="0.25"
                           />
                         </div>
 
                         <div className="space-y-2">
-                          <label className="block text-sm font-medium text-gray-200">
+                          <label className="block text-sm font-medium text-fg">
                             Status <sup className="text-pink-400">*</sup>
                           </label>
                           <select
                             name="status"
                             value={test.status}
                             onChange={(e) => handleTestStatusChange(e, testIndex)}
-                            className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer"
+                            className="w-full px-4 py-3 rounded-lg bg-page border border-line text-fg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer"
                           >
                             <option value="draft">Draft</option>
                             <option value="published">Published</option>
@@ -624,7 +624,7 @@ const EditMockTestSeries = () => {
                       <div className="space-y-4">
                         <h4 className="font-semibold text-white text-lg">Questions ({test.questions?.length || 0})</h4>
                         {test.questions && test.questions.map((question, questionIndex) => (
-                          <div key={questionIndex} className="rounded-xl bg-zinc-800/50 p-5 relative border border-zinc-700/30">
+                          <div key={questionIndex} className="rounded-xl bg-surface p-5 relative border border-line">
                             <button
                               type="button"
                               onClick={() => deleteQuestion(testIndex, questionIndex)}
@@ -644,7 +644,7 @@ const EditMockTestSeries = () => {
 
                             <div className="space-y-4">
                               <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-200">
+                                <label className="block text-sm font-medium text-fg">
                                   Question {questionIndex + 1} <sup className="text-pink-400">*</sup>
                                 </label>
                                 <input
@@ -652,17 +652,17 @@ const EditMockTestSeries = () => {
                                   name="text"
                                   value={question.text || ''}
                                   onChange={(e) => handleQuestionChange(e, testIndex, questionIndex)}
-                                  className="w-full px-4 py-3 rounded-lg bg-zinc-700 border border-zinc-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                  className="w-full px-4 py-3 rounded-lg bg-page border border-line text-fg placeholder-muted focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                   placeholder="Enter question text"
                                 />
                                 <div className="mt-2">
                                   {question.questionImage ? (
-                                    <div className="relative inline-block w-full max-w-sm border border-zinc-600 rounded-lg overflow-hidden mt-2">
-                                      <img src={question.questionImage} alt="Question" className="w-full h-auto max-h-48 object-contain bg-zinc-800" />
+                                    <div className="relative inline-block w-full max-w-sm border border-line rounded-lg overflow-hidden mt-2">
+                                      <img src={question.questionImage} alt="Question" className="w-full h-auto max-h-48 object-contain bg-surface" />
                                       <button type="button" onClick={() => handleQuestionImageChange(testIndex, questionIndex, '')} className="absolute top-1 right-1 bg-red-500 p-1 text-xs rounded-md text-white">Remove</button>
                                     </div>
                                   ) : (
-                                    <label className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-700 hover:bg-zinc-600 border border-zinc-600 rounded-lg text-sm text-gray-300 cursor-pointer transition-colors">
+                                    <label className="inline-flex items-center gap-2 px-4 py-2 bg-elevated hover:bg-elevated border border-line rounded-lg text-sm text-muted cursor-pointer transition-colors">
                                       <FaImage /> Add Question Image
                                       <input type="file" className="hidden" accept="image/*" onChange={(e) => uploadField(e.target.files[0], (url) => handleQuestionImageChange(testIndex, questionIndex, url))} />
                                     </label>
@@ -675,7 +675,7 @@ const EditMockTestSeries = () => {
                                 <>
                                   {/* Left Column Items */}
                                   <div className="space-y-2">
-                                    <label className="block text-sm font-medium text-gray-200">
+                                    <label className="block text-sm font-medium text-fg">
                                       Left Column Items <sup className="text-pink-400">*</sup>
                                     </label>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -688,7 +688,7 @@ const EditMockTestSeries = () => {
                                             type="text"
                                             value={leftItem}
                                             onChange={(e) => handleLeftColumnChange(testIndex, questionIndex, itemIndex, e.target.value)}
-                                            className="w-full px-4 py-2 rounded-lg bg-zinc-700 border border-zinc-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                            className="w-full px-4 py-2 rounded-lg bg-page border border-line text-fg placeholder-muted focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                             placeholder={`Left item ${itemIndex + 1}`}
                                           />
                                         </div>
@@ -698,7 +698,7 @@ const EditMockTestSeries = () => {
 
                                   {/* Right Column Items */}
                                   <div className="space-y-2">
-                                    <label className="block text-sm font-medium text-gray-200">
+                                    <label className="block text-sm font-medium text-fg">
                                       Right Column Items <sup className="text-pink-400">*</sup>
                                     </label>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -711,7 +711,7 @@ const EditMockTestSeries = () => {
                                             type="text"
                                             value={rightItem}
                                             onChange={(e) => handleRightColumnChange(testIndex, questionIndex, itemIndex, e.target.value)}
-                                            className="w-full px-4 py-2 rounded-lg bg-zinc-700 border border-zinc-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                            className="w-full px-4 py-2 rounded-lg bg-page border border-line text-fg placeholder-muted focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                             placeholder={`Right item ${itemIndex + 1}`}
                                           />
                                         </div>
@@ -721,7 +721,7 @@ const EditMockTestSeries = () => {
 
                                   {/* Mapping Options (5 options) */}
                                   <div className="space-y-2">
-                                    <label className="block text-sm font-medium text-gray-200">
+                                    <label className="block text-sm font-medium text-fg">
                                       Mapping Options <sup className="text-pink-400">*</sup>
                                     </label>
                                     <div className="space-y-2">
@@ -729,7 +729,7 @@ const EditMockTestSeries = () => {
                                         <div key={optionIndex} className="flex items-center gap-2">
                                           <span className={`px-3 py-2 rounded-lg font-medium text-sm min-w-[80px] text-center ${optionIndex === 4
                                             ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                                            : 'bg-zinc-700 text-gray-300'
+                                            : 'bg-elevated text-muted'
                                             }`}>
                                             Option {optionIndex + 1}
                                             {optionIndex === 4 && ' ✓'}
@@ -738,13 +738,13 @@ const EditMockTestSeries = () => {
                                             type="text"
                                             value={option}
                                             onChange={(e) => handleOptionChange(testIndex, questionIndex, optionIndex, e.target.value)}
-                                            className="flex-1 px-4 py-2 rounded-lg bg-zinc-700 border border-zinc-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                            className="flex-1 px-4 py-2 rounded-lg bg-page border border-line text-fg placeholder-muted focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                             placeholder={`e.g., a-${optionIndex + 1} b-${(optionIndex + 1) % 4 + 1} c-${(optionIndex + 2) % 4 + 1} d-${(optionIndex + 3) % 4 + 1}`}
                                           />
                                         </div>
                                       ))}
                                     </div>
-                                    <p className="text-xs text-gray-400 mt-2">
+                                    <p className="text-xs text-muted mt-2">
                                       💡 The 5th option (last one) is automatically set as the correct answer
                                     </p>
                                   </div>
@@ -757,24 +757,24 @@ const EditMockTestSeries = () => {
                                       const option = typeof opt === 'string' ? { text: opt, image: '' } : { text: opt?.text || '', image: opt?.image || '' };
                                       return (
                                         <div key={optionIndex} className="space-y-2 p-3 bg-zinc-800/80 rounded-lg border border-zinc-600/50">
-                                          <label className="block text-sm font-medium text-gray-300">
+                                          <label className="block text-sm font-medium text-muted">
                                             Option {String.fromCharCode(65 + optionIndex)}
                                           </label>
                                           <input
                                             type="text"
                                             value={option.text}
                                             onChange={(e) => handleOptionChange(testIndex, questionIndex, optionIndex, 'text', e.target.value)}
-                                            className="w-full px-4 py-2 rounded-lg bg-zinc-700 border border-zinc-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm"
+                                            className="w-full px-4 py-2 rounded-lg bg-page border border-line text-fg placeholder-muted focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm"
                                             placeholder={`Option ${String.fromCharCode(65 + optionIndex)} text`}
                                           />
                                           <div className="mt-2">
                                             {option.image ? (
-                                              <div className="relative inline-block w-full max-w-sm border border-zinc-600 rounded-lg overflow-hidden mt-1">
-                                                <img src={option.image} alt={`Opt ${String.fromCharCode(65 + optionIndex)}`} className="w-full h-auto max-h-32 object-contain bg-zinc-800" />
+                                              <div className="relative inline-block w-full max-w-sm border border-line rounded-lg overflow-hidden mt-1">
+                                                <img src={option.image} alt={`Opt ${String.fromCharCode(65 + optionIndex)}`} className="w-full h-auto max-h-32 object-contain bg-surface" />
                                                 <button type="button" onClick={() => handleOptionChange(testIndex, questionIndex, optionIndex, 'image', '')} className="absolute top-1 right-1 bg-red-500 p-1 text-xs rounded-md text-white">Remove</button>
                                               </div>
                                             ) : (
-                                              <label className="inline-flex items-center gap-2 px-3 py-1.5 bg-zinc-700 hover:bg-zinc-600 border border-zinc-600 rounded-lg text-xs text-gray-300 cursor-pointer transition-colors">
+                                              <label className="inline-flex items-center gap-2 px-3 py-1.5 bg-elevated hover:bg-elevated border border-line rounded-lg text-xs text-muted cursor-pointer transition-colors">
                                                 <FaImage /> Add Option Image
                                                 <input type="file" className="hidden" accept="image/*" onChange={(e) => uploadField(e.target.files[0], (url) => handleOptionChange(testIndex, questionIndex, optionIndex, 'image', url))} />
                                               </label>
@@ -786,14 +786,14 @@ const EditMockTestSeries = () => {
                                   </div>
 
                                   <div className="space-y-2">
-                                    <label className="block text-sm font-medium text-gray-200">
+                                    <label className="block text-sm font-medium text-fg">
                                       Correct Answer <sup className="text-pink-400">*</sup>
                                     </label>
                                     <select
                                       name="correctAnswer"
                                       value={question.correctAnswer}
                                       onChange={(e) => handleQuestionChange(e, testIndex, questionIndex)}
-                                      className="w-full px-4 py-3 rounded-lg bg-zinc-700 border border-zinc-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer"
+                                      className="w-full px-4 py-3 rounded-lg bg-page border border-line text-fg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer"
                                     >
                                       <option value="">Select correct answer</option>
                                       {question.options.map((opt, optionIndex) => {
@@ -818,14 +818,14 @@ const EditMockTestSeries = () => {
                           <button
                             type="button"
                             onClick={() => addQuestion(testIndex, 'MCQ')}
-                            className="flex-1 py-3 px-4 border-2 border-dashed border-zinc-600 rounded-lg text-gray-400 hover:text-white hover:border-blue-500 transition-all duration-200 font-medium"
+                            className="flex-1 py-3 px-4 border-2 border-dashed border-line rounded-lg text-muted hover:text-white hover:border-blue-500 transition-all duration-200 font-medium"
                           >
                             + Add MCQ
                           </button>
                           <button
                             type="button"
                             onClick={() => addQuestion(testIndex, 'MATCH')}
-                            className="flex-1 py-3 px-4 border-2 border-dashed border-zinc-600 rounded-lg text-gray-400 hover:text-white hover:border-emerald-500 transition-all duration-200 font-medium"
+                            className="flex-1 py-3 px-4 border-2 border-dashed border-line rounded-lg text-muted hover:text-white hover:border-emerald-500 transition-all duration-200 font-medium"
                           >
                             + Add Match
                           </button>
@@ -845,18 +845,18 @@ const EditMockTestSeries = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-zinc-700/50">
+            <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-line">
               <button
                 type="button"
                 onClick={openAddMockTestModal}
-                className="flex-1 py-3 px-6 rounded-lg font-semibold text-white bg-zinc-700 hover:bg-zinc-600 transition-all duration-200"
+                className="flex-1 py-3 px-6 rounded-lg font-semibold text-white bg-elevated hover:bg-elevated transition-all duration-200"
               >
                 Add Mock Test
               </button>
               <button
                 type="button"
                 onClick={openAddAttachmentsModal}
-                className="flex-1 py-3 px-6 rounded-lg font-semibold text-white bg-zinc-700 hover:bg-zinc-600 transition-all duration-200"
+                className="flex-1 py-3 px-6 rounded-lg font-semibold text-white bg-elevated hover:bg-elevated transition-all duration-200"
               >
                 Add OMR Based Test
               </button>
@@ -872,7 +872,7 @@ const EditMockTestSeries = () => {
               </button>
               <Link
                 to="/dashboard/instructor"
-                className="flex-1 py-3 px-6 rounded-lg font-semibold text-white bg-zinc-700 hover:bg-zinc-600 transition-all duration-200 text-center"
+                className="flex-1 py-3 px-6 rounded-lg font-semibold text-white bg-elevated hover:bg-elevated transition-all duration-200 text-center"
               >
                 Cancel
               </Link>
@@ -899,11 +899,11 @@ const EditMockTestSeries = () => {
         </Modal>
         <Modal isOpen={isBulkImportModalOpen} onClose={closeBulkImportModal}>
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-white">Bulk Import Questions</h2>
+            <h2 className="text-2xl font-bold text-fg">Bulk Import Questions</h2>
 
             {/* Question Type Selector */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-200">
+              <label className="block text-sm font-medium text-fg">
                 Question Type <sup className="text-pink-400">*</sup>
               </label>
               <div className="flex gap-4">
@@ -912,7 +912,7 @@ const EditMockTestSeries = () => {
                   onClick={() => setBulkImportQuestionType('mcq')}
                   className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${bulkImportQuestionType === 'mcq'
                     ? 'bg-blue-500 text-white shadow-lg'
-                    : 'bg-zinc-700 text-gray-300 hover:bg-zinc-600'
+                    : 'bg-elevated text-muted hover:bg-elevated'
                     }`}
                 >
                   📝 Multiple Choice (MCQ)
@@ -922,7 +922,7 @@ const EditMockTestSeries = () => {
                   onClick={() => setBulkImportQuestionType('match')}
                   className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${bulkImportQuestionType === 'match'
                     ? 'bg-emerald-500 text-white shadow-lg'
-                    : 'bg-zinc-700 text-gray-300 hover:bg-zinc-600'
+                    : 'bg-elevated text-muted hover:bg-elevated'
                     }`}
                 >
                   🔗 Match the Following
@@ -933,10 +933,10 @@ const EditMockTestSeries = () => {
             {/* Format Instructions */}
             {bulkImportQuestionType === 'mcq' ? (
               <div>
-                <p className="text-gray-400 text-sm mb-2">
+                <p className="text-muted text-sm mb-2">
                   <strong>MCQ Format</strong> (6 lines per question):
                 </p>
-                <div className="bg-zinc-800 p-4 rounded-lg text-xs text-gray-300 font-mono space-y-1">
+                <div className="bg-surface p-4 rounded-lg text-xs text-muted font-mono space-y-1">
                   <div className="text-blue-400">Question text?</div>
                   <div>Option 1</div>
                   <div>Option 2</div>
@@ -944,7 +944,7 @@ const EditMockTestSeries = () => {
                   <div>Option 4</div>
                   <div className="text-green-400">Correct Answer</div>
                 </div>
-                <div className="mt-3 bg-zinc-900 p-3 rounded-lg text-xs text-gray-400 font-mono">
+                <div className="mt-3 bg-page p-3 rounded-lg text-xs text-muted font-mono">
                   <div className="text-yellow-400 mb-2">Example:</div>
                   <div>What is the capital of France?</div>
                   <div>Paris</div>
@@ -956,10 +956,10 @@ const EditMockTestSeries = () => {
               </div>
             ) : (
               <div>
-                <p className="text-gray-400 text-sm mb-2">
+                <p className="text-muted text-sm mb-2">
                   <strong>Match the Following Format</strong> (14 lines per question):
                 </p>
-                <div className="bg-zinc-800 p-4 rounded-lg text-xs text-gray-300 font-mono space-y-1">
+                <div className="bg-surface p-4 rounded-lg text-xs text-muted font-mono space-y-1">
                   <div className="text-emerald-400">Question text</div>
                   <div className="text-blue-400">a) Left Item 1</div>
                   <div className="text-blue-400">b) Left Item 2</div>
@@ -969,13 +969,13 @@ const EditMockTestSeries = () => {
                   <div className="text-orange-400">2) Right Item 2</div>
                   <div className="text-orange-400">3) Right Item 3</div>
                   <div className="text-orange-400">4) Right Item 4</div>
-                  <div className="text-gray-400">a-1 b-2 c-3 d-4</div>
-                  <div className="text-gray-400">a-2 b-1 c-3 d-4</div>
-                  <div className="text-gray-400">a-1 b-3 c-2 d-4</div>
-                  <div className="text-gray-400">a-4 b-2 c-1 d-3</div>
+                  <div className="text-muted">a-1 b-2 c-3 d-4</div>
+                  <div className="text-muted">a-2 b-1 c-3 d-4</div>
+                  <div className="text-muted">a-1 b-3 c-2 d-4</div>
+                  <div className="text-muted">a-4 b-2 c-1 d-3</div>
                   <div className="text-green-400">a-2 b-1 c-3 d-4 (Correct)</div>
                 </div>
-                <div className="mt-3 bg-zinc-900 p-3 rounded-lg text-xs text-gray-400 font-mono">
+                <div className="mt-3 bg-page p-3 rounded-lg text-xs text-muted font-mono">
                   <div className="text-yellow-400 mb-2">Example:</div>
                   <div>Match the following dams:</div>
                   <div>a) Bhakra</div>
@@ -1007,7 +1007,7 @@ const EditMockTestSeries = () => {
                   ? "What is the speed of light in vacuum?\n299,792 km/s\n300,000 km/s\n150,000 km/s\n250,000 km/s\n299,792 km/s"
                   : "Match the following dams:\na) Bhakra\nb) Hirakud\nc) Nagarjuna Sagar\nd) Sardar Sarovar\n1) Mahanadi\n2) Sutlej\n3) Krishna\n4) Narmada\na-1 b-2 c-3 d-4\na-2 b-1 c-3 d-4\na-1 b-3 c-2 d-4\na-4 b-2 c-1 d-3\na-2 b-1 c-3 d-4"
               }
-              className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 resize-none font-mono text-sm"
+              className="w-full px-4 py-3 rounded-lg bg-page border border-line text-fg placeholder-muted focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 resize-none font-mono text-sm"
             />
             <div className="flex gap-3">
               <button
@@ -1020,7 +1020,7 @@ const EditMockTestSeries = () => {
               <button
                 type="button"
                 onClick={closeBulkImportModal}
-                className="flex-1 py-3 px-6 rounded-lg font-semibold text-white bg-zinc-700 hover:bg-zinc-600 transition-all duration-200"
+                className="flex-1 py-3 px-6 rounded-lg font-semibold text-white bg-elevated hover:bg-elevated transition-all duration-200"
               >
                 Cancel
               </button>
@@ -1030,42 +1030,42 @@ const EditMockTestSeries = () => {
       </div>
 
       {/* Tips Section */}
-      <div className="sticky top-10 hidden lg:block max-w-[420px] flex-1 rounded-xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-8 shadow-2xl backdrop-blur-sm">
+      <div className="sticky top-10 hidden lg:block max-w-[420px] flex-1 rounded-xl border border-line bg-surface p-8 shadow-2xl backdrop-blur-sm">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
             <svg className="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
-          <p className="text-xl font-semibold text-white">Editing Tips</p>
+          <p className="text-xl font-semibold text-fg">Editing Tips</p>
         </div>
 
-        <ul className="space-y-4 text-sm text-gray-300">
-          <li className="flex items-start gap-3 p-3 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 transition-colors duration-200">
+        <ul className="space-y-4 text-sm text-fg">
+          <li className="flex items-start gap-3 p-3 rounded-lg bg-page border border-line hover:bg-elevated transition-colors duration-200">
             <span className="text-blue-400 mt-0.5">•</span>
             <span>Review and update the series name and description if needed.</span>
           </li>
-          <li className="flex items-start gap-3 p-3 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 transition-colors duration-200">
+          <li className="flex items-start gap-3 p-3 rounded-lg bg-page border border-line hover:bg-elevated transition-colors duration-200">
             <span className="text-purple-400 mt-0.5">•</span>
             <span>Set an appropriate price for the series.</span>
           </li>
-          <li className="flex items-start gap-3 p-3 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 transition-colors duration-200">
+          <li className="flex items-start gap-3 p-3 rounded-lg bg-page border border-line hover:bg-elevated transition-colors duration-200">
             <span className="text-pink-400 mt-0.5">•</span>
             <span>Check existing tests for any necessary modifications.</span>
           </li>
-          <li className="flex items-start gap-3 p-3 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 transition-colors duration-200">
+          <li className="flex items-start gap-3 p-3 rounded-lg bg-page border border-line hover:bg-elevated transition-colors duration-200">
             <span className="text-green-400 mt-0.5">•</span>
             <span>Create diverse questions to cover various aspects.</span>
           </li>
-          <li className="flex items-start gap-3 p-3 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 transition-colors duration-200">
+          <li className="flex items-start gap-3 p-3 rounded-lg bg-page border border-line hover:bg-elevated transition-colors duration-200">
             <span className="text-yellow-400 mt-0.5">•</span>
             <span>Double-check all questions and answers for accuracy.</span>
           </li>
-          <li className="flex items-start gap-3 p-3 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 transition-colors duration-200">
+          <li className="flex items-start gap-3 p-3 rounded-lg bg-page border border-line hover:bg-elevated transition-colors duration-200">
             <span className="text-indigo-400 mt-0.5">•</span>
             <span>Ensure a good balance of difficulty levels.</span>
           </li>
-          <li className="flex items-start gap-3 p-3 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 transition-colors duration-200">
+          <li className="flex items-start gap-3 p-3 rounded-lg bg-page border border-line hover:bg-elevated transition-colors duration-200">
             <span className="text-red-400 mt-0.5">•</span>
             <span>Preview the entire series before saving to catch any errors.</span>
           </li>

@@ -49,7 +49,7 @@ function CourseDetailsCard({ course, setConfirmationModal, handleBuyCourse }) {
   }
 
   return (
-    <div className="flex flex-col gap-4 rounded-2xl bg-richblack-700 p-4 text-richblack-5 w-full max-w-[400px] mx-auto lg:mx-0">
+    <div className="flex flex-col gap-4 rounded-2xl bg-elevated p-4 text-fg w-full max-w-[400px] mx-auto lg:mx-0">
       <Img
         src={ThumbnailImage}
         alt={course?.courseName}
@@ -83,7 +83,7 @@ function CourseDetailsCard({ course, setConfirmationModal, handleBuyCourse }) {
           )}
         </div>
 
-        <p className="pb-3 pt-6 text-center text-sm text-richblack-25">
+        <p className="pb-3 pt-6 text-center text-sm text-fg">
           30-Day Money-Back Guarantee
         </p>
 
@@ -103,7 +103,7 @@ function CourseDetailsCard({ course, setConfirmationModal, handleBuyCourse }) {
 
         <div className="text-center mt-6">
           <button
-            className="mx-auto flex items-center gap-2 py-2 px-4 text-yellow-100 hover:bg-richblack-600 rounded-md transition-all duration-200"
+            className="mx-auto flex items-center gap-2 py-2 px-4 text-yellow-100 hover:bg-elevated rounded-md transition-all duration-200"
             onClick={handleShare}
           >
             <FaShareSquare size={15} /> Share

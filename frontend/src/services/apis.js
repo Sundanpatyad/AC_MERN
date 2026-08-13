@@ -1,6 +1,6 @@
 // Override per environment with VITE_API_BASE_URL (see .env.example).
-export const BASE_URL = 'https://ac-mern-569448299007.europe-west1.run.app';
-// export const BASE_URL = 'http://localhost:8000';
+// export const BASE_URL = 'https://ac-mern-569448299007.europe-west1.run.app';
+export const BASE_URL = 'http://localhost:8000';
 
 
 export const studyMaterialEndPoints = {
@@ -14,6 +14,7 @@ export const studyMaterialEndPoints = {
   DELETE_EXAM: `${BASE_URL}/api/v1/materials/deleteExam`,
   DELETE_STUDY_MATERIALS: `${BASE_URL}/api/v1/materials/deleteStudyMaterial`,
   ADMIN_MOCK_LIST: `${BASE_URL}/api/v1/admin/users-by-mock-test`,
+  ADMIN_MOCK_PURCHASERS: `${BASE_URL}/api/v1/admin/users-by-mock-test`,
 
 }
 
