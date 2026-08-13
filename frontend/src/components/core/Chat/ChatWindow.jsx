@@ -70,13 +70,13 @@ const ChatWindow = () => {
 
   return (
     <div className="bg-black h-[100vh] pt-16 fixed w-full flex flex-col">
-      <h2 className="text-xl font-semibold p-4 bg-zinc-900">Chat</h2>
+      <h2 className="text-xl font-semibold p-4 bg-page">Chat</h2>
       <div className="flex-grow flex flex-col overflow-hidden">
         <div className="flex-grow overflow-y-auto p-4 space-y-4">
           {messages.map((msg, index) => (
             <div key={index} className={`flex ${msg.sender._id === userId ? 'justify-end' : 'justify-start'}`}>
               <div className={`p-3 rounded-lg max-w-[70%] ${
-                msg.sender._id === userId ? 'bg-slate-200 text-black' : 'bg-zinc-700 text-white'
+                msg.sender._id === userId ? 'bg-slate-200 text-black' : 'bg-elevated text-white'
               } shadow-md`}>
                 <p className="font-semibold text-sm mb-1">{msg.sender.firstName}</p>
                 <p className="text-sm">{msg.content}</p>
@@ -91,8 +91,8 @@ const ChatWindow = () => {
           <div ref={messageEndRef} />
         </div>
       </div>
-      <div className="bg-zinc-900 pb-16 lg:pb-2 p-4">
-        <div className="flex items-center space-x-2 bg-zinc-700 rounded-lg p-2">
+      <div className="bg-page pb-16 lg:pb-2 p-4">
+        <div className="flex items-center space-x-2 bg-elevated rounded-lg p-2">
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}

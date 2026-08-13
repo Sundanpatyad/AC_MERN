@@ -28,7 +28,7 @@ const CourseSection = ({setShowLoginModal}) => {
               interval={1500}
             />
       </div>
-      {/* <p className='mt-2 w-[90%] text-center text-base lg:text-lg font-bold text-richblack-300'>
+      {/* <p className='mt-2 w-[90%] text-center text-base lg:text-lg font-bold text-subtle'>
         Our courses are designed and taught by experts who have years of experience and are passionate about sharing their knowledge with you.
       </p> */}
       <div>

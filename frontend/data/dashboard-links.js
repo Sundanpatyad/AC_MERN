@@ -56,4 +56,11 @@ export const sidebarLinks = [
     type: ACCOUNT_TYPE.INSTRUCTOR,
     icon: "VscBell",
   },
+  {
+    id: 8,
+    name: "Admin Console",
+    path: "/adminMockTest",
+    type: ACCOUNT_TYPE.INSTRUCTOR,
+    icon: "VscShield",
+  },
 ];

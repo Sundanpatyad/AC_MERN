@@ -11,7 +11,7 @@ export default function MockTestsTable({ mockTests, loading }) {
 
   const SkeletonCard = () => {
     return (
-      <div className="rounded-2xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-6 shadow-2xl">
+      <div className="rounded-2xl border border-line bg-surface p-6 shadow-2xl">
         <div className="flex flex-col gap-4">
           <div className="h-6 w-3/4 rounded-lg skeleton"></div>
           <div className="h-4 w-full rounded-lg skeleton"></div>
@@ -37,16 +37,16 @@ export default function MockTestsTable({ mockTests, loading }) {
 
   if (!loading && mockTests?.length === 0) {
     return (
-      <div className="rounded-2xl border-2 border-dashed border-zinc-700 bg-zinc-900/50 p-16 text-center">
+      <div className="rounded-2xl border-2 border-dashed border-line bg-page p-16 text-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="p-4 rounded-full bg-zinc-800 border border-zinc-700">
-            <svg className="w-16 h-16 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="p-4 rounded-full bg-surface border border-line">
+            <svg className="w-16 h-16 text-subtle" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
           <div>
-            <p className="text-gray-300 text-xl font-medium">No mock tests found</p>
-            <p className="text-gray-500 text-sm mt-2">Create your first mock test series to get started</p>
+            <p className="text-muted text-xl font-medium">No mock tests found</p>
+            <p className="text-subtle text-sm mt-2">Create your first mock test series to get started</p>
           </div>
         </div>
       </div>
@@ -59,16 +59,16 @@ export default function MockTestsTable({ mockTests, loading }) {
         {mockTests?.map((series) => (
           <div
             key={series._id}
-            className="group rounded-2xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-6 shadow-2xl hover:border-zinc-600/50 transition-all duration-300"
+            className="group rounded-2xl border border-line bg-surface p-6 shadow-2xl hover:border-muted transition-all duration-300"
           >
             <div className="flex flex-col">
               {/* Header with Title and Status */}
               <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-xl font-bold text-white mb-2 capitalize">
+                  <h3 className="text-xl font-bold text-fg mb-2 capitalize">
                     {series.seriesName}
                   </h3>
-                  <p className="text-sm text-gray-400 line-clamp-2">
+                  <p className="text-sm text-muted line-clamp-2">
                     {series.description?.split(" ").length > TRUNCATE_LENGTH
                       ? series.description.split(" ").slice(0, TRUNCATE_LENGTH).join(" ") + "..."
                       : series.description}
@@ -100,8 +100,8 @@ export default function MockTestsTable({ mockTests, loading }) {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Total Tests</p>
-                    <p className="text-gray-300 font-semibold">{series.mockTests?.length || 0}</p>
+                    <p className="text-xs text-subtle">Total Tests</p>
+                    <p className="text-muted font-semibold">{series.mockTests?.length || 0}</p>
                   </div>
                 </div>
 
@@ -112,8 +112,8 @@ export default function MockTestsTable({ mockTests, loading }) {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Price</p>
-                    <p className="text-gray-300 font-semibold">₹{series.price}</p>
+                    <p className="text-xs text-subtle">Price</p>
+                    <p className="text-muted font-semibold">₹{series.price}</p>
                   </div>
                 </div>
 
@@ -124,21 +124,21 @@ export default function MockTestsTable({ mockTests, loading }) {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Students</p>
-                    <p className="text-gray-300 font-semibold">{series.studentsEnrolled?.length || 0}</p>
+                    <p className="text-xs text-subtle">Students</p>
+                    <p className="text-muted font-semibold">{series.studentsEnrolled?.length || 0}</p>
                   </div>
                 </div>
               </div>
 
               {/* Dates */}
-              <div className="flex flex-wrap gap-4 text-xs text-gray-500 mb-4 pb-4 border-b border-zinc-700/50">
+              <div className="flex flex-wrap gap-4 text-xs text-subtle mb-4 pb-4 border-b border-line">
                 <div className="flex items-center gap-1.5">
                   <span>Created:</span>
-                  <span className="text-gray-400">{formatDate(series?.createdAt)}</span>
+                  <span className="text-muted">{formatDate(series?.createdAt)}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span>Updated:</span>
-                  <span className="text-gray-400">{formatDate(series?.updatedAt)}</span>
+                  <span className="text-muted">{formatDate(series?.updatedAt)}</span>
                 </div>
               </div>
 
@@ -147,7 +147,7 @@ export default function MockTestsTable({ mockTests, loading }) {
                 <button
                   disabled={loading}
                   onClick={() => navigate(`/dashboard/edit-mock-test-series/${series._id}`)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 hover:border-blue-500/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-fg bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 hover:border-blue-500/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <FiEdit2 size={18} />
                   <span>Edit</span>

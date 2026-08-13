@@ -103,13 +103,13 @@ export function PlaceholdersAndVanishInputDemo({ onResultClick }) {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="absolute w-full left-0 right-0 z-50 bg-transparent rounded text-gray-200 shadow-lg overflow-hidden max-h-96 overflow-y-auto"
+            className="absolute w-full left-0 right-0 z-50 bg-surface border border-line rounded-xl text-fg shadow-lg overflow-hidden max-h-96 overflow-y-auto"
           >
             <div className="container mx-auto px-4 py-4">
-              {isLoading && <p className="text-center text-gray-400">Loading...</p>}
+              {isLoading && <p className="text-center text-muted">Loading...</p>}
 
               {!isLoading && searchResults.length > 0 && (
-                <ul className="divide-y divide-gray-600">
+                <ul className="divide-y divide-line">
                   {searchResults.map((result) => (
                     <motion.li
                       key={result._id}
@@ -120,16 +120,16 @@ export function PlaceholdersAndVanishInputDemo({ onResultClick }) {
                     >
                       <Link
                         to={getItemLink(result)}
-                        className="flex items-center space-x-4 transition-colors duration-200 p-2 rounded hover:bg--900"
+                        className="flex items-center space-x-4 transition-colors duration-200 p-2 rounded hover:bg-elevated"
                         onClick={handleResultClick}
                       >
                         {result.thumbnail && (
                           <img src={result.thumbnail} alt={result.name} className="w-16 h-16 object-cover rounded" />
                         )}
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-sm font-medium text-gray-200 truncate">{result.name}</h3>
-                          <p className="text-sm text-gray-400">Type: {result.type}</p>
-                          <p className="text-md text-gray-100">Price: ₹{result.price}</p>
+                          <h3 className="text-sm font-medium text-fg truncate">{result.name}</h3>
+                          <p className="text-sm text-muted">Type: {result.type}</p>
+                          <p className="text-md text-fg">Price: ₹{result.price}</p>
                         </div>
                       </Link>
                     </motion.li>
@@ -138,7 +138,7 @@ export function PlaceholdersAndVanishInputDemo({ onResultClick }) {
               )}
 
               {!isLoading && searchQuery && searchResults.length === 0 && (
-                <p className="text-center py-4 text-gray-400">No results found.</p>
+                <p className="text-center py-4 text-muted">No results found.</p>
               )}
             </div>
           </motion.div>

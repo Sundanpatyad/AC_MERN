@@ -30,11 +30,11 @@ export default function UpdatePassword() {
   return (
     <form onSubmit={handleSubmit(submitPasswordForm)} className="max-w-md mx-auto">
       <div className="my-10 rounded-lg bg-black p-8 shadow-lg">
-        <h2 className="text-2xl font-bold text-white mb-6">Update Password</h2>
+        <h2 className="text-2xl font-bold text-fg mb-6">Update Password</h2>
         <div className="space-y-6">
           {["oldPassword", "newPassword", "confirmNewPassword"].map((field) => (
             <div key={field} className="relative">
-              <label htmlFor={field} className="block text-sm font-medium text-gray-300 mb-1">
+              <label htmlFor={field} className="block text-sm font-medium text-muted mb-1">
                 {field === "oldPassword" ? "Current Password" : field === "newPassword" ? "New Password" : "Confirm New Password"}
               </label>
               <input
@@ -53,7 +53,7 @@ export default function UpdatePassword() {
                   if (field === "newPassword") setShowNewPassword(prev => !prev);
                   if (field === "confirmNewPassword") setShowConfirmNewPassword(prev => !prev);
                 }}
-                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 cursor-pointer"
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted cursor-pointer"
               >
                 {(field === "oldPassword" && showOldPassword) ||
                  (field === "newPassword" && showNewPassword) ||

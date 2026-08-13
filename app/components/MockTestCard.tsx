@@ -9,17 +9,25 @@ import {
   ViewStyle,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { Radii } from '@/constants/theme';
+import { Fonts, Radii } from '@/constants/theme';
 import { useTheme } from '@/providers/AppThemeProvider';
 
 interface MockTestCardProps {
   test: any;
   onPress?: () => void;
   showStatus?: boolean;
-  /** `default` = media card, `row` = compact list row */
-  variant?: 'default' | 'row';
+  /** `default` = media card, `row` = compact list row, `hero` = tall carousel card */
+  variant?: 'default' | 'row' | 'hero';
   style?: StyleProp<ViewStyle>;
+  /** Width for hero carousel cards */
+  heroWidth?: number;
+}
+
+function stripHtml(value?: string) {
+  if (!value) return '';
+  return value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
 export function MockTestCard({
@@ -28,10 +36,12 @@ export function MockTestCard({
   showStatus = false,
   variant = 'default',
   style,
+  heroWidth = 320,
 }: MockTestCardProps) {
   const router = useRouter();
   const { colors } = useTheme();
   const isRow = variant === 'row';
+  const isHero = variant === 'hero';
 
   const handlePress = () => {
     if (onPress) {
@@ -44,6 +54,57 @@ export function MockTestCard({
   const isFree = test.price === 0;
   const testCount = test.mockTests?.length || 0;
   const priceLabel = isFree ? 'Free' : `₹${test.price}`;
+  const description =
+    stripHtml(test.description) ||
+    `${testCount} ${testCount === 1 ? 'test' : 'tests'} · Practice and rank up`;
+  const badgeLabel = isFree ? 'Free' : showStatus ? 'Enrolled' : 'Featured';
+
+  if (isHero) {
+    return (
+      <Pressable
+        onPress={handlePress}
+        accessibilityRole="button"
+        accessibilityLabel={`${test.seriesName}, ${priceLabel}`}
+        style={({ pressed }) => [
+          styles.hero,
+          { width: heroWidth, opacity: pressed ? 0.94 : 1 },
+          style,
+        ]}
+      >
+        {test.thumbnail ? (
+          <Image source={{ uri: test.thumbnail }} style={styles.heroImage} resizeMode="cover" />
+        ) : (
+          <View style={[styles.heroPlaceholder, { backgroundColor: colors.surfaceRaised }]}>
+            <Ionicons name="book-outline" size={32} color={colors.textMuted} />
+          </View>
+        )}
+
+        <LinearGradient
+          colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.55)', 'rgba(0,0,0,0.92)']}
+          locations={[0.2, 0.55, 1]}
+          style={styles.heroGradient}
+        />
+
+        <View style={styles.heroBadge}>
+          <Text style={styles.heroBadgeText}>{badgeLabel}</Text>
+        </View>
+
+        <View style={styles.heroCopy}>
+          <View style={styles.heroTitleRow}>
+            <Text style={styles.heroTitle} numberOfLines={1}>
+              {test.seriesName}
+            </Text>
+            <Text style={styles.heroPrice} numberOfLines={1}>
+              {priceLabel}
+            </Text>
+          </View>
+          <Text style={styles.heroDesc} numberOfLines={2}>
+            {description}
+          </Text>
+        </View>
+      </Pressable>
+    );
+  }
 
   if (isRow) {
     return (
@@ -146,6 +207,70 @@ export function MockTestCard({
 }
 
 const styles = StyleSheet.create({
+  hero: {
+    height: 220,
+    borderRadius: 24,
+    overflow: 'hidden',
+    backgroundColor: '#1C1C1E',
+  },
+  heroImage: {
+    ...StyleSheet.absoluteFillObject,
+    width: '100%',
+    height: '100%',
+  },
+  heroPlaceholder: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroGradient: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  heroBadge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: Radii.pill,
+  },
+  heroBadgeText: {
+    color: '#111111',
+    fontSize: 11,
+    fontFamily: Fonts.semiBold,
+  },
+  heroCopy: {
+    position: 'absolute',
+    left: 14,
+    right: 14,
+    bottom: 14,
+    gap: 4,
+  },
+  heroTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  heroTitle: {
+    flex: 1,
+    color: '#FFFFFF',
+    fontSize: 17,
+    fontFamily: Fonts.semiBold,
+    letterSpacing: -0.2,
+  },
+  heroPrice: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontFamily: Fonts.medium,
+  },
+  heroDesc: {
+    color: 'rgba(255,255,255,0.82)',
+    fontSize: 12,
+    fontFamily: Fonts.sans,
+    lineHeight: 16,
+  },
   card: {
     borderRadius: Radii.lg,
     overflow: 'hidden',

@@ -33,7 +33,7 @@ export default function CoursesTable({ courses, setCourses, loading, setLoading 
 
   const SkeletonCard = () => {
     return (
-      <div className="rounded-2xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-6 shadow-2xl">
+      <div className="rounded-2xl border border-line bg-surface p-6 shadow-2xl">
         <div className="flex flex-col md:flex-row gap-6">
           <div className='h-48 w-full md:w-64 rounded-xl skeleton'></div>
           <div className="flex flex-col flex-1 gap-3">
@@ -62,16 +62,16 @@ export default function CoursesTable({ courses, setCourses, loading, setLoading 
 
   if (!loading && courses?.length === 0) {
     return (
-      <div className="rounded-2xl border-2 border-dashed border-zinc-700 bg-zinc-900/50 p-16 text-center">
+      <div className="rounded-2xl border-2 border-dashed border-line bg-page p-16 text-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="p-4 rounded-full bg-zinc-800 border border-zinc-700">
-            <svg className="w-16 h-16 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="p-4 rounded-full bg-surface border border-line">
+            <svg className="w-16 h-16 text-subtle" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
           </div>
           <div>
-            <p className="text-gray-300 text-xl font-medium">No courses found</p>
-            <p className="text-gray-500 text-sm mt-2">Create your first course to get started</p>
+            <p className="text-muted text-xl font-medium">No courses found</p>
+            <p className="text-subtle text-sm mt-2">Create your first course to get started</p>
           </div>
         </div>
       </div>
@@ -84,7 +84,7 @@ export default function CoursesTable({ courses, setCourses, loading, setLoading 
         {courses?.map((course) => (
           <div
             key={course._id}
-            className="group rounded-2xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-6 shadow-2xl hover:border-zinc-600/50 transition-all duration-300"
+            className="group rounded-2xl border border-line bg-surface p-6 shadow-2xl hover:border-muted transition-all duration-300"
           >
             <div className="flex flex-col lg:flex-row gap-6">
               {/* Course Thumbnail */}
@@ -113,10 +113,10 @@ export default function CoursesTable({ courses, setCourses, loading, setLoading 
               {/* Course Details */}
               <div className="flex flex-col flex-1 min-w-0">
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold text-white mb-2 capitalize line-clamp-1">
+                  <h3 className="text-xl font-bold text-fg mb-2 capitalize line-clamp-1">
                     {course.courseName}
                   </h3>
-                  <p className="text-sm text-gray-400 line-clamp-2 mb-4">
+                  <p className="text-sm text-muted line-clamp-2 mb-4">
                     {course.courseDescription.split(" ").length > TRUNCATE_LENGTH
                       ? course.courseDescription.split(" ").slice(0, TRUNCATE_LENGTH).join(" ") + "..."
                       : course.courseDescription}
@@ -130,7 +130,7 @@ export default function CoursesTable({ courses, setCourses, loading, setLoading 
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                       </div>
-                      <span className="text-gray-300">2hr 30min</span>
+                      <span className="text-muted">2hr 30min</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <div className="p-1.5 rounded-lg bg-green-500/10">
@@ -138,29 +138,29 @@ export default function CoursesTable({ courses, setCourses, loading, setLoading 
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                       </div>
-                      <span className="text-gray-300 font-semibold">₹{course.price}</span>
+                      <span className="text-muted font-semibold">₹{course.price}</span>
                     </div>
                   </div>
 
                   {/* Dates */}
-                  <div className="flex flex-wrap gap-4 text-xs text-gray-500">
+                  <div className="flex flex-wrap gap-4 text-xs text-subtle">
                     <div className="flex items-center gap-1.5">
                       <span>Created:</span>
-                      <span className="text-gray-400">{formatDate(course?.createdAt)}</span>
+                      <span className="text-muted">{formatDate(course?.createdAt)}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <span>Updated:</span>
-                      <span className="text-gray-400">{formatDate(course?.updatedAt)}</span>
+                      <span className="text-muted">{formatDate(course?.updatedAt)}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex gap-3 mt-4 pt-4 border-t border-zinc-700/50">
+                <div className="flex gap-3 mt-4 pt-4 border-t border-line">
                   <button
                     disabled={loading}
                     onClick={() => navigate(`/dashboard/edit-course/${course._id}`)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 hover:border-blue-500/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-fg bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 hover:border-blue-500/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <FiEdit2 size={18} />
                     <span>Edit</span>
@@ -177,7 +177,7 @@ export default function CoursesTable({ courses, setCourses, loading, setLoading 
                         btn2Handler: !loading ? () => setConfirmationModal(null) : () => { },
                       })
                     }}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 hover:border-red-500/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-red-400 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 hover:border-red-500/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <RiDeleteBin6Line size={18} />
                     <span>Delete</span>

@@ -9,7 +9,6 @@ const TestFooter = ({
     handleNextQuestion,
     handlePreviousQuestion,
     handleSkipQuestion,
-    isDarkMode,
     selectedAnswer
 }) => {
     const scrollContainerRef = useRef(null);
@@ -29,7 +28,7 @@ const TestFooter = ({
     }, [currentQuestionIndex]);
 
     return (
-        <div className={`flex flex-col gap-3 pt-3 md:pt-6 border-t flex-shrink-0 -mx-3 px-3 md:mx-0 md:px-0 transition-colors ${isDarkMode ? 'border-zinc-800 bg-zinc-900/50 md:bg-transparent' : 'border-gray-200 bg-white md:bg-transparent'}`}>
+        <div className="flex flex-col gap-3 pt-3 md:pt-6 border-t flex-shrink-0 -mx-3 px-3 md:mx-0 md:px-0 transition-colors border-line bg-page md:bg-transparent">
             {/* Question Numbers Horizontal Scroll */}
             <div
                 ref={scrollContainerRef}
@@ -43,12 +42,12 @@ const TestFooter = ({
                             onClick={() => handleQuestionNavigation(index)}
                             className={`flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-lg font-medium text-xs md:text-sm transition-all duration-200 border
                 ${index === currentQuestionIndex
-                                    ? 'bg-white text-black border-white shadow-lg scale-105'
+                                    ? 'bg-blue-600 text-white border-blue-600 shadow-lg scale-105'
                                     : answeredQuestions[index]
                                         ? 'bg-blue-600/20 text-blue-500 border-blue-500/30'
                                         : skippedQuestions.includes(index)
                                             ? 'bg-orange-500/20 text-orange-500 border-orange-500/30'
-                                            : (isDarkMode ? 'bg-zinc-800 text-zinc-500 border-zinc-700 hover:border-zinc-600 hover:text-zinc-300' : 'bg-gray-100 text-gray-500 border-gray-200 hover:border-gray-300 hover:text-gray-700')
+                                            : 'bg-surface text-subtle border-line hover:border-muted hover:text-fg'
                                 }`}
                         >
                             {index + 1}
@@ -63,8 +62,8 @@ const TestFooter = ({
                     disabled={currentQuestionIndex === 0}
                     className={`flex-1 py-2.5 md:py-3 rounded-xl font-semibold text-xs md:text-sm transition-all duration-200 border
             ${currentQuestionIndex > 0
-                            ? (isDarkMode ? 'bg-zinc-800 text-white hover:bg-zinc-700 border-zinc-700' : 'bg-white text-gray-900 hover:bg-gray-100 border-gray-200')
-                            : (isDarkMode ? 'bg-zinc-900 text-zinc-600 cursor-not-allowed border-zinc-800' : 'bg-gray-100 text-gray-300 cursor-not-allowed border-gray-200')
+                            ? 'bg-surface text-fg hover:bg-elevated border-line'
+                            : 'bg-page text-subtle cursor-not-allowed border-line'
                         }`}
                 >
                     Prev
@@ -72,7 +71,7 @@ const TestFooter = ({
 
                 <button
                     onClick={handleSkipQuestion}
-                    className={`flex-1 py-2.5 md:py-3 rounded-xl font-semibold text-xs md:text-sm transition-colors border ${isDarkMode ? 'text-zinc-400 bg-zinc-800/50 hover:bg-zinc-800 hover:text-white border-zinc-800' : 'text-gray-500 bg-gray-50 hover:bg-gray-100 hover:text-gray-900 border-gray-200'}`}
+                    className="flex-1 py-2.5 md:py-3 rounded-xl font-semibold text-xs md:text-sm transition-colors border text-muted bg-surface hover:bg-elevated hover:text-fg border-line"
                 >
                     Skip
                 </button>
@@ -83,7 +82,7 @@ const TestFooter = ({
                     className={`flex-[2] py-2.5 md:py-3 rounded-xl font-semibold text-xs md:text-sm shadow-lg transition-all duration-200 border
             ${selectedAnswer || answeredQuestions[currentQuestionIndex]
                             ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-blue-500/25 border-transparent'
-                            : (isDarkMode ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed border-zinc-700' : 'bg-gray-100 text-gray-300 cursor-not-allowed border-gray-200')
+                            : 'bg-surface text-subtle cursor-not-allowed border-line'
                         }`}
                 >
                     {currentQuestionIndex + 1 === totalQuestions ? 'Finish' : 'Next'}

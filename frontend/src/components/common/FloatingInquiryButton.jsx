@@ -57,8 +57,8 @@ export default function FloatingInquiryButton() {
 
   if (hideOnTest) return null;
 
-  // Keep the inquiry button at the bottom.
-  const bottomOffset = "bottom-8 md:bottom-8";
+  // Sit above the mobile bottom tab bar (h-16); desktop has no tab bar.
+  const bottomOffset = "bottom-24 md:bottom-8";
 
   return (
     <>

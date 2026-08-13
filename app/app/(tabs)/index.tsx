@@ -9,6 +9,7 @@ import {
   Linking,
   useWindowDimensions,
   Pressable,
+  TextInput,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -22,8 +23,7 @@ import { ScreenBackground } from '../../components/ui/ScreenBackground';
 import { Card } from '../../components/ui/Card';
 import { ScoreBarChart } from '../../components/ui/ScoreBarChart';
 import { HomeSkeleton } from '../../components/ui/Skeleton';
-import { BrandLogo } from '../../components/ui/BrandLogo';
-import { AppPalette, Radii } from '../../constants/theme';
+import { AppPalette, Fonts, Radii } from '../../constants/theme';
 import { useTheme } from '../../providers/AppThemeProvider';
 import { SectionHeading } from '../../components/ui/SectionHeading';
 
@@ -31,8 +31,17 @@ const YOUTUBE_CHANNEL = 'https://www.youtube.com/@awakeningclasses';
 const RANK_STORY_URL = 'https://youtu.be/zZqPFZo8IUo?si=MbeDgOr_YtO9bH_x';
 const BANNER_ASPECT = 1024 / 535;
 const H_PAD = 20;
-const BLOCK_GAP = 12;
-const SECTION_GAP = 8;
+const BLOCK_GAP = 20;
+const SECTION_GAP = 12;
+
+const FILTERS = [
+  { id: 'all', label: 'All courses' },
+  { id: 'free', label: 'Free' },
+  { id: 'premium', label: 'Premium' },
+  { id: 'new', label: 'New arrivals' },
+] as const;
+
+type FilterId = (typeof FILTERS)[number]['id'];
 
 async function openExternal(url: string) {
   try {
@@ -40,12 +49,6 @@ async function openExternal(url: string) {
   } catch {
     await Linking.openURL(url);
   }
-}
-
-function greetingForHour(hour: number) {
-  if (hour < 12) return 'Good morning';
-  if (hour < 17) return 'Good afternoon';
-  return 'Good evening';
 }
 
 export default function HomeScreen() {
@@ -56,14 +59,16 @@ export default function HomeScreen() {
   const { width: screenWidth } = useWindowDimensions();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
-  const [featuredTests, setFeaturedTests] = useState([]);
+  const [featuredTests, setFeaturedTests] = useState<any[]>([]);
   const [attempts, setAttempts] = useState<any[]>([]);
   const [personalRank, setPersonalRank] = useState<any | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [query, setQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState<FilterId>('all');
 
-  const contentWidth = screenWidth - H_PAD * 2;
-  const bannerHeight = Math.round(contentWidth / BANNER_ASPECT);
+  const bannerHeight = Math.round((screenWidth - H_PAD * 2) / BANNER_ASPECT);
+  const heroCardWidth = Math.min(320, screenWidth * 0.82);
 
   const fetchHomeData = useCallback(async () => {
     try {
@@ -82,7 +87,7 @@ export default function HomeScreen() {
             (a: any, b: any) =>
               new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           )
-          .slice(0, 4);
+          .slice(0, 10);
         setFeaturedTests(tests);
       }
 
@@ -104,6 +109,30 @@ export default function HomeScreen() {
   useEffect(() => {
     fetchHomeData();
   }, [fetchHomeData]);
+
+  const filteredTests = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return featuredTests.filter((t) => {
+      const matchesQuery =
+        !q ||
+        String(t.seriesName || '')
+          .toLowerCase()
+          .includes(q) ||
+        String(t.description || '')
+          .toLowerCase()
+          .includes(q);
+
+      if (!matchesQuery) return false;
+
+      if (activeFilter === 'free') return Number(t.price) === 0;
+      if (activeFilter === 'premium') return Number(t.price) > 0;
+      if (activeFilter === 'new') {
+        const created = new Date(t.createdAt).getTime();
+        return Date.now() - created < 1000 * 60 * 60 * 24 * 60;
+      }
+      return true;
+    });
+  }, [featuredTests, query, activeFilter]);
 
   const analytics = useMemo(() => {
     const list = [...attempts].sort(
@@ -134,15 +163,7 @@ export default function HomeScreen() {
     };
   }, [attempts]);
 
-  const metrics = [
-    { label: 'Attempts', value: String(analytics.testsTaken) },
-    { label: 'Avg', value: `${analytics.avgScore}%` },
-    {
-      label: 'Rank',
-      value: personalRank?.rank != null ? `#${personalRank.rank}` : '-',
-    },
-    { label: 'Best', value: `${analytics.bestScore}%` },
-  ];
+  const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Student';
 
   return (
     <ScreenBackground>
@@ -150,11 +171,12 @@ export default function HomeScreen() {
         contentContainerStyle={[
           styles.content,
           {
-            paddingTop: Math.max(insets.top, 20) + 8,
-            paddingBottom: 40,
+            paddingTop: Math.max(insets.top, 16) + 6,
+            paddingBottom: 48,
           },
         ]}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -170,110 +192,139 @@ export default function HomeScreen() {
           <HomeSkeleton bannerHeight={bannerHeight} />
         ) : (
           <>
-            <View style={styles.topBlock}>
-              <View style={styles.header}>
-                <View style={styles.brandRow}>
-                  <BrandLogo size={28} />
-                  <Text style={styles.brand}>Awakening Classes</Text>
+            <View style={styles.header}>
+              <Pressable
+                onPress={() => router.push('/(tabs)/profile')}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel="Open profile"
+                style={({ pressed }) => [styles.headerLeft, pressed && { opacity: 0.88 }]}
+              >
+                <View style={styles.avatar}>
+                  {user?.image ? (
+                    <Image source={{ uri: user.image }} style={styles.avatarImage} />
+                  ) : (
+                    <Text style={styles.avatarLetter}>{user?.firstName?.[0] || 'A'}</Text>
+                  )}
                 </View>
-                <Pressable
-                  onPress={() => router.push('/(tabs)/profile')}
-                  hitSlop={8}
-                  accessibilityRole="button"
-                  accessibilityLabel="Open profile"
-                  style={({ pressed }) => pressed && { opacity: 0.85 }}
-                >
-                  <View style={styles.avatar}>
-                    {user?.image ? (
-                      <Image source={{ uri: user.image }} style={styles.avatarImage} />
-                    ) : (
-                      <Text style={styles.avatarLetter}>{user?.firstName?.[0]}</Text>
-                    )}
-                  </View>
-                </Pressable>
-              </View>
+                <View style={styles.greetingBlock}>
+                  <Text style={styles.greetingLine}>Good to see you,</Text>
+                  <Text style={styles.userName} numberOfLines={1}>
+                    {displayName}
+                  </Text>
+                </View>
+              </Pressable>
 
-              <View style={styles.hero}>
-                <Text style={styles.greeting} numberOfLines={1}>
-                  {greetingForHour(new Date().getHours())}, {user?.firstName || 'there'}
-                </Text>
-                <Text style={styles.heroSub}>Ready for your next mock test?</Text>
-              </View>
-
-              <View style={styles.metrics}>
-                {metrics.map((m, i) => (
-                  <React.Fragment key={m.label}>
-                    {i > 0 ? <View style={styles.metricRule} /> : null}
-                    <View style={styles.metric}>
-                      <Text
-                        style={styles.metricValue}
-                        numberOfLines={1}
-                        adjustsFontSizeToFit
-                        minimumFontScale={0.8}
-                      >
-                        {m.value}
-                      </Text>
-                      <Text style={styles.metricLabel}>{m.label}</Text>
-                    </View>
-                  </React.Fragment>
-                ))}
-              </View>
-
-              <View style={styles.actions}>
-                <Pressable
-                  onPress={() => router.push('/(tabs)/mock-tests')}
-                  style={({ pressed }) => [
-                    styles.primaryAction,
-                    pressed && { opacity: 0.9 },
-                  ]}
-                  accessibilityRole="button"
-                  accessibilityLabel="Browse tests"
-                >
-                  <Text style={styles.primaryActionText}>Browse tests</Text>
-                  <Ionicons name="arrow-forward" size={16} color={colors.primaryButtonText} />
-                </Pressable>
-                <Pressable
-                  onPress={() => openExternal(YOUTUBE_CHANNEL)}
-                  style={({ pressed }) => [
-                    styles.secondaryAction,
-                    pressed && { opacity: 0.9 },
-                  ]}
-                  accessibilityRole="button"
-                  accessibilityLabel="Watch lectures"
-                >
-                  <Ionicons name="play-circle-outline" size={18} color={colors.text} />
-                  <Text style={styles.secondaryActionText}>Lectures</Text>
-                </Pressable>
-              </View>
+              <Pressable
+                onPress={() => router.push('/notifications')}
+                hitSlop={10}
+                accessibilityRole="button"
+                accessibilityLabel="Notifications"
+                style={({ pressed }) => [styles.bellBtn, pressed && { opacity: 0.8 }]}
+              >
+                <Ionicons name="notifications-outline" size={22} color={colors.text} />
+              </Pressable>
             </View>
 
-            <View style={styles.section}>
-              <SectionHeading
-                title="Featured"
-                rightText="See all"
-                onPressRight={() => router.push('/(tabs)/mock-tests')}
+            <View style={styles.searchBar}>
+              <TextInput
+                value={query}
+                onChangeText={setQuery}
+                placeholder="Find your next course"
+                placeholderTextColor={colors.textMuted}
+                style={styles.searchInput}
+                returnKeyType="search"
+                accessibilityLabel="Search courses"
               />
-              <View style={styles.list}>
-                {featuredTests.length > 0 ? (
-                  featuredTests.map((test: any) => (
-                    <MockTestCard key={test._id} test={test} variant="row" />
-                  ))
-                ) : (
-                  <Text style={styles.empty}>No tests available right now.</Text>
-                )}
-              </View>
+              <Pressable
+                onPress={() => router.push('/(tabs)/mock-tests')}
+                style={({ pressed }) => [
+                  styles.searchBtn,
+                  pressed && { opacity: 0.88 },
+                ]}
+                accessibilityRole="button"
+                accessibilityLabel="Browse all tests"
+              >
+                <Ionicons name="search" size={18} color={colors.text} />
+              </Pressable>
             </View>
 
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.chips}
+            >
+              {FILTERS.map((filter) => {
+                const active = activeFilter === filter.id;
+                return (
+                  <Pressable
+                    key={filter.id}
+                    onPress={() => setActiveFilter(filter.id)}
+                    style={({ pressed }) => [
+                      styles.chip,
+                      active && styles.chipActive,
+                      pressed && { opacity: 0.9 },
+                    ]}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: active }}
+                  >
+                    <Text style={[styles.chipText, active && styles.chipTextActive]}>
+                      {filter.label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+
             <View style={styles.section}>
+              <View style={styles.sectionPad}>
+                <SectionHeading
+                  title="Popular courses"
+                  serif
+                  rightText="See all"
+                  onPressRight={() => router.push('/(tabs)/mock-tests')}
+                />
+              </View>
+
+              {filteredTests.length > 0 ? (
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  decelerationRate="fast"
+                  snapToInterval={heroCardWidth + 14}
+                  contentContainerStyle={styles.carousel}
+                >
+                  {filteredTests.map((test: any) => (
+                    <MockTestCard
+                      key={test._id}
+                      test={test}
+                      variant="hero"
+                      heroWidth={heroCardWidth}
+                    />
+                  ))}
+                </ScrollView>
+              ) : (
+                <View style={styles.sectionPad}>
+                  <Text style={styles.empty}>No courses match your search.</Text>
+                </View>
+              )}
+            </View>
+
+            <View style={[styles.section, styles.sectionPad]}>
               <SectionHeading
-                title="Progress"
+                title="Your progress"
+                serif
                 rightText="History"
                 onPressRight={() => router.push('/(tabs)/my-tests')}
               />
               <Card padding={14}>
                 {analytics.chartData.length > 0 ? (
                   <>
-                    <Text style={styles.chartLabel}>Recent scores</Text>
+                    <View style={styles.progressMeta}>
+                      <Text style={styles.metaPill}>{analytics.testsTaken} attempts</Text>
+                      <Text style={styles.metaPill}>Avg {analytics.avgScore}%</Text>
+                      <Text style={styles.metaPill}>Best {analytics.bestScore}%</Text>
+                    </View>
                     <ScoreBarChart data={analytics.chartData} height={112} />
                   </>
                 ) : (
@@ -296,9 +347,10 @@ export default function HomeScreen() {
               </Card>
             </View>
 
-            <View style={styles.section}>
+            <View style={[styles.section, styles.sectionPad]}>
               <SectionHeading
                 title="Standing"
+                serif
                 rightText="Leaderboard"
                 onPressRight={() => router.push('/(tabs)/rankings')}
               />
@@ -333,8 +385,8 @@ export default function HomeScreen() {
               </Pressable>
             </View>
 
-            <View style={styles.section}>
-              <SectionHeading title="Spotlight" />
+            <View style={[styles.section, styles.sectionPad]}>
+              <SectionHeading title="Spotlight" serif />
               <Pressable
                 onPress={() => openExternal(RANK_STORY_URL)}
                 style={({ pressed }) => [
@@ -350,6 +402,20 @@ export default function HomeScreen() {
                   resizeMode="cover"
                 />
               </Pressable>
+
+              <Pressable
+                onPress={() => openExternal(YOUTUBE_CHANNEL)}
+                style={({ pressed }) => [
+                  styles.lectureRow,
+                  pressed && { opacity: 0.9 },
+                ]}
+                accessibilityRole="button"
+                accessibilityLabel="Watch lectures"
+              >
+                <Ionicons name="play-circle-outline" size={20} color={colors.text} />
+                <Text style={styles.lectureText}>Watch free lectures on YouTube</Text>
+                <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
+              </Pressable>
             </View>
           </>
         )}
@@ -361,37 +427,28 @@ export default function HomeScreen() {
 function createStyles(colors: AppPalette) {
   return StyleSheet.create({
     content: {
-      paddingHorizontal: H_PAD,
       gap: BLOCK_GAP,
     },
-    topBlock: {
-      gap: 12,
+    sectionPad: {
+      paddingHorizontal: H_PAD,
     },
     header: {
+      paddingHorizontal: H_PAD,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      minHeight: 36,
+      gap: 12,
     },
-    brandRow: {
+    headerLeft: {
+      flex: 1,
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 10,
-      flex: 1,
-      paddingRight: 12,
+      gap: 12,
       minWidth: 0,
     },
-    brand: {
-      fontSize: 12,
-      fontWeight: '700',
-      color: colors.textSecondary,
-      letterSpacing: 0.7,
-      textTransform: 'uppercase',
-      flexShrink: 1,
-    },
     avatar: {
-      width: 36,
-      height: 36,
+      width: 44,
+      height: 44,
       borderRadius: 999,
       backgroundColor: colors.surfaceRaised,
       borderWidth: StyleSheet.hairlineWidth,
@@ -401,121 +458,114 @@ function createStyles(colors: AppPalette) {
       overflow: 'hidden',
     },
     avatarImage: {
-      width: 36,
-      height: 36,
+      width: 44,
+      height: 44,
     },
     avatarLetter: {
-      fontSize: 14,
+      fontSize: 16,
       fontWeight: '700',
       color: colors.text,
     },
-    hero: {
+    greetingBlock: {
+      flex: 1,
+      minWidth: 0,
       gap: 2,
     },
-    greeting: {
-      fontSize: 26,
-      fontWeight: '700',
-      color: colors.text,
-      letterSpacing: -0.5,
-    },
-    heroSub: {
-      fontSize: 14,
+    greetingLine: {
+      fontSize: 13,
       color: colors.textSecondary,
-      lineHeight: 20,
+      fontWeight: '400',
     },
-    metrics: {
-      flexDirection: 'row',
-      alignItems: 'stretch',
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-      borderRadius: Radii.lg,
-      paddingVertical: 12,
-    },
-    metric: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 2,
-      paddingHorizontal: 4,
-    },
-    metricValue: {
-      fontSize: 17,
-      fontWeight: '700',
+    userName: {
+      fontSize: 28,
+      lineHeight: 34,
       color: colors.text,
+      fontFamily: Fonts.semiBold,
       letterSpacing: -0.3,
-      textAlign: 'center',
-      width: '100%',
     },
-    metricLabel: {
-      fontSize: 11,
-      fontWeight: '500',
-      color: colors.textMuted,
-      textAlign: 'center',
-    },
-    metricRule: {
-      width: StyleSheet.hairlineWidth,
-      height: 28,
-      alignSelf: 'center',
-      backgroundColor: colors.borderStrong,
-    },
-    actions: {
-      flexDirection: 'row',
-      gap: 8,
-    },
-    primaryAction: {
-      flex: 1.35,
-      minHeight: 44,
-      borderRadius: Radii.md,
-      backgroundColor: colors.text,
-      paddingHorizontal: 14,
-      flexDirection: 'row',
+    bellBtn: {
+      width: 42,
+      height: 42,
+      borderRadius: 999,
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    searchBar: {
+      marginHorizontal: H_PAD,
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.surfaceRaised,
+      borderRadius: Radii.pill,
+      paddingLeft: 18,
+      paddingRight: 6,
+      paddingVertical: 6,
       gap: 8,
+      minHeight: 52,
     },
-    primaryActionText: {
-      color: colors.primaryButtonText,
-      fontSize: 14,
-      fontWeight: '700',
-    },
-    secondaryAction: {
+    searchInput: {
       flex: 1,
-      minHeight: 44,
-      borderRadius: Radii.md,
+      color: colors.text,
+      fontSize: 15,
+      paddingVertical: 8,
+    },
+    searchBtn: {
+      width: 40,
+      height: 40,
+      borderRadius: 999,
       backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-      paddingHorizontal: 12,
-      flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: 6,
     },
-    secondaryActionText: {
+    chips: {
+      paddingHorizontal: H_PAD,
+      gap: 10,
+    },
+    chip: {
+      paddingHorizontal: 16,
+      paddingVertical: 11,
+      borderRadius: Radii.pill,
+      backgroundColor: colors.surfaceRaised,
+    },
+    chipActive: {
+      backgroundColor: colors.text,
+    },
+    chipText: {
       color: colors.text,
-      fontSize: 14,
+      fontSize: 13,
+      fontWeight: '500',
+    },
+    chipTextActive: {
+      color: colors.primaryButtonText,
       fontWeight: '600',
     },
     section: {
       gap: SECTION_GAP,
     },
-    list: {
-      gap: 8,
-    },
-    chartLabel: {
-      fontSize: 11,
-      fontWeight: '700',
-      letterSpacing: 0.4,
-      textTransform: 'uppercase',
-      color: colors.textSecondary,
-      marginBottom: 8,
+    carousel: {
+      paddingHorizontal: H_PAD,
+      gap: 14,
     },
     empty: {
       textAlign: 'center',
       color: colors.textMuted,
       fontSize: 13,
-      paddingVertical: 8,
+      paddingVertical: 12,
+    },
+    progressMeta: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+      marginBottom: 12,
+    },
+    metaPill: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      backgroundColor: colors.surfaceRaised,
+      overflow: 'hidden',
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: Radii.pill,
     },
     emptyRow: {
       flexDirection: 'row',
@@ -570,7 +620,7 @@ function createStyles(colors: AppPalette) {
     },
     banner: {
       width: '100%',
-      borderRadius: Radii.lg,
+      borderRadius: 24,
       overflow: 'hidden',
       borderWidth: 1,
       borderColor: colors.border,
@@ -579,6 +629,18 @@ function createStyles(colors: AppPalette) {
     bannerImage: {
       width: '100%',
       height: '100%',
+    },
+    lectureRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      paddingVertical: 4,
+    },
+    lectureText: {
+      flex: 1,
+      fontSize: 14,
+      fontWeight: '500',
+      color: colors.text,
     },
   });
 }

@@ -11,7 +11,7 @@ const Modal = ({ isOpen, onClose, children }) => {
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          className="absolute top-4 right-4 text-muted hover:text-gray-600 dark:hover:text-muted transition-colors"
         >
           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -58,7 +58,7 @@ const AddMockTest = ({ seriesId, onClose }) => {
       <h2 className="text-3xl font-bold mb-8 text-gray-800 dark:text-gray-100">Add New Mock Test</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label htmlFor="testName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="testName" className="block text-sm font-medium text-gray-700 dark:text-muted mb-2">
             Test Name
           </label>
           <input
@@ -71,7 +71,7 @@ const AddMockTest = ({ seriesId, onClose }) => {
           />
         </div>
         <div>
-          <label htmlFor="testData" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="testData" className="block text-sm font-medium text-gray-700 dark:text-muted mb-2">
             Test Data
           </label>
           <textarea
@@ -81,11 +81,11 @@ const AddMockTest = ({ seriesId, onClose }) => {
             required
             rows="10"
             placeholder="Enter questions and answers here. Each question should be followed by 4 options and the correct answer, each on a new line."
-            className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+            className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 placeholder-muted dark:placeholder-muted"
           />
         </div>
         <div>
-          <label htmlFor="duration" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="duration" className="block text-sm font-medium text-gray-700 dark:text-muted mb-2">
             Duration (in minutes)
           </label>
           <input

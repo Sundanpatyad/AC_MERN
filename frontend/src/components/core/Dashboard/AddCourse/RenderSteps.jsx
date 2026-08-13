@@ -39,7 +39,7 @@ export default function RenderSteps() {
                     ? "border-blue-400 bg-gradient-to-br from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/50 scale-110"
                     : step > item.id
                       ? "border-green-400 bg-gradient-to-br from-green-500 to-emerald-500 text-white shadow-lg shadow-green-500/50"
-                      : "border-zinc-600 bg-zinc-800 text-zinc-400"
+                      : "border-line bg-surface text-muted"
                   }`}
               >
                 {step > item.id ? (
@@ -55,7 +55,7 @@ export default function RenderSteps() {
               <div className="h-[25px] w-[33%] flex items-center">
                 <div className={`h-1 w-full rounded-full transition-all duration-500 ${step > item.id
                     ? "bg-gradient-to-r from-green-400 to-emerald-400 shadow-md shadow-green-400/50"
-                    : "bg-zinc-700"
+                    : "bg-elevated"
                   }`}>
                 </div>
               </div>
@@ -71,8 +71,8 @@ export default function RenderSteps() {
             key={item.id}
           >
             <p className={`text-sm font-medium transition-all duration-300 ${step >= item.id
-                ? "text-white font-semibold"
-                : "text-zinc-500"
+                ? "text-fg font-semibold"
+                : "text-subtle"
               }`}>
               {item.title}
             </p>

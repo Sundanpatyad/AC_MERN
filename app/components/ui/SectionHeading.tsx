@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, StyleProp, ViewStyle } from 'react-native';
 import { useTheme } from '@/providers/AppThemeProvider';
-import { AppPalette } from '@/constants/theme';
+import { AppPalette, Fonts } from '@/constants/theme';
 
 type Props = {
   title: string;
@@ -9,16 +9,25 @@ type Props = {
   rightText?: string;
   onPressRight?: () => void;
   style?: StyleProp<ViewStyle>;
+  /** Large editorial serif title (home / marketing sections) */
+  serif?: boolean;
 };
 
-export function SectionHeading({ title, subtitle, rightText, onPressRight, style }: Props) {
+export function SectionHeading({
+  title,
+  subtitle,
+  rightText,
+  onPressRight,
+  style,
+  serif = false,
+}: Props) {
   const { colors } = useTheme();
   const styles = createStyles(colors);
 
   return (
     <View style={[styles.root, style]}>
       <View style={styles.row}>
-        <Text style={styles.title}>{title}</Text>
+        <Text style={[styles.title, serif && styles.titleSerif]}>{title}</Text>
         {rightText && onPressRight && (
           <TouchableOpacity onPress={onPressRight} hitSlop={8}>
             <Text style={styles.right}>{rightText}</Text>
@@ -46,10 +55,17 @@ function createStyles(colors: AppPalette) {
       color: colors.text,
       letterSpacing: -0.2,
     },
+    titleSerif: {
+      fontSize: 26,
+      fontFamily: Fonts.semiBold,
+      letterSpacing: -0.3,
+      lineHeight: 32,
+    },
     right: {
       fontSize: 13,
-      fontWeight: '600',
+      fontWeight: '500',
       color: colors.textSecondary,
+      paddingBottom: 4,
     },
     subtitle: {
       marginTop: 6,

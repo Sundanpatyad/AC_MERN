@@ -55,10 +55,10 @@ const BottomBar = () => {
           />
         ) : (
           <NavItem
-            to="/dashboard/my-courses"
+            to="/adminMockTest"
             icon={MdOutlineAdminPanelSettings}
             label="Admin"
-            active={isActive('/dashboard/my-courses')}
+            active={isActive('/adminMockTest')}
           />
         )}
 

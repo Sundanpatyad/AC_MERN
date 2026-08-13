@@ -76,7 +76,7 @@ export default function ChangeProfilePicture() {
           </div>
         </div>
         <div className="space-y-4 text-center sm:text-left">
-          <p className="text-gray-300 text-sm sm:text-base">
+          <p className="text-muted text-sm sm:text-base">
             Upload a new profile picture. <br />
             Image should be in PNG, JPG, or GIF format.
           </p>

@@ -70,7 +70,7 @@ const optionValue = (opt) => {
 
 // ─── Sub-components ─────────────────────────────────────────────────────────
 
-const OptionButton = ({ opt, index, isDarkMode, isSelected, onClick }) => {
+const OptionButton = ({ opt, index, isSelected, onClick }) => {
     const { text, image } = normaliseOption(opt);
     const hasImage = !!image;
     const hasText = !!text;
@@ -78,9 +78,7 @@ const OptionButton = ({ opt, index, isDarkMode, isSelected, onClick }) => {
 
     const baseClass = `group relative p-3 md:p-4 text-left rounded-xl border-2 transition-all duration-200 hover:shadow-lg`;
     const selectedClass = 'bg-blue-600/10 border-blue-500 shadow-blue-500/10';
-    const unselectedClass = isDarkMode
-        ? 'bg-zinc-800/30 border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800'
-        : 'bg-white border-gray-200 hover:border-gray-400 hover:bg-gray-50';
+    const unselectedClass = 'bg-surface border-line hover:border-muted hover:bg-surface';
 
     return (
         <button
@@ -94,14 +92,12 @@ const OptionButton = ({ opt, index, isDarkMode, isSelected, onClick }) => {
                         className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors
                             ${isSelected
                                 ? 'border-blue-500 bg-blue-500'
-                                : isDarkMode
-                                    ? 'border-zinc-500 group-hover:border-zinc-400'
-                                    : 'border-gray-300 group-hover:border-gray-400'
+                                : 'border-line group-hover:border-muted'
                             }`}
                     >
                         {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
                     </div>
-                    <span className={`text-xs font-bold ${isSelected ? 'text-blue-400' : 'text-zinc-500'}`}>
+                    <span className={`text-xs font-bold ${isSelected ? 'text-blue-400' : 'text-subtle'}`}>
                         {label}
                     </span>
                 </div>
@@ -116,8 +112,8 @@ const OptionButton = ({ opt, index, isDarkMode, isSelected, onClick }) => {
                     <span
                         className={`text-xs md:text-base leading-snug
                             ${isSelected
-                                ? isDarkMode ? 'text-white' : 'text-gray-900'
-                                : isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                ? 'text-fg'
+                                : 'text-muted'
                             }`}
                     >
                         {text}
@@ -132,7 +128,6 @@ const OptionButton = ({ opt, index, isDarkMode, isSelected, onClick }) => {
 
 const QuestionArea = ({
     currentQuestionData,
-    isDarkMode,
     selectedAnswer,
     handleAnswerSelect,
 }) => {
@@ -143,7 +138,7 @@ const QuestionArea = ({
         <div className="flex-1 overflow-y-auto space-y-4 min-h-0">
 
             {/* ── Question ── */}
-            <div className={`prose max-w-none ${isDarkMode ? 'prose-invert' : 'prose-slate'}`}>
+            <div className="prose max-w-none prose-slate dark:prose-invert">
                 {/* Question thumbnail image — click to expand */}
                 {questionImage && (
                     <div className="mb-4">
@@ -158,8 +153,7 @@ const QuestionArea = ({
                 {/* Question text */}
                 {questionText && (
                     <h3
-                        className={`text-base md:text-2xl leading-snug font-medium whitespace-pre-line
-                            ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}
+                        className="text-base md:text-2xl leading-snug font-medium whitespace-pre-line text-fg"
                     >
                         {questionText.replace(/\\n/g, '\n')}
                     </h3>
@@ -180,15 +174,12 @@ const QuestionArea = ({
                             {currentQuestionData.leftColumn.map((item, idx) => (
                                 <div
                                     key={`left-${idx}`}
-                                    className={`flex items-start gap-2 md:gap-4 p-2 md:p-4 rounded-lg md:rounded-xl border transition-colors
-                                        ${isDarkMode
-                                            ? 'bg-zinc-800/50 border-zinc-700/50 hover:bg-zinc-800'
-                                            : 'bg-gray-50 border-gray-200 hover:bg-gray-100'}`}
+                                    className="flex items-start gap-2 md:gap-4 p-2 md:p-4 rounded-lg md:rounded-xl border transition-colors bg-surface border-line hover:bg-surface"
                                 >
                                     <span className="flex-shrink-0 w-4 h-4 md:w-6 md:h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-[10px] md:text-xs font-bold mt-0.5">
                                         {String.fromCharCode(97 + idx)}
                                     </span>
-                                    <span className={`text-[10px] md:text-base leading-snug ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    <span className="text-[10px] md:text-base leading-snug text-muted">
                                         {item.replace(/^[a-z]\)\s*/, '')}
                                     </span>
                                 </div>
@@ -203,15 +194,12 @@ const QuestionArea = ({
                             {currentQuestionData.rightColumn.map((item, idx) => (
                                 <div
                                     key={`right-${idx}`}
-                                    className={`flex items-start gap-2 md:gap-4 p-2 md:p-4 rounded-lg md:rounded-xl border transition-colors
-                                        ${isDarkMode
-                                            ? 'bg-zinc-800/50 border-zinc-700/50 hover:bg-zinc-800'
-                                            : 'bg-gray-50 border-gray-200 hover:bg-gray-100'}`}
+                                    className="flex items-start gap-2 md:gap-4 p-2 md:p-4 rounded-lg md:rounded-xl border transition-colors bg-surface border-line hover:bg-surface"
                                 >
                                     <span className="flex-shrink-0 w-4 h-4 md:w-6 md:h-6 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center text-[10px] md:text-xs font-bold mt-0.5">
                                         {idx + 1}
                                     </span>
-                                    <span className={`text-[10px] md:text-base leading-snug ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    <span className="text-[10px] md:text-base leading-snug text-muted">
                                         {item.replace(/^\d+\)\s*/, '')}
                                     </span>
                                 </div>
@@ -232,7 +220,6 @@ const QuestionArea = ({
                             key={index}
                             opt={opt}
                             index={index}
-                            isDarkMode={isDarkMode}
                             isSelected={selectedAnswer === value}
                             onClick={() => handleAnswerSelect(value)}
                         />

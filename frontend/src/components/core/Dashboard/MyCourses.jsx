@@ -50,10 +50,10 @@ export default function MyCoursesAndTests() {
       {/* Header Section */}
       <div className="mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <h1 className="text-4xl font-bold text-white bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+          <h1 className="text-4xl font-bold text-fg mb-2">
             My Courses and Tests
           </h1>
-          <p className="text-gray-400 text-sm">Manage your courses and mock tests</p>
+          <p className="text-muted text-sm">Manage your courses and mock tests</p>
         </div>
 
         <div className="flex flex-wrap gap-3">
@@ -89,7 +89,7 @@ export default function MyCoursesAndTests() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-white">My Courses</h2>
+          <h2 className="text-2xl font-bold text-fg">My Courses</h2>
           <span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-sm font-medium">
             {courses?.length || 0}
           </span>
@@ -112,7 +112,7 @@ export default function MyCoursesAndTests() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-white">My Mock Tests</h2>
+          <h2 className="text-2xl font-bold text-fg">My Mock Tests</h2>
           <span className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-sm font-medium">
             {mockTests?.length || 0}
           </span>

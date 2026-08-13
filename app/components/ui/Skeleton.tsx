@@ -1,5 +1,13 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { Animated, StyleSheet, View, ViewStyle, StyleProp, DimensionValue } from 'react-native';
+import {
+  Animated,
+  ScrollView,
+  StyleSheet,
+  View,
+  ViewStyle,
+  StyleProp,
+  DimensionValue,
+} from 'react-native';
 import { AppPalette, Radii } from '@/constants/theme';
 import { useTheme } from '@/providers/AppThemeProvider';
 
@@ -85,41 +93,31 @@ export function HomeSkeleton({ bannerHeight = 180 }: { bannerHeight?: number }) 
   return (
     <View style={styles.homeColumn}>
       <View style={styles.homeHeader}>
-        <Skeleton height={12} width={150} />
-        <SkeletonCircle size={36} />
-      </View>
-
-      <View style={{ gap: 8 }}>
-        <Skeleton height={28} width="72%" />
-        <Skeleton height={14} width="55%" />
-      </View>
-
-      <View style={[styles.block, { marginBottom: 0, paddingVertical: 16 }]}>
-        <View style={[styles.statsRow, { marginBottom: 0 }]}>
-          <Skeleton height={42} style={{ flex: 1 }} borderRadius={Radii.sm} />
-          <Skeleton height={42} style={{ flex: 1 }} borderRadius={Radii.sm} />
-          <Skeleton height={42} style={{ flex: 1 }} borderRadius={Radii.sm} />
-          <Skeleton height={42} style={{ flex: 1 }} borderRadius={Radii.sm} />
-        </View>
-      </View>
-
-      <View style={styles.homeGrid}>
-        <Skeleton height={48} style={{ flex: 1.35 }} borderRadius={Radii.md} />
-        <Skeleton height={48} style={{ flex: 1 }} borderRadius={Radii.md} />
-      </View>
-
-      <Skeleton height={18} width={90} />
-      {[0, 1, 2].map((i) => (
-        <View key={i} style={[styles.block, styles.homeRow, { marginBottom: 0 }]}>
-          <Skeleton height={64} width={64} borderRadius={Radii.md} />
-          <View style={{ flex: 1, gap: 8 }}>
-            <Skeleton height={14} width="78%" />
-            <Skeleton height={11} width="48%" />
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
+          <SkeletonCircle size={44} />
+          <View style={{ gap: 8, flex: 1 }}>
+            <Skeleton height={12} width={110} />
+            <Skeleton height={26} width="68%" />
           </View>
         </View>
-      ))}
+        <SkeletonCircle size={28} />
+      </View>
 
-      <Skeleton height={18} width={80} />
+      <Skeleton height={52} borderRadius={Radii.pill} />
+
+      <View style={{ flexDirection: 'row', gap: 10 }}>
+        <Skeleton height={40} width={100} borderRadius={Radii.pill} />
+        <Skeleton height={40} width={72} borderRadius={Radii.pill} />
+        <Skeleton height={40} width={96} borderRadius={Radii.pill} />
+      </View>
+
+      <Skeleton height={28} width={180} />
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 14 }}>
+        <Skeleton height={220} width={320} borderRadius={24} />
+        <Skeleton height={220} width={320} borderRadius={24} />
+      </ScrollView>
+
+      <Skeleton height={28} width={150} />
       <View style={[styles.block, { marginBottom: 0 }]}>
         <Skeleton height={12} width={100} style={{ marginBottom: 12 }} />
         <View style={styles.chartRow}>
@@ -129,7 +127,7 @@ export function HomeSkeleton({ bannerHeight = 180 }: { bannerHeight?: number }) 
         </View>
       </View>
 
-      <Skeleton height={18} width={90} />
+      <Skeleton height={28} width={110} />
       <View style={[styles.block, styles.homeRow, { marginBottom: 0 }]}>
         <Skeleton height={40} width={40} borderRadius={12} />
         <View style={{ flex: 1, gap: 8 }}>
@@ -138,8 +136,8 @@ export function HomeSkeleton({ bannerHeight = 180 }: { bannerHeight?: number }) 
         </View>
       </View>
 
-      <Skeleton height={18} width={80} />
-      <Skeleton height={bannerHeight} borderRadius={Radii.lg} />
+      <Skeleton height={28} width={100} />
+      <Skeleton height={bannerHeight} borderRadius={24} />
     </View>
   );
 }

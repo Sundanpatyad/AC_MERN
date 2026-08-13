@@ -5,8 +5,7 @@ const ConfirmationModal = ({
     onCancel, 
     onConfirm, 
     totalQuestions, 
-    answeredCount, 
-    isDarkMode 
+    answeredCount
 }) => {
     if (!isOpen) return null;
 
@@ -19,8 +18,7 @@ const ConfirmationModal = ({
             />
             
             {/* Modal Content */}
-            <div className={`relative w-full max-w-md transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-2xl transition-all border
-                ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-100'}`}>
+            <div className="relative w-full max-w-md transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-2xl transition-all border bg-page border-line">
                 
                 <div className="flex flex-col items-center text-center space-y-4">
                     {/* Icon */}
@@ -30,23 +28,23 @@ const ConfirmationModal = ({
                         </svg>
                     </div>
 
-                    <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                    <h3 className="text-xl font-bold text-fg">
                         Finish Mock Test?
                     </h3>
                     
-                    <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-gray-500'}`}>
+                    <p className="text-sm text-muted">
                         Are you sure you want to submit your test? Once submitted, you cannot change your answers.
                     </p>
 
                     {/* Stats Summary */}
-                    <div className={`w-full grid grid-cols-2 gap-3 p-4 rounded-xl ${isDarkMode ? 'bg-zinc-800/50' : 'bg-gray-50'}`}>
+                    <div className="w-full grid grid-cols-2 gap-3 p-4 rounded-xl bg-surface">
                         <div className="text-center">
-                            <p className="text-[10px] uppercase tracking-wider font-semibold text-zinc-500">Answered</p>
-                            <p className={`text-2xl font-bold ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>{answeredCount}</p>
+                            <p className="text-[10px] uppercase tracking-wider font-semibold text-subtle">Answered</p>
+                            <p className="text-2xl font-bold text-blue-500">{answeredCount}</p>
                         </div>
-                        <div className="text-center border-l border-zinc-700/30">
-                            <p className="text-[10px] uppercase tracking-wider font-semibold text-zinc-500">Left</p>
-                            <p className={`text-2xl font-bold ${isDarkMode ? 'text-orange-400' : 'text-orange-600'}`}>{totalQuestions - answeredCount}</p>
+                        <div className="text-center border-l border-line">
+                            <p className="text-[10px] uppercase tracking-wider font-semibold text-subtle">Left</p>
+                            <p className="text-2xl font-bold text-orange-500">{totalQuestions - answeredCount}</p>
                         </div>
                     </div>
 
@@ -59,10 +57,7 @@ const ConfirmationModal = ({
                         </button>
                         <button
                             onClick={onCancel}
-                            className={`w-full py-3 px-4 font-semibold rounded-xl transition-colors
-                                ${isDarkMode 
-                                    ? 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700' 
-                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                            className="w-full py-3 px-4 font-semibold rounded-xl transition-colors bg-surface text-muted hover:bg-elevated"
                         >
                             Go Back to Test
                         </button>

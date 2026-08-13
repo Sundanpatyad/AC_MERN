@@ -30,15 +30,6 @@ const AttemptMockTest = () => {
 
     const { GET_MCOKTEST_SERIES_BY_ID, CREATE_ATTEMPT_DETAILS } = mocktestEndpoints;
 
-    const [isDarkMode, setIsDarkMode] = useState(() => {
-        const savedMode = localStorage.getItem('mockTestDarkMode');
-        return savedMode ? JSON.parse(savedMode) : false;
-    });
-
-    useEffect(() => {
-        localStorage.setItem('mockTestDarkMode', JSON.stringify(isDarkMode));
-    }, [isDarkMode]);
-
     // Handle session cleanup on navigation vs refresh
     const isBrowserRefresh = useRef(false);
 
@@ -419,11 +410,11 @@ const AttemptMockTest = () => {
     const currentQuestionData = currentTest.questions[currentQuestion];
 
     return (
-        <div className={`min-h-screen flex flex-col items-center justify-center font-inter transition-colors duration-300 ${isDarkMode ? 'bg-black' : 'bg-gray-200'}`}>
-            <div className={`w-full h-screen shadow-2xl p-3 md:p-10 space-y-4 md:space-y-8 backdrop-blur-sm relative overflow-hidden flex flex-col transition-colors duration-300 ${isDarkMode ? 'bg-zinc-900/50' : 'bg-gray-50'}`}>
+        <div className="min-h-screen flex flex-col items-center justify-center font-inter transition-colors duration-300 bg-page">
+            <div className="w-full h-screen shadow-2xl p-3 md:p-10 space-y-4 md:space-y-8 backdrop-blur-sm relative overflow-hidden flex flex-col transition-colors duration-300 bg-page">
 
                 {/* Progress Bar */}
-                <div className={`absolute top-0 left-0 w-full h-1 ${isDarkMode ? 'bg-zinc-800' : 'bg-gray-300'}`}>
+                <div className="absolute top-0 left-0 w-full h-1 bg-surface">
                     <div
                         className="h-full bg-gradient-to-r from-blue-500 to-emerald-500 transition-all duration-300"
                         style={{ width: `${((currentQuestion + 1) / currentTest.questions.length) * 100}%` }}
@@ -435,14 +426,11 @@ const AttemptMockTest = () => {
                     currentQuestionIndex={currentQuestion}
                     totalQuestions={currentTest.questions.length}
                     timeLeft={timeLeft}
-                    isDarkMode={isDarkMode}
-                    setIsDarkMode={setIsDarkMode}
                     formatTime={formatTime}
                 />
 
                 <QuestionArea
                     currentQuestionData={currentQuestionData}
-                    isDarkMode={isDarkMode}
                     selectedAnswer={selectedAnswer}
                     handleAnswerSelect={handleAnswerSelect}
                 />
@@ -456,7 +444,6 @@ const AttemptMockTest = () => {
                     handleNextQuestion={handleNextQuestion}
                     handlePreviousQuestion={handlePreviousQuestion}
                     handleSkipQuestion={handleSkipQuestion}
-                    isDarkMode={isDarkMode}
                     selectedAnswer={selectedAnswer}
                 />
 
@@ -469,7 +456,6 @@ const AttemptMockTest = () => {
                     }}
                     totalQuestions={currentTest.questions.length}
                     answeredCount={answeredQuestions.filter(Boolean).length}
-                    isDarkMode={isDarkMode}
                 />
             </div>
         </div>

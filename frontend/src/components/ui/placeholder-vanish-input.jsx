@@ -200,8 +200,8 @@ export function PlaceholdersAndVanishInput({
       `}</style>
       <form
         className={cn(
-          "w-full relative max-w-xl mx-auto bg-white dark:bg-zinc-900 h-12 rounded-full overflow-hidden shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),_0px_1px_0px_0px_rgba(25,28,33,0.02),_0px_0px_0px_1px_rgba(25,28,33,0.08)] transition duration-200",
-          value && "bg-gray-50"
+          "w-full relative max-w-xl mx-auto bg-surface border border-line h-12 rounded-full overflow-hidden transition duration-200",
+          value && "bg-elevated"
         )}
         onSubmit={handleSubmit}
       >
@@ -224,7 +224,7 @@ export function PlaceholdersAndVanishInput({
           value={value}
           type="text"
           className={cn(
-            "w-full relative text-sm sm:text-base z-50 border-none text-white bg-transparent h-full rounded-full focus:outline-none focus:ring-0 pl-4 sm:pl-10 pr-20",
+            "w-full relative text-sm sm:text-base z-50 border-none text-fg bg-transparent h-full rounded-full focus:outline-none focus:ring-0 pl-4 sm:pl-10 pr-20",
             animating && "text-transparent dark:text-transparent"
           )}
         />
@@ -250,7 +250,7 @@ export function PlaceholdersAndVanishInput({
                   duration: 0.3,
                   ease: "linear",
                 }}
-                className="dark:text-zinc-500 text-sm sm:text-base font-normal text-neutral-500 pl-4 sm:pl-12 text-left w-[calc(100%-2rem)] truncate"
+                className="text-subtle text-sm sm:text-base font-normal pl-4 sm:pl-12 text-left w-[calc(100%-2rem)] truncate"
               >
                 {placeholders[currentPlaceholder]}
               </motion.p>

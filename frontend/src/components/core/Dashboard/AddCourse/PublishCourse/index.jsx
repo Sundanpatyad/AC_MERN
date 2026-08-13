@@ -64,8 +64,8 @@ export default function PublishCourse() {
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-8 shadow-2xl">
-      <p className="text-2xl font-bold text-white mb-6">
+    <div className="rounded-2xl border border-line bg-surface p-8 shadow-2xl">
+      <p className="text-2xl font-bold text-fg mb-6">
         Publish Settings
       </p>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -79,25 +79,25 @@ export default function PublishCourse() {
                 {...register("public")}
                 className="sr-only peer"
               />
-              <div className="w-5 h-5 border-2 border-zinc-600 rounded bg-zinc-800 peer-checked:bg-gradient-to-br peer-checked:from-blue-500 peer-checked:to-purple-500 peer-checked:border-transparent transition-all duration-200 flex items-center justify-center">
+              <div className="w-5 h-5 border-2 border-line rounded bg-surface peer-checked:bg-gradient-to-br peer-checked:from-blue-500 peer-checked:to-purple-500 peer-checked:border-transparent transition-all duration-200 flex items-center justify-center">
                 <svg className="w-3 h-3 text-white hidden peer-checked:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
             </div>
-            <span className="ml-3 text-base text-gray-300 group-hover:text-white transition-colors duration-200">
+            <span className="ml-3 text-base text-muted group-hover:text-fg transition-colors duration-200">
               Make this course as public
             </span>
           </label>
         </div>
 
         {/* Next Prev Button */}
-        <div className="ml-auto flex max-w-max items-center gap-x-4 pt-4 border-t border-zinc-700/50">
+        <div className="ml-auto flex max-w-max items-center gap-x-4 pt-4 border-t border-line">
           <button
             disabled={loading}
             type="button"
             onClick={goBack}
-            className="flex items-center gap-x-2 rounded-lg px-6 py-3 font-semibold text-white bg-zinc-700 hover:bg-zinc-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-x-2 rounded-lg px-6 py-3 font-semibold text-white bg-elevated hover:bg-elevated transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Back
           </button>

@@ -107,7 +107,7 @@ export default function EditProfile() {
 function InputField({ label, name, type = "text", register, errors, defaultValue, validation = { required: true } }) {
   return (
     <div>
-      <label htmlFor={name} className="block text-sm font-medium text-gray-300 mb-1">
+      <label htmlFor={name} className="block text-sm font-medium text-muted mb-1">
         {label}
       </label>
       <input
@@ -129,7 +129,7 @@ function InputField({ label, name, type = "text", register, errors, defaultValue
 function SelectField({ label, name, options, register, errors, defaultValue }) {
   return (
     <div>
-      <label htmlFor={name} className="block text-sm font-medium text-gray-300 mb-1">
+      <label htmlFor={name} className="block text-sm font-medium text-muted mb-1">
         {label}
       </label>
       <select

@@ -20,8 +20,8 @@ export default function DeleteAccount() {
             <FiTrash2 className="text-3xl text-white" />
           </div>
           <div className="flex-1">
-            <h2 className="text-2xl font-bold text-white mb-4">Delete Account</h2>
-            <div className="text-gray-300 space-y-3">
+            <h2 className="text-2xl font-bold text-fg mb-4">Delete Account</h2>
+            <div className="text-muted space-y-3">
               <p>Would you like to delete your account?</p>
               <p>
                 This account may contain Paid Courses. Deleting your account is

@@ -35,7 +35,7 @@ const CourseCard = React.memo(
 
     return (
       <div
-        className="bg-zinc-900 border border-slate-500 w-full rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer flex flex-col"
+        className="bg-surface border border-line w-full rounded-xl overflow-hidden hover:bg-elevated transition-colors duration-200 cursor-pointer flex flex-col"
         onClick={() => handleCourseClick(course)}
       >
         <div className="relative h-28 sm:h-32 md:h-40">
@@ -46,70 +46,58 @@ const CourseCard = React.memo(
           />
         </div>
         <div className="p-3 sm:p-4 md:p-6 flex-grow flex flex-col justify-between">
-          <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-white text-center p-2">
+          <h3 className="text-base sm:text-lg md:text-xl font-semibold text-fg p-1">
             {course.courseName}
           </h3>
-          <p className="text-xs sm:text-sm md:text-base text-richblack-100 mb-2 sm:mb-4 line-clamp-2">
+          <p className="text-xs sm:text-sm md:text-base text-muted mb-2 sm:mb-4 line-clamp-2">
             {course.courseDescription}
           </p>
-          <div className="flex justify-between items-center text-xs sm:text-sm text-richblack-200 mb-2 sm:mb-4 md:mb-6">
+          <div className="flex justify-between items-center text-xs sm:text-sm text-muted mb-2 sm:mb-4 md:mb-6">
             <div className="flex items-center">
-              <p className="font-semibold bg-white px-3 rounded-full text-black">
+              <p className="font-semibold bg-solid text-solid-fg px-3 py-0.5 rounded-full">
                 {course.price === 0 ? "Free" : `₹${course.price}`}
               </p>
             </div>
             <div className="flex items-center">
-              <FaBookOpen className="mr-1 text-richblack-50" />
+              <FaBookOpen className="mr-1 text-fg" />
               <p className="font-medium">{course.courseDuration}</p>
             </div>
           </div>
-          <div className="flex flex-col space-y-2">
+          <div className="flex flex-col space-y-2" onClick={(e) => e.stopPropagation()}>
             {isEnrolled ? (
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleCourseClick(course);
-                }}
-                className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-xs sm:text-sm"
+                onClick={() => handleCourseClick(course)}
+                className="btn-primary w-full text-xs sm:text-sm"
               >
                 Go to Course
               </button>
             ) : course.price === 0 ? (
               <Link
                 to={`/courses/${course._id}`}
-                className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-xs sm:text-sm"
+                className="btn-primary w-full text-xs sm:text-sm"
               >
-                View Course 
+                View Course
               </Link>
             ) : isLoggedIn ? (
-              <>
+              <div className="flex gap-2">
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAddToCart(course);
-                  }}
-                  className="w-full py-2 px-3 bg-richblack-700 text-white font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-600 text-xs sm:text-sm"
+                  onClick={() => handleAddToCart(course)}
+                  aria-label="Add to cart"
+                  className="w-10 h-10 rounded-full border border-line flex items-center justify-center text-muted hover:text-fg hover:bg-elevated transition-colors"
                 >
-                  <FaShoppingCart className="inline mr-1" />
-                
+                  <FaShoppingCart size={13} />
                 </button>
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleBuyNow(course);
-                  }}
-                  className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-xs sm:text-sm"
+                  onClick={() => handleBuyNow(course)}
+                  className="btn-primary flex-1 text-xs sm:text-sm"
                 >
                   Buy Now
                 </button>
-              </>
+              </div>
             ) : (
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate("/login");
-                }}
-                className="w-full py-2 px-3 bg-white text-richblack-900 font-semibold rounded-lg text-center transition-all duration-300 hover:bg-richblack-900 hover:text-white text-xs sm:text-sm"
+                onClick={() => navigate("/login")}
+                className="btn-primary w-full text-xs sm:text-sm"
               >
                 Login to Purchase
               </button>
@@ -122,21 +110,21 @@ const CourseCard = React.memo(
 );
 
 const CourseCardSkeleton = () => (
-  <div className="bg-black w-full rounded-xl overflow-hidden shadow-lg animate-pulse">
-    <div className="h-40 bg-richblack-700"></div>
+  <div className="bg-surface border border-line w-full rounded-xl overflow-hidden animate-pulse">
+    <div className="h-40 bg-elevated"></div>
     <div className="p-6">
-      <div className="h-4 bg-richblack-700 rounded w-3/4 mb-4"></div>
-      <div className="h-3 bg-richblack-700 rounded w-1/2 mb-2"></div>
-      <div className="h-3 bg-richblack-700 rounded w-1/4 mb-4"></div>
-      <div className="h-8 bg-richblack-700 rounded mb-2"></div>
-      <div className="h-8 bg-richblack-700 rounded"></div>
+      <div className="h-4 bg-elevated rounded w-3/4 mb-4"></div>
+      <div className="h-3 bg-elevated rounded w-1/2 mb-2"></div>
+      <div className="h-3 bg-elevated rounded w-1/4 mb-4"></div>
+      <div className="h-8 bg-elevated rounded mb-2"></div>
+      <div className="h-8 bg-elevated rounded"></div>
     </div>
   </div>
 );
 
 const SectionSkeleton = ({ title }) => (
   <div className="mx-auto w-full max-w-maxContent px-4 py-8 sm:py-12">
-    <div className="h-8 bg-black rounded w-1/4 mb-4"></div>
+    <div className="h-8 bg-elevated rounded w-1/4 mb-4"></div>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8">
       {Array(3)
         .fill()
@@ -277,10 +265,10 @@ function Catalog() {
   }
 
   return (
-    <div className="bg-black min-h-screen text-white">
+    <div className="min-h-screen bg-page text-fg">
       <div className="mx-auto w-full max-w-maxContent px-4 py-8 sm:py-20">
         <div className="flex flex-col justify-between items-center">
-          <h2 className="text-7xl tracking-wide sm:text-3xl md:text-[90px] font-inter text-center mt-10 text-slate-200 pb-4">
+          <h2 className="text-7xl tracking-wide sm:text-3xl md:text-[90px] font-inter text-center mt-10 text-fg pb-4">
             Explore Courses
           </h2>
           <div className="relative md:mt-8 text-center">
@@ -289,10 +277,10 @@ function Catalog() {
               placeholder="Search Courses..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-80 py-3 px-8 rounded-2xl border border-slate-500 bg-transparent text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400 touch-action-manipulation select-none"
+              className="w-80 py-3 px-8 rounded-2xl border border-line bg-surface text-fg placeholder-muted focus:outline-none focus:ring-2 focus:ring-muted touch-action-manipulation select-none"
             />
           </div>
-          <div className='text-sm md:text-xl text-center text-slate-300 pt-3 pb-20'>
+          <div className="text-sm md:text-xl text-center text-subtle pt-3 pb-20">
             <p>
               Unlock your potential with our expertly crafted courses designed to help you excel!
             </p>

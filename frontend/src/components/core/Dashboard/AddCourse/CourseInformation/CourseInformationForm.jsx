@@ -134,18 +134,18 @@ export default function CourseInformationForm() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-8 rounded-2xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-8 shadow-2xl"
+      className="space-y-8 rounded-2xl border border-line bg-surface p-8 shadow-2xl"
     >
       {/* Course Title */}
       <div className="flex flex-col space-y-2">
-        <label className="text-sm font-medium text-gray-200" htmlFor="courseTitle">
+        <label className="text-sm font-medium text-fg" htmlFor="courseTitle">
           Course Title <sup className="text-pink-400">*</sup>
         </label>
         <input
           id="courseTitle"
           placeholder="Enter Course Title"
           {...register("courseTitle", { required: true })}
-          className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+          className="w-full px-4 py-3 rounded-lg bg-surface border border-line text-fg placeholder-muted focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
         />
         {errors.courseTitle && (
           <span className="ml-2 text-xs tracking-wide text-pink-400 flex items-center gap-1">
@@ -156,14 +156,14 @@ export default function CourseInformationForm() {
 
       {/* Course Short Description */}
       <div className="flex flex-col space-y-2">
-        <label className="text-sm font-medium text-gray-200" htmlFor="courseShortDesc">
+        <label className="text-sm font-medium text-fg" htmlFor="courseShortDesc">
           Course Short Description <sup className="text-pink-400">*</sup>
         </label>
         <textarea
           id="courseShortDesc"
           placeholder="Enter Description"
           {...register("courseShortDesc", { required: true })}
-          className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none min-h-[130px]"
+          className="w-full px-4 py-3 rounded-lg bg-surface border border-line text-fg placeholder-muted focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none min-h-[130px]"
         />
         {errors.courseShortDesc && (
           <span className="ml-2 text-xs tracking-wide text-pink-400 flex items-center gap-1">
@@ -174,7 +174,7 @@ export default function CourseInformationForm() {
 
       {/* Course Price */}
       <div className="flex flex-col space-y-2">
-        <label className="text-sm font-medium text-gray-200" htmlFor="coursePrice">
+        <label className="text-sm font-medium text-fg" htmlFor="coursePrice">
           Course Price <sup className="text-pink-400">*</sup>
         </label>
         <div className="relative">
@@ -188,9 +188,9 @@ export default function CourseInformationForm() {
                 value: /^(0|[1-9]\d*)(\.\d+)?$/,
               },
             })}
-            className="w-full px-4 py-3 pl-12 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            className="w-full px-4 py-3 pl-12 rounded-lg bg-surface border border-line text-fg placeholder-muted focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
           />
-          <HiOutlineCurrencyRupee className="absolute left-3 top-1/2 -translate-y-1/2 text-2xl text-gray-400" />
+          <HiOutlineCurrencyRupee className="absolute left-3 top-1/2 -translate-y-1/2 text-2xl text-muted" />
         </div>
         {errors.coursePrice && (
           <span className="ml-2 text-xs tracking-wide text-pink-400 flex items-center gap-1">
@@ -201,21 +201,21 @@ export default function CourseInformationForm() {
 
       {/* Course Category */}
       <div className="flex flex-col space-y-2">
-        <label className="text-sm font-medium text-gray-200" htmlFor="courseCategory">
+        <label className="text-sm font-medium text-fg" htmlFor="courseCategory">
           Course Category <sup className="text-pink-400">*</sup>
         </label>
         <select
           {...register("courseCategory", { required: true })}
           defaultValue=""
           id="courseCategory"
-          className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer"
+          className="w-full px-4 py-3 rounded-lg bg-surface border border-line text-fg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer"
         >
-          <option value="" disabled className="bg-zinc-800">
+          <option value="" disabled className="bg-surface">
             Choose a Category
           </option>
           {!categoriesLoading &&
             courseCategories?.map((category, indx) => (
-              <option key={indx} value={category?._id} className="bg-zinc-800">
+              <option key={indx} value={category?._id} className="bg-surface">
                 {category?.name}
               </option>
             ))}
@@ -249,14 +249,14 @@ export default function CourseInformationForm() {
 
       {/* Benefits of the course */}
       <div className="flex flex-col space-y-2">
-        <label className="text-sm font-medium text-gray-200" htmlFor="courseBenefits">
+        <label className="text-sm font-medium text-fg" htmlFor="courseBenefits">
           Benefits of the course <sup className="text-pink-400">*</sup>
         </label>
         <textarea
           id="courseBenefits"
           placeholder="Enter benefits of the course"
           {...register("courseBenefits", { required: true })}
-          className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none min-h-[130px]"
+          className="w-full px-4 py-3 rounded-lg bg-surface border border-line text-fg placeholder-muted focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none min-h-[130px]"
         />
         {errors.courseBenefits && (
           <span className="ml-2 text-xs tracking-wide text-pink-400 flex items-center gap-1">
@@ -280,7 +280,7 @@ export default function CourseInformationForm() {
           <button
             onClick={() => dispatch(setStep(2))}
             disabled={loading}
-            className="flex cursor-pointer items-center gap-x-2 rounded-lg px-6 py-3 font-semibold text-white bg-zinc-700 hover:bg-zinc-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex cursor-pointer items-center gap-x-2 rounded-lg px-6 py-3 font-semibold text-fg bg-elevated hover:bg-elevated transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Continue Without Saving
           </button>
