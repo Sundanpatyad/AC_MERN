@@ -4,7 +4,7 @@ import { HiOutlineGlobeAlt, HiOutlineUsers } from "react-icons/hi";
 import { MdOutlineVerified } from 'react-icons/md';
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 
 import ConfirmationModal from "../components/common/ConfirmationModal";
 import Footer from "../components/common/Footer";
@@ -47,7 +47,7 @@ function CourseDetails() {
         setTotalNoOfLectures(res.data.courseDetails.courseContent.reduce((acc, section) => acc + section.subSection.length, 0));
       } catch (error) {
         console.error("Could not fetch Course Details", error);
-        toast.error("Failed to load course details");
+        toast.error("Couldn't load course");
       } finally {
         setIsLoading(false);
       }
@@ -72,7 +72,7 @@ function CourseDetails() {
 
   const handleAddToCart = () => {
     if (user?.accountType === ACCOUNT_TYPE.INSTRUCTOR) {
-      toast.error("Instructors can't buy courses.");
+      toast.error("Instructors can't buy");
       return;
     }
     if (token) {

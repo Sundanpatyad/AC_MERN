@@ -1,18 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from 'axios';
 import { endpoints } from "../services/apis";
-import toast from 'react-hot-toast';
+import toast from '@/utils/toast';
 import { getStoredToken, setStoredToken, removeStoredToken } from "../utils/tokenStorage";
 
 const { MOBILE_NUMBER } = endpoints;
 
-const toastOptions = {
-    style: {
-        borderRadius: '10px',
-        background: '#333',
-        color: '#fff',
-    },
-};
 
 const initialState = {
     user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null,
@@ -76,7 +69,7 @@ const profileSlice = createSlice({
                 state.loading = false;
                 state.user.mobileNumber = action.payload;
                 localStorage.setItem('user', JSON.stringify(state.user));
-                toast.success('Mobile number updated successfully', toastOptions);
+                toast.success('Number updated');
             })
             .addCase(updateMobileNumber.rejected, (state, action) => {
                 state.loading = false;

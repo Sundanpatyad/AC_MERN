@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import toast from 'react-hot-toast';
+import toast from '@/utils/toast';
 import { fetchAllMockTests } from '../services/operations/mocktest';
 
 // Async thunk for fetching mock tests
@@ -10,7 +10,7 @@ export const getAllMockTests = createAsyncThunk(
       const response = await fetchAllMockTests(token);
       return response.filter(test => test.status !== 'draft');
     } catch (error) {
-      toast.error("Failed to load mock tests. Please try again.");
+      toast.error("Couldn't load tests");
       return rejectWithValue(error.response?.data || "Something went wrong");
     }
   }

@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { FaShoppingCart, FaBookOpen } from 'react-icons/fa'
 import { useDispatch, useSelector } from 'react-redux'
 import { addToCart, removeFromCart } from '../../../slices/cartSlice'
-import toast from 'react-hot-toast'
+import toast from '@/utils/toast'
 import { buyItem } from '../../../services/operations/studentFeaturesAPI'
 
 const CourseCard = ({ course, handleAddToCart, handleBuyNow, isInCart, isEnrolled, isLoggedIn , setShowLoginModal }) => {
@@ -123,7 +123,7 @@ const Courses = ({ catalogPageData, isLoading , setShowLoginModal }) => {
 
   const handleAddToCart = (course) => {
     if (course.price === 0) {
-      toast.error("This course is free. You can start it directly.")
+      toast.error("This course is free")
       return
     }
     if (!isInCart(course)) {
@@ -133,7 +133,7 @@ const Courses = ({ catalogPageData, isLoading , setShowLoginModal }) => {
 
   const handleBuyNow = async (course) => {
     if (user?.accountType === "Instructor") {
-      toast.error("You are an Instructor. You can't buy a course.")
+      toast.error("Instructors can't buy")
       return
     }
     if (course.price === 0) {
@@ -144,7 +144,7 @@ const Courses = ({ catalogPageData, isLoading , setShowLoginModal }) => {
       await buyItem(token, [course._id], ['course'], user, navigate, dispatch)
     } catch (error) {
       console.error("Error buying course:", error)
-      toast.error("Failed to buy the course. Please try again.")
+      toast.error("Purchase failed")
     }
   }
 

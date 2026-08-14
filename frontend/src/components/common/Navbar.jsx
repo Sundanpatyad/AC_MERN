@@ -46,7 +46,6 @@ const Navbar = () => {
     const [confirmationModal, setConfirmationModal] = useState(null);
     const lastScrollY = useRef(0);
     const isHome = location.pathname === '/';
-    const overlayHero = isHome && !isScrolled;
 
     const { scrollY } = useScroll();
 
@@ -85,15 +84,13 @@ const Navbar = () => {
             <motion.nav
                 animate={{ y: hidden ? '-100%' : 0 }}
                 transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                className={`fixed top-0 left-0 right-0 z-[100] h-16 transition-colors duration-300 ${
-                    overlayHero
-                        ? 'nav-on-media bg-transparent border-b border-transparent'
-                        : isScrolled
-                            ? 'bg-page border-b border-line'
-                            : 'bg-page border-b border-transparent'
+                className={`fixed top-0 left-0 right-0 z-[100] pt-[env(safe-area-inset-top)] transition-colors duration-300 ${
+                    isScrolled
+                        ? 'bg-page border-b border-line'
+                        : 'bg-page border-b border-transparent'
                 }`}
             >
-                <div className="page-shell h-full flex items-center justify-between gap-3">
+                <div className="page-shell h-16 flex items-center justify-between gap-3">
                     <Link to="/" className="flex items-center gap-2.5 min-w-0 relative z-[101]">
                         <img
                             src={rzpLogo}
@@ -349,7 +346,7 @@ const Navbar = () => {
                 )}
             </AnimatePresence>
 
-            {!isHome && <div className="h-16" />}
+            {!isHome && <div className="h-[calc(4rem+env(safe-area-inset-top))]" />}
 
             <AnimatePresence>
                 {isSearchModalOpen && (

@@ -1,6 +1,6 @@
 import React from "react"
 import copy from "copy-to-clipboard"
-import { toast } from "react-hot-toast"
+import { toast } from "@/utils/toast"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 
@@ -25,17 +25,17 @@ function CourseDetailsCard({ course, setConfirmationModal, handleBuyCourse }) {
 
   const handleShare = () => {
     copy(window.location.href)
-    toast.success("Link copied to clipboard")
+    toast.success("Link copied")
   }
 
   const handleAddToCart = () => {
     if (user && user?.accountType === ACCOUNT_TYPE.INSTRUCTOR) {
-      toast.error("You are an Instructor. You can't buy a course.")
+      toast.error("Instructors can't buy")
       return
     }
     if (token) {
       dispatch(addToCart(course))
-      toast.success("Course added to cart")
+      toast.success("Added to cart")
       return
     }
     setConfirmationModal({

@@ -7,9 +7,8 @@ import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import rootReducer from './reducer/index';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { Toaster } from 'react-hot-toast';
+import Toaster from './components/common/Toaster';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import * as serviceWorkerRegistration from '../serviceWorkerRegistration.js';
 import { unregisterStaleServiceWorkers } from './lib/pwa';
 // Registers the axios auth interceptors before any component can issue a request.
 import './services/apiConnector';
@@ -30,14 +29,31 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <GoogleOAuthProvider clientId={CLIENT_ID}>
             <App />
           </GoogleOAuthProvider>
-          <Toaster position="bottom-center" />
+          <Toaster />
         </React.StrictMode>
       </Provider>
     </BrowserRouter>
   </QueryClientProvider>
 );
 
-// PWA offline SW conflicts with Firebase messaging SW — do not register it.
-// FCM registers /firebase-messaging-sw.js on login instead.
-serviceWorkerRegistration.unregister();
+// Keep Firebase messaging SW. Drop leftover Workbox/CRA workers that
+// cache stale JS and blank the installed PWA after a deploy.
 unregisterStaleServiceWorkers();
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.addEventListener("message", (event) => {
+    if (event.data?.type === "AC_PWA_RELOAD") {
+      window.location.reload();
+    }
+  });
+}
+
+window.addEventListener("unhandledrejection", (event) => {
+  const message = String(event.reason?.message || event.reason || "");
+  if (/Failed to fetch dynamically imported module|Importing a module script failed|Loading chunk/i.test(message)) {
+    if (!sessionStorage.getItem("ac-pwa-chunk-reload")) {
+      sessionStorage.setItem("ac-pwa-chunk-reload", "1");
+      window.location.reload();
+    }
+  }
+});

@@ -21,7 +21,7 @@ import { enablePushNotifications, listenForForegroundMessages } from "./services
 import { resumePendingPayment } from "./services/operations/studentFeaturesAPI";
 import PaymentResult from "./pages/PaymentResult";
 import PayCheckout from "./pages/PayCheckout";
-import { toast } from "react-hot-toast";
+import { toast } from "@/utils/toast";
 import {
   initGoogleAnalytics,
   trackPageView,
@@ -129,13 +129,7 @@ function App() {
       unsubscribe = await listenForForegroundMessages((payload) => {
         const title = payload?.notification?.title || "Awakening Classes";
         const body = payload?.notification?.body || "";
-        toast(`${title}${body ? `: ${body}` : ""}`, {
-          style: {
-            borderRadius: "10px",
-            background: "#333",
-            color: "#fff",
-          },
-        });
+        toast(body || title);
       });
     });
 

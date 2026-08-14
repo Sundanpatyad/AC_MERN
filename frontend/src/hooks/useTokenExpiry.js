@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../services/operations/authAPI';
-import { toast } from 'react-hot-toast';
+import { toast } from '@/utils/toast';
 
 /**
  * Custom hook to check token expiry and auto-logout
@@ -24,13 +24,7 @@ export const useTokenExpiry = () => {
                 const currentTime = Date.now();
                 // If token is expired
                 if (currentTime >= expiryTime) {
-                    toast.error('Session expired. Please login again.', {
-                        style: {
-                            borderRadius: '10px',
-                            background: '#333',
-                            color: '#fff',
-                        },
-                    });
+                    toast.error('Session expired');
                     dispatch(logout(navigate));
                 }
             } catch (error) {

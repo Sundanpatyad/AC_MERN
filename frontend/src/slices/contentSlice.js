@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import toast from 'react-hot-toast';
+import toast from '@/utils/toast';
 import { studyMaterialEndPoints } from '../services/apis';
 
 const {
@@ -143,60 +143,59 @@ const contentSlice = createSlice({
                 state.error = action.error.message;            })
             .addCase(fetchStudyMaterials.fulfilled, (state, action) => {
                 state.studyMaterials = action.payload;
-                toast.success('Study materials loaded successfully');
             })
             .addCase(fetchStudyMaterials.rejected, (state, action) => {
-                toast.error(`Failed to load study materials: ${action.error.message}`);
+                toast.error("Couldn't load materials");
             })
             .addCase(createExam.fulfilled, (state, action) => {
                 state.exams.push(action.payload);
                 state.selectedExamId = action.payload._id;
                 state.contentType = 'studyMaterial';
-                toast.success('Exam created successfully');
+                toast.success('Exam created');
             })
             .addCase(createExam.rejected, (state, action) => {
-                toast.error(`Failed to create exam: ${action.error.message}`);
+                toast.error("Couldn't create exam");
             })
             .addCase(createStudyMaterial.fulfilled, (state, action) => {
                 state.studyMaterials.push(action.payload);
-                toast.success('Study material created successfully');
+                toast.success('Material created');
             })
             .addCase(createStudyMaterial.rejected, (state, action) => {
-                toast.error(`Failed to create study material: ${action.error.message}`);
+                toast.error("Couldn't create material");
             })
             .addCase(updateExam.fulfilled, (state, action) => {
                 const index = state.exams.findIndex(exam => exam._id === action.payload._id);
                 if (index !== -1) {
                     state.exams[index] = action.payload;
                 }
-                toast.success('Exam updated successfully');
+                toast.success('Exam updated');
             })
             .addCase(updateExam.rejected, (state, action) => {
-                toast.error(`Failed to update exam: ${action.error.message}`);
+                toast.error("Couldn't update exam");
             })
             .addCase(updateStudyMaterial.fulfilled, (state, action) => {
                 const index = state.studyMaterials.findIndex(material => material._id === action.payload._id);
                 if (index !== -1) {
                     state.studyMaterials[index] = action.payload;
                 }
-                toast.success('Study material updated successfully');
+                toast.success('Material updated');
             })
             .addCase(updateStudyMaterial.rejected, (state, action) => {
-                toast.error(`Failed to update study material: ${action.error.message}`);
+                toast.error("Couldn't update material");
             })
             .addCase(deleteExam.fulfilled, (state, action) => {
                 state.exams = state.exams.filter(exam => exam._id !== action.payload);
-                toast.success('Exam deleted successfully');
+                toast.success('Exam deleted');
             })
             .addCase(deleteExam.rejected, (state, action) => {
-                toast.error(`Failed to delete exam: ${action.error.message}`);
+                toast.error("Couldn't delete exam");
             })
             .addCase(deleteStudyMaterial.fulfilled, (state, action) => {
                 state.studyMaterials = state.studyMaterials.filter(material => material._id !== action.payload);
-                toast.success('Study material deleted successfully');
+                toast.success('Material deleted');
             })
             .addCase(deleteStudyMaterial.rejected, (state, action) => {
-                toast.error(`Failed to delete study material: ${action.error.message}`);
+                toast.error("Couldn't delete material");
             });
     },
 });

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { BiCalendar } from "react-icons/bi";
 import { FaShoppingCart, FaBookOpen } from "react-icons/fa";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 
 import { ACCOUNT_TYPE } from "../utils/constants";
 import { addToCart } from "../slices/cartSlice";
@@ -33,7 +33,7 @@ const MockTestDetails = () => {
       setTestDetails(res);
     } catch (error) {
       console.error("Could not fetch Mock Test Details:", error);
-      toast.error("Failed to load mock test details");
+      toast.error("Couldn't load test");
     } finally {
       setIsLoading(false);
     }
@@ -54,12 +54,12 @@ const MockTestDetails = () => {
 
   const handleAddToCart = () => {
     if (user?.accountType === ACCOUNT_TYPE.INSTRUCTOR) {
-      toast.error("Instructors can't add mock tests to cart.");
+      toast.error("Instructors can't add to cart");
       return;
     }
 
     if (isEnrolled || testDetails.price === 0) {
-      toast.error("This mock test is already available to you.");
+      toast.error("Already unlocked");
       return;
     }
 
@@ -80,7 +80,7 @@ const MockTestDetails = () => {
     }
 
     if (user?.accountType === ACCOUNT_TYPE.INSTRUCTOR) {
-      toast.error("Instructors can't purchase mock tests.");
+      toast.error("Instructors can't buy");
       return;
     }
 
@@ -93,7 +93,7 @@ const MockTestDetails = () => {
       await buyItem(token, [mockId], ['MOCK_TEST'], user, navigate, dispatch);
     } catch (error) {
       console.error("Error purchasing mock test:", error);
-      toast.error("Failed to purchase mock test");
+      toast.error("Purchase failed");
     }
   };
 
@@ -117,7 +117,7 @@ const MockTestDetails = () => {
   }
 
   if (!testDetails) {
-    return <div className="text-center text-2xl text-red-500">Failed to load mock test details</div>;
+    return <div className="text-center text-2xl text-red-500">Couldn't load test</div>;
   }
 
   return (

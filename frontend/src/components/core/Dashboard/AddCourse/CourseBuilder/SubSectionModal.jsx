@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
-import { toast } from "react-hot-toast"
+import { toast } from "@/utils/toast"
 import { RxCross2 } from "react-icons/rx"
 import { useDispatch, useSelector } from "react-redux"
 
@@ -93,7 +93,7 @@ export default function SubSectionModal({ modalData, setModalData, add = false, 
 
     if (edit) {
       if (!isFormUpdated()) {
-        toast.error("No changes made to the form")
+        toast.error("No changes to save")
       } else {
         handleEditSubsection()
       }

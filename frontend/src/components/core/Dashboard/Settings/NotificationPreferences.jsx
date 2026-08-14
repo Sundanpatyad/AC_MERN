@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
-import { toast } from "react-hot-toast"
+import { toast } from "@/utils/toast"
 import {
   disablePushNotifications,
   enablePushNotifications,
@@ -74,9 +74,7 @@ export default function NotificationPreferences() {
     setSaving(false)
     if (saved) {
       setPrefs(saved)
-      toast.success("Preferences saved", {
-        style: { borderRadius: "10px", background: "#333", color: "#fff" },
-      })
+      toast.success("Saved")
     }
   }
 

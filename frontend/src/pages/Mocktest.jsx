@@ -5,7 +5,7 @@ import { useQuery } from 'react-query'
 import { fetchAllMockTests } from '../services/operations/mocktest'
 import { buyItem } from '../services/operations/studentFeaturesAPI'
 import { addToCart } from '../slices/cartSlice'
-import toast from 'react-hot-toast'
+import toast from '@/utils/toast'
 import { FaBookOpen, FaSearch, FaShoppingCart } from 'react-icons/fa'
 import Footer from "../components/common/Footer"
 import ConfirmationModal from "../components/common/ConfirmationModal"
@@ -249,7 +249,7 @@ const MockTestComponent = () => {
     }
 
     if (user?.accountType === ACCOUNT_TYPE.INSTRUCTOR) {
-      toast.error("Instructors can't add mock tests to cart.")
+      toast.error("Instructors can't add to cart")
       return
     }
 
@@ -270,7 +270,7 @@ const MockTestComponent = () => {
     }
 
     if (user?.accountType === ACCOUNT_TYPE.INSTRUCTOR) {
-      toast.error("Instructors can't purchase mock tests.")
+      toast.error("Instructors can't buy")
       return
     }
 
@@ -278,7 +278,7 @@ const MockTestComponent = () => {
       await buyItem(token, [mockTest._id], ['MOCK_TEST'], user, navigate, dispatch)
     } catch (error) {
       console.error("Error purchasing mock test:", error)
-      toast.error("Failed to purchase mock test")
+      toast.error("Purchase failed")
     }
   }, [isLoggedIn, user, navigate, dispatch, token])
 

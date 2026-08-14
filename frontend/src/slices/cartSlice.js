@@ -1,13 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { toast } from "react-hot-toast";
+import { toast } from "@/utils/toast";
 
-const toastOptions = {
-  style: {
-    borderRadius: '10px',
-    background: '#333',
-    color: '#fff',
-  },
-};
 
 const initialState = {
   cart: localStorage.getItem("cart")
@@ -30,7 +23,7 @@ const cartSlice = createSlice({
       const index = state.cart.findIndex((cartItem) => cartItem._id === item._id);
 
       if (index >= 0) {
-        toast.error(`${item.seriesName ? "Mock test" : "Course"} already in cart`, toastOptions);
+        toast.error("Already in cart");
         return;
       }
 
@@ -42,7 +35,7 @@ const cartSlice = createSlice({
       localStorage.setItem("total", JSON.stringify(state.total));
       localStorage.setItem("totalItems", JSON.stringify(state.totalItems));
 
-      toast.success(`${item.seriesName ? "Mock test" : "Course"} added to cart`, toastOptions);
+      toast.success("Added to cart");
     },
 
     removeFromCart: (state, action) => {
@@ -59,7 +52,7 @@ const cartSlice = createSlice({
         localStorage.setItem("total", JSON.stringify(state.total));
         localStorage.setItem("totalItems", JSON.stringify(state.totalItems));
 
-        toast.success(`${removedItem.seriesName ? "Mock test" : "Course"} removed from cart`, toastOptions);
+        toast.success("Removed from cart");
       }
     },
 

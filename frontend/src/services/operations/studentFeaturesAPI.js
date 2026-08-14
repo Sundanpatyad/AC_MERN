@@ -1,4 +1,4 @@
-import { toast } from "react-hot-toast";
+import { toast } from "@/utils/toast";
 import { MockTestPaymentEndpoints, studentEndpoints, BASE_URL } from "../apis";
 import { apiConnector } from "../apiConnector";
 import rzpLogo from "../../assets/Logo/rzp_logo.png";
@@ -12,13 +12,6 @@ const PENDING_ORDER_KEY = "rzp_pending_order";
 const POLL_INTERVAL_MS = 3000;
 const POLL_TIMEOUT_MS = 180000;
 
-const toastOptions = {
-    style: {
-        borderRadius: '10px',
-        background: '#333',
-        color: '#fff',
-    },
-};
 
 export function setCheckoutActive(active) {
     if (typeof window === "undefined") return;
@@ -138,7 +131,7 @@ export async function resumePendingPayment(token) {
 
     const paid = await pollPaymentStatus(pending.orderId, token, {
         onPaid: () => {
-            toast.success("Payment successful. Access has been unlocked.", toastOptions);
+            toast.success("Payment successful");
             setTimeout(() => window.location.reload(), 1200);
         },
     });
@@ -149,7 +142,7 @@ export async function resumePendingPayment(token) {
 }
 
 export async function buyItem(token, itemId, itemTypes, userDetails, navigate, dispatch) {
-    const toastId = toast.loading("Loading...", toastOptions);
+    const toastId = toast.loading("Loading...");
 
     try {
         const handoffToBrowser = shouldHandoffPaymentToBrowser();
@@ -159,12 +152,12 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
             console.log("Razorpay SDK loaded:", res);
 
             if (!res) {
-                toast.error("RazorPay SDK failed to load. Please check your internet connection.", toastOptions);
+                toast.error("Couldn't load payment");
                 return;
             }
 
             if (!window.Razorpay) {
-                toast.error("Razorpay is not available. Please refresh the page.", toastOptions);
+                toast.error("Payment unavailable");
                 return;
             }
         }
@@ -209,7 +202,7 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
             }
 
             if (orderData.alreadyPaid) {
-                toast.success(orderResponse.data.message || "Access already unlocked.", toastOptions);
+                toast.success(orderResponse.data.message || "Already unlocked");
                 setTimeout(() => window.location.reload(), 800);
                 continue;
             }
@@ -219,7 +212,7 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
                 import.meta.env.VITE_APP_RAZORPAY_KEY;
 
             if (!RAZORPAY_KEY) {
-                toast.error("Razorpay key is not configured. Please contact support.", toastOptions);
+                toast.error("Payment not configured");
                 return;
             }
 
@@ -266,7 +259,7 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
                     checkoutParams.set("contact", contact);
                 }
                 const checkoutUrl = `${window.location.origin}/pay-checkout?${checkoutParams.toString()}`;
-                toast.success("Opening Chrome for UPI payment…", toastOptions);
+                toast.success("Opening payment");
                 openInSystemBrowser(checkoutUrl);
                 continue;
             }
@@ -317,8 +310,7 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
                             );
                         }
                         clearPendingOrder();
-                        const itemTypeName = itemType === 'course' ? 'course' : 'mock test';
-                        toast.success(`Payment Successful, you are added to the ${itemTypeName}`, toastOptions);
+                        toast.success("Payment successful");
 
                         if (itemType === 'course') {
                             dispatch(resetCart());
@@ -333,15 +325,11 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
                             ? null
                             : await pollPaymentStatus(orderId, token);
                         if (recovered) {
-                            toast.success("Payment successful. Access has been unlocked.", toastOptions);
+                            toast.success("Payment successful");
                             setTimeout(() => window.location.reload(), 1500);
                             return;
                         }
-                        toast.error(
-                            verifyError.response?.data?.message ||
-                            "Payment received but verification failed. Contact support if access is missing.",
-                            toastOptions
-                        );
+                        toast.error(verifyError.response?.data?.message || "Couldn't verify payment");
                     }
                 },
                 modal: {
@@ -350,16 +338,16 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
                             orderId,
                             userAgent: navigator.userAgent,
                         });
-                        toast("Checking payment status…", toastOptions);
+                        toast("Checking payment");
                         pollPaymentStatus(orderId, token, {
                             onPaid: () => {
-                                toast.success("Payment successful. Access has been unlocked.", toastOptions);
+                                toast.success("Payment successful");
                                 setTimeout(() => window.location.reload(), 1200);
                             },
                         }).then((paid) => {
                             if (!paid) {
                                 clearPendingOrder();
-                                toast("If money was deducted, access will unlock shortly. Refresh this page or contact support with your order ID.", toastOptions);
+                                toast("If charged, access will unlock shortly");
                             }
                         });
                     },
@@ -393,11 +381,11 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
                     reason: err.reason,
                     metadata: err.metadata,
                 });
-                toast.error(`Payment failed: ${err.description || err.reason || "Unknown error"}`, toastOptions);
+                toast.error("Payment failed");
                 if (itemType !== 'course') {
                     pollPaymentStatus(orderId, token, {
                         onPaid: () => {
-                            toast.success("Payment successful. Access has been unlocked.", toastOptions);
+                            toast.success("Payment successful");
                             setTimeout(() => window.location.reload(), 1200);
                         },
                     });
@@ -411,8 +399,8 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
     catch (error) {
         console.error("Payment Error:", error);
         clearPendingOrder();
-        const errorMessage = error.response?.data?.message || error.message || "Could not make Payment";
-        toast.error(errorMessage, toastOptions);
+        const errorMessage = error.response?.data?.message || error.message || "Payment failed";
+        toast.error(errorMessage);
     } finally {
         toast.dismiss(toastId);
     }

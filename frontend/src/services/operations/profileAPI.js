@@ -1,4 +1,4 @@
-import { toast } from "react-hot-toast"
+import { toast } from "@/utils/toast"
 import { setLoading, setUser } from "../../slices/profileSlice"
 import { apiConnector } from "../apiConnector"
 import { profileEndpoints } from "../apis"
@@ -6,18 +6,11 @@ import { logout } from "./authAPI"
 
 const { GET_USER_DETAILS_API, GET_USER_ENROLLED_COURSES_API, GET_INSTRUCTOR_DATA_API, GET_ATTEMPT_DATA_API, GET_USER_ENROLLED_MOCK_TESTS_API , UPDATE_MOCKTEST_API} = profileEndpoints
 
-const toastOptions = {
-  style: {
-    borderRadius: '10px',
-    background: '#333',
-    color: '#fff',
-  },
-};
 
 // ================ get User Details  ================
 export function getUserDetails(token, navigate) {
   return async (dispatch) => {
-    const toastId = toast.loading("Loading...", toastOptions)
+    const toastId = toast.loading("Loading...")
     dispatch(setLoading(true))
     try {
       const response = await apiConnector("GET", GET_USER_DETAILS_API, null, { Authorization: `Bearer ${token}`, })
@@ -33,7 +26,7 @@ export function getUserDetails(token, navigate) {
     } catch (error) {
       dispatch(logout(navigate))
       //console.log("GET_USER_DETAILS API ERROR............", error)
-      toast.error("Could Not Get User Details", toastOptions)
+      toast.error("Couldn't load profile")
     }
     toast.dismiss(toastId)
     dispatch(setLoading(false))
@@ -54,7 +47,7 @@ export async function getUserEnrolledCourses(token) {
     result = response.data.data
   } catch (error) {
     //console.log("GET_USER_ENROLLED_COURSES_API API ERROR............", error)
-    toast.error("Could Not Get Enrolled Courses", toastOptions)
+    toast.error("Couldn't load courses")
   }
   return result
 }
@@ -79,7 +72,7 @@ export async function getUserEnrolledMockTests(token) {
     result = response.data.data
   } catch (error) {
     //console.log("GET_USER_ENROLLED_MOCK_TESTS_API ERROR............", error)
-    toast.error("Could Not Get Enrolled Mock Tests", toastOptions)
+    toast.error("Couldn't load tests")
   }
   return result
 }
@@ -104,7 +97,7 @@ export async function getUserAttempts(token) {
     result = response.data
   } catch (error) {
     //console.log("GET_USER_ATTEMPTS_API API ERROR............", error)
-    toast.error("Could Not Get User Attempts", toastOptions)
+    toast.error("Couldn't load attempts")
   }
   return result
 }
@@ -120,13 +113,13 @@ export async function getInstructorData(token) {
     result = response?.data?.courses
   } catch (error) {
     //console.log("GET_INSTRUCTOR_DATA_API API ERROR............", error)
-    toast.error("Could Not Get Instructor Data", toastOptions)
+    toast.error("Couldn't load data")
   }
   return result
 }
 
 export const saveSeries = async (seriesId, seriesData, token) => {
-  const toastId = toast.loading("Saving series...", toastOptions);
+  const toastId = toast.loading("Saving...");
   let result = null;
 
   try {
@@ -146,10 +139,10 @@ export const saveSeries = async (seriesId, seriesData, token) => {
     }
 
     result = response?.data?.data;
-    toast.success("Mock Test Series updated successfully", toastOptions);
+    toast.success("Series updated");
   } catch (error) {
     console.error("Save Series API ERROR:", error);
-    toast.error(error.message || "Error updating Mock Test Series", toastOptions);
+    toast.error(error.message || "Couldn't update series");
   } finally {
     toast.dismiss(toastId);
   }

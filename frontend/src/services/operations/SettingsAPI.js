@@ -1,4 +1,4 @@
-import { toast } from "react-hot-toast"
+import { toast } from "@/utils/toast"
 
 import { setUser } from "../../slices/profileSlice"
 import { apiConnector } from "../apiConnector"
@@ -34,7 +34,7 @@ export function updateUserProfileImage(token, formData) {
       if (!response.data.success) {
         throw new Error(response.data.message)
       }
-      toast.success("Display Picture Updated Successfully")
+      toast.success("Photo updated")
       dispatch(setUser(response.data.data));
 
       // below line is must - if not code - then as we refresh the page after changing profile image then old profile image will show 
@@ -42,7 +42,7 @@ export function updateUserProfileImage(token, formData) {
       localStorage.setItem("user", JSON.stringify(response.data.data));
     } catch (error) {
       //console.log("UPDATE_DISPLAY_PICTURE_API API ERROR............", error)
-      toast.error("Could Not Update Profile Picture")
+      toast.error("Couldn't update photo")
     }
     toast.dismiss(toastId)
   }
@@ -71,10 +71,10 @@ export function updateProfile(token, formData) {
    
       // //console.log('DATA = ', data)
       localStorage.setItem("user", JSON.stringify({ ...response.data.updatedUserDetails, image: userImage }));
-      toast.success("Profile Updated Successfully")
+      toast.success("Profile updated")
     } catch (error) {
       //console.log("UPDATE_PROFILE_API API ERROR............", error)
-      toast.error("Could Not Update Profile")
+      toast.error("Couldn't update profile")
     }
     toast.dismiss(toastId)
   }
@@ -93,7 +93,7 @@ export async function changePassword(token, formData) {
     if (!response.data.success) {
       throw new Error(response.data.message)
     }
-    toast.success("Password Changed Successfully")
+    toast.success("Password changed")
   } catch (error) {
     //console.log("CHANGE_PASSWORD_API API ERROR............", error)
     toast.error(error.response.data.message)
@@ -114,11 +114,11 @@ export function deleteProfile(token, navigate) {
       if (!response.data.success) {
         throw new Error(response.data.message)
       }
-      toast.success("Profile Deleted Successfully")
+      toast.success("Profile deleted")
       dispatch(logout(navigate))
     } catch (error) {
       //console.log("DELETE_PROFILE_API API ERROR............", error)
-      toast.error("Could Not Delete Profile")
+      toast.error("Couldn't delete profile")
     }
     toast.dismiss(toastId)
   }

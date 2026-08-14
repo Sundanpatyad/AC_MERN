@@ -1,38 +1,32 @@
 {
-    "name": "Awakening Classes",
-    "short_name": "Awakening Classes",
-    "theme_color": "#000000",
-    "background_color": "#000000",
-    "display": "browser",
-    "orientation": "portrait",
-    "scope": "/",
-    "start_url": "/",
-    "icons": [
-        {
-            "src":"/maskable.png",
-            "sizes": "384x384",
-            "type": "image/png",
-            "purpose": "maskable any"
-        },
-        {
-            "src": "/title192.png",
-            "sizes": "192x192",
-            "type":"image/png"
-        },
-        {
-            "src": "/title256.png",
-            "sizes": "256x256",
-            "type":"image/png"
-        },
-        {
-            "src": "/title384.png",
-            "sizes": "384x384",
-            "type":"image/png"
-        },
-        {
-            "src": "/title512.png",
-            "sizes": "512x512",
-            "type":"image/png"
-        }
-    ]
-  }
+  "id": "/",
+  "name": "Awakening Classes",
+  "short_name": "Awakening",
+  "description": "Mock tests and courses for competitive exams",
+  "theme_color": "#14130F",
+  "background_color": "#E8E6D4",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/?source=pwa",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

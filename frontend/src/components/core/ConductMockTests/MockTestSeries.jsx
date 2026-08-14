@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useTransition } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import axios from 'axios';
 import { mocktestEndpoints } from '../../../services/apis';
 import LoadingSpinner from './Spinner';
@@ -44,7 +44,7 @@ const MockTestSeries = () => {
 
       // Shared /view-mock link: unpaid users go to purchase/detail page
       if (!canAccessSeries(series)) {
-        toast.error("Please purchase this mock test to access tests");
+        toast.error("Purchase required");
         navigate(`/mock-test/${mockId}`, { replace: true });
         return;
       }
@@ -53,15 +53,15 @@ const MockTestSeries = () => {
       setLoading(false);
     } catch (error) {
       console.error('Error fetching test series:', error);
-      setError('Failed to load mock test details');
-      toast.error("Failed to load mock test details");
+      setError('Couldn't load test');
+      toast.error("Couldn't load test");
       setLoading(false);
     }
   };
 
   const startTest = (test) => {
     if (!canAccessSeries(testSeries)) {
-      toast.error("Please purchase this mock test to continue");
+      toast.error("Purchase required");
       navigate(`/mock-test/${mockId}`, { replace: true });
       return;
     }

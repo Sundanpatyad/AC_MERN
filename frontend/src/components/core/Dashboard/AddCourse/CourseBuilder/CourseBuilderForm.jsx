@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
+import { toast } from "@/utils/toast";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { MdNavigateNext } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
@@ -37,7 +37,7 @@ export default function CourseBuilderForm() {
         setValue("sectionName", "");
       }
     } catch (error) {
-      toast.error("Error creating/updating section");
+      toast.error("Couldn't save section");
     } finally {
       setLoading(false);
     }
@@ -59,7 +59,7 @@ export default function CourseBuilderForm() {
 
   const goToNext = () => {
     if (course.courseContent.length === 0) {
-      toast.error("Please add at least one section");
+      toast.error("Add a section first");
       return;
     }
     //console.log("Moving to next step");

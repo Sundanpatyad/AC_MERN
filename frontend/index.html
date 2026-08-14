@@ -3,15 +3,54 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/png" href="./src//assets/Logo/title.png" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="mobile-web-app-capable" content="no" />
-  <meta name="apple-mobile-web-app-capable" content="no" />
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Awakening" />
+  <meta name="theme-color" content="#E8E6D4" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#14130F" media="(prefers-color-scheme: dark)" />
   <link rel="manifest" href="/manifest.json" />
 
   <title>Awakening Classes</title>
 
-  <!-- Theme Initialization Script to prevent FOUC -->
+  <!-- Recover already-installed PWAs stuck on a stale service worker cache. -->
+  <script>
+    (function () {
+      var KEY = 'ac-pwa-migrate-v3';
+      try {
+        if (sessionStorage.getItem(KEY) === '1') return;
+      } catch (e) {}
+
+      if (!('serviceWorker' in navigator)) return;
+
+      navigator.serviceWorker.getRegistrations().then(function (regs) {
+        var stale = regs.filter(function (reg) {
+          var url =
+            (reg.active && reg.active.scriptURL) ||
+            (reg.waiting && reg.waiting.scriptURL) ||
+            (reg.installing && reg.installing.scriptURL) ||
+            '';
+          return url.indexOf('firebase-messaging-sw.js') === -1;
+        });
+        if (!stale.length) return;
+
+        return Promise.all(stale.map(function (reg) { return reg.unregister(); }))
+          .then(function () {
+            if (!('caches' in window)) return;
+            return caches.keys().then(function (keys) {
+              return Promise.all(keys.map(function (key) { return caches.delete(key); }));
+            });
+          })
+          .then(function () {
+            try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
+            location.reload();
+          });
+      }).catch(function () {});
+    })();
+  </script>
   <script>
     (function() {
       try {
