@@ -78,7 +78,7 @@ const MockTestsSection = ({ setShowLoginModal }) => {
   }, [navigate]);
 
   return (
-    <section className="section-pad border-t border-line bg-page">
+    <section className="border-t border-line bg-page pt-10 pb-16 md:pt-[5.5rem] md:pb-[5.5rem]">
       <div className="page-shell">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
           <div className="space-y-2">

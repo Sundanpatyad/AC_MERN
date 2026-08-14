@@ -42,7 +42,7 @@ const Home = () => {
     <div className="w-full overflow-x-hidden bg-page min-h-screen text-fg">
       <HeroSection />
 
-      <Suspense fallback={<div className="h-64" />}>
+      <Suspense fallback={<div className="h-24 md:h-32" />}>
         <MockTestSection setShowLoginModal={setShowLoginModal} />
       </Suspense>
 
