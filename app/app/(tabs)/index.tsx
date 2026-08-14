@@ -240,17 +240,17 @@ function StudentHomeScreen() {
                   accessibilityLabel="Notifications"
                   style={({ pressed }) => [styles.bellBtn, pressed && { opacity: 0.8 }]}
                 >
-                  <Ionicons name="notifications-outline" size={22} color="#0F172A" />
+                  <Ionicons name="notifications-outline" size={22} color={colors.text} />
                 </Pressable>
               </View>
 
               <View style={styles.searchBar}>
-                <Ionicons name="search" size={16} color="rgba(15,23,42,0.45)" />
+                <Ionicons name="search" size={16} color={colors.textMuted} />
                 <TextInput
                   value={query}
                   onChangeText={setQuery}
                   placeholder="Search..."
-                  placeholderTextColor="rgba(15,23,42,0.4)"
+                  placeholderTextColor={colors.textMuted}
                   style={styles.searchInput}
                   returnKeyType="search"
                   accessibilityLabel="Search courses"
@@ -464,9 +464,9 @@ function createStyles(colors: AppPalette) {
       width: 34,
       height: 34,
       borderRadius: 999,
-      backgroundColor: 'rgba(255,255,255,0.7)',
+      backgroundColor: colors.surface,
       borderWidth: 1.5,
-      borderColor: 'rgba(15,23,42,0.12)',
+      borderColor: colors.borderStrong,
       alignItems: 'center',
       justifyContent: 'center',
       overflow: 'hidden',
@@ -478,7 +478,7 @@ function createStyles(colors: AppPalette) {
     avatarLetter: {
       fontSize: 13,
       fontWeight: '700',
-      color: '#0F172A',
+      color: colors.text,
     },
     greetingBlock: {
       flex: 1,
@@ -487,13 +487,13 @@ function createStyles(colors: AppPalette) {
     },
     greetingLine: {
       fontSize: 11,
-      color: 'rgba(15,23,42,0.55)',
+      color: colors.textSecondary,
       fontWeight: '400',
     },
     userName: {
       fontSize: 20,
       lineHeight: 24,
-      color: '#0F172A',
+      color: colors.text,
       fontFamily: Fonts.semiBold,
       letterSpacing: -0.3,
     },
@@ -503,19 +503,19 @@ function createStyles(colors: AppPalette) {
       borderRadius: 999,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: 'rgba(255,255,255,0.72)',
+      backgroundColor: colors.surface,
       borderWidth: 1,
-      borderColor: 'rgba(15,23,42,0.08)',
+      borderColor: colors.border,
     },
     searchBar: {
       marginHorizontal: H_PAD,
       marginTop: 12,
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: 'rgba(255,255,255,0.78)',
+      backgroundColor: colors.surface,
       borderRadius: Radii.pill,
       borderWidth: 1,
-      borderColor: 'rgba(15,23,42,0.08)',
+      borderColor: colors.border,
       paddingHorizontal: 12,
       paddingVertical: 4,
       gap: 8,
@@ -523,7 +523,7 @@ function createStyles(colors: AppPalette) {
     },
     searchInput: {
       flex: 1,
-      color: '#0F172A',
+      color: colors.text,
       fontSize: 13,
       paddingVertical: 6,
     },
@@ -540,25 +540,25 @@ function createStyles(colors: AppPalette) {
       paddingHorizontal: 14,
       paddingVertical: 8,
       borderRadius: Radii.pill,
-      backgroundColor: 'rgba(255,255,255,0.55)',
+      backgroundColor: colors.surface,
       borderWidth: 1,
-      borderColor: 'rgba(15,23,42,0.08)',
+      borderColor: colors.border,
       flexShrink: 0,
       alignSelf: 'flex-start',
     },
     chipActive: {
-      backgroundColor: '#0F172A',
-      borderColor: '#0F172A',
+      backgroundColor: colors.text,
+      borderColor: colors.text,
     },
     chipText: {
-      color: '#0F172A',
+      color: colors.text,
       fontSize: 13,
       lineHeight: 18,
       fontFamily: Fonts.medium,
       ...(Platform.OS === 'android' ? { includeFontPadding: false } : null),
     },
     chipTextActive: {
-      color: '#FFFFFF',
+      color: colors.primaryButtonText,
       fontFamily: Fonts.semiBold,
     },
     section: {

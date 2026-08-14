@@ -77,13 +77,13 @@ function StudentMockTestsScreen() {
             <Ionicons
               name="search"
               size={16}
-              color="rgba(15,23,42,0.45)"
+              color={colors.textMuted}
               style={styles.searchIcon}
             />
             <TextInput
               style={styles.searchInput}
               placeholder="Search series..."
-              placeholderTextColor="rgba(15,23,42,0.4)"
+              placeholderTextColor={colors.textMuted}
               value={searchQuery}
               onChangeText={setSearchQuery}
             />
@@ -123,22 +123,22 @@ function createStyles(colors: AppPalette) {
     title: {
       fontSize: 22,
       fontWeight: '700',
-      color: '#0F172A',
+      color: colors.text,
       marginBottom: 2,
       letterSpacing: -0.3,
     },
     subtitle: {
       fontSize: 13,
-      color: 'rgba(15,23,42,0.55)',
+      color: colors.textSecondary,
       marginBottom: 14,
     },
     searchContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: 'rgba(255,255,255,0.78)',
+      backgroundColor: colors.surface,
       borderRadius: Radii.pill,
       borderWidth: 1,
-      borderColor: 'rgba(15,23,42,0.08)',
+      borderColor: colors.border,
       paddingHorizontal: 12,
       height: 40,
     },
@@ -147,7 +147,7 @@ function createStyles(colors: AppPalette) {
     },
     searchInput: {
       flex: 1,
-      color: '#0F172A',
+      color: colors.text,
       fontSize: 15,
     },
     scrollContent: {

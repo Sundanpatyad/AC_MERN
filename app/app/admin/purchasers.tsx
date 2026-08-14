@@ -91,7 +91,7 @@ export default function PurchasersScreen() {
       >
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-            <Ionicons name="chevron-back" size={22} color="#0F172A" />
+            <Ionicons name="chevron-back" size={22} color={colors.text} />
           </TouchableOpacity>
           <Text style={styles.title} numberOfLines={1}>
             {params.testName || 'Purchasers'}
@@ -184,16 +184,16 @@ function createStyles(colors: AppPalette) {
       borderRadius: 20,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: 'rgba(255,255,255,0.72)',
+      backgroundColor: colors.surface,
       borderWidth: 1,
-      borderColor: 'rgba(15,23,42,0.08)',
+      borderColor: colors.border,
     },
     title: {
       flex: 1,
       textAlign: 'center',
       fontSize: 16,
       fontFamily: Fonts.semiBold,
-      color: '#0F172A',
+      color: colors.text,
       marginHorizontal: 8,
     },
     stats: {

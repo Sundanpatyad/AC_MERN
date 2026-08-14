@@ -10,6 +10,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { Toaster } from 'react-hot-toast';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import * as serviceWorkerRegistration from '../serviceWorkerRegistration.js';
+import { unregisterStaleServiceWorkers } from './lib/pwa';
 // Registers the axios auth interceptors before any component can issue a request.
 import './services/apiConnector';
 
@@ -39,3 +40,4 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 // PWA offline SW conflicts with Firebase messaging SW — do not register it.
 // FCM registers /firebase-messaging-sw.js on login instead.
 serviceWorkerRegistration.unregister();
+unregisterStaleServiceWorkers();

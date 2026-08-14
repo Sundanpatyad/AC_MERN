@@ -10,7 +10,6 @@ import { ACCOUNT_TYPE } from "../src/utils/constants";
 import BottomBar from "./components/common/ButtomBar";
 import FloatingInquiryButton from "./components/common/FloatingInquiryButton";
 import YourComponent from "./components/ui/InitialLoader";
-import InstallApp from "./components/core/HomePage/installApp";
 import PhoneWizardPage from "./components/core/HomePage/Phone";
 import AdminCountMock from "./components/core/Admin/MockCountAdmin";
 // import { checkAndVerifyPayment } from "./services/operations/studentFeaturesAPI";
@@ -21,6 +20,7 @@ import { useTokenExpiry } from "./hooks/useTokenExpiry";
 import { enablePushNotifications, listenForForegroundMessages } from "./services/pushNotifications";
 import { resumePendingPayment } from "./services/operations/studentFeaturesAPI";
 import PaymentResult from "./pages/PaymentResult";
+import PayCheckout from "./pages/PayCheckout";
 import { toast } from "react-hot-toast";
 import {
   initGoogleAnalytics,
@@ -179,7 +179,10 @@ function App() {
   //   };
   // }, []);
 
-  const hideChrome = location.pathname.includes("attempt-test");
+  const hideChrome =
+    location.pathname.includes("attempt-test") ||
+    location.pathname.includes("pay-checkout") ||
+    location.pathname.includes("payment-result");
 
   return (
     <div className="w-full min-h-screen bg-page text-fg flex flex-col font-outfit">
@@ -204,7 +207,7 @@ function App() {
         className="flex flex-col min-h-screen"
       >
         {!hideChrome && <Navbar />}
-        <main className={`flex-grow ${token && !location.pathname.includes("attempt-test") ? "pb-20 md:pb-0" : ""}`}>
+        <main className={`flex-grow ${token && !hideChrome ? "pb-20 md:pb-0" : ""}`}>
           <Suspense fallback={<div className="flex justify-center items-center min-h-[50vh] text-muted text-sm">Loading...</div>}>
             <Routes>
               <Route path="/" element={<Home />} />
@@ -349,6 +352,7 @@ function App() {
                 )}
               </Route>
 
+              <Route path="/pay-checkout" element={<PayCheckout />} />
               <Route path="/payment-result" element={<PaymentResult />} />
               <Route path="/mocktest" element={<Mocktest />} />
               <Route path="view-mock/:mockId" element={<MockTestSeries />} />
@@ -361,7 +365,7 @@ function App() {
         </main>
       </motion.div>
 
-      {token && !location.pathname.includes("attempt-test") && (
+      {token && !hideChrome && (
         <div className="md:hidden">
           <BottomBar />
         </div>

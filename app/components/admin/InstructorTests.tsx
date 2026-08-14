@@ -143,14 +143,14 @@ function createStyles(colors: AppPalette) {
     title: {
       fontSize: 22,
       fontFamily: Fonts.semiBold,
-      color: '#0F172A',
+      color: colors.text,
       letterSpacing: -0.3,
     },
     subtitle: {
       marginTop: 4,
       fontSize: 13,
       fontFamily: Fonts.sans,
-      color: 'rgba(15,23,42,0.55)',
+      color: colors.textSecondary,
     },
     scroll: {
       paddingHorizontal: 20,

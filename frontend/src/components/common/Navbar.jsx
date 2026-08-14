@@ -27,7 +27,6 @@ import rzpLogo from '../../assets/Logo/logo.png';
 import { PlaceholdersAndVanishInputDemo } from '../ui/Search';
 import { RxCross1 } from 'react-icons/rx';
 import { CgShoppingCart } from 'react-icons/cg';
-import InstallApp from '../core/HomePage/installApp';
 
 const SCROLL_THRESHOLD = 50;
 
@@ -44,7 +43,6 @@ const Navbar = () => {
     const { user } = useSelector((state) => state.profile);
     const [isScrolled, setIsScrolled] = useState(false);
     const [hidden, setHidden] = useState(false);
-    const [deferredPrompt, setDeferredPrompt] = useState(null);
     const [confirmationModal, setConfirmationModal] = useState(null);
     const lastScrollY = useRef(0);
     const isHome = location.pathname === '/';
@@ -66,22 +64,6 @@ const Navbar = () => {
         (route) => matchPath({ path: route }, location.pathname),
         [location.pathname]
     );
-
-    useEffect(() => {
-        const handleBeforeInstallPrompt = (e) => {
-            e.preventDefault();
-            setDeferredPrompt(e);
-        };
-        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-        return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    }, []);
-
-    const handleInstallClick = () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then(() => setDeferredPrompt(null));
-        }
-    };
 
     useEffect(() => {
         if (!isMobileMenuOpen) return;
@@ -368,8 +350,6 @@ const Navbar = () => {
             </AnimatePresence>
 
             {!isHome && <div className="h-16" />}
-
-            {deferredPrompt && <InstallApp handleInstall={handleInstallClick} />}
 
             <AnimatePresence>
                 {isSearchModalOpen && (
