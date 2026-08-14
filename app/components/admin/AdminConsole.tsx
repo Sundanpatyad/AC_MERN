@@ -393,14 +393,14 @@ function createStyles(colors: AppPalette) {
     title: {
       fontSize: 22,
       fontFamily: Fonts.semiBold,
-      color: '#0F172A',
+      color: colors.text,
       letterSpacing: -0.3,
     },
     subtitle: {
       marginTop: 4,
       fontSize: 13,
       fontFamily: Fonts.sans,
-      color: 'rgba(15,23,42,0.55)',
+      color: colors.textSecondary,
       lineHeight: 18,
     },
     tabRow: {
@@ -408,9 +408,9 @@ function createStyles(colors: AppPalette) {
       flexDirection: 'row',
       borderRadius: Radii.pill,
       padding: 4,
-      backgroundColor: 'rgba(255,255,255,0.65)',
+      backgroundColor: colors.surface,
       borderWidth: 1,
-      borderColor: 'rgba(15,23,42,0.08)',
+      borderColor: colors.border,
       position: 'relative',
     },
     tabPill: {
@@ -419,7 +419,7 @@ function createStyles(colors: AppPalette) {
       left: 4,
       height: 36,
       borderRadius: Radii.pill,
-      backgroundColor: '#0F172A',
+      backgroundColor: colors.text,
     },
     tab: {
       flex: 1,
@@ -434,10 +434,10 @@ function createStyles(colors: AppPalette) {
       fontFamily: Fonts.semiBold,
     },
     tabLabelOn: {
-      color: '#FFFFFF',
+      color: colors.primaryButtonText,
     },
     tabLabelOff: {
-      color: 'rgba(15,23,42,0.55)',
+      color: colors.textSecondary,
     },
     scroll: {
       paddingHorizontal: 20,

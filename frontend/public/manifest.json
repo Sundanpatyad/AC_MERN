@@ -3,7 +3,7 @@
     "short_name": "Awakening Classes",
     "theme_color": "#000000",
     "background_color": "#000000",
-    "display": "standalone",
+    "display": "browser",
     "orientation": "portrait",
     "scope": "/",
     "start_url": "/",

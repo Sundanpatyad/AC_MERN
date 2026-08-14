@@ -1,6 +1,7 @@
 import React from 'react';
 import { Platform, StyleSheet, View, ViewStyle, StyleProp } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTheme } from '@/providers/AppThemeProvider';
 
 type Props = {
   children: React.ReactNode;
@@ -9,40 +10,44 @@ type Props = {
   fadeTo: string;
 };
 
-/** Clean light-blue + white mesh layers. */
+/** Website cream/ink mesh with a soft brand-red glow. */
 export function MeshFill() {
+  const { colors } = useTheme();
+
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <View style={[StyleSheet.absoluteFill, styles.base]} />
+      <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.meshBase }]} />
       <LinearGradient
-        colors={['#DBEAFE', '#BFDBFE', '#93C5FD']}
+        colors={colors.meshGlow}
         locations={[0, 0.48, 1]}
-        start={{ x: 0.1, y: 0 }}
-        end={{ x: 0.9, y: 1 }}
+        start={{ x: 0.12, y: 0 }}
+        end={{ x: 0.88, y: 1 }}
         style={StyleSheet.absoluteFill}
       />
       <LinearGradient
-        colors={['rgba(96, 165, 250, 0.55)', 'rgba(147, 197, 253, 0.35)', 'transparent']}
-        locations={[0, 0.5, 1]}
-        start={{ x: 1, y: 0 }}
-        end={{ x: 0.2, y: 1 }}
+        colors={colors.meshWash}
+        locations={[0, 0.52, 1]}
+        start={{ x: 0.85, y: 1 }}
+        end={{ x: 0.15, y: 0 }}
         style={StyleSheet.absoluteFill}
       />
       <LinearGradient
-        colors={['rgba(186, 230, 253, 0.7)', 'rgba(147, 197, 253, 0.4)', 'rgba(59, 130, 246, 0.28)']}
+        colors={colors.glowTop}
         locations={[0, 0.42, 1]}
-        start={{ x: 0, y: 0.1 }}
-        end={{ x: 1, y: 0.9 }}
+        start={{ x: 0.18, y: 0 }}
+        end={{ x: 0.8, y: 0.7 }}
         style={StyleSheet.absoluteFill}
       />
     </View>
   );
 }
 
-/** Light blue + white mesh used on app headers. */
+/** Header mesh matching the website color scheme. */
 export function MeshHero({ children, style }: Props) {
+  const { colors } = useTheme();
+
   return (
-    <View style={[styles.hero, style]}>
+    <View style={[styles.hero, { backgroundColor: colors.meshBase }, style]}>
       <View style={styles.heroClip} pointerEvents="none">
         <MeshFill />
       </View>
@@ -52,12 +57,8 @@ export function MeshHero({ children, style }: Props) {
 }
 
 const styles = StyleSheet.create({
-  base: {
-    backgroundColor: '#BFDBFE',
-  },
   hero: {
-    overflow: 'visible',
-    backgroundColor: '#BFDBFE',
+    overflow: 'hidden',
     borderBottomLeftRadius: 28,
     borderBottomRightRadius: 28,
     marginBottom: 16,

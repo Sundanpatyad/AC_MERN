@@ -17,6 +17,8 @@ export type AppPalette = {
   accent: string;
   accentMuted: string;
   danger: string;
+  brand: string;
+  brandSoft: string;
   success: string;
   warning: string;
   glow: string;
@@ -37,7 +39,7 @@ export type AppPalette = {
   meshPurple: string;
   meshCream: string;
   meshHot: string;
-  /** Header mesh — Zentra-style blue glow */
+  /** Header mesh — website cream/ink + brand red */
   meshBase: string;
   meshGlow: [string, string, string];
   meshWash: [string, string, string];
@@ -49,87 +51,91 @@ export type AppPalette = {
 };
 
 export const PaletteDark: AppPalette = {
-  black: '#000000',
-  background: '#000000',
-  backgroundElevated: '#0A0A0A',
-  surface: '#121212',
-  surfaceRaised: '#1C1C1E',
-  border: 'rgba(255,255,255,0.08)',
-  borderStrong: 'rgba(255,255,255,0.14)',
-  text: '#FFFFFF',
-  textSecondary: '#8E8E93',
-  textMuted: '#636366',
-  accent: '#FFFFFF',
-  accentMuted: '#D1D1D6',
-  danger: '#FF453A',
+  black: '#14130F',
+  background: '#14130F',
+  backgroundElevated: '#1C1B16',
+  surface: '#1C1B16',
+  surfaceRaised: '#25241E',
+  border: '#2E2C24',
+  borderStrong: 'rgba(225,224,204,0.16)',
+  text: '#E1E0CC',
+  textSecondary: '#B5B39F',
+  textMuted: '#8A8778',
+  accent: '#E1E0CC',
+  accentMuted: '#B5B39F',
+  danger: '#FF4444',
+  brand: '#FF0000',
+  brandSoft: 'rgba(255, 0, 0, 0.16)',
   success: '#30D158',
   warning: '#FFD60A',
-  glow: 'rgba(255,255,255,0.12)',
-  overlay: 'rgba(0,0,0,0.55)',
-  tabBar: 'rgba(18,18,18,0.92)',
-  tabBarPill: '#111111',
-  tabBarIndicator: '#FFFFFF',
-  tabBarIconActive: '#111111',
-  tabBarIconInactive: '#FFFFFF',
+  glow: 'rgba(225,224,204,0.08)',
+  overlay: 'rgba(20, 19, 15, 0.65)',
+  tabBar: 'rgba(28,27,22,0.92)',
+  tabBarPill: '#E1E0CC',
+  tabBarIndicator: '#14130F',
+  tabBarIconActive: '#E1E0CC',
+  tabBarIconInactive: '#14130F',
   tabBarPillBorder: 'transparent',
-  primaryGradient: ['#FFFFFF', '#D1D1D6'],
-  primaryButtonText: '#000000',
-  primaryShadow: '#FFFFFF',
+  primaryGradient: ['#E1E0CC', '#F0EFDE'],
+  primaryButtonText: '#14130F',
+  primaryShadow: '#E1E0CC',
   statusBarStyle: 'light',
-  meshMagenta: 'rgba(255, 255, 255, 0.12)',
-  meshPurple: 'rgba(255, 255, 255, 0.06)',
-  meshCream: 'rgba(255, 255, 255, 0.1)',
-  meshHot: 'rgba(255, 255, 255, 0.08)',
-  meshBase: '#F8FBFF',
-  meshGlow: ['rgba(191, 219, 254, 0.7)', 'rgba(239, 246, 255, 0.5)', 'transparent'],
-  meshWash: ['rgba(219, 234, 254, 0.85)', 'rgba(255, 255, 255, 0.9)', 'transparent'],
-  glowTop: ['rgba(255,255,255,0.14)', 'rgba(255,255,255,0.02)', 'transparent'],
-  glowBottom: ['transparent', 'rgba(255,255,255,0.04)'],
-  gridLine: '#FFFFFF',
-  gridOpacity: 0.045,
-  refreshTint: '#FFFFFF',
+  meshMagenta: 'rgba(255, 0, 0, 0.16)',
+  meshPurple: 'rgba(225, 224, 204, 0.08)',
+  meshCream: 'rgba(225, 224, 204, 0.12)',
+  meshHot: 'rgba(255, 0, 0, 0.10)',
+  meshBase: '#14130F',
+  meshGlow: ['#1C1B16', '#14130F', '#25241E'],
+  meshWash: ['rgba(255,0,0,0.18)', 'rgba(255,0,0,0.06)', 'transparent'],
+  glowTop: ['rgba(225,224,204,0.10)', 'rgba(255,0,0,0.08)', 'transparent'],
+  glowBottom: ['transparent', 'rgba(255,0,0,0.12)'],
+  gridLine: '#E1E0CC',
+  gridOpacity: 0.04,
+  refreshTint: '#E1E0CC',
 };
 
 export const PaletteLight: AppPalette = {
-  black: '#000000',
-  background: '#F2F2F7',
-  backgroundElevated: '#FFFFFF',
-  surface: '#FFFFFF',
-  surfaceRaised: '#EBEBF0',
-  border: 'rgba(0,0,0,0.08)',
-  borderStrong: 'rgba(0,0,0,0.14)',
-  text: '#111111',
-  textSecondary: '#6C6C70',
-  textMuted: '#8E8E93',
-  accent: '#111111',
-  accentMuted: '#3A3A3C',
-  danger: '#FF3B30',
+  black: '#16150F',
+  background: '#E8E6D4',
+  backgroundElevated: '#F3F1E0',
+  surface: '#F3F1E0',
+  surfaceRaised: '#DDDAC4',
+  border: '#CFCBB3',
+  borderStrong: 'rgba(22,21,15,0.16)',
+  text: '#16150F',
+  textSecondary: '#5A584C',
+  textMuted: '#8A8778',
+  accent: '#16150F',
+  accentMuted: '#5A584C',
+  danger: '#FF0000',
+  brand: '#FF0000',
+  brandSoft: 'rgba(255, 0, 0, 0.10)',
   success: '#34C759',
   warning: '#FF9500',
-  glow: 'rgba(0,0,0,0.06)',
-  overlay: 'rgba(0,0,0,0.4)',
-  tabBar: 'rgba(255,255,255,0.94)',
-  tabBarPill: '#FFFFFF',
-  tabBarIndicator: '#111111',
-  tabBarIconActive: '#FFFFFF',
-  tabBarIconInactive: '#111111',
-  tabBarPillBorder: 'rgba(0,0,0,0.1)',
-  primaryGradient: ['#1C1C1E', '#3A3A3C'],
-  primaryButtonText: '#FFFFFF',
-  primaryShadow: '#000000',
+  glow: 'rgba(22,21,15,0.06)',
+  overlay: 'rgba(22, 21, 15, 0.45)',
+  tabBar: 'rgba(243,241,224,0.94)',
+  tabBarPill: '#16150F',
+  tabBarIndicator: '#E8E6D4',
+  tabBarIconActive: '#16150F',
+  tabBarIconInactive: '#E1E0CC',
+  tabBarPillBorder: 'transparent',
+  primaryGradient: ['#16150F', '#0C0B08'],
+  primaryButtonText: '#E8E6D4',
+  primaryShadow: '#16150F',
   statusBarStyle: 'dark',
-  meshMagenta: 'rgba(0, 0, 0, 0.04)',
-  meshPurple: 'rgba(0, 0, 0, 0.03)',
-  meshCream: 'rgba(255, 255, 255, 0.5)',
-  meshHot: 'rgba(0, 0, 0, 0.02)',
-  meshBase: '#F8FBFF',
-  meshGlow: ['rgba(191, 219, 254, 0.65)', 'rgba(239, 246, 255, 0.45)', 'transparent'],
-  meshWash: ['rgba(219, 234, 254, 0.8)', 'rgba(255, 255, 255, 0.92)', 'transparent'],
-  glowTop: ['rgba(0,0,0,0.04)', 'rgba(0,0,0,0.015)', 'transparent'],
-  glowBottom: ['transparent', 'rgba(0,0,0,0.03)'],
-  gridLine: '#000000',
-  gridOpacity: 0.035,
-  refreshTint: '#111111',
+  meshMagenta: 'rgba(255, 0, 0, 0.12)',
+  meshPurple: 'rgba(255, 255, 255, 0.35)',
+  meshCream: 'rgba(243, 241, 224, 0.7)',
+  meshHot: 'rgba(255, 0, 0, 0.08)',
+  meshBase: '#E8E6D4',
+  meshGlow: ['#F3F1E0', '#E8E6D4', '#DDDAC4'],
+  meshWash: ['rgba(255,0,0,0.12)', 'rgba(255,0,0,0.04)', 'transparent'],
+  glowTop: ['rgba(255,255,255,0.42)', 'rgba(255,0,0,0.08)', 'transparent'],
+  glowBottom: ['transparent', 'rgba(255,0,0,0.08)'],
+  gridLine: '#16150F',
+  gridOpacity: 0.045,
+  refreshTint: '#16150F',
 };
 
 /** @deprecated Prefer useTheme().colors — kept as dark default for legacy static styles. */
@@ -139,8 +145,8 @@ export function resolvePalette(scheme: ColorScheme): AppPalette {
   return scheme === 'light' ? PaletteLight : PaletteDark;
 }
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = PaletteDark.text;
+const tintColorLight = PaletteLight.brand;
+const tintColorDark = PaletteDark.brand;
 
 export const Colors = {
   light: {

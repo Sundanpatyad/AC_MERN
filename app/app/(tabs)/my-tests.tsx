@@ -141,13 +141,13 @@ function createStyles(colors: AppPalette) {
     title: {
       fontSize: 22,
       fontWeight: '700',
-      color: '#0F172A',
+      color: colors.text,
       marginBottom: 2,
       letterSpacing: -0.3,
     },
     subtitle: {
       fontSize: 13,
-      color: 'rgba(15,23,42,0.55)',
+      color: colors.textSecondary,
     },
     scrollContent: {
       padding: 16,

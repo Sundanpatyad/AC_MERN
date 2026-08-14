@@ -21,8 +21,8 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { colors, isDark } = useTheme();
-  const styles = useMemo(() => createStyles(colors, isDark), [colors, isDark]);
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const onGoogle = async () => {
     if (isLoading) return;
@@ -80,7 +80,7 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.root}>
-      <StatusBar style="dark" />
+      <StatusBar style={colors.statusBarStyle} />
 
       <MeshHero
         fadeTo={colors.background}
@@ -134,7 +134,7 @@ export default function LoginScreen() {
             ]}
           >
             {isLoading ? (
-              <ActivityIndicator color={isDark ? '#111111' : '#FFFFFF'} />
+              <ActivityIndicator color={colors.primaryButtonText} />
             ) : (
               <>
                 <View style={styles.googleMark}>
@@ -160,7 +160,7 @@ export default function LoginScreen() {
   );
 }
 
-function createStyles(colors: AppPalette, isDark: boolean) {
+function createStyles(colors: AppPalette) {
   return StyleSheet.create({
     root: {
       flex: 1,
@@ -169,17 +169,17 @@ function createStyles(colors: AppPalette, isDark: boolean) {
     brand: {
       ...Type.h3,
       paddingHorizontal: 24,
-      color: '#0F172A',
+      color: colors.text,
       marginBottom: 18,
     },
     headline: {
       ...Type.hero,
       paddingHorizontal: 24,
-      color: '#0F172A',
+      color: colors.text,
     },
     headlineMuted: {
       ...Type.heroEmphasis,
-      color: 'rgba(15,23,42,0.55)',
+      color: colors.textSecondary,
     },
     body: {
       flex: 1,
@@ -224,10 +224,10 @@ function createStyles(colors: AppPalette, isDark: boolean) {
       borderRadius: 12,
       paddingHorizontal: 10,
       marginBottom: 6,
-      backgroundColor: isDark ? '#1C1C1E' : '#F2F2F7',
+      backgroundColor: colors.surfaceRaised,
     },
     mockOptionOn: {
-      backgroundColor: isDark ? '#FFFFFF' : '#111111',
+      backgroundColor: colors.text,
     },
     mockRadio: {
       width: 22,
@@ -235,10 +235,10 @@ function createStyles(colors: AppPalette, isDark: boolean) {
       borderRadius: 11,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: isDark ? '#2C2C2E' : '#E5E5EA',
+      backgroundColor: colors.border,
     },
     mockRadioOn: {
-      backgroundColor: isDark ? '#111111' : '#FFFFFF',
+      backgroundColor: colors.background,
     },
     mockLabel: {
       fontSize: 11,
@@ -246,7 +246,7 @@ function createStyles(colors: AppPalette, isDark: boolean) {
       color: colors.textSecondary,
     },
     mockLabelOn: {
-      color: isDark ? '#FFFFFF' : '#111111',
+      color: colors.text,
     },
     mockOptionText: {
       fontSize: 14,
@@ -254,7 +254,7 @@ function createStyles(colors: AppPalette, isDark: boolean) {
       color: colors.text,
     },
     mockOptionTextOn: {
-      color: isDark ? '#111111' : '#FFFFFF',
+      color: colors.primaryButtonText,
     },
     actions: {
       paddingTop: 16,
@@ -262,7 +262,7 @@ function createStyles(colors: AppPalette, isDark: boolean) {
     cta: {
       height: 56,
       borderRadius: 999,
-      backgroundColor: isDark ? '#FFFFFF' : '#1C1C1E',
+      backgroundColor: colors.text,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
@@ -282,7 +282,7 @@ function createStyles(colors: AppPalette, isDark: boolean) {
     },
     ctaText: {
       ...Type.button,
-      color: isDark ? '#111111' : '#FFFFFF',
+      color: colors.primaryButtonText,
     },
     footer: {
       ...Type.caption,

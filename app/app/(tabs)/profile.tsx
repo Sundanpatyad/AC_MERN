@@ -106,7 +106,7 @@ export default function ProfileScreen() {
             accessibilityLabel="Open settings"
             style={({ pressed }) => [styles.settingsBtn, pressed && { opacity: 0.7 }]}
           >
-            <Ionicons name="settings-outline" size={18} color="#0F172A" />
+            <Ionicons name="settings-outline" size={18} color={colors.text} />
           </Pressable>
         </View>
       </MeshHero>
@@ -265,16 +265,16 @@ function createStyles(colors: AppPalette) {
     title: {
       fontSize: 22,
       fontFamily: Fonts.semiBold,
-      color: '#0F172A',
+      color: colors.text,
       letterSpacing: -0.3,
     },
     settingsBtn: {
       width: 36,
       height: 36,
       borderRadius: 18,
-      backgroundColor: 'rgba(255,255,255,0.72)',
+      backgroundColor: colors.surface,
       borderWidth: 1,
-      borderColor: 'rgba(15,23,42,0.08)',
+      borderColor: colors.border,
       alignItems: 'center',
       justifyContent: 'center',
     },

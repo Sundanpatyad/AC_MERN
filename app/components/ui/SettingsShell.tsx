@@ -28,12 +28,15 @@ export function SettingsShell({ title, children, contentStyle }: Props) {
         <View style={styles.header}>
           <TouchableOpacity
             onPress={() => router.back()}
-            style={styles.backBtn}
+            style={[
+              styles.backBtn,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+            ]}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Ionicons name="chevron-back" size={22} color="#0F172A" />
+            <Ionicons name="chevron-back" size={22} color={colors.text} />
           </TouchableOpacity>
-          <Text style={styles.title} numberOfLines={1}>
+          <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
             {title}
           </Text>
           <View style={styles.backBtnSpacer} />
@@ -118,9 +121,9 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.72)',
+    backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: 'rgba(15,23,42,0.08)',
+    borderColor: 'transparent',
   },
   backBtnSpacer: {
     width: 40,
@@ -131,7 +134,6 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
     marginHorizontal: 8,
-    color: '#0F172A',
   },
   content: {
     padding: 16,

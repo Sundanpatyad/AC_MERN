@@ -3,6 +3,7 @@ import { MockTestPaymentEndpoints, studentEndpoints, BASE_URL } from "../apis";
 import { apiConnector } from "../apiConnector";
 import rzpLogo from "../../assets/Logo/rzp_logo.png";
 import { resetCart } from "../../slices/cartSlice";
+import { openInSystemBrowser, shouldHandoffPaymentToBrowser } from "../../lib/pwa";
 
 const { MOCK_TEST_PAYMENT_API, MOCK_TEST_VERIFY_API, MOCK_TEST_STATUS_API } = MockTestPaymentEndpoints;
 const { COURSE_PAYMENT_API, COURSE_VERIFY_API } = studentEndpoints;
@@ -151,17 +152,21 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
     const toastId = toast.loading("Loading...", toastOptions);
 
     try {
-        const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
-        console.log("Razorpay SDK loaded:", res);
+        const handoffToBrowser = shouldHandoffPaymentToBrowser();
 
-        if (!res) {
-            toast.error("RazorPay SDK failed to load. Please check your internet connection.", toastOptions);
-            return;
-        }
+        if (!handoffToBrowser) {
+            const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+            console.log("Razorpay SDK loaded:", res);
 
-        if (!window.Razorpay) {
-            toast.error("Razorpay is not available. Please refresh the page.", toastOptions);
-            return;
+            if (!res) {
+                toast.error("RazorPay SDK failed to load. Please check your internet connection.", toastOptions);
+                return;
+            }
+
+            if (!window.Razorpay) {
+                toast.error("Razorpay is not available. Please refresh the page.", toastOptions);
+                return;
+            }
         }
 
         const purchases = [];
@@ -245,8 +250,26 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
                 prefill.contact = contact;
             }
 
-            const useRedirect = isMobileBrowser();
+            const useRedirect = isMobileBrowser() || handoffToBrowser;
             savePendingOrder(orderId, itemType);
+
+            if (handoffToBrowser) {
+                const checkoutParams = new URLSearchParams({
+                    order_id: orderId,
+                    amount: String(amountInPaise),
+                    key: RAZORPAY_KEY,
+                    currency: orderData.currency || "INR",
+                    name: prefill.name || "",
+                    email: prefill.email || "",
+                });
+                if (contact) {
+                    checkoutParams.set("contact", contact);
+                }
+                const checkoutUrl = `${window.location.origin}/pay-checkout?${checkoutParams.toString()}`;
+                toast.success("Opening Chrome for UPI payment…", toastOptions);
+                openInSystemBrowser(checkoutUrl);
+                continue;
+            }
 
             const options = {
                 key: RAZORPAY_KEY,

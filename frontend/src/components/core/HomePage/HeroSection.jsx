@@ -418,12 +418,10 @@ const HeroSection = () => {
   const { token } = useSelector((state) => state.auth)
 
   return (
-    <section className="relative min-h-[calc(100dvh-4rem)] w-full flex items-center bg-page overflow-hidden">
-      <div className="page-shell py-10 md:py-14 lg:py-16 w-full">
+    <section className="relative min-h-[100dvh] w-full flex items-start lg:items-center bg-page overflow-hidden">
+      <div className="page-shell pt-28 pb-12 md:pt-24 md:pb-14 lg:py-16 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="text-center lg:text-left space-y-6 md:space-y-7">
-         
-
             <motion.h1
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
