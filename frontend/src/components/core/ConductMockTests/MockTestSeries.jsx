@@ -53,7 +53,7 @@ const MockTestSeries = () => {
       setLoading(false);
     } catch (error) {
       console.error('Error fetching test series:', error);
-      setError('Couldn't load test');
+      setError("Couldn't load test");
       toast.error("Couldn't load test");
       setLoading(false);
     }
