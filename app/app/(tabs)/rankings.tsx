@@ -4,6 +4,8 @@ import { apiConnector } from '../../services/api';
 import { endpoints } from '../../constants/api';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenBackground } from '../../components/ui/ScreenBackground';
+import { MeshHero } from '../../components/ui/MeshHero';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Card } from '../../components/ui/Card';
 import { AppPalette, Radii } from '../../constants/theme';
 import { useTheme } from '../../providers/AppThemeProvider';
@@ -11,6 +13,7 @@ import { RankingsSkeleton, Skeleton } from '../../components/ui/Skeleton';
 
 export default function RankingsScreen() {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [rankings, setRankings] = useState<any[]>([]);
   const [personalRank, setPersonalRank] = useState<any | null>(null);
@@ -122,22 +125,26 @@ export default function RankingsScreen() {
 
   return (
     <ScreenBackground>
+      <MeshHero
+        fadeTo={colors.background}
+        style={{ paddingTop: Math.max(insets.top, 12) + 4, paddingBottom: 16 }}
+      >
       <View style={styles.header}>
         <Text style={styles.title}>Leaderboard</Text>
         <Text style={styles.subtitle}>Top performers across all tests</Text>
         
         <View style={styles.searchContainer}>
-          <Ionicons name="search" size={18} color={colors.textMuted} style={styles.searchIcon} />
+          <Ionicons name="search" size={16} color="rgba(15,23,42,0.45)" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search by user or test..."
-            placeholderTextColor={colors.textMuted}
+            placeholderTextColor="rgba(15,23,42,0.4)"
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
           {searchQuery !== '' && (
             <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Ionicons name="close-circle" size={18} color={colors.textMuted} />
+              <Ionicons name="close-circle" size={18} color="rgba(15,23,42,0.4)" />
             </TouchableOpacity>
           )}
         </View>
@@ -165,6 +172,7 @@ export default function RankingsScreen() {
           ))}
         </ScrollView>
       </View>
+      </MeshHero>
 
       <FlatList
         data={filteredData}
@@ -225,37 +233,36 @@ export default function RankingsScreen() {
 function createStyles(colors: AppPalette) {
   return StyleSheet.create({
     header: {
-      padding: 20,
-      paddingTop: 64,
+      paddingHorizontal: 16,
     },
     title: {
-      fontSize: 28,
+      fontSize: 22,
       fontWeight: '700',
-      color: colors.text,
-      marginBottom: 4,
-      letterSpacing: -0.4,
+      color: '#0F172A',
+      marginBottom: 2,
+      letterSpacing: -0.3,
     },
     subtitle: {
-      fontSize: 14,
-      color: colors.textSecondary,
-      marginBottom: 16,
+      fontSize: 13,
+      color: 'rgba(15,23,42,0.55)',
+      marginBottom: 12,
     },
     searchContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: colors.surface,
+      backgroundColor: 'rgba(255,255,255,0.78)',
       borderRadius: Radii.pill,
-      paddingHorizontal: 16,
-      height: 48,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: 'rgba(15,23,42,0.08)',
+      paddingHorizontal: 12,
+      height: 40,
     },
     searchIcon: {
       marginRight: 8,
     },
     searchInput: {
       flex: 1,
-      color: colors.text,
+      color: '#0F172A',
       fontSize: 15,
     },
     filterContainer: {
@@ -266,28 +273,28 @@ function createStyles(colors: AppPalette) {
       gap: 8,
     },
     filterBadge: {
-      backgroundColor: colors.surface,
+      backgroundColor: 'rgba(255,255,255,0.55)',
+      borderWidth: 1,
+      borderColor: 'rgba(15,23,42,0.08)',
       paddingHorizontal: 14,
       paddingVertical: 8,
       borderRadius: Radii.pill,
-      borderWidth: 1,
-      borderColor: colors.border,
     },
     filterBadgeActive: {
-      backgroundColor: colors.text,
-      borderColor: colors.text,
+      backgroundColor: '#0F172A',
+      borderColor: '#0F172A',
     },
     filterText: {
-      color: colors.textSecondary,
+      color: '#0F172A',
       fontSize: 12,
       fontWeight: '600',
     },
     filterTextActive: {
-      color: colors.primaryButtonText,
+      color: '#FFFFFF',
     },
     scrollContent: {
-      padding: 20,
-      paddingBottom: 32,
+      padding: 16,
+      paddingBottom: 16,
     },
     personalRankSection: {
       marginBottom: 20,

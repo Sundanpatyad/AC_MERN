@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { apiConnector } from '../../services/api';
 import { endpoints } from '../../constants/api';
 import { useTestStore } from '../../store/testStore';
-import { useAuthStore } from '../../store/authStore';
+import { isInstructorAccount, useAuthStore } from '../../store/authStore';
 import { Button } from '../../components/ui/Button';
 import { ConfirmationSheet } from '../../components/ui/ConfirmationSheet';
 import { DetailSkeleton } from '../../components/ui/Skeleton';
@@ -23,8 +23,9 @@ function paramValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
 
-function hasSeriesAccess(series: any, userId?: string) {
+function hasSeriesAccess(series: any, userId?: string, accountType?: string) {
   if (!series) return false;
+  if (isInstructorAccount(accountType)) return true;
   if (Number(series.price) === 0) return true;
   if (series.isEnrolled) return true;
   if (!userId || !Array.isArray(series.studentsEnrolled)) return false;
@@ -103,7 +104,7 @@ export default function TakeTestScreen() {
         return;
       }
 
-      if (!hasSeriesAccess(parentSeries, user?._id)) {
+      if (!hasSeriesAccess(parentSeries, user?._id, user?.accountType)) {
         resetTest();
         router.replace(`/mock-test/${parentSeries._id}`);
         return;
@@ -139,7 +140,7 @@ export default function TakeTestScreen() {
     } finally {
       setIsLoading(false);
     }
-  }, [id, seriesIdParam, user?._id, isTestActive, resetTest, router, startTest]);
+  }, [id, seriesIdParam, user?._id, user?.accountType, isTestActive, resetTest, router, startTest]);
 
   useEffect(() => {
     fetchTest();

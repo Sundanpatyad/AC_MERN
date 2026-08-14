@@ -10,16 +10,18 @@ import {
   useWindowDimensions,
   Pressable,
   TextInput,
+  Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
-import { useAuthStore } from '../../store/authStore';
+import { isInstructorAccount, useAuthStore } from '../../store/authStore';
+import { AdminConsole } from '../../components/admin/AdminConsole';
 import { apiConnector } from '../../services/api';
 import { endpoints } from '../../constants/api';
 import { MockTestCard } from '../../components/MockTestCard';
-import { ScreenBackground } from '../../components/ui/ScreenBackground';
+import { MeshHero } from '../../components/ui/MeshHero';
 import { Card } from '../../components/ui/Card';
 import { ScoreBarChart } from '../../components/ui/ScoreBarChart';
 import { HomeSkeleton } from '../../components/ui/Skeleton';
@@ -30,9 +32,9 @@ import { SectionHeading } from '../../components/ui/SectionHeading';
 const YOUTUBE_CHANNEL = 'https://www.youtube.com/@awakeningclasses';
 const RANK_STORY_URL = 'https://youtu.be/zZqPFZo8IUo?si=MbeDgOr_YtO9bH_x';
 const BANNER_ASPECT = 1024 / 535;
-const H_PAD = 20;
-const BLOCK_GAP = 20;
-const SECTION_GAP = 12;
+const H_PAD = 16;
+const BLOCK_GAP = 14;
+const SECTION_GAP = 8;
 
 const FILTERS = [
   { id: 'all', label: 'All courses' },
@@ -53,6 +55,14 @@ async function openExternal(url: string) {
 
 export default function HomeScreen() {
   const { user } = useAuthStore();
+  if (isInstructorAccount(user?.accountType)) {
+    return <AdminConsole />;
+  }
+  return <StudentHomeScreen />;
+}
+
+function StudentHomeScreen() {
+  const { user } = useAuthStore();
   const router = useRouter();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -68,7 +78,7 @@ export default function HomeScreen() {
   const [activeFilter, setActiveFilter] = useState<FilterId>('all');
 
   const bannerHeight = Math.round((screenWidth - H_PAD * 2) / BANNER_ASPECT);
-  const heroCardWidth = Math.min(320, screenWidth * 0.82);
+  const heroCardWidth = Math.min(260, screenWidth * 0.72);
 
   const fetchHomeData = useCallback(async () => {
     try {
@@ -166,13 +176,12 @@ export default function HomeScreen() {
   const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Student';
 
   return (
-    <ScreenBackground>
+    <View style={[styles.page, { backgroundColor: colors.background }]}>
       <ScrollView
         contentContainerStyle={[
           styles.content,
           {
-            paddingTop: Math.max(insets.top, 16) + 6,
-            paddingBottom: 48,
+            paddingBottom: 16,
           },
         ]}
         showsVerticalScrollIndicator={false}
@@ -189,92 +198,94 @@ export default function HomeScreen() {
         }
       >
         {isLoading ? (
-          <HomeSkeleton bannerHeight={bannerHeight} />
+          <View style={{ paddingTop: Math.max(insets.top, 16) + 6 }}>
+            <HomeSkeleton bannerHeight={bannerHeight} />
+          </View>
         ) : (
           <>
-            <View style={styles.header}>
-              <Pressable
-                onPress={() => router.push('/(tabs)/profile')}
-                hitSlop={8}
-                accessibilityRole="button"
-                accessibilityLabel="Open profile"
-                style={({ pressed }) => [styles.headerLeft, pressed && { opacity: 0.88 }]}
-              >
-                <View style={styles.avatar}>
-                  {user?.image ? (
-                    <Image source={{ uri: user.image }} style={styles.avatarImage} />
-                  ) : (
-                    <Text style={styles.avatarLetter}>{user?.firstName?.[0] || 'A'}</Text>
-                  )}
-                </View>
-                <View style={styles.greetingBlock}>
-                  <Text style={styles.greetingLine}>Good to see you,</Text>
-                  <Text style={styles.userName} numberOfLines={1}>
-                    {displayName}
-                  </Text>
-                </View>
-              </Pressable>
-
-              <Pressable
-                onPress={() => router.push('/notifications')}
-                hitSlop={10}
-                accessibilityRole="button"
-                accessibilityLabel="Notifications"
-                style={({ pressed }) => [styles.bellBtn, pressed && { opacity: 0.8 }]}
-              >
-                <Ionicons name="notifications-outline" size={22} color={colors.text} />
-              </Pressable>
-            </View>
-
-            <View style={styles.searchBar}>
-              <TextInput
-                value={query}
-                onChangeText={setQuery}
-                placeholder="Find your next course"
-                placeholderTextColor={colors.textMuted}
-                style={styles.searchInput}
-                returnKeyType="search"
-                accessibilityLabel="Search courses"
-              />
-              <Pressable
-                onPress={() => router.push('/(tabs)/mock-tests')}
-                style={({ pressed }) => [
-                  styles.searchBtn,
-                  pressed && { opacity: 0.88 },
-                ]}
-                accessibilityRole="button"
-                accessibilityLabel="Browse all tests"
-              >
-                <Ionicons name="search" size={18} color={colors.text} />
-              </Pressable>
-            </View>
-
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.chips}
+            <MeshHero
+              fadeTo={colors.background}
+              style={{
+                paddingTop: Math.max(insets.top, 12) + 4,
+                paddingBottom: 16,
+              }}
             >
-              {FILTERS.map((filter) => {
-                const active = activeFilter === filter.id;
-                return (
-                  <Pressable
-                    key={filter.id}
-                    onPress={() => setActiveFilter(filter.id)}
-                    style={({ pressed }) => [
-                      styles.chip,
-                      active && styles.chipActive,
-                      pressed && { opacity: 0.9 },
-                    ]}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected: active }}
-                  >
-                    <Text style={[styles.chipText, active && styles.chipTextActive]}>
-                      {filter.label}
+              <View style={styles.header}>
+                <Pressable
+                  onPress={() => router.push('/(tabs)/profile')}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel="Open profile"
+                  style={({ pressed }) => [styles.headerLeft, pressed && { opacity: 0.88 }]}
+                >
+                  <View style={styles.avatar}>
+                    {user?.image ? (
+                      <Image source={{ uri: user.image }} style={styles.avatarImage} />
+                    ) : (
+                      <Text style={styles.avatarLetter}>{user?.firstName?.[0] || 'A'}</Text>
+                    )}
+                  </View>
+                  <View style={styles.greetingBlock}>
+                    <Text style={styles.greetingLine}>Good to see you,</Text>
+                    <Text style={styles.userName} numberOfLines={1}>
+                      {displayName}
                     </Text>
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
+                  </View>
+                </Pressable>
+
+                <Pressable
+                  onPress={() => router.push('/notifications')}
+                  hitSlop={10}
+                  accessibilityRole="button"
+                  accessibilityLabel="Notifications"
+                  style={({ pressed }) => [styles.bellBtn, pressed && { opacity: 0.8 }]}
+                >
+                  <Ionicons name="notifications-outline" size={22} color="#0F172A" />
+                </Pressable>
+              </View>
+
+              <View style={styles.searchBar}>
+                <Ionicons name="search" size={16} color="rgba(15,23,42,0.45)" />
+                <TextInput
+                  value={query}
+                  onChangeText={setQuery}
+                  placeholder="Search..."
+                  placeholderTextColor="rgba(15,23,42,0.4)"
+                  style={styles.searchInput}
+                  returnKeyType="search"
+                  accessibilityLabel="Search courses"
+                />
+              </View>
+
+              <ScrollView
+                horizontal
+                nestedScrollEnabled
+                showsHorizontalScrollIndicator={false}
+                style={styles.chipsScroll}
+                contentContainerStyle={styles.chips}
+              >
+                {FILTERS.map((filter) => {
+                  const active = activeFilter === filter.id;
+                  return (
+                    <Pressable
+                      key={filter.id}
+                      onPress={() => setActiveFilter(filter.id)}
+                      style={({ pressed }) => [
+                        styles.chip,
+                        active && styles.chipActive,
+                        pressed && { opacity: 0.9 },
+                      ]}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: active }}
+                    >
+                      <Text style={[styles.chipText, active && styles.chipTextActive]}>
+                        {filter.label}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+            </MeshHero>
 
             <View style={styles.section}>
               <View style={styles.sectionPad}>
@@ -317,7 +328,7 @@ export default function HomeScreen() {
                 rightText="History"
                 onPressRight={() => router.push('/(tabs)/my-tests')}
               />
-              <Card padding={14}>
+              <Card padding={10}>
                 {analytics.chartData.length > 0 ? (
                   <>
                     <View style={styles.progressMeta}>
@@ -325,7 +336,7 @@ export default function HomeScreen() {
                       <Text style={styles.metaPill}>Avg {analytics.avgScore}%</Text>
                       <Text style={styles.metaPill}>Best {analytics.bestScore}%</Text>
                     </View>
-                    <ScoreBarChart data={analytics.chartData} height={112} />
+                    <ScoreBarChart data={analytics.chartData} height={88} />
                   </>
                 ) : (
                   <Pressable
@@ -358,7 +369,7 @@ export default function HomeScreen() {
                 onPress={() => router.push('/(tabs)/rankings')}
                 style={({ pressed }) => pressed && { opacity: 0.92 }}
               >
-                <Card padding={12}>
+                <Card padding={10}>
                   <View style={styles.standing}>
                     <View style={styles.standingIcon}>
                       <Ionicons name="trophy-outline" size={18} color={colors.textSecondary} />
@@ -420,12 +431,15 @@ export default function HomeScreen() {
           </>
         )}
       </ScrollView>
-    </ScreenBackground>
+    </View>
   );
 }
 
 function createStyles(colors: AppPalette) {
   return StyleSheet.create({
+    page: {
+      flex: 1,
+    },
     content: {
       gap: BLOCK_GAP,
     },
@@ -447,24 +461,24 @@ function createStyles(colors: AppPalette) {
       minWidth: 0,
     },
     avatar: {
-      width: 44,
-      height: 44,
+      width: 34,
+      height: 34,
       borderRadius: 999,
-      backgroundColor: colors.surfaceRaised,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: colors.borderStrong,
+      backgroundColor: 'rgba(255,255,255,0.7)',
+      borderWidth: 1.5,
+      borderColor: 'rgba(15,23,42,0.12)',
       alignItems: 'center',
       justifyContent: 'center',
       overflow: 'hidden',
     },
     avatarImage: {
-      width: 44,
-      height: 44,
+      width: 34,
+      height: 34,
     },
     avatarLetter: {
-      fontSize: 16,
+      fontSize: 13,
       fontWeight: '700',
-      color: colors.text,
+      color: '#0F172A',
     },
     greetingBlock: {
       flex: 1,
@@ -472,71 +486,80 @@ function createStyles(colors: AppPalette) {
       gap: 2,
     },
     greetingLine: {
-      fontSize: 13,
-      color: colors.textSecondary,
+      fontSize: 11,
+      color: 'rgba(15,23,42,0.55)',
       fontWeight: '400',
     },
     userName: {
-      fontSize: 28,
-      lineHeight: 34,
-      color: colors.text,
+      fontSize: 20,
+      lineHeight: 24,
+      color: '#0F172A',
       fontFamily: Fonts.semiBold,
       letterSpacing: -0.3,
     },
     bellBtn: {
-      width: 42,
-      height: 42,
+      width: 34,
+      height: 34,
       borderRadius: 999,
       alignItems: 'center',
       justifyContent: 'center',
+      backgroundColor: 'rgba(255,255,255,0.72)',
+      borderWidth: 1,
+      borderColor: 'rgba(15,23,42,0.08)',
     },
     searchBar: {
       marginHorizontal: H_PAD,
+      marginTop: 12,
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: colors.surfaceRaised,
+      backgroundColor: 'rgba(255,255,255,0.78)',
       borderRadius: Radii.pill,
-      paddingLeft: 18,
-      paddingRight: 6,
-      paddingVertical: 6,
+      borderWidth: 1,
+      borderColor: 'rgba(15,23,42,0.08)',
+      paddingHorizontal: 12,
+      paddingVertical: 4,
       gap: 8,
-      minHeight: 52,
+      minHeight: 38,
     },
     searchInput: {
       flex: 1,
-      color: colors.text,
-      fontSize: 15,
-      paddingVertical: 8,
+      color: '#0F172A',
+      fontSize: 13,
+      paddingVertical: 6,
     },
-    searchBtn: {
-      width: 40,
-      height: 40,
-      borderRadius: 999,
-      backgroundColor: colors.surface,
-      alignItems: 'center',
-      justifyContent: 'center',
+    chipsScroll: {
+      flexGrow: 0,
     },
     chips: {
       paddingHorizontal: H_PAD,
-      gap: 10,
+      paddingTop: 10,
+      gap: 8,
+      alignItems: 'center',
     },
     chip: {
-      paddingHorizontal: 16,
-      paddingVertical: 11,
+      paddingHorizontal: 14,
+      paddingVertical: 8,
       borderRadius: Radii.pill,
-      backgroundColor: colors.surfaceRaised,
+      backgroundColor: 'rgba(255,255,255,0.55)',
+      borderWidth: 1,
+      borderColor: 'rgba(15,23,42,0.08)',
+      flexShrink: 0,
+      alignSelf: 'flex-start',
     },
     chipActive: {
-      backgroundColor: colors.text,
+      backgroundColor: '#0F172A',
+      borderColor: '#0F172A',
     },
     chipText: {
-      color: colors.text,
+      color: '#0F172A',
       fontSize: 13,
-      fontWeight: '500',
+      lineHeight: 18,
+      fontFamily: Fonts.medium,
+      ...(Platform.OS === 'android' ? { includeFontPadding: false } : null),
     },
     chipTextActive: {
-      color: colors.primaryButtonText,
-      fontWeight: '600',
+      color: '#FFFFFF',
+      fontFamily: Fonts.semiBold,
     },
     section: {
       gap: SECTION_GAP,
@@ -620,7 +643,7 @@ function createStyles(colors: AppPalette) {
     },
     banner: {
       width: '100%',
-      borderRadius: 24,
+      borderRadius: 16,
       overflow: 'hidden',
       borderWidth: 1,
       borderColor: colors.border,

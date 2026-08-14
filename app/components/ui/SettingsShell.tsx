@@ -2,8 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ViewStyle } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ScreenBackground } from './ScreenBackground';
-import { Radii } from '@/constants/theme';
+import { MeshHero } from './MeshHero';
+import { Radii, Type } from '@/constants/theme';
 import { useTheme } from '@/providers/AppThemeProvider';
 
 type Props = {
@@ -15,25 +17,28 @@ type Props = {
 export function SettingsShell({ title, children, contentStyle }: Props) {
   const router = useRouter();
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
 
   return (
     <ScreenBackground>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={[
-            styles.backBtn,
-            { backgroundColor: colors.surface, borderColor: colors.border },
-          ]}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <Ionicons name="chevron-back" size={22} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
-          {title}
-        </Text>
-        <View style={styles.backBtnSpacer} />
-      </View>
+      <MeshHero
+        fadeTo={colors.background}
+        style={{ paddingTop: Math.max(insets.top, 12) + 4, paddingBottom: 14 }}
+      >
+        <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backBtn}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Ionicons name="chevron-back" size={22} color="#0F172A" />
+          </TouchableOpacity>
+          <Text style={styles.title} numberOfLines={1}>
+            {title}
+          </Text>
+          <View style={styles.backBtnSpacer} />
+        </View>
+      </MeshHero>
       <ScrollView
         contentContainerStyle={[styles.content, contentStyle]}
         keyboardShouldPersistTaps="handled"
@@ -102,9 +107,7 @@ export function SettingsRow({
 
 const styles = StyleSheet.create({
   header: {
-    paddingTop: 58,
     paddingHorizontal: 16,
-    paddingBottom: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -115,21 +118,23 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.72)',
     borderWidth: 1,
+    borderColor: 'rgba(15,23,42,0.08)',
   },
   backBtnSpacer: {
     width: 40,
     height: 40,
   },
   title: {
+    ...Type.title,
     flex: 1,
     textAlign: 'center',
-    fontSize: 18,
-    fontWeight: '700',
     marginHorizontal: 8,
+    color: '#0F172A',
   },
   content: {
-    padding: 20,
+    padding: 16,
     paddingBottom: 40,
   },
   card: {

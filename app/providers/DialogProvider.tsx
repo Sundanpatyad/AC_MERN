@@ -61,13 +61,14 @@ export function showConfirm(options: ConfirmOptions): Promise<boolean> {
     tone: options.tone ?? 'default',
     actions: [
       {
-        label: options.confirmText ?? 'Confirm',
-        variant: options.confirmVariant ?? 'primary',
+        label: options.cancelText ?? 'Cancel',
+        variant: 'outline',
         onPress: () => {},
       },
       {
-        label: options.cancelText ?? 'Cancel',
-        variant: 'outline',
+        label: options.confirmText ?? 'Confirm',
+        variant: options.confirmVariant ?? 'primary',
+        destructive: (options.tone ?? 'default') === 'danger',
         onPress: () => {},
       },
     ],
@@ -101,7 +102,7 @@ export function DialogProvider({ children }: { children: React.ReactNode }) {
     const isConfirm = request.actions.length > 1;
     return request.actions.map((action, index) => ({
       ...action,
-      onPress: () => close(isConfirm ? index === 0 : true),
+      onPress: () => close(isConfirm ? index === request.actions.length - 1 : true),
     }));
   }, [close, request]);
 

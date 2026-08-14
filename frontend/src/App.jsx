@@ -19,6 +19,8 @@ import PrivacyPolicy from "./pages/PrivicyPolicy";
 import TermsOfService from "./pages/Terms";
 import { useTokenExpiry } from "./hooks/useTokenExpiry";
 import { enablePushNotifications, listenForForegroundMessages } from "./services/pushNotifications";
+import { resumePendingPayment } from "./services/operations/studentFeaturesAPI";
+import PaymentResult from "./pages/PaymentResult";
 import { toast } from "react-hot-toast";
 import {
   initGoogleAnalytics,
@@ -155,11 +157,17 @@ function App() {
     return () => window.removeEventListener("scroll", handleArrow);
   }, []);
 
-  // useEffect(() => {
-  //   if (token) {
-  //     checkAndVerifyPayment(token, navigate, dispatch);
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (!token) return;
+    resumePendingPayment(token);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") {
+        resumePendingPayment(token);
+      }
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [token]);
 
   // useEffect(() => {
   //   const timer = setTimeout(() => setShowHome(true), 1000);
@@ -341,6 +349,7 @@ function App() {
                 )}
               </Route>
 
+              <Route path="/payment-result" element={<PaymentResult />} />
               <Route path="/mocktest" element={<Mocktest />} />
               <Route path="view-mock/:mockId" element={<MockTestSeries />} />
               <Route path="attempt-test/:mockId/:testId" element={<AttemptMockTest />} />

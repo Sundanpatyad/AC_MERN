@@ -8,8 +8,15 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
-import { Button } from './Button';
-import { Fonts, Radii } from '@/constants/theme';
+import {
+  FLOATING_TAB_BAR_HEIGHT,
+  TAB_BAR_END_PAD,
+  TAB_BAR_ICON_SIZE,
+  TAB_BAR_INDICATOR_SIZE,
+  TAB_BAR_ITEM_GAP,
+  floatingTabBarWidth,
+} from '@/constants/layout';
+import { Radii, Type } from '@/constants/theme';
 import { useTheme } from '@/providers/AppThemeProvider';
 
 export type DialogTone = 'default' | 'success' | 'danger';
@@ -20,6 +27,8 @@ export type DialogAction = {
   label: string;
   onPress: () => void;
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+  destructive?: boolean;
+  icon?: IoniconName;
 };
 
 type AppDialogProps = {
@@ -32,14 +41,84 @@ type AppDialogProps = {
   dismissOnOverlay?: boolean;
 };
 
-const OPEN_MS = 240;
-const CLOSE_MS = 180;
+const OPEN_MS = 220;
+const CLOSE_MS = 160;
 
-const TONE_ICON: Record<DialogTone, { name: IoniconName; colorKey: 'text' | 'success' | 'danger' } | null> = {
+const TONE_ICON: Record<
+  DialogTone,
+  { name: IoniconName; colorKey: 'text' | 'success' | 'danger' } | null
+> = {
   default: null,
   success: { name: 'checkmark-circle', colorKey: 'success' },
   danger: { name: 'alert-circle', colorKey: 'danger' },
 };
+
+function resolveActionIcon(
+  action: DialogAction,
+  isConfirmAction: boolean
+): IoniconName {
+  if (action.icon) return action.icon;
+
+  const label = action.label.toLowerCase();
+  if (label.includes('log out') || label.includes('logout')) return 'log-out-outline';
+  if (label.includes('delete')) return 'trash-outline';
+  if (label.includes('submit')) return 'checkmark';
+  if (label.includes('ok') || label.includes('got it')) return 'checkmark';
+  if (
+    label.includes('cancel') ||
+    label.includes('keep') ||
+    label.includes('close') ||
+    label.includes('no')
+  ) {
+    return 'close';
+  }
+
+  return isConfirmAction || action.variant === 'primary' ? 'checkmark' : 'close';
+}
+
+function DialogButton({
+  action,
+  tone,
+  isConfirmAction,
+}: {
+  action: DialogAction;
+  tone: DialogTone;
+  isConfirmAction: boolean;
+}) {
+  const { colors } = useTheme();
+  const isDanger = (tone === 'danger' && isConfirmAction) || action.destructive;
+  const filled = isConfirmAction || action.variant === 'primary';
+  const iconName = resolveActionIcon(action, isConfirmAction);
+
+  const backgroundColor = filled
+    ? isDanger
+      ? colors.danger
+      : colors.tabBarIndicator
+    : 'transparent';
+
+  const iconColor = filled
+    ? isDanger
+      ? '#FFFFFF'
+      : colors.tabBarIconActive
+    : colors.tabBarIconInactive;
+
+  return (
+    <Pressable
+      onPress={action.onPress}
+      accessibilityRole="button"
+      accessibilityLabel={action.label}
+      style={({ pressed }) => [
+        styles.actionButton,
+        {
+          backgroundColor,
+          opacity: pressed ? 0.82 : 1,
+        },
+      ]}
+    >
+      <Ionicons name={iconName} size={TAB_BAR_ICON_SIZE} color={iconColor} />
+    </Pressable>
+  );
+}
 
 export function AppDialog({
   isVisible,
@@ -54,6 +133,7 @@ export function AppDialog({
   const [mounted, setMounted] = React.useState(isVisible);
   const progress = useSharedValue(0);
   const icon = TONE_ICON[tone];
+  const isConfirm = actions.length > 1;
 
   useEffect(() => {
     if (isVisible) {
@@ -77,12 +157,12 @@ export function AppDialog({
   }, [isVisible, mounted, progress]);
 
   const overlayStyle = useAnimatedStyle(() => ({
-    opacity: progress.value,
+    opacity: progress.value * 0.92,
   }));
 
   const cardStyle = useAnimatedStyle(() => ({
     opacity: progress.value,
-    transform: [{ scale: 0.94 + progress.value * 0.06 }],
+    transform: [{ scale: 0.96 + progress.value * 0.04 }],
   }));
 
   if (!mounted) return null;
@@ -120,24 +200,33 @@ export function AppDialog({
             <View
               style={[
                 styles.iconWrap,
-                { backgroundColor: `${colors[icon.colorKey]}18` },
+                { backgroundColor: `${colors[icon.colorKey]}14` },
               ]}
             >
-              <Ionicons name={icon.name} size={28} color={colors[icon.colorKey]} />
+              <Ionicons name={icon.name} size={22} color={colors[icon.colorKey]} />
             </View>
           ) : null}
 
           <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
           <Text style={[styles.message, { color: colors.textSecondary }]}>{message}</Text>
 
-          <View style={styles.actions}>
-            {actions.map((action) => (
-              <Button
+          <View
+            style={[
+              styles.actionsPill,
+              {
+                width: floatingTabBarWidth(actions.length),
+                backgroundColor: colors.tabBarPill,
+                borderColor: colors.tabBarPillBorder,
+                borderWidth: colors.tabBarPillBorder === 'transparent' ? 0 : 1,
+              },
+            ]}
+          >
+            {actions.map((action, index) => (
+              <DialogButton
                 key={action.label}
-                title={action.label}
-                onPress={action.onPress}
-                variant={action.variant ?? 'primary'}
-                style={styles.button}
+                action={action}
+                tone={tone}
+                isConfirmAction={!isConfirm || index === actions.length - 1}
               />
             ))}
           </View>
@@ -152,49 +241,59 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 28,
+    paddingHorizontal: 36,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
   },
   card: {
     width: '100%',
-    maxWidth: 340,
-    borderRadius: Radii.xl,
+    maxWidth: 288,
+    borderRadius: Radii.lg,
     borderWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: 22,
-    paddingTop: 26,
-    paddingBottom: 18,
-    alignItems: 'center',
+    paddingHorizontal: 18,
+    paddingTop: 18,
+    paddingBottom: 16,
+    alignItems: 'stretch',
   },
   iconWrap: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 14,
+    alignSelf: 'center',
+    marginBottom: 10,
   },
   title: {
-    fontFamily: Fonts.semiBold,
-    fontSize: 20,
-    lineHeight: 26,
+    ...Type.title,
+    fontSize: 17,
+    lineHeight: 22,
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   message: {
-    fontFamily: Fonts.sans,
-    fontSize: 14,
-    lineHeight: 21,
+    ...Type.bodySmall,
+    fontSize: 13,
+    lineHeight: 18,
     textAlign: 'center',
-    marginBottom: 22,
+    marginBottom: 18,
   },
-  actions: {
-    width: '100%',
-    gap: 6,
+  actionsPill: {
+    height: FLOATING_TAB_BAR_HEIGHT,
+    borderRadius: FLOATING_TAB_BAR_HEIGHT / 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
+    paddingHorizontal: TAB_BAR_END_PAD,
+    gap: TAB_BAR_ITEM_GAP,
   },
-  button: {
-    width: '100%',
-    marginVertical: 0,
+  actionButton: {
+    width: TAB_BAR_INDICATOR_SIZE,
+    height: TAB_BAR_INDICATOR_SIZE,
+    borderRadius: TAB_BAR_INDICATOR_SIZE / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

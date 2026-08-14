@@ -34,15 +34,18 @@ export function AppThemeProvider({ children }: { children: React.ReactNode }) {
   const colorScheme: ColorScheme =
     preference === 'system' ? systemScheme : preference;
 
+  const colors = useMemo(() => resolvePalette(colorScheme), [colorScheme]);
+  const isDark = colorScheme === 'dark';
+
   const value = useMemo<ThemeContextValue>(
     () => ({
       preference,
       colorScheme,
-      isDark: colorScheme === 'dark',
-      colors: resolvePalette(colorScheme),
+      isDark,
+      colors,
       setPreference,
     }),
-    [preference, colorScheme, setPreference]
+    [preference, colorScheme, isDark, colors, setPreference]
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

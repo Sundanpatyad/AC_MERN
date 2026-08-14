@@ -13,6 +13,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Fonts, Radii } from '@/constants/theme';
 import { useTheme } from '@/providers/AppThemeProvider';
+import { isInstructorAccount, useAuthStore } from '@/store/authStore';
 
 interface MockTestCardProps {
   test: any;
@@ -40,6 +41,8 @@ export function MockTestCard({
 }: MockTestCardProps) {
   const router = useRouter();
   const { colors } = useTheme();
+  const { user } = useAuthStore();
+  const instructor = isInstructorAccount(user?.accountType);
   const isRow = variant === 'row';
   const isHero = variant === 'hero';
 
@@ -51,9 +54,11 @@ export function MockTestCard({
     }
   };
 
-  const isFree = test.price === 0;
+  const isFree = Number(test.price) === 0;
   const testCount = test.mockTests?.length || 0;
   const priceLabel = isFree ? 'Free' : `₹${test.price}`;
+  const actionLabel =
+    instructor || isFree || showStatus || test.isEnrolled ? 'Start now' : 'Buy now';
   const description =
     stripHtml(test.description) ||
     `${testCount} ${testCount === 1 ? 'test' : 'tests'} · Practice and rank up`;
@@ -197,7 +202,7 @@ export function MockTestCard({
           <Text style={[styles.price, { color: colors.text }]}>{priceLabel}</Text>
           <View style={[styles.actionButton, { backgroundColor: colors.text }]}>
             <Text style={[styles.actionText, { color: colors.primaryButtonText }]}>
-              {showStatus ? 'View' : 'Details'}
+              {actionLabel}
             </Text>
           </View>
         </View>
@@ -208,8 +213,8 @@ export function MockTestCard({
 
 const styles = StyleSheet.create({
   hero: {
-    height: 220,
-    borderRadius: 24,
+    height: 176,
+    borderRadius: 16,
     overflow: 'hidden',
     backgroundColor: '#1C1C1E',
   },
@@ -256,7 +261,7 @@ const styles = StyleSheet.create({
   heroTitle: {
     flex: 1,
     color: '#FFFFFF',
-    fontSize: 17,
+    fontSize: 15,
     fontFamily: Fonts.semiBold,
     letterSpacing: -0.2,
   },

@@ -50,6 +50,7 @@ export const studentEndpoints = {
 export const MockTestPaymentEndpoints = {
   MOCK_TEST_PAYMENT_API: `${BASE_URL}/api/v1/payment/captureMockPayment`,
   MOCK_TEST_VERIFY_API: `${BASE_URL}/api/v1/payment/verifyMockPayment`,
+  MOCK_TEST_STATUS_API: `${BASE_URL}/api/v1/payment/paymentStatus`,
   SEND_PAYMENT_SUCCESS_EMAIL_API: `${BASE_URL}/api/v1/payment/sendPaymentSuccessEmail`,
 }
 

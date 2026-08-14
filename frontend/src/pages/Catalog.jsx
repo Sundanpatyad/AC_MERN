@@ -217,14 +217,7 @@ function Catalog() {
         return;
       }
 
-      const response = await buyItem(course._id, token);
-
-      if (response) {
-        toast.success("Purchase successful");
-        navigate(`/courses/${course._id}`);
-      } else {
-        toast.error("Purchase failed");
-      }
+      await buyItem(token, [course._id], ["course"], user, navigate, dispatch);
     },
     [navigate, token, isLoggedIn, user]
   );

@@ -129,3 +129,5 @@ export const handleGoogleLogin = async () => {
     return { success: false, message };
   }
 };
+
+export default handleGoogleLogin;

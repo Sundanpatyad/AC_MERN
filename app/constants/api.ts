@@ -29,10 +29,27 @@ export const endpoints = {
   // Payment
   CAPTURE_MOCK_PAYMENT: `${BASE_URL}/api/v1/payment/captureMockPayment`,
   VERIFY_MOCK_PAYMENT: `${BASE_URL}/api/v1/payment/verifyMockPayment`,
+  PAYMENT_STATUS: `${BASE_URL}/api/v1/payment/paymentStatus`,
 
   // Push notifications (FCM)
   REGISTER_FCM_TOKEN: `${BASE_URL}/api/v1/notifications/register`,
   UNREGISTER_FCM_TOKEN: `${BASE_URL}/api/v1/notifications/unregister`,
   GET_NOTIFICATION_PREFS: `${BASE_URL}/api/v1/notifications/prefs`,
   UPDATE_NOTIFICATION_PREFS: `${BASE_URL}/api/v1/notifications/prefs`,
+  SEND_NOTIFICATION: `${BASE_URL}/api/v1/notifications/send`,
+
+  // Instructor / admin
+  GET_INSTRUCTOR_DASHBOARD: `${BASE_URL}/api/v1/profile/instructorDashboard`,
+  GET_INSTRUCTOR_COURSES: `${BASE_URL}/api/v1/course/getInstructorCourses`,
+  GET_INSTRUCTOR_MOCK_TESTS: `${BASE_URL}/api/v1/mock/getMockTests`,
+  CREATE_MOCK_TEST_SERIES: `${BASE_URL}/api/v1/mock/createMockTestSeries`,
+  UPDATE_MOCK_TEST_SERIES: `${BASE_URL}/api/v1/mock/updateMockTestSeries`,
+  ADD_MOCKTEST_TO_SERIES: `${BASE_URL}/api/v1/mock/addMocktestToSeries`,
+  ADD_SERIES_ATTACHMENTS: `${BASE_URL}/api/v1/mock/series`,
+  ADMIN_MOCK_LIST: `${BASE_URL}/api/v1/admin/users-by-mock-test`,
+  ADMIN_MOCK_PURCHASERS: `${BASE_URL}/api/v1/admin/users-by-mock-test`,
+
+  // Study materials
+  GET_EXAMS: `${BASE_URL}/api/v1/materials/getExam`,
+  GET_STUDY_MATERIALS: `${BASE_URL}/api/v1/materials/getAllStudyMaterials`,
 };

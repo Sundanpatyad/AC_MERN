@@ -1,308 +1,299 @@
 import React, { useMemo, useState } from 'react';
 import {
-  View,
-  Text,
+  ActivityIndicator,
+  Image,
+  Pressable,
   StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  TouchableOpacity,
+  Text,
+  View,
 } from 'react-native';
-import { Link, useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
 
-import { Input } from '../../components/ui/Input';
-import { Button } from '../../components/ui/Button';
-import { ScreenBackground } from '../../components/ui/ScreenBackground';
-import { BrandLogo } from '../../components/ui/BrandLogo';
-import { apiConnector } from '../../services/api';
-import { endpoints } from '../../constants/api';
-import { useAuthStore } from '../../store/authStore';
-import { AppPalette } from '../../constants/theme';
+import { MeshHero } from '../../components/ui/MeshHero';
+import { showMessage } from '../../providers/DialogProvider';
 import { useTheme } from '../../providers/AppThemeProvider';
+import { AppPalette, Fonts, Type } from '../../constants/theme';
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { setToken, setUser } = useAuthStore();
-  const { colors } = useTheme();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const insets = useSafeAreaInsets();
+  const { colors, isDark } = useTheme();
+  const styles = useMemo(() => createStyles(colors, isDark), [colors, isDark]);
 
-  const handleLogin = async () => {
-    if (!email || !password) {
-      return;
-    }
-
+  const onGoogle = async () => {
+    if (isLoading) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
     setIsLoading(true);
     try {
-      const response = await apiConnector.post(endpoints.LOGIN_API, {
-        email,
-        password,
-      });
+      const googleAuth = await import('../../services/googleAuth');
+      const imported = googleAuth as {
+        handleGoogleLogin?: unknown;
+        default?: { handleGoogleLogin?: unknown } | ((...args: never[]) => unknown);
+      };
+      const handleGoogleLogin =
+        imported.handleGoogleLogin ??
+        (typeof imported.default === 'function'
+          ? imported.default
+          : imported.default?.handleGoogleLogin);
 
-      if (response.data.success) {
-        const { token, user } = response.data;
-        const userImage =
-          user?.image ||
-          `https://api.dicebear.com/5.x/initials/svg?seed=${user?.firstName} ${user?.lastName}`;
+      if (typeof handleGoogleLogin !== 'function') {
+        await showMessage({
+          title: 'Sign in unavailable',
+          message: 'Google Sign-In is not available. Use a development build, not Expo Go.',
+          tone: 'danger',
+        });
+        return;
+      }
 
-        await setToken(token);
-        await setUser({ ...user, image: userImage });
+      const result = await (handleGoogleLogin as () => Promise<{
+        success: boolean;
+        message?: string;
+      }>)();
 
-        // Register FCM device token with backend after login
-        try {
-          const { enablePushNotifications } = await import('../../services/pushNotifications');
-          await enablePushNotifications();
-        } catch {
-          // Push may be unavailable until a native rebuild
-        }
-
+      if (result.success) {
         router.replace('/(tabs)');
+        return;
+      }
+
+      const cancelled = (result.message || '').toLowerCase().includes('cancel');
+      if (!cancelled && result.message) {
+        await showMessage({
+          title: 'Sign in failed',
+          message: result.message,
+          tone: 'danger',
+        });
       }
     } catch (error: any) {
+      await showMessage({
+        title: 'Sign in failed',
+        message: error?.message || 'Google Sign-In could not start.',
+        tone: 'danger',
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <ScreenBackground>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.flex}
+    <View style={styles.root}>
+      <StatusBar style="dark" />
+
+      <MeshHero
+        fadeTo={colors.background}
+        style={{ paddingTop: insets.top + 16, paddingBottom: 28 }}
       >
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View>
-            <View style={styles.header}>
-              <View style={styles.brandRow}>
-                <BrandLogo size={22} />
-                <Text style={styles.brand}>AWAKENING CLASSES</Text>
-              </View>
+        <Text style={styles.brand}>Awakening Classes</Text>
+        <Text style={styles.headline}>
+          Learn more.{'\n'}
+          <Text style={styles.headlineMuted}>Achieve more.</Text>
+        </Text>
+      </MeshHero>
 
-              <Text style={styles.title}>Log in</Text>
-              <Text style={styles.terms}>By logging in, you agree to our Terms of Use.</Text>
-            </View>
-
-            <View style={styles.form}>
-              <Input
-                placeholder="Email"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                value={email}
-                onChangeText={setEmail}
-              />
-              <Input
-                placeholder="Your password"
-                isPassword
-                value={password}
-                onChangeText={setPassword}
-              />
-
-              <Link href="/(auth)/forgot-password" style={styles.forgotPassword}>
-                <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-              </Link>
-
-              <Button
-                title="Log in"
-                onPress={handleLogin}
-                isLoading={isLoading}
-                style={styles.cta}
-              />
-
-              <View style={styles.dividerContainer}>
-                <View style={styles.divider} />
-                <Text style={styles.dividerText}>Or</Text>
-                <View style={styles.divider} />
-              </View>
-
-              <View style={styles.socialStack}>
-                <SocialButton
-                  icon={
-                    <Ionicons name="logo-google" size={18} color={colors.text} />
-                  }
-                  title="Sign in with google"
-                  onPress={async () => {
-                    setIsLoading(true);
-                    const { handleGoogleLogin } = await import('../../services/googleAuth');
-                    const result = await handleGoogleLogin();
-                    setIsLoading(false);
-
-                    if (result.success) {
-                      router.replace('/(tabs)');
-                    }
-                  }}
-                  disabled={isLoading}
-                />
-              </View>
-
-              <Text style={styles.privacyText}>
-                For more information, please see our Privacy policy.
-              </Text>
-
-              <View style={styles.footer}>
-                <Text style={styles.footerText}>Don't have an account? </Text>
-                <Link href="/(auth)/signup">
-                  <Text style={styles.signupText}>Sign Up</Text>
-                </Link>
-              </View>
-            </View>
+      <View style={styles.body}>
+        <View style={styles.mock} pointerEvents="none">
+          <View style={styles.mockTop}>
+            <Text style={styles.mockMeta}>Full Mock · Q 12 / 100</Text>
+            <Text style={styles.mockTimer}>29:41</Text>
           </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </ScreenBackground>
+          <Text style={styles.mockQuestion}>If x² + 5x + 6 = 0, the roots are</Text>
+          {[
+            { label: 'A', text: '−2 and −3', selected: true },
+            { label: 'B', text: '−1 and −6', selected: false },
+            { label: 'C', text: '2 and 3', selected: false },
+            { label: 'D', text: '1 and 6', selected: false },
+          ].map((option) => (
+            <View
+              key={option.label}
+              style={[styles.mockOption, option.selected && styles.mockOptionOn]}
+            >
+              <View style={[styles.mockRadio, option.selected && styles.mockRadioOn]}>
+                <Text style={[styles.mockLabel, option.selected && styles.mockLabelOn]}>
+                  {option.label}
+                </Text>
+              </View>
+              <Text style={[styles.mockOptionText, option.selected && styles.mockOptionTextOn]}>
+                {option.text}
+              </Text>
+            </View>
+          ))}
+        </View>
+
+        <View style={[styles.actions, { paddingBottom: Math.max(insets.bottom, 16) + 6 }]}>
+          <Pressable
+            onPress={onGoogle}
+            disabled={isLoading}
+            accessibilityRole="button"
+            accessibilityLabel="Login with Google"
+            style={({ pressed }) => [
+              styles.cta,
+              { opacity: isLoading ? 0.72 : pressed ? 0.9 : 1 },
+            ]}
+          >
+            {isLoading ? (
+              <ActivityIndicator color={isDark ? '#111111' : '#FFFFFF'} />
+            ) : (
+              <>
+                <View style={styles.googleMark}>
+                  <Image
+                    source={require('../../assets/images/google-g.png')}
+                    style={styles.googleIcon}
+                    resizeMode="contain"
+                  />
+                </View>
+                <Text style={styles.ctaText}>Login with Google</Text>
+              </>
+            )}
+          </Pressable>
+
+          <Text style={styles.footer}>
+            By continuing you confirm that you agree to our{' '}
+            <Text style={styles.footerLink}>Terms of Use</Text> and{' '}
+            <Text style={styles.footerLink}>Privacy Policy</Text>.
+          </Text>
+        </View>
+      </View>
+    </View>
   );
 }
 
-function createStyles(colors: AppPalette) {
+function createStyles(colors: AppPalette, isDark: boolean) {
   return StyleSheet.create({
-    flex: { flex: 1 },
-    scrollContent: {
-      flexGrow: 1,
-      justifyContent: 'center',
-      padding: 18,
-      paddingVertical: 26,
-    },
-    header: {
-      marginBottom: 10,
-    },
-    brandRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 8,
-      marginBottom: 12,
+    root: {
+      flex: 1,
+      backgroundColor: colors.background,
     },
     brand: {
-      fontSize: 12,
-      fontWeight: '700',
-      color: colors.textSecondary,
-      letterSpacing: 0.8,
-      textTransform: 'uppercase',
+      ...Type.h3,
+      paddingHorizontal: 24,
+      color: '#0F172A',
+      marginBottom: 18,
     },
-    title: {
-      fontSize: 26,
-      fontWeight: '700',
-      color: colors.text,
-      marginBottom: 6,
-      letterSpacing: -0.4,
+    headline: {
+      ...Type.hero,
+      paddingHorizontal: 24,
+      color: '#0F172A',
     },
-    subtitle: {
-      fontSize: 14,
-      color: colors.textSecondary,
-      lineHeight: 20,
+    headlineMuted: {
+      ...Type.heroEmphasis,
+      color: 'rgba(15,23,42,0.55)',
     },
-    terms: {
-      fontSize: 12,
-      color: colors.textMuted,
-      lineHeight: 18,
-      marginBottom: 6,
-    },
-    form: {
-      gap: 2,
-    },
-    forgotPassword: {
-      alignSelf: 'flex-end',
-      marginTop: 8,
-      marginBottom: 4,
-    },
-    forgotPasswordText: {
-      color: colors.text,
-      fontSize: 13,
-      fontWeight: '600',
-    },
-    cta: {
-      marginTop: 16,
-    },
-    dividerContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginVertical: 16,
-    },
-    divider: {
+    body: {
       flex: 1,
-      height: StyleSheet.hairlineWidth,
-      backgroundColor: colors.borderStrong,
+      paddingHorizontal: 24,
+      justifyContent: 'space-between',
     },
-    dividerText: {
-      color: colors.textMuted,
-      paddingHorizontal: 16,
-      fontSize: 12,
-      fontWeight: '600',
-    },
-    socialStack: {
-      gap: 10,
-      marginTop: 6,
-    },
-    footer: {
-      flexDirection: 'row',
-      justifyContent: 'center',
-      marginTop: 16,
-    },
-    footerText: {
-      color: colors.textSecondary,
-      fontSize: 14,
-    },
-    signupText: {
-      color: colors.text,
-      fontSize: 14,
-      fontWeight: '700',
-    },
-    privacyText: {
-      color: colors.textMuted,
-      fontSize: 12,
-      lineHeight: 18,
-      textAlign: 'center',
-      marginTop: 12,
-      marginBottom: 6,
-    },
-  });
-}
-
-function SocialButton({
-  icon,
-  title,
-  onPress,
-  disabled,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  onPress: () => void;
-  disabled?: boolean;
-}) {
-  const { colors } = useTheme();
-  const styles = StyleSheet.create({
-    btn: {
-      height: 44,
-      borderRadius: 999,
+    mock: {
+      backgroundColor: colors.surface,
+      borderRadius: 20,
+      padding: 16,
       borderWidth: 1,
       borderColor: colors.border,
-      backgroundColor: colors.surface,
-      paddingHorizontal: 14,
+    },
+    mockTop: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 12,
+    },
+    mockMeta: {
+      color: colors.textSecondary,
+      fontSize: 12,
+      fontFamily: Fonts.medium,
+    },
+    mockTimer: {
+      color: colors.text,
+      fontSize: 13,
+      fontFamily: Fonts.semiBold,
+    },
+    mockQuestion: {
+      color: colors.text,
+      fontSize: 16,
+      lineHeight: 22,
+      fontFamily: Fonts.semiBold,
+      marginBottom: 12,
+    },
+    mockOption: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      minHeight: 40,
+      borderRadius: 12,
+      paddingHorizontal: 10,
+      marginBottom: 6,
+      backgroundColor: isDark ? '#1C1C1E' : '#F2F2F7',
+    },
+    mockOptionOn: {
+      backgroundColor: isDark ? '#FFFFFF' : '#111111',
+    },
+    mockRadio: {
+      width: 22,
+      height: 22,
+      borderRadius: 11,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: isDark ? '#2C2C2E' : '#E5E5EA',
+    },
+    mockRadioOn: {
+      backgroundColor: isDark ? '#111111' : '#FFFFFF',
+    },
+    mockLabel: {
+      fontSize: 11,
+      fontFamily: Fonts.semiBold,
+      color: colors.textSecondary,
+    },
+    mockLabelOn: {
+      color: isDark ? '#FFFFFF' : '#111111',
+    },
+    mockOptionText: {
+      fontSize: 14,
+      fontFamily: Fonts.medium,
+      color: colors.text,
+    },
+    mockOptionTextOn: {
+      color: isDark ? '#111111' : '#FFFFFF',
+    },
+    actions: {
+      paddingTop: 16,
+    },
+    cta: {
+      height: 56,
+      borderRadius: 999,
+      backgroundColor: isDark ? '#FFFFFF' : '#1C1C1E',
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
       gap: 10,
     },
-    btnText: {
+    googleMark: {
+      width: 22,
+      height: 22,
+      borderRadius: 11,
+      backgroundColor: '#FFFFFF',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    googleIcon: {
+      width: 16,
+      height: 16,
+    },
+    ctaText: {
+      ...Type.button,
+      color: isDark ? '#111111' : '#FFFFFF',
+    },
+    footer: {
+      ...Type.caption,
+      marginTop: 16,
+      color: colors.textSecondary,
+      textAlign: 'center',
+    },
+    footerLink: {
+      ...Type.link,
       color: colors.text,
-      fontSize: 13,
-      fontWeight: '700',
+      textDecorationLine: 'underline',
     },
   });
-
-  return (
-    <TouchableOpacity
-      style={styles.btn}
-      onPress={onPress}
-      disabled={disabled}
-      activeOpacity={0.8}
-    >
-      {icon}
-      <Text style={styles.btnText}>{title}</Text>
-    </TouchableOpacity>
-  );
 }

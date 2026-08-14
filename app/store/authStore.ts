@@ -11,6 +11,10 @@ interface User {
   image: string;
 }
 
+export function isInstructorAccount(accountType?: string | null) {
+  return accountType === 'Instructor' || accountType === 'Admin';
+}
+
 interface AuthState {
   token: string | null;
   user: User | null;

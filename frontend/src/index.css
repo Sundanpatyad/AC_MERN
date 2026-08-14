@@ -5,50 +5,72 @@
 @tailwind utilities;
 
 :root {
-  --c-bg: #ffffff;
-  --c-surface: #f9f9f9;
-  --c-elevated: #f1f1f1;
-  --c-fg: #0f0f0f;
-  --c-muted: #555555;
-  --c-subtle: #888888;
-  --c-line: #e5e5e5;
+  --c-bg: #e8e6d4;
+  --c-surface: #f3f1e0;
+  --c-elevated: #dddac4;
+  --c-fg: #16150f;
+  --c-muted: #5a584c;
+  --c-subtle: #8a8778;
+  --c-line: #cfcbb3;
   --c-brand: #ff0000;
   --c-brand-hover: #cc0000;
+  --c-brand-soft: rgba(255, 0, 0, 0.1);
   --c-brand-fg: #ffffff;
+  --c-primary: #e1e0cc;
 
   /* Solid pair used for primary buttons */
-  --c-solid: #0f0f0f;
-  --c-solid-hover: #000000;
-  --c-solid-fg: #ffffff;
+  --c-solid: #16150f;
+  --c-solid-hover: #0c0b08;
+  --c-solid-fg: #e8e6d4;
 
-  --c-overlay: rgba(255, 255, 255, 0.6);
-  --c-glass: rgba(0, 0, 0, 0.05);
+  --c-overlay: rgba(232, 230, 212, 0.7);
+  --c-glass: rgba(22, 21, 15, 0.05);
 
   --radius: 12px;
   color-scheme: light;
 }
 
 .dark {
-  --c-bg: #0f0f0f;
-  --c-surface: #212121;
-  --c-elevated: #272727;
-  --c-fg: #f1f1f1;
-  --c-muted: #aaaaaa;
-  --c-subtle: #717171;
-  --c-line: #303030;
+  --c-bg: #14130f;
+  --c-surface: #1c1b16;
+  --c-elevated: #25241e;
+  --c-fg: #e1e0cc;
+  --c-muted: #b5b39f;
+  --c-subtle: #8a8778;
+  --c-line: #2e2c24;
   --c-brand: #ff0000;
   --c-brand-hover: #ff4444;
+  --c-brand-soft: rgba(255, 0, 0, 0.16);
   --c-brand-fg: #ffffff;
+  --c-primary: #e1e0cc;
 
   /* Solid pair used for primary buttons */
-  --c-solid: #f1f1f1;
-  --c-solid-hover: #ffffff;
-  --c-solid-fg: #0f0f0f;
+  --c-solid: #e1e0cc;
+  --c-solid-hover: #f0efde;
+  --c-solid-fg: #14130f;
 
-  --c-overlay: rgba(0, 0, 0, 0.6);
-  --c-glass: rgba(255, 255, 255, 0.05);
+  --c-overlay: rgba(20, 19, 15, 0.65);
+  --c-glass: rgba(225, 224, 204, 0.05);
 
   color-scheme: dark;
+}
+
+.nav-on-media {
+  --c-bg: transparent;
+  --c-fg: #e1e0cc;
+  --c-muted: rgba(225, 224, 204, 0.78);
+  --c-subtle: rgba(225, 224, 204, 0.55);
+  --c-surface: #1c1b16;
+  --c-elevated: rgba(20, 19, 15, 0.5);
+  --c-line: rgba(225, 224, 204, 0.16);
+  --c-solid: #e1e0cc;
+  --c-solid-hover: #f0efde;
+  --c-solid-fg: #14130f;
+}
+
+.noise-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
 }
 
 body {

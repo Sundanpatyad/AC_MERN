@@ -33,17 +33,18 @@ export function ConfirmationSheet({
       onClose={onClose}
       actions={[
         {
+          label: cancelText,
+          variant: 'outline',
+          onPress: onClose,
+        },
+        {
           label: confirmText,
           variant: confirmVariant,
+          destructive: tone === 'danger',
           onPress: () => {
             onConfirm();
             onClose();
           },
-        },
-        {
-          label: cancelText,
-          variant: 'outline',
-          onPress: onClose,
         },
       ]}
     />

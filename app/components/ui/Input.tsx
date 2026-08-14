@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Radii } from '@/constants/theme';
+import { Radii, Type } from '@/constants/theme';
 import { useTheme } from '@/providers/AppThemeProvider';
 
 interface InputProps extends TextInputProps {
@@ -73,10 +73,9 @@ const styles = StyleSheet.create({
     marginVertical: 6,
   },
   label: {
-    fontSize: 11,
+    ...Type.caption,
+    fontFamily: Type.button.fontFamily,
     marginBottom: 6,
-    fontWeight: '600',
-    letterSpacing: 0.3,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -86,15 +85,15 @@ const styles = StyleSheet.create({
     minHeight: 48,
   },
   input: {
+    ...Type.bodySmall,
     flex: 1,
     paddingHorizontal: 14,
-    fontSize: 14,
   },
   eyeIcon: {
     padding: 12,
   },
   errorText: {
-    fontSize: 12,
+    ...Type.caption,
     marginTop: 4,
     marginLeft: 4,
   },

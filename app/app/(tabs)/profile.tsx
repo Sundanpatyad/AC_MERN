@@ -11,11 +11,14 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuthStore } from '../../store/authStore';
+import { isInstructorAccount, useAuthStore } from '../../store/authStore';
+import { SettingsCard } from '../../components/ui/SettingsShell';
+import { ListRow } from '../../components/ui/ListRow';
 import { apiConnector } from '../../services/api';
 import { endpoints } from '../../constants/api';
 import { MockTestCard } from '../../components/MockTestCard';
 import { ScreenBackground } from '../../components/ui/ScreenBackground';
+import { MeshHero } from '../../components/ui/MeshHero';
 import { Button } from '../../components/ui/Button';
 import { AppPalette, Fonts, Radii } from '../../constants/theme';
 import { useTheme } from '../../providers/AppThemeProvider';
@@ -83,32 +86,30 @@ export default function ProfileScreen() {
     };
   }, [attempts, personalRank]);
 
+  const instructor = isInstructorAccount(user?.accountType);
   const displayName =
-    [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Student';
+    [user?.firstName, user?.lastName].filter(Boolean).join(' ') ||
+    (instructor ? 'Instructor' : 'Student');
   const initials = `${user?.firstName?.[0] || ''}${user?.lastName?.[0] || ''}`.toUpperCase() || 'A';
 
   return (
     <ScreenBackground>
-      <View
-        style={[
-          styles.header,
-          { paddingTop: Math.max(insets.top, 16) + 8, borderBottomColor: colors.border },
-        ]}
+      <MeshHero
+        fadeTo={colors.background}
+        style={{ paddingTop: Math.max(insets.top, 12) + 4, paddingBottom: 14 }}
       >
-        <Text style={styles.title}>Profile</Text>
-        <Pressable
-          onPress={() => router.push('/settings')}
-          accessibilityRole="button"
-          accessibilityLabel="Open settings"
-          style={({ pressed }) => [
-            styles.settingsBtn,
-            { borderColor: colors.border },
-            pressed && { opacity: 0.7 },
-          ]}
-        >
-          <Ionicons name="settings-outline" size={18} color={colors.text} />
-        </Pressable>
-      </View>
+        <View style={styles.header}>
+          <Text style={styles.title}>Profile</Text>
+          <Pressable
+            onPress={() => router.push('/settings')}
+            accessibilityRole="button"
+            accessibilityLabel="Open settings"
+            style={({ pressed }) => [styles.settingsBtn, pressed && { opacity: 0.7 }]}
+          >
+            <Ionicons name="settings-outline" size={18} color="#0F172A" />
+          </Pressable>
+        </View>
+      </MeshHero>
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -150,6 +151,36 @@ export default function ProfileScreen() {
           </View>
         </View>
 
+        {instructor ? (
+          <View style={{ marginBottom: 24 }}>
+            <Text style={[styles.sectionTitle, { marginBottom: 12 }]}>Admin pages</Text>
+            <SettingsCard>
+              {[
+                { icon: 'grid-outline', label: 'Dashboard', route: '/admin/dashboard' },
+                { icon: 'stats-chart-outline', label: 'Admin Console', route: '/(tabs)' },
+                { icon: 'document-text-outline', label: 'My Tests', route: '/(tabs)/mock-tests' },
+                { icon: 'add-circle-outline', label: 'Create Mock Test', route: '/admin/create-series' },
+                { icon: 'notifications-outline', label: 'Send Notification', route: '/admin/send-notification' },
+                { icon: 'folder-open-outline', label: 'Study Materials', route: '/admin/study-materials' },
+              ].map((item, index, list) => (
+                <ListRow
+                  key={item.route}
+                  iconName={item.icon}
+                  label={item.label}
+                  onPress={() => router.push(item.route as any)}
+                  style={
+                    index === list.length - 1
+                      ? { borderBottomWidth: 0 }
+                      : {
+                          borderBottomWidth: StyleSheet.hairlineWidth,
+                          borderBottomColor: colors.border,
+                        }
+                  }
+                />
+              ))}
+            </SettingsCard>
+          </View>
+        ) : (
         <View style={[styles.stats, { borderColor: colors.border }]}>
           <Pressable
             style={styles.stat}
@@ -178,41 +209,46 @@ export default function ProfileScreen() {
             <Text style={styles.statValue}>{stats.avg}</Text>
           </Pressable>
         </View>
-
-        <View style={styles.sectionHead}>
-          <Text style={styles.sectionTitle}>Purchased mocks</Text>
-          {purchased.length > 0 ? (
-            <Pressable onPress={() => router.push('/(tabs)/my-tests')} hitSlop={8}>
-              <Text style={styles.sectionLink}>See all</Text>
-            </Pressable>
-          ) : null}
-        </View>
-
-        {isLoading ? (
-          <Text style={styles.emptyCopy}>Loading…</Text>
-        ) : purchased.length > 0 ? (
-          <View style={styles.mocksList}>
-            {purchased.map((test: any) => (
-              <MockTestCard key={test._id} test={test} variant="row" showStatus />
-            ))}
-          </View>
-        ) : (
-          <View style={[styles.empty, { borderColor: colors.border, backgroundColor: colors.surface }]}>
-            <View style={[styles.emptyIcon, { borderColor: colors.border }]}>
-              <Ionicons name="folder-open-outline" size={22} color={colors.text} />
-            </View>
-            <Text style={styles.emptyTitle}>No purchases yet</Text>
-            <Text style={styles.emptyCopy}>
-              Mock series you buy will be listed here for quick access.
-            </Text>
-            <Button
-              title="Browse mock tests"
-              onPress={() => router.push('/(tabs)/mock-tests')}
-              variant="outline"
-              style={styles.emptyButton}
-            />
-          </View>
         )}
+
+        {!instructor ? (
+          <>
+            <View style={styles.sectionHead}>
+              <Text style={styles.sectionTitle}>Purchased mocks</Text>
+              {purchased.length > 0 ? (
+                <Pressable onPress={() => router.push('/(tabs)/my-tests')} hitSlop={8}>
+                  <Text style={styles.sectionLink}>See all</Text>
+                </Pressable>
+              ) : null}
+            </View>
+
+            {isLoading ? (
+              <Text style={styles.emptyCopy}>Loading…</Text>
+            ) : purchased.length > 0 ? (
+              <View style={styles.mocksList}>
+                {purchased.map((test: any) => (
+                  <MockTestCard key={test._id} test={test} variant="row" showStatus />
+                ))}
+              </View>
+            ) : (
+              <View style={[styles.empty, { borderColor: colors.border, backgroundColor: colors.surface }]}>
+                <View style={[styles.emptyIcon, { borderColor: colors.border }]}>
+                  <Ionicons name="folder-open-outline" size={22} color={colors.text} />
+                </View>
+                <Text style={styles.emptyTitle}>No purchases yet</Text>
+                <Text style={styles.emptyCopy}>
+                  Mock series you buy will be listed here for quick access.
+                </Text>
+                <Button
+                  title="Browse mock tests"
+                  onPress={() => router.push('/(tabs)/mock-tests')}
+                  variant="outline"
+                  style={styles.emptyButton}
+                />
+              </View>
+            )}
+          </>
+        ) : null}
       </ScrollView>
     </ScreenBackground>
   );
@@ -222,36 +258,36 @@ function createStyles(colors: AppPalette) {
   return StyleSheet.create({
     header: {
       paddingHorizontal: 20,
-      paddingBottom: 14,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      borderBottomWidth: StyleSheet.hairlineWidth,
     },
     title: {
       fontSize: 22,
       fontFamily: Fonts.semiBold,
-      color: colors.text,
+      color: '#0F172A',
       letterSpacing: -0.3,
     },
     settingsBtn: {
       width: 36,
       height: 36,
       borderRadius: 18,
-      borderWidth: StyleSheet.hairlineWidth,
+      backgroundColor: 'rgba(255,255,255,0.72)',
+      borderWidth: 1,
+      borderColor: 'rgba(15,23,42,0.08)',
       alignItems: 'center',
       justifyContent: 'center',
     },
     scrollContent: {
       paddingHorizontal: 20,
-      paddingBottom: 48,
+      paddingBottom: 16,
     },
     identity: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 16,
       paddingTop: 24,
-      paddingBottom: 24,
+      paddingBottom: 16,
     },
     avatar: {
       width: 72,

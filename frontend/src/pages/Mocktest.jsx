@@ -276,7 +276,6 @@ const MockTestComponent = () => {
 
     try {
       await buyItem(token, [mockTest._id], ['MOCK_TEST'], user, navigate, dispatch)
-      toast.success("Mock test purchased successfully!")
     } catch (error) {
       console.error("Error purchasing mock test:", error)
       toast.error("Failed to purchase mock test")
