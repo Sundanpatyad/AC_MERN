@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { BASE_URL } from "../services/apis";
+
+const openedOrders = new Set();
 
 function loadRazorpay() {
   return new Promise((resolve) => {
@@ -19,8 +21,10 @@ function loadRazorpay() {
 export default function PayCheckout() {
   const [params] = useSearchParams();
   const [error, setError] = useState("");
+  const startedRef = useRef(false);
 
   useEffect(() => {
+    if (startedRef.current) return;
     let cancelled = false;
 
     const start = async () => {
@@ -37,9 +41,15 @@ export default function PayCheckout() {
         return;
       }
 
+      if (openedOrders.has(orderId)) return;
+      openedOrders.add(orderId);
+      startedRef.current = true;
+
       const loaded = await loadRazorpay();
       if (cancelled) return;
       if (!loaded || !window.Razorpay) {
+        openedOrders.delete(orderId);
+        startedRef.current = false;
         setError("Could not load Razorpay. Open this page in Chrome and try again.");
         return;
       }

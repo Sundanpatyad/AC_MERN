@@ -69,7 +69,7 @@ const ChatWindow = () => {
   };
 
   return (
-    <div className="bg-black h-[100vh] pt-16 fixed w-full flex flex-col">
+    <div className="bg-page h-[100dvh] pt-[calc(4rem+env(safe-area-inset-top))] fixed w-full flex flex-col">
       <h2 className="text-xl font-semibold p-4 bg-page">Chat</h2>
       <div className="flex-grow flex flex-col overflow-hidden">
         <div className="flex-grow overflow-y-auto p-4 space-y-4">

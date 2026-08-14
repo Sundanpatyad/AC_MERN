@@ -10,7 +10,7 @@ import { deleteCourse, fetchInstructorCourses, } from "../../../../services/oper
 import { COURSE_STATUS } from "../../../../utils/constants"
 import ConfirmationModal from "../../../common/ConfirmationModal"
 import Img from './../../../common/Img';
-import toast from 'react-hot-toast'
+import toast from '@/utils/toast'
 
 export default function CoursesTable({ courses, setCourses, loading, setLoading }) {
   const navigate = useNavigate()

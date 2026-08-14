@@ -1,4 +1,4 @@
-import { toast } from "react-hot-toast";
+import { toast } from "@/utils/toast";
 import { MockTestPaymentEndpoints, studentEndpoints } from "../apis";
 import { apiConnector } from "../apiConnector";
 import rzpLogo from "../../assets/Logo/rzp_logo.png";
@@ -9,13 +9,6 @@ import Cookies from 'js-cookie';
 const { MOCK_TEST_PAYMENT_API, MOCK_TEST_VERIFY_API } = MockTestPaymentEndpoints;
 const { COURSE_PAYMENT_API, COURSE_VERIFY_API, SEND_PAYMENT_SUCCESS_EMAIL_API } = studentEndpoints;
 
-const toastOptions = {
-    style: {
-        borderRadius: '10px',
-        background: '#333',
-        color: '#fff',
-    },
-};
 
 function loadScript(src) {
     return new Promise((resolve) => {
@@ -54,13 +47,13 @@ function clearPaymentInfoCookie() {
 
 // ================ buyItem ================ 
 export async function buyItem(token, itemId, itemTypes, userDetails, navigate, dispatch) {
-    const toastId = toast.loading("Loading...", toastOptions);
+    const toastId = toast.loading("Loading...");
 
     try {
         const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
 
         if (!res) {
-            toast.error("RazorPay SDK failed to load", toastOptions);
+            toast.error("Couldn't load payment");
             return;
         }
 
@@ -109,13 +102,13 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
             paymentObject.open();
 
             paymentObject.on("payment.failed", function (response) {
-                toast.error("Oops, payment failed", toastOptions);
+                toast.error("Payment failed");
                 clearPaymentInfoCookie();
             });
         }
     }
     catch (error) {
-        toast.error(error.response?.data?.message || "Could not make Payment", toastOptions);
+        toast.error(error.response?.data?.message || "Payment failed");
     } finally {
         toast.dismiss(toastId);
     }
@@ -123,7 +116,7 @@ export async function buyItem(token, itemId, itemTypes, userDetails, navigate, d
 
 // ================ verifyPayment ================ 
 export async function verifyPayment(bodyData, token, navigate, dispatch) {
-    const toastId = toast.loading("Verifying Payment....", toastOptions);
+    const toastId = toast.loading("Verifying...");
     // dispatch(setPaymentLoading(true));   
 
     try {
@@ -137,8 +130,7 @@ export async function verifyPayment(bodyData, token, navigate, dispatch) {
             throw new Error(response.data.message);
         }
 
-        const itemTypeName = bodyData.itemType === 'course' ? 'course' : 'mock test';
-        toast.success(`Payment Successful, you are added to the ${itemTypeName}`, toastOptions);
+        toast.success("Payment successful");
 
         if (bodyData.itemType) {
             dispatch(resetCart());
@@ -155,7 +147,7 @@ export async function verifyPayment(bodyData, token, navigate, dispatch) {
 
         return response;
     } catch (error) {
-        toast.error("Could not verify Payment", toastOptions);
+        toast.error("Couldn't verify payment");
         // Keep payment info in cookies if verification fails
     } finally {
         toast.dismiss(toastId);

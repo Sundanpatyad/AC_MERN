@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { HiOutlineChatAlt2 } from "react-icons/hi";
 import { IoClose } from "react-icons/io5";
 import { FiUser, FiPhone, FiMessageSquare, FiSend } from "react-icons/fi";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import { submitInquiry } from "../../services/inquiryEmail";
 
 export default function FloatingInquiryButton() {
@@ -47,11 +47,11 @@ export default function FloatingInquiryButton() {
         phone: values.phone.trim(),
         query: values.query.trim(),
       });
-      toast.success("Your inquiry was sent. We will contact you soon.");
+      toast.success("Inquiry sent");
       reset();
       setOpen(false);
     } catch (error) {
-      toast.error(error.message || "Failed to send inquiry. Please try again.");
+      toast.error(error.message || "Couldn't send inquiry");
     }
   };
 

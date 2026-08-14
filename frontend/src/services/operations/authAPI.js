@@ -1,4 +1,4 @@
-import { toast } from "react-hot-toast"
+import { toast } from "@/utils/toast"
 
 import { setLoading, setToken } from "../../slices/authSlice"
 import { resetCart } from "../../slices/cartSlice"
@@ -23,13 +23,7 @@ const {
 export function sendOtp(email, navigate) {
   return async (dispatch) => {
 
-    const toastId = toast.loading("Loading...", {
-      style: {
-        borderRadius: '10px',
-        background: '#333',
-        color: '#fff',
-      },
-    });
+    const toastId = toast.loading("Loading...");
     dispatch(setLoading(true));
 
     try {
@@ -43,22 +37,10 @@ export function sendOtp(email, navigate) {
       }
 
       navigate("/verify-email");
-      toast.success("OTP Sent Successfully", {
-        style: {
-          borderRadius: '10px',
-          background: '#333',
-          color: '#fff',
-        },
-      });
+      toast.success("OTP sent");
     } catch (error) {
       //console.log("SENDOTP API ERROR --> ", error);
-      toast.error(error.response.data?.message, {
-        style: {
-          borderRadius: '10px',
-          background: '#333',
-          color: '#fff',
-        },
-      });
+      toast.error(error.response.data?.message);
     }
     dispatch(setLoading(false));
     toast.dismiss(toastId);
@@ -69,13 +51,7 @@ export function sendOtp(email, navigate) {
 export function signUp(accountType, firstName, lastName, email, password, confirmPassword, otp, navigate) {
   return async (dispatch) => {
 
-    const toastId = toast.loading("Loading...", {
-      style: {
-        borderRadius: '10px',
-        background: '#333',
-        color: '#fff',
-      },
-    });
+    const toastId = toast.loading("Loading...");
     dispatch(setLoading(true));
     try {
       const response = await apiConnector("POST", SIGNUP_API, {
@@ -89,33 +65,15 @@ export function signUp(accountType, firstName, lastName, email, password, confir
       })
 
       if (!response.data.success) {
-        toast.error(response.data.message, {
-          style: {
-            borderRadius: '10px',
-            background: '#333',
-            color: '#fff',
-          },
-        });
+        toast.error(response.data.message);
         throw new Error(response.data.message);
       }
 
-      toast.success("Signup Successful", {
-        style: {
-          borderRadius: '10px',
-          background: '#333',
-          color: '#fff',
-        },
-      });
+      toast.success("Account created");
       navigate("/login");
     } catch (error) {
       //console.log("SIGNUP API ERROR --> ", error);
-      toast.error("Invalid OTP", {
-        style: {
-          borderRadius: '10px',
-          background: '#333',
-          color: '#fff',
-        },
-      });
+      toast.error("Invalid OTP");
     }
     dispatch(setLoading(false))
     toast.dismiss(toastId)
@@ -127,14 +85,7 @@ export function signUp(accountType, firstName, lastName, email, password, confir
 export function login(email, password, navigate) {
   return async (dispatch) => {
 
-    const toastId = toast.loading("Loading...", {
-      icon: '👏',
-      style: {
-        borderRadius: '10px',
-        background: '#333',
-        color: '#fff',
-      },
-    });
+    const toastId = toast.loading("Loading...");
     dispatch(setLoading(true));
 
     try {
@@ -149,14 +100,7 @@ export function login(email, password, navigate) {
         throw new Error(response.data.message)
       }
 
-      toast('Login Successful , Enjoy The Expreience ', {
-        icon: '👏',
-        style: {
-          borderRadius: '10px',
-          background: '#333',
-          color: '#fff',
-        },
-      });
+      toast('Logged in');
       dispatch(setToken(response.data.token))
 
       const userImage = response.data?.user?.image
@@ -170,13 +114,7 @@ export function login(email, password, navigate) {
       navigate("/dashboard/my-profile");
     } catch (error) {
       //console.log("LOGIN API ERROR.......", error)
-      toast.error(error.response?.data?.message, {
-        style: {
-          borderRadius: '10px',
-          background: '#333',
-          color: '#fff',
-        },
-      });
+      toast.error(error.response?.data?.message);
     }
     dispatch(setLoading(false))
     toast.dismiss(toastId)
@@ -188,13 +126,7 @@ export function login(email, password, navigate) {
 export function getPasswordResetToken(email, setEmailSent) {
   return async (dispatch) => {
 
-    const toastId = toast.loading("Loading...", {
-      style: {
-        borderRadius: '10px',
-        background: '#333',
-        color: '#fff',
-      },
-    });
+    const toastId = toast.loading("Loading...");
     dispatch(setLoading(true))
     try {
       const response = await apiConnector("POST", RESETPASSTOKEN_API, {
@@ -207,23 +139,11 @@ export function getPasswordResetToken(email, setEmailSent) {
         throw new Error(response.data.message)
       }
 
-      toast.success("Reset Email Sent", {
-        style: {
-          borderRadius: '10px',
-          background: '#333',
-          color: '#fff',
-        },
-      });
+      toast.success("Reset email sent");
       setEmailSent(true)
     } catch (error) {
       //console.log("RESET PASS TOKEN ERROR............", error)
-      toast.error(error.response?.data?.message, {
-        style: {
-          borderRadius: '10px',
-          background: '#333',
-          color: '#fff',
-        },
-      });
+      toast.error(error.response?.data?.message);
     }
     toast.dismiss(toastId)
     dispatch(setLoading(false))
@@ -234,13 +154,7 @@ export function getPasswordResetToken(email, setEmailSent) {
 // ================ reset Password ================
 export function resetPassword(password, confirmPassword, token, navigate) {
   return async (dispatch) => {
-    const toastId = toast.loading("Loading...", {
-      style: {
-        borderRadius: '10px',
-        background: '#333',
-        color: '#fff',
-      },
-    });
+    const toastId = toast.loading("Loading...");
     dispatch(setLoading(true))
 
     try {
@@ -256,23 +170,11 @@ export function resetPassword(password, confirmPassword, token, navigate) {
         throw new Error(response.data.message)
       }
 
-      toast.success("Password Reset Successfully", {
-        style: {
-          borderRadius: '10px',
-          background: '#333',
-          color: '#fff',
-        },
-      });
+      toast.success("Password reset");
       navigate("/login")
     } catch (error) {
       //console.log("RESETPASSWORD ERROR............", error)
-      toast.error(error.response?.data?.message, {
-        style: {
-          borderRadius: '10px',
-          background: '#333',
-          color: '#fff',
-        },
-      });
+      toast.error(error.response?.data?.message);
     }
     toast.dismiss(toastId)
     dispatch(setLoading(false))
@@ -291,13 +193,7 @@ export function logout(navigate) {
     dispatch(resetCart())
     removeStoredToken()
     localStorage.removeItem("user")
-    toast.success("Logged Out", {
-      style: {
-        borderRadius: '10px',
-        background: '#333',
-        color: '#fff',
-      },
-    });
+    toast.success("Logged out");
     navigate("/login")
   }
 }
@@ -305,13 +201,7 @@ export function logout(navigate) {
 export const googleLogin = (credential, navigate) => {
   return async (dispatch) => {
     try {
-      const toastId = toast.loading("Loading...", {
-        style: {
-          borderRadius: '10px',
-          background: '#333',
-          color: '#fff',
-        },
-      });
+      const toastId = toast.loading("Loading...");
 
       const response = await apiConnector("POST", GOOGLE_API, { accessToken: credential });
 
@@ -332,25 +222,13 @@ export const googleLogin = (credential, navigate) => {
       setStoredToken(token);
       localStorage.setItem("user", JSON.stringify({ ...userData, image: userImage }));
       toast.dismiss(toastId)
-      toast.success('Login Successful , Enjoy The Experience', {
-        style: {
-          borderRadius: '10px',
-          background: '#333',
-          color: '#fff',
-        },
-      });
+      toast.success('Logged in');
 
       navigate("/dashboard/my-profile");
 
     } catch (error) {
       //console.log("Error in Google Login", error);
-      toast.error("Google Login Failed", {
-        style: {
-          borderRadius: '10px',
-          background: '#333',
-          color: '#fff',
-        },
-      });
+      toast.error("Google login failed");
     }
   };
 };

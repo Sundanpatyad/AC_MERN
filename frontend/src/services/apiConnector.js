@@ -1,5 +1,5 @@
 import axios from "axios"
-import { toast } from "react-hot-toast"
+import { toast } from "@/utils/toast"
 import { BASE_URL } from "./apis"
 import { getStoredToken, removeStoredToken } from "../utils/tokenStorage"
 
@@ -53,13 +53,7 @@ axiosInstance.interceptors.response.use(
                 localStorage.removeItem('user');
 
                 // Show toast notification
-                toast.error('Session expired. Please login again.', {
-                    style: {
-                        borderRadius: '10px',
-                        background: '#333',
-                        color: '#fff',
-                    },
-                });
+                toast.error('Session expired');
 
                 // Redirect to login page
                 window.location.href = '/login';

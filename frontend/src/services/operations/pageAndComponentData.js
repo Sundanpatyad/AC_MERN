@@ -1,5 +1,5 @@
 import React from 'react'
-// import { toast } from "react-hot-toast"
+// import { toast } from "@/utils/toast"
 import { apiConnector } from '../apiConnector';
 import { catalogData } from '../apis';
 

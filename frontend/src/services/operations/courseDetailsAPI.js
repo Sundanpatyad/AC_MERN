@@ -1,4 +1,4 @@
-import { toast } from "react-hot-toast"
+import { toast } from "@/utils/toast"
 
 import { updateCompletedLectures } from "../../slices/viewCourseSlice"
 // import { setLoading } from "../../slices/profileSlice";
@@ -110,7 +110,7 @@ export const addCourseDetails = async (data, token) => {
     }
 
     result = response?.data?.data
-    toast.success("Course Details Added Successfully")
+    toast.success("Course created")
   } catch (error) {
     //console.log("CREATE COURSE API ERROR............", error)
     toast.error(error.message)
@@ -137,7 +137,7 @@ export const editCourseDetails = async (data, token) => {
     }
 
     result = response?.data?.data
-    toast.success("Course Details Updated Successfully")
+    toast.success("Course updated")
   } catch (error) {
     //console.log("EDIT COURSE API ERROR............", error)
     toast.error(error.message)
@@ -163,7 +163,7 @@ export const createSection = async (data, token) => {
     }
 
     result = response?.data?.updatedCourseDetails
-    toast.success("Course Section Created")
+    toast.success("Section created")
   } catch (error) {
     //console.log("CREATE SECTION API ERROR............", error)
     toast.error(error.message)
@@ -188,7 +188,7 @@ export const createMock = async (data, token) => {
     }
 
     result = response?.data?.updatedCourseDetails
-    toast.success("Course Mock Created")
+    toast.success("Mock created")
   } catch (error) {
     //console.log("CREATE MOCK API ERROR............", error)
     toast.error(error.message)
@@ -215,7 +215,7 @@ export const createSubSection = async (data, token) => {
     }
 
     result = response?.data?.data
-    toast.success("Lecture Added")
+    toast.success("Lecture added")
   } catch (error) {
     //console.log("CREATE SUB-SECTION API ERROR............", error)
     toast.error(error.message)
@@ -241,7 +241,7 @@ export const updateSection = async (data, token) => {
     }
 
     result = response?.data?.data
-    toast.success("Course Section Updated")
+    toast.success("Section updated")
   } catch (error) {
     //console.log("UPDATE SECTION API ERROR............", error)
     toast.error(error.message)
@@ -267,7 +267,7 @@ export const updateMock = async (data, token) => {
     }
 
     result = response?.data?.data
-    toast.success("Course Section Updated")
+    toast.success("Section updated")
   } catch (error) {
     //console.log("UPDATE SECTION API ERROR............", error)
     toast.error(error.message)
@@ -293,7 +293,7 @@ export const updateSubSection = async (data, token) => {
     }
 
     result = response?.data?.data
-    toast.success("Lecture Updated")
+    toast.success("Lecture updated")
   } catch (error) {
     //console.log("UPDATE SUB-SECTION API ERROR............", error)
     toast.error(error.message)
@@ -317,7 +317,7 @@ export const updateMockTest = async (data, token) => {
     }
 
     result = response?.data?.data
-    toast.success("Lecture Updated")
+    toast.success("Lecture updated")
   } catch (error) {
     //console.log("UPDATE SUB-SECTION API ERROR............", error)
     toast.error(error.message)
@@ -343,7 +343,7 @@ export const deleteSection = async (data, token) => {
     }
 
     result = response?.data?.data
-    toast.success("Course Section Deleted")
+    toast.success("Section deleted")
   } catch (error) {
     //console.log("DELETE SECTION API ERROR............", error)
     toast.error(error.message)
@@ -366,7 +366,7 @@ export const deleteSubSection = async (data, token) => {
       throw new Error("Could Not Delete Lecture")
     }
     result = response?.data?.data
-    toast.success("Lecture Deleted")
+    toast.success("Lecture deleted")
   } catch (error) {
     //console.log("DELETE SUB-SECTION API ERROR............", error)
     toast.error(error.message)
@@ -412,7 +412,7 @@ export const deleteCourse = async (data, token) => {
     if (!response?.data?.success) {
       throw new Error("Could Not Delete Course")
     }
-    toast.success("Course Deleted")
+    toast.success("Course deleted")
   } catch (error) {
     //console.log("DELETE COURSE API ERROR............", error)
     toast.error(error.message)
@@ -468,7 +468,7 @@ export const markLectureAsComplete = async (data, token) => {
     if (!response.data.message) {
       throw new Error(response.data.error)
     }
-    toast.success("Lecture Completed")
+    toast.success("Lecture completed")
     result = true
   } catch (error) {
     //console.log("MARK_LECTURE_AS_COMPLETE_API API ERROR............", error)
@@ -492,7 +492,7 @@ export const createRating = async (data, token) => {
     if (!response?.data?.success) {
       throw new Error("Could Not Create Rating")
     }
-    toast.success("Rating Created")
+    toast.success("Rating saved")
     success = true
   } catch (error) {
     success = false

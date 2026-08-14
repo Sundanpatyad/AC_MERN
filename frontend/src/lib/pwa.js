@@ -50,17 +50,36 @@ export function openInSystemBrowser(url) {
 export async function unregisterStaleServiceWorkers() {
   if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return;
 
+  const MIGRATE_KEY = "ac-pwa-migrate-v3";
+
   try {
     const registrations = await navigator.serviceWorker.getRegistrations();
-    await Promise.all(
-      registrations.map((registration) => {
-        const scope = registration.scope || "";
-        if (scope.includes("firebase-cloud-messaging-push-scope")) {
-          return Promise.resolve();
-        }
-        return registration.unregister();
-      })
-    );
+    const stale = registrations.filter((registration) => {
+      const scope = registration.scope || "";
+      const scriptURL =
+        registration.active?.scriptURL ||
+        registration.waiting?.scriptURL ||
+        registration.installing?.scriptURL ||
+        "";
+      return !(
+        scope.includes("firebase-cloud-messaging-push-scope") ||
+        scriptURL.includes("firebase-messaging-sw.js")
+      );
+    });
+
+    if (!stale.length) return;
+
+    await Promise.all(stale.map((registration) => registration.unregister()));
+
+    if ("caches" in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map((key) => caches.delete(key)));
+    }
+
+    if (!sessionStorage.getItem(MIGRATE_KEY)) {
+      sessionStorage.setItem(MIGRATE_KEY, "1");
+      window.location.reload();
+    }
   } catch (error) {
     console.warn("[PWA] Failed to unregister stale service workers:", error);
   }

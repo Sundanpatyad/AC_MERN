@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
-import { toast } from "react-hot-toast"
+import { toast } from "@/utils/toast"
 import { HiOutlineCurrencyRupee } from "react-icons/hi"
 import { MdNavigateNext } from "react-icons/md"
 import { useDispatch, useSelector } from "react-redux"
@@ -106,7 +106,7 @@ export default function CourseInformationForm() {
           dispatch(setCourse(result))
         }
       } else {
-        toast.error("No changes made to the form")
+        toast.error("No changes to save")
       }
       return
     }

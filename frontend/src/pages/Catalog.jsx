@@ -8,7 +8,7 @@ import { getCatalogPageData } from "../services/operations/pageAndComponentData"
 import { useCategories } from "../hooks/useCategories";
 import { addToCart } from "../slices/cartSlice";
 import { buyItem } from "../services/operations/studentFeaturesAPI";
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import { FaBookOpen, FaShoppingCart } from "react-icons/fa";
 import { ACCOUNT_TYPE } from "../utils/constants";
 import { setCourse, setStep } from "../slices/courseSlice";
@@ -187,7 +187,7 @@ function Catalog() {
       }
 
       if (user?.accountType === ACCOUNT_TYPE.INSTRUCTOR) {
-        toast.error("Instructors can't add courses to cart.");
+        toast.error("Instructors can't add to cart");
         return;
       }
 
@@ -197,9 +197,9 @@ function Catalog() {
       const response = await dispatch(addToCart(course._id));
 
       if (response.meta.requestStatus === "fulfilled") {
-        toast.success("Course added to cart");
+        toast.success("Added to cart");
       } else {
-        toast.error("Failed to add course to cart");
+        toast.error("Couldn't add to cart");
       }
     },
     [dispatch, navigate, isLoggedIn, user]
@@ -213,7 +213,7 @@ function Catalog() {
       }
 
       if (user?.accountType === ACCOUNT_TYPE.INSTRUCTOR) {
-        toast.error("Instructors can't purchase courses.");
+        toast.error("Instructors can't buy");
         return;
       }
 

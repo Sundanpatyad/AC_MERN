@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import toast from "react-hot-toast";
+import toast from "@/utils/toast";
 import axios from 'axios';
 import { mocktestEndpoints } from '../../../services/apis';
 import LoadingSpinner from './Spinner';
@@ -64,7 +64,7 @@ const AttemptMockTest = () => {
 
         const redirectToDetails = () => {
             localStorage.removeItem(`mockTestProgress_${mockId}`);
-            toast.error("Please purchase this mock test to continue");
+            toast.error("Purchase required");
             navigate(`/mock-test/${mockId}`, { replace: true });
         };
 
@@ -370,7 +370,7 @@ const AttemptMockTest = () => {
             );
         } catch (error) {
             console.error('Error submitting score:', error);
-            toast.error("Failed to submit score, but results are shown below.");
+            toast.error("Score not saved");
         }
     };
 

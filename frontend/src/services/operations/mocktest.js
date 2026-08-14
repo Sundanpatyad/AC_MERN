@@ -1,19 +1,12 @@
-import { toast } from "react-hot-toast"
+import { toast } from "@/utils/toast"
 import { apiConnector } from "../apiConnector"
 import { mocktestEndpoints } from "../apis"
 
 const { CREATE_MOCKTEST_API , GET_INSTRUCTORS_MOCKTESTS , GET_MOCK_TEST_API  , FETCH_MOCKTEST_BY_ID , ENORLL_MOCKTEST , GET_MCOKTEST_SERIES_BY_ID} = mocktestEndpoints;
 
-const toastOptions = {
-  style: {
-    borderRadius: '10px',
-    background: '#333',
-    color: '#fff',
-  },
-};
 
 export const addMockTest = async (data, token) => {
-  const toastId = toast.loading("Loading...", toastOptions)
+  const toastId = toast.loading("Loading...")
   let result = null;
 
   try {
@@ -28,10 +21,10 @@ export const addMockTest = async (data, token) => {
     }
 
     result = response?.data?.data
-    toast.success("Course Details Added Successfully", toastOptions)
+    toast.success("Mock created")
   } catch (error) {
     //console.log("CREATE COURSE API ERROR............", error)
-    toast.error(error.message, toastOptions)
+    toast.error(error.message)
   }
   toast.dismiss(toastId)
   return result
@@ -55,7 +48,7 @@ export const fetchInstructorMockTest = async (token) => {
     result = response?.data?.data
   } catch (error) {
     //console.log("INSTRUCTOR MockTest API ERROR............", error)
-    toast.error(error.message, toastOptions)
+    toast.error(error.message)
   }
   return result
 }
@@ -81,7 +74,7 @@ export const fetchAllMockTests = async (token, options = {}) => {
     result = response?.data?.data
     return result
   } catch (error) {
-    toast.error(error.message, toastOptions)
+    toast.error(error.message)
     return result
   }
 }
@@ -100,13 +93,13 @@ export const fetchMockTestDetails = async (mockTestId, token) => {
     }
     result = response?.data?.data
   } catch (error) {
-    toast.error(error.message, toastOptions)
+    toast.error(error.message)
   }
   return result
 }
 
 export const enrollInMockTest = async (mockTestId, token) => {
-  const toastId = toast.loading("Loading...", toastOptions)
+  const toastId = toast.loading("Loading...")
   let result = null;
   try {
     const response = await apiConnector(
@@ -122,10 +115,10 @@ export const enrollInMockTest = async (mockTestId, token) => {
       throw new Error("Could Not Enroll in Mock Test")
     }
     result = response?.data?.data
-    toast.success("Enrolled in Mock Test Successfully", toastOptions)
+    toast.success("Enrolled")
   } catch (error) {
     //console.log("Enroll MockTest API ERROR............", error)
-    toast.error(error.message, toastOptions)
+    toast.error(error.message)
   }
   toast.dismiss(toastId)
   return result
@@ -133,7 +126,7 @@ export const enrollInMockTest = async (mockTestId, token) => {
 
 
 export const fetchSeries = async (seriesId, token) => {
-  const toastId = toast.loading("Loading...", toastOptions);
+  const toastId = toast.loading("Loading...");
   let result = null;
 
   try {
@@ -153,10 +146,9 @@ export const fetchSeries = async (seriesId, token) => {
     }
 
     result = response?.data?.data;
-    toast.success("Mock Test Series Fetched Successfully", toastOptions);
   } catch (error) {
     //console.log("Fetch Series API ERROR............", error);
-    toast.error(error.message, toastOptions);
+    toast.error(error.message);
   }
 
   toast.dismiss(toastId);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
-import toast from 'react-hot-toast';
+import toast from '@/utils/toast';
 import { ArrowRight } from 'lucide-react';
 
 import { fetchAllMockTests } from '../../../services/operations/mocktest';
@@ -37,7 +37,7 @@ const MockTestsSection = ({ setShowLoginModal }) => {
         setMockTests(data || []);
       } catch (error) {
         console.error("Error fetching mock tests:", error);
-        toast.error("Failed to load mock tests. Please try again.");
+        toast.error("Couldn't load tests");
       } finally {
         setIsLoading(false);
       }
@@ -49,7 +49,7 @@ const MockTestsSection = ({ setShowLoginModal }) => {
 
   const handleAddToCart = useCallback(async (mockTest) => {
     if (user?.accountType === ACCOUNT_TYPE.INSTRUCTOR) {
-      toast.error("Instructors can't add mock tests to cart.");
+      toast.error("Instructors can't add to cart");
       return;
     }
     dispatch(addToCart(mockTest));
@@ -57,19 +57,19 @@ const MockTestsSection = ({ setShowLoginModal }) => {
 
   const handleRemoveFromCart = useCallback(async (mockTest) => {
     dispatch(removeFromCart(mockTest));
-    toast.success("Removed from cart successfully!");
+    toast.success("Removed from cart");
   }, [dispatch]);
 
   const handleBuyNow = useCallback(async (mockTest) => {
     if (user?.accountType === ACCOUNT_TYPE.INSTRUCTOR) {
-      toast.error("Instructors can't purchase mock tests.");
+      toast.error("Instructors can't buy");
       return;
     }
     try {
       await buyItem(token, [mockTest._id], ['MOCK_TEST'], user, navigate, dispatch);
     } catch (error) {
       console.error("Error purchasing mock test:", error);
-      toast.error("Failed to purchase the mock test. Please try again.");
+      toast.error("Purchase failed");
     }
   }, [token, user, navigate, dispatch]);
 

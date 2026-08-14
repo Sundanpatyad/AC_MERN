@@ -7,7 +7,7 @@ import { saveSeries } from '../../../../services/operations/profileAPI';
 import AddMockTest from './AddTextQuestions';
 import AddAttachments from './AddOMRbased';
 import { uploadImageToCloudinary } from '../../../../services/operations/uploadToCloudinary';
-import toast from 'react-hot-toast';
+import toast from '@/utils/toast';
 
 const EditMockTestSeries = () => {
   const { token } = useSelector((state) => state.auth);
@@ -105,11 +105,11 @@ const EditMockTestSeries = () => {
   // Upload helper: reads a file, uploads to Cloudinary, calls setter with URL
   const uploadField = async (file, setter) => {
     if (!file) return;
-    const tid = toast.loading('Uploading image...');
+    const tid = toast.loading('Uploading...');
     try {
       const url = await uploadImageToCloudinary(file, token);
       setter(url);
-      toast.success('Image uploaded!', { id: tid });
+      toast.success('Image uploaded', { id: tid });
     } catch (e) {
       toast.error('Upload failed', { id: tid });
     }
