@@ -46,7 +46,9 @@ axiosInstance.interceptors.response.use(
             const errorMessage = error.response.data?.message?.toLowerCase() || '';
 
             if (errorMessage.includes('token') || errorMessage.includes('unauthorized') || errorMessage.includes('expired')) {
-                // Clear local storage
+                if (typeof window !== 'undefined' && window.__rzpCheckoutOpen) {
+                    return Promise.reject(error);
+                }
                 removeStoredToken();
                 localStorage.removeItem('user');
 

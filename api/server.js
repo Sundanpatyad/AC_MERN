@@ -26,7 +26,9 @@ const app = express();
    GLOBAL MIDDLEWARE
 ========================= */
 
-// 🔥 IMPORTANT: increase payload limits (DigitalOcean App Platform)
+// Razorpay signs the raw webhook bytes — this must run before express.json().
+app.use('/api/v1/payment/webhook', express.raw({ type: () => true, limit: '1mb' }));
+
 app.use(express.json({ limit: '15mb' }));
 app.use(express.urlencoded({ limit: '15mb', extended: true }));
 

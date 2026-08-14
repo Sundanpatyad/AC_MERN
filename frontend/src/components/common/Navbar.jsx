@@ -47,6 +47,8 @@ const Navbar = () => {
     const [deferredPrompt, setDeferredPrompt] = useState(null);
     const [confirmationModal, setConfirmationModal] = useState(null);
     const lastScrollY = useRef(0);
+    const isHome = location.pathname === '/';
+    const overlayHero = isHome && !isScrolled;
 
     const { scrollY } = useScroll();
 
@@ -101,8 +103,12 @@ const Navbar = () => {
             <motion.nav
                 animate={{ y: hidden ? '-100%' : 0 }}
                 transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                className={`fixed top-0 left-0 right-0 z-[100] h-16 bg-page transition-colors duration-300 ${
-                    isScrolled ? 'border-b border-line' : 'border-b border-transparent'
+                className={`fixed top-0 left-0 right-0 z-[100] h-16 transition-colors duration-300 ${
+                    overlayHero
+                        ? 'nav-on-media bg-transparent border-b border-transparent'
+                        : isScrolled
+                            ? 'bg-page border-b border-line'
+                            : 'bg-page border-b border-transparent'
                 }`}
             >
                 <div className="page-shell h-full flex items-center justify-between gap-3">
@@ -361,7 +367,7 @@ const Navbar = () => {
                 )}
             </AnimatePresence>
 
-            <div className="h-16" />
+            {!isHome && <div className="h-16" />}
 
             {deferredPrompt && <InstallApp handleInstall={handleInstallClick} />}
 

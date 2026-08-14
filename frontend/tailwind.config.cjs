@@ -38,6 +38,9 @@ module.exports = {
         soft: "var(--c-brand-soft)",
         fg: "var(--c-brand-fg)",
       },
+      primary: {
+        DEFAULT: "#E1E0CC",
+      },
       // Your custom colors
       richblack: {
         5: "#F1F2FF",

@@ -14,7 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import RazorpayCheckout from 'react-native-razorpay';
 
-import { useAuthStore } from '../../store/authStore';
+import { isInstructorAccount, useAuthStore } from '../../store/authStore';
 import { apiConnector } from '../../services/api';
 import { endpoints } from '../../constants/api';
 import { Button } from '../../components/ui/Button';
@@ -28,12 +28,38 @@ function stripHtml(value?: string) {
   return value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
+function normalizeIndianMobile(value?: string | number | null) {
+  if (value == null || value === '') return undefined;
+  const digits = String(value).replace(/\D/g, '');
+  if (digits.length === 12 && digits.startsWith('91')) return digits.slice(2);
+  if (digits.length === 11 && digits.startsWith('0')) return digits.slice(1);
+  if (digits.length === 10) return digits;
+  return undefined;
+}
+
+async function pollNativePaymentStatus(orderId: string) {
+  const deadline = Date.now() + 90000;
+  while (Date.now() < deadline) {
+    try {
+      const res = await apiConnector.get(`${endpoints.PAYMENT_STATUS}/${orderId}`, {
+        timeout: 15000,
+      });
+      if (res.data?.data?.status === 'paid') return true;
+    } catch (error) {
+      console.warn('[Payment Poll]', error);
+    }
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+  }
+  return false;
+}
+
 function paramValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
 
-function hasAccess(testDetails: any, userId?: string) {
+function hasAccess(testDetails: any, userId?: string, accountType?: string) {
   if (!testDetails) return false;
+  if (isInstructorAccount(accountType)) return true;
   if (Number(testDetails.price) === 0) return true;
   if (testDetails.isEnrolled) return true;
   if (!userId || !Array.isArray(testDetails.studentsEnrolled)) return false;
@@ -76,7 +102,8 @@ export default function MockTestDetailScreen() {
     fetchDetails();
   }, [fetchDetails]);
 
-  const canAccess = hasAccess(testDetails, user?._id);
+  const instructor = isInstructorAccount(user?.accountType);
+  const canAccess = hasAccess(testDetails, user?._id, user?.accountType);
 
   const totalQuestions = useMemo(() => {
     if (!testDetails?.mockTests?.length) return 0;
@@ -103,6 +130,11 @@ export default function MockTestDetailScreen() {
   const handleEnroll = async () => {
     if (!user) {
       router.push('/(auth)/login');
+      return;
+    }
+    if (isInstructorAccount(user.accountType)) {
+      const firstId = testDetails?.mockTests?.[0]?._id;
+      if (firstId) handleStartTest(firstId);
       return;
     }
 
@@ -155,6 +187,16 @@ export default function MockTestDetailScreen() {
       }
 
       const orderData = orderResponse.data.data;
+      if (orderData?.alreadyPaid || orderResponse.data?.code === 'ALREADY_PAID') {
+        showMessage({
+          title: 'Payment successful',
+          message: orderResponse.data?.message || 'You now have access to this mock test.',
+          tone: 'success',
+        });
+        fetchDetails();
+        return;
+      }
+
       const razorpayKey = orderData.key;
       const orderId = orderData.orderId || orderData.id;
       const amount = orderData.amount;
@@ -163,21 +205,28 @@ export default function MockTestDetailScreen() {
         throw new Error('Invalid payment order from server');
       }
 
-      const options = {
+      const contact = normalizeIndianMobile(
+        (user as any)?.mobileNumber || (user as any)?.additionalDetails?.contactNumber
+      );
+
+      const options: Record<string, any> = {
         description: `Purchase ${testDetails.seriesName}`,
-        image: 'https://ac-62i9.onrender.com/assets/Logo/rzp_logo.png',
+        image: 'https://awakeningclasses.in/logo.png',
         currency: orderData.currency || 'INR',
         key: razorpayKey,
         amount,
         name: 'Awakening Classes',
         order_id: orderId,
+        retry: { enabled: true, max_count: 3 },
         prefill: {
           email: user?.email || '',
           name: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
-          contact: user?.additionalDetails?.contactNumber || '',
         },
-        theme: { color: isDark ? '#000000' : '#111111' },
+        theme: { color: isDark ? '#111111' : '#111111' },
       };
+      if (contact) {
+        options.prefill.contact = contact;
+      }
 
       if (!RazorpayCheckout || !RazorpayCheckout.open) {
         showMessage({
@@ -205,28 +254,54 @@ export default function MockTestDetailScreen() {
               });
               fetchDetails();
             } else {
+              const recovered = await pollNativePaymentStatus(orderId);
               showMessage({
-                title: 'Verification pending',
-                message:
-                  verifyRes.data?.message ||
-                  'Payment received. Contact support if access is missing.',
+                title: recovered ? 'Payment successful' : 'Verification pending',
+                message: recovered
+                  ? 'You now have access to this mock test.'
+                  : verifyRes.data?.message ||
+                    'Payment received. Contact support if access is missing.',
+                tone: recovered ? 'success' : undefined,
               });
+              if (recovered) fetchDetails();
             }
           } catch (verifyError: any) {
+            const recovered = await pollNativePaymentStatus(orderId);
             showMessage({
-              title: 'Verification pending',
-              message:
-                verifyError.response?.data?.message ||
-                'Payment received. Contact support if access is missing.',
+              title: recovered ? 'Payment successful' : 'Verification pending',
+              message: recovered
+                ? 'You now have access to this mock test.'
+                : verifyError.response?.data?.message ||
+                  'Payment received. Contact support if access is missing.',
+              tone: recovered ? 'success' : undefined,
             });
+            if (recovered) fetchDetails();
           }
         })
-        .catch((error: any) => {
-          console.log('[Razorpay Error]', error);
+        .catch(async (error: any) => {
+          console.log('[Razorpay Error]', {
+            description: error?.description,
+            code: error?.code,
+            details: error?.details || error?.error,
+          });
+          showMessage({
+            title: 'Checking payment',
+            message: 'If you completed the payment in your UPI app, access will unlock shortly.',
+          });
+          const recovered = await pollNativePaymentStatus(orderId);
+          if (recovered) {
+            showMessage({
+              title: 'Payment successful',
+              message: 'You now have access to this mock test.',
+              tone: 'success',
+            });
+            fetchDetails();
+            return;
+          }
           const description = error?.description || error?.error?.description;
           if (description && description !== 'undefined') {
             showMessage({
-              title: 'Payment cancelled',
+              title: 'Payment not completed',
               message: String(description),
             });
           }
@@ -292,11 +367,9 @@ export default function MockTestDetailScreen() {
     },
   ];
 
-  const ctaTitle = canAccess
-    ? 'Start learning'
-    : Number(testDetails.price) === 0
-      ? 'Enroll free'
-      : 'Buy now';
+  const ctaTitle = instructor || canAccess || Number(testDetails.price) === 0
+    ? 'Start now'
+    : 'Buy now';
 
   const onCtaPress = () => {
     if (canAccess) {
@@ -392,6 +465,15 @@ export default function MockTestDetailScreen() {
             {stripHtml(testDetails.description) ||
               'Focused mock tests to help you prepare with real exam patterns and clear performance feedback.'}
           </Text>
+
+          {instructor ? (
+            <Button
+              title="Edit series"
+              onPress={() => router.push(`/admin/edit-series/${id}`)}
+              variant="outline"
+              style={{ marginBottom: 16 }}
+            />
+          ) : null}
 
           <Text style={styles.sectionTitle}>Tests in this series</Text>
           <View style={styles.testList}>

@@ -8,7 +8,7 @@ import {
   TextStyle,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Radii } from '@/constants/theme';
+import { Radii, Type } from '@/constants/theme';
 import { useTheme } from '@/providers/AppThemeProvider';
 
 interface ButtonProps {
@@ -127,8 +127,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   text: {
-    fontSize: 14,
-    fontWeight: '700',
-    letterSpacing: 0.1,
+    ...Type.button,
   },
 });

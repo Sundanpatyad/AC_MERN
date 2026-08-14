@@ -36,6 +36,10 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
+      "navigationBar": {
+        "backgroundColor": "#FFFFFF",
+        "barStyle": "dark-content"
+      },
       "package": "com.awakeningclasses",
       "googleServicesFile": "./google-services.json",
       "permissions": [

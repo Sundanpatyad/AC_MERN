@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, StyleProp, ViewStyle } from 'react-native';
 import { useTheme } from '@/providers/AppThemeProvider';
-import { AppPalette, Fonts } from '@/constants/theme';
+import { AppPalette, Type } from '@/constants/theme';
 
 type Props = {
   title: string;
@@ -50,28 +50,22 @@ function createStyles(colors: AppPalette) {
       gap: 12,
     },
     title: {
-      fontSize: 18,
-      fontWeight: '700',
+      ...Type.h3,
       color: colors.text,
-      letterSpacing: -0.2,
     },
     titleSerif: {
-      fontSize: 26,
-      fontFamily: Fonts.semiBold,
-      letterSpacing: -0.3,
-      lineHeight: 32,
+      ...Type.h3,
     },
     right: {
-      fontSize: 13,
-      fontWeight: '500',
+      ...Type.caption,
+      fontFamily: Type.nav.fontFamily,
       color: colors.textSecondary,
       paddingBottom: 4,
     },
     subtitle: {
+      ...Type.bodySmall,
       marginTop: 6,
-      fontSize: 13,
       color: colors.textSecondary,
-      lineHeight: 18,
     },
   });
 }

@@ -4,14 +4,15 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useMemo, useState } from 'react';
 import { Text, TextInput } from 'react-native';
+import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-context';
 import 'react-native-reanimated';
 import {
   useFonts,
-  Poppins_400Regular,
-  Poppins_500Medium,
-  Poppins_600SemiBold,
-  Poppins_700Bold,
-} from '@expo-google-fonts/poppins';
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+} from '@expo-google-fonts/inter';
 
 import { useAuthStore } from '../store/authStore';
 import { useThemeStore } from '../store/themeStore';
@@ -43,10 +44,10 @@ function RootNavigator() {
   const hydrateTheme = useThemeStore((s) => s.hydrate);
 
   const [fontsLoaded] = useFonts({
-    Poppins_400Regular,
-    Poppins_500Medium,
-    Poppins_600SemiBold,
-    Poppins_700Bold,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
   });
 
   useEffect(() => {
@@ -113,6 +114,7 @@ function RootNavigator() {
       >
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="admin" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style={colors.statusBarStyle} />
     </ThemeProvider>
@@ -121,10 +123,12 @@ function RootNavigator() {
 
 export default function RootLayout() {
   return (
-    <AppThemeProvider>
-      <DialogProvider>
-        <RootNavigator />
-      </DialogProvider>
-    </AppThemeProvider>
+    <SafeAreaProvider initialMetrics={initialWindowMetrics ?? undefined}>
+      <AppThemeProvider>
+        <DialogProvider>
+          <RootNavigator />
+        </DialogProvider>
+      </AppThemeProvider>
+    </SafeAreaProvider>
   );
 }
