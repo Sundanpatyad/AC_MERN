@@ -422,14 +422,7 @@ const HeroSection = () => {
       <div className="page-shell py-10 md:py-14 lg:py-16 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="text-center lg:text-left space-y-6 md:space-y-7">
-            <motion.p
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45 }}
-              className="text-sm font-semibold tracking-wide text-muted"
-            >
-              Awakening Classes
-            </motion.p>
+         
 
             <motion.h1
               initial={{ opacity: 0, y: 16 }}
