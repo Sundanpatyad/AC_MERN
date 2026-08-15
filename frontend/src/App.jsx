@@ -14,7 +14,7 @@ import PhoneWizardPage from "./components/core/HomePage/Phone";
 import AdminCountMock from "./components/core/Admin/MockCountAdmin";
 // import { checkAndVerifyPayment } from "./services/operations/studentFeaturesAPI";
 import PrivacyPolicy from "./pages/PrivicyPolicy";
-// import CookiePolicy from "./pages/CookiePolicy";
+import CookiePolicy from "./pages/CookiePolicy";
 import TermsOfService from "./pages/Terms";
 import { useTokenExpiry } from "./hooks/useTokenExpiry";
 import { enablePushNotifications, listenForForegroundMessages } from "./services/pushNotifications";
@@ -207,7 +207,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              {/* <Route path="/cookie-policy" element={<CookiePolicy />} /> */}
+              <Route path="/cookie-policy" element={<CookiePolicy />} />
               <Route path="/terms" element={<TermsOfService />} />
               <Route path="/about" element={<About />} />
               <Route path="/rankings" element={<RankingsPage />} />

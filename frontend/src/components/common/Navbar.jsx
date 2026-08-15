@@ -95,7 +95,7 @@ const Navbar = () => {
                         <img
                             src={rzpLogo}
                             alt="Awakening Classes"
-                            className="w-8 h-8 rounded-full shrink-0"
+                            className="w-8 h-8 rounded-full shrink-0 object-cover"
                         />
                         <span className="font-semibold text-[15px] sm:text-lg text-fg tracking-tight truncate">
                             Awakening Classes

@@ -19,6 +19,7 @@ import { useThemeStore } from '../store/themeStore';
 import { AppThemeProvider, useTheme } from '../providers/AppThemeProvider';
 import { DialogProvider } from '../providers/DialogProvider';
 import { Fonts } from '../constants/theme';
+import { AppSplash } from '../components/ui/AppSplash';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -40,6 +41,7 @@ function RootNavigator() {
   const segments = useSegments();
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
+  const [minSplashDone, setMinSplashDone] = useState(false);
   const hydrateAuth = useAuthStore((s) => s.hydrate);
   const hydrateTheme = useThemeStore((s) => s.hydrate);
 
@@ -59,10 +61,9 @@ function RootNavigator() {
   }, [hydrateAuth, hydrateTheme]);
 
   useEffect(() => {
-    if (isReady && !isLoading && fontsLoaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [isReady, isLoading, fontsLoaded]);
+    const timer = setTimeout(() => setMinSplashDone(true), 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (isLoading || !isReady || !fontsLoaded) return;
@@ -100,8 +101,8 @@ function RootNavigator() {
     [colors, isDark]
   );
 
-  if (!isReady || isLoading || !fontsLoaded) {
-    return null;
+  if (!isReady || isLoading || !fontsLoaded || !minSplashDone) {
+    return <AppSplash />;
   }
 
   return (
