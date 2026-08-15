@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 
 import { MeshHero } from '../../components/ui/MeshHero';
+import { BrandLogo } from '../../components/ui/BrandLogo';
 import { showMessage } from '../../providers/DialogProvider';
 import { useTheme } from '../../providers/AppThemeProvider';
 import { AppPalette, Fonts, Type } from '../../constants/theme';
@@ -86,7 +87,10 @@ export default function LoginScreen() {
         fadeTo={colors.background}
         style={{ paddingTop: insets.top + 16, paddingBottom: 28 }}
       >
-        <Text style={styles.brand}>Awakening Classes</Text>
+        <View style={styles.brandRow}>
+          <BrandLogo size={36} />
+          <Text style={styles.brand}>Awakening Classes</Text>
+        </View>
         <Text style={styles.headline}>
           Learn more.{'\n'}
           <Text style={styles.headlineMuted}>Achieve more.</Text>
@@ -166,11 +170,17 @@ function createStyles(colors: AppPalette) {
       flex: 1,
       backgroundColor: colors.background,
     },
+    brandRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      paddingHorizontal: 24,
+      marginBottom: 18,
+    },
     brand: {
       ...Type.h3,
-      paddingHorizontal: 24,
       color: colors.text,
-      marginBottom: 18,
+      marginBottom: 0,
     },
     headline: {
       ...Type.hero,

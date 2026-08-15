@@ -43,11 +43,11 @@ const InstallApp = ({ handleInstall }) => {
                 <X className="w-4 h-4" />
               </button>
               <div className="flex items-center space-x-4">
-                <div className="flex-shrink-0 bg-elevated p-3 rounded-full">
+                <div className="flex-shrink-0">
                   <img
                     src={rzpLogo}
                     alt="App Logo"
-                    className="w-6 h-6 rounded-full"
+                    className="w-12 h-12 rounded-full object-cover"
                   />
                 </div>
                 <div className="flex-1">

@@ -17,7 +17,7 @@ const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10">
           <div className="col-span-2 md:col-span-1 space-y-4">
             <Link to="/" className="inline-flex items-center gap-2.5">
-              <img src={rzpLogo} alt="" className="w-8 h-8 rounded-full" />
+              <img src={rzpLogo} alt="" className="w-8 h-8 rounded-full object-cover" />
               <span className="font-semibold text-fg tracking-tight">Awakening Classes</span>
             </Link>
             <p className="text-sm text-muted max-w-xs leading-relaxed">
