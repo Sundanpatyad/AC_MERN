@@ -9,6 +9,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTabScreenBottomPadding } from '../../lib/safeArea';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { isInstructorAccount, useAuthStore } from '../../store/authStore';
@@ -28,6 +29,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabClearance = useTabScreenBottomPadding();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   const [purchased, setPurchased] = useState<any[]>([]);
@@ -112,7 +114,7 @@ export default function ProfileScreen() {
       </MeshHero>
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: tabClearance }]}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -271,10 +273,6 @@ function createStyles(colors: AppPalette) {
     settingsBtn: {
       width: 36,
       height: 36,
-      borderRadius: 18,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
       alignItems: 'center',
       justifyContent: 'center',
     },

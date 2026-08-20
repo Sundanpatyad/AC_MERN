@@ -19,9 +19,9 @@ import { useThemeStore } from '../store/themeStore';
 import { AppThemeProvider, useTheme } from '../providers/AppThemeProvider';
 import { DialogProvider } from '../providers/DialogProvider';
 import { Fonts } from '../constants/theme';
-import { AppSplash } from '../components/ui/AppSplash';
 
 SplashScreen.preventAutoHideAsync();
+SplashScreen.setOptions({ duration: 650, fade: true });
 
 // Default app typeface (React 19 types omit defaultProps)
 const TextAny = Text as typeof Text & { defaultProps?: { style?: unknown } };
@@ -41,7 +41,6 @@ function RootNavigator() {
   const segments = useSegments();
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
-  const [minSplashDone, setMinSplashDone] = useState(false);
   const hydrateAuth = useAuthStore((s) => s.hydrate);
   const hydrateTheme = useThemeStore((s) => s.hydrate);
 
@@ -60,13 +59,15 @@ function RootNavigator() {
     init();
   }, [hydrateAuth, hydrateTheme]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setMinSplashDone(true), 800);
-    return () => clearTimeout(timer);
-  }, []);
+  const appReady = isReady && !isLoading && fontsLoaded;
 
   useEffect(() => {
-    if (isLoading || !isReady || !fontsLoaded) return;
+    if (!appReady) return;
+    SplashScreen.hideAsync().catch(() => {});
+  }, [appReady]);
+
+  useEffect(() => {
+    if (!appReady) return;
 
     const inAuthGroup = segments[0] === '(auth)';
 
@@ -75,15 +76,15 @@ function RootNavigator() {
     } else if (token && inAuthGroup) {
       router.replace('/(tabs)');
     }
-  }, [token, segments, isLoading, isReady, fontsLoaded, router]);
+  }, [token, segments, appReady, router]);
 
   // Register FCM device token once the user is authenticated
   useEffect(() => {
-    if (!token || isLoading || !isReady || !fontsLoaded) return;
+    if (!token || !appReady) return;
     import('../services/pushNotifications')
       .then(({ enablePushNotifications }) => enablePushNotifications())
       .catch(() => {});
-  }, [token, isLoading, isReady, fontsLoaded]);
+  }, [token, appReady]);
 
   const navigationTheme = useMemo(
     () => ({
@@ -101,8 +102,8 @@ function RootNavigator() {
     [colors, isDark]
   );
 
-  if (!isReady || isLoading || !fontsLoaded || !minSplashDone) {
-    return <AppSplash />;
+  if (!appReady) {
+    return null;
   }
 
   return (

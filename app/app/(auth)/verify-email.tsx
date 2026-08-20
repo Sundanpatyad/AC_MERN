@@ -5,6 +5,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { ScreenBackground } from '../../components/ui/ScreenBackground';
+import { useNativeBottomInset } from '../../lib/safeArea';
 import { AppPalette } from '../../constants/theme';
 import { useTheme } from '../../providers/AppThemeProvider';
 import { apiConnector } from '../../services/api';
@@ -16,6 +17,7 @@ export default function VerifyEmailScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { colors } = useTheme();
+  const bottomInset = useNativeBottomInset();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   const handleVerify = async () => {
@@ -60,7 +62,7 @@ export default function VerifyEmailScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomInset + 24 }]}>
         <View style={styles.header}>
           <Text style={styles.title}>Verify Email</Text>
           <Text style={styles.subtitle}>

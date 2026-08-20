@@ -10,6 +10,7 @@ import {
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNativeBottomInset } from '../../lib/safeArea';
 import * as Haptics from 'expo-haptics';
 
 import { MeshHero } from '../../components/ui/MeshHero';
@@ -22,6 +23,7 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const bottomInset = useNativeBottomInset();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
@@ -85,6 +87,7 @@ export default function LoginScreen() {
 
       <MeshHero
         fadeTo={colors.background}
+        divided={false}
         style={{ paddingTop: insets.top + 16, paddingBottom: 28 }}
       >
         <View style={styles.brandRow}>
@@ -126,7 +129,7 @@ export default function LoginScreen() {
           ))}
         </View>
 
-        <View style={[styles.actions, { paddingBottom: Math.max(insets.bottom, 16) + 6 }]}>
+        <View style={[styles.actions, { paddingBottom: bottomInset + 16 }]}>
           <Pressable
             onPress={onGoogle}
             disabled={isLoading}

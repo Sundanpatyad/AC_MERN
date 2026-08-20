@@ -18,6 +18,7 @@ import {
 } from '@/constants/layout';
 import { Radii, Type } from '@/constants/theme';
 import { useTheme } from '@/providers/AppThemeProvider';
+import { useNativeBottomInset } from '@/lib/safeArea';
 
 export type DialogTone = 'default' | 'success' | 'danger';
 
@@ -130,6 +131,7 @@ export function AppDialog({
   dismissOnOverlay = true,
 }: AppDialogProps) {
   const { colors } = useTheme();
+  const bottomInset = useNativeBottomInset();
   const [mounted, setMounted] = React.useState(isVisible);
   const progress = useSharedValue(0);
   const icon = TONE_ICON[tone];
@@ -175,7 +177,7 @@ export function AppDialog({
       statusBarTranslucent
       onRequestClose={onClose}
     >
-      <View style={styles.root} accessibilityViewIsModal>
+      <View style={[styles.root, { paddingBottom: bottomInset }]} accessibilityViewIsModal>
         <Animated.View
           style={[styles.overlay, { backgroundColor: colors.overlay }, overlayStyle]}
         >

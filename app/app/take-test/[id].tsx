@@ -2,6 +2,8 @@ import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNativeBottomInset } from '../../lib/safeArea';
 
 import { apiConnector } from '../../services/api';
 import { endpoints } from '../../constants/api';
@@ -41,6 +43,8 @@ export default function TakeTestScreen() {
   const router = useRouter();
   const { user } = useAuthStore();
   const { colors, isDark } = useTheme();
+  const insets = useSafeAreaInsets();
+  const bottomInset = useNativeBottomInset();
   const styles = useMemo(() => createStyles(colors, isDark), [colors, isDark]);
   const { answers, setAnswer, clearAnswer, timeRemaining, setTimeRemaining, startTest, resetTest, isTestActive } = useTestStore();
 
@@ -50,6 +54,7 @@ export default function TakeTestScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmSheetVisible, setIsConfirmSheetVisible] = useState(false);
+  const [skippedQuestions, setSkippedQuestions] = useState<number[]>([]);
   const navScrollViewRef = React.useRef<ScrollView>(null);
 
   // Helper to shuffle array
@@ -131,6 +136,8 @@ export default function TakeTestScreen() {
       const randomizedQuestions = shuffle(questionsWithOriginalData);
       setTestData(foundTest);
       setShuffledQuestions(randomizedQuestions);
+      setSkippedQuestions([]);
+      setCurrentQuestionIndex(0);
 
       if (!isTestActive && foundTest.duration) {
         startTest(foundTest.duration);
@@ -175,15 +182,14 @@ export default function TakeTestScreen() {
     const currentAnswer = answers[currentQuestion._id];
 
     if (currentAnswer?.selectedOption === originalIndex) {
-      // Toggle off if already selected
       clearAnswer(currentQuestion._id);
     } else {
-      // Select new option
       setAnswer(currentQuestion._id, {
         questionId: currentQuestion._id,
         selectedOption: originalIndex,
         timeTaken: 0 
       });
+      setSkippedQuestions((prev) => prev.filter((i) => i !== currentQuestionIndex));
     }
   };
 
@@ -194,6 +200,9 @@ export default function TakeTestScreen() {
   };
 
   const handleSkip = () => {
+    setSkippedQuestions((prev) =>
+      prev.includes(currentQuestionIndex) ? prev : [...prev, currentQuestionIndex]
+    );
     handleNext();
   };
 
@@ -303,7 +312,7 @@ export default function TakeTestScreen() {
 
   if (isLoading) {
     return (
-      <View style={[styles.container, { paddingTop: 60 }]}>
+      <View style={[styles.container, { paddingTop: Math.max(insets.top, 12) + 8 }]}>
         <DetailSkeleton />
       </View>
     );
@@ -324,7 +333,7 @@ export default function TakeTestScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: Math.max(insets.top, 12) + 8 }]}>
         <View style={styles.headerTextWrap}>
           <Text style={styles.testName} numberOfLines={1} ellipsizeMode="tail">
             {testData.testName}
@@ -359,7 +368,8 @@ export default function TakeTestScreen() {
           showsHorizontalScrollIndicator={false}
         >
           {shuffledQuestions.map((q: any, idx: number) => {
-            const isAnswered = !!answers[q._id];
+            const isAnswered = answers[q._id]?.selectedOption !== undefined && answers[q._id]?.selectedOption !== null;
+            const isSkipped = skippedQuestions.includes(idx);
             const isCurrent = idx === currentQuestionIndex;
             return (
               <TouchableOpacity
@@ -367,15 +377,21 @@ export default function TakeTestScreen() {
                 style={[
                   styles.dot,
                   isAnswered && styles.dotAnswered,
+                  isSkipped && !isAnswered && styles.dotSkipped,
                   isCurrent && styles.dotCurrent,
                 ]}
                 onPress={() => setCurrentQuestionIndex(idx)}
               >
-                <Text style={[
-                  styles.dotText,
-                  isAnswered && styles.dotTextActive,
-                  isCurrent && styles.dotTextCurrent,
-                ]}>{idx + 1}</Text>
+                <Text
+                  style={[
+                    styles.dotText,
+                    isAnswered && styles.dotTextAnswered,
+                    isSkipped && !isAnswered && styles.dotTextSkipped,
+                    isCurrent && styles.dotTextCurrent,
+                  ]}
+                >
+                  {idx + 1}
+                </Text>
               </TouchableOpacity>
             );
           })}
@@ -479,7 +495,7 @@ export default function TakeTestScreen() {
       </ScrollView>
 
       {/* Footer Navigation — compact, matches web TestFooter proportions */}
-      <View style={styles.footer}>
+      <View style={[styles.footer, { paddingBottom: bottomInset + 8 }]}>
         <TouchableOpacity
           onPress={handlePrev}
           disabled={currentQuestionIndex === 0}
@@ -551,7 +567,7 @@ function createStyles(colors: AppPalette, isDark: boolean) {
       alignItems: 'center',
       paddingHorizontal: 16,
       paddingBottom: 12,
-      paddingTop: 56,
+      paddingTop: 12,
       backgroundColor: colors.backgroundElevated,
       borderBottomWidth: 1,
       borderBottomColor: colors.border,
@@ -610,8 +626,12 @@ function createStyles(colors: AppPalette, isDark: boolean) {
       borderColor: colors.borderStrong,
     },
     dotAnswered: {
-      backgroundColor: 'rgba(59, 130, 246, 0.2)',
-      borderColor: '#3b82f6',
+      backgroundColor: 'rgba(37, 99, 235, 0.2)',
+      borderColor: 'rgba(59, 130, 246, 0.45)',
+    },
+    dotSkipped: {
+      backgroundColor: 'rgba(249, 115, 22, 0.2)',
+      borderColor: 'rgba(249, 115, 22, 0.4)',
     },
     dotCurrent: {
       backgroundColor: colors.text,
@@ -622,8 +642,11 @@ function createStyles(colors: AppPalette, isDark: boolean) {
       fontSize: 10,
       fontWeight: '700',
     },
-    dotTextActive: {
-      color: isDark ? '#fff' : '#111',
+    dotTextAnswered: {
+      color: '#3b82f6',
+    },
+    dotTextSkipped: {
+      color: '#f97316',
     },
     dotTextCurrent: {
       color: isDark ? '#000' : '#fff',
@@ -770,7 +793,7 @@ function createStyles(colors: AppPalette, isDark: boolean) {
       gap: 6,
       paddingHorizontal: 16,
       paddingTop: 6,
-      paddingBottom: 20,
+      paddingBottom: 8,
       backgroundColor: colors.backgroundElevated,
       borderTopWidth: 1,
       borderTopColor: colors.border,

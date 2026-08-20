@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ViewStyle } from 
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNativeBottomInset } from '@/lib/safeArea';
 import { ScreenBackground } from './ScreenBackground';
 import { MeshHero } from './MeshHero';
 import { Radii, Type } from '@/constants/theme';
@@ -18,6 +19,7 @@ export function SettingsShell({ title, children, contentStyle }: Props) {
   const router = useRouter();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const bottomInset = useNativeBottomInset();
 
   return (
     <ScreenBackground>
@@ -28,11 +30,10 @@ export function SettingsShell({ title, children, contentStyle }: Props) {
         <View style={styles.header}>
           <TouchableOpacity
             onPress={() => router.back()}
-            style={[
-              styles.backBtn,
-              { backgroundColor: colors.surface, borderColor: colors.border },
-            ]}
+            style={styles.backBtn}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
           >
             <Ionicons name="chevron-back" size={22} color={colors.text} />
           </TouchableOpacity>
@@ -43,7 +44,7 @@ export function SettingsShell({ title, children, contentStyle }: Props) {
         </View>
       </MeshHero>
       <ScrollView
-        contentContainerStyle={[styles.content, contentStyle]}
+        contentContainerStyle={[styles.content, { paddingBottom: bottomInset + 24 }, contentStyle]}
         keyboardShouldPersistTaps="handled"
       >
         {children}
@@ -118,12 +119,9 @@ const styles = StyleSheet.create({
   backBtn: {
     width: 40,
     height: 40,
-    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: 'transparent',
+    marginLeft: -6,
   },
   backBtnSpacer: {
     width: 40,
@@ -137,7 +135,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
-    paddingBottom: 40,
+    paddingBottom: 24,
   },
   card: {
     borderRadius: Radii.lg,

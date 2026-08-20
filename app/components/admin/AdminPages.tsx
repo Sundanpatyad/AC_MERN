@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTabScreenBottomPadding } from '../../lib/safeArea';
 import { useRouter } from 'expo-router';
 import { ScreenBackground } from '../ui/ScreenBackground';
 import { MeshHero } from '../ui/MeshHero';
@@ -22,6 +23,7 @@ export function AdminPages() {
   const router = useRouter();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabClearance = useTabScreenBottomPadding();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   return (
@@ -36,7 +38,7 @@ export function AdminPages() {
         </View>
       </MeshHero>
 
-      <View style={styles.body}>
+      <View style={[styles.body, { paddingBottom: tabClearance }]}>
         <SettingsCard>
           {PAGES.map((item, index) => (
             <ListRow

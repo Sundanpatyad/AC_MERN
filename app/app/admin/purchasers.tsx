@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ScreenBackground } from '../../components/ui/ScreenBackground';
 import { MeshHero } from '../../components/ui/MeshHero';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNativeBottomInset } from '../../lib/safeArea';
 import { Card } from '../../components/ui/Card';
 import { apiConnector } from '../../services/api';
 import { endpoints } from '../../constants/api';
@@ -26,6 +27,7 @@ export default function PurchasersScreen() {
   const router = useRouter();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const bottomInset = useNativeBottomInset();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const params = useLocalSearchParams<{
     seriesId?: string;
@@ -119,7 +121,7 @@ export default function PurchasersScreen() {
       <FlatList
         data={users}
         keyExtractor={(item, index) => String(item.userId || item._id || item.email || index)}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={[styles.list, { paddingBottom: bottomInset + 24 }]}
         onEndReached={() => {
           if (hasMore && !loading) fetchPage(page + 1, query.trim(), true);
         }}

@@ -9,6 +9,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNativeBottomInset } from '../../lib/safeArea';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -75,6 +76,7 @@ export default function MockTestDetailScreen() {
   const { user } = useAuthStore();
   const { colors, isDark } = useTheme();
   const insets = useSafeAreaInsets();
+  const bottomInset = useNativeBottomInset();
   const { height: screenHeight } = useWindowDimensions();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
@@ -385,7 +387,7 @@ export default function MockTestDetailScreen() {
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: 110 + insets.bottom },
+          { paddingBottom: 110 + bottomInset },
         ]}
         showsVerticalScrollIndicator={false}
         bounces={false}
@@ -507,7 +509,7 @@ export default function MockTestDetailScreen() {
         </View>
       </ScrollView>
 
-      <View style={[styles.ctaBar, { paddingBottom: Math.max(insets.bottom, 16) }]}>
+      <View style={[styles.ctaBar, { paddingBottom: bottomInset + 16 }]}>
         <Button
           title={isProcessing ? 'Please wait…' : ctaTitle}
           onPress={onCtaPress}

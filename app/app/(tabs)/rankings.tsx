@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ScreenBackground } from '../../components/ui/ScreenBackground';
 import { MeshHero } from '../../components/ui/MeshHero';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTabScreenBottomPadding } from '../../lib/safeArea';
 import { Card } from '../../components/ui/Card';
 import { AppPalette, Radii } from '../../constants/theme';
 import { useTheme } from '../../providers/AppThemeProvider';
@@ -14,6 +15,7 @@ import { RankingsSkeleton, Skeleton } from '../../components/ui/Skeleton';
 export default function RankingsScreen() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabClearance = useTabScreenBottomPadding();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [rankings, setRankings] = useState<any[]>([]);
   const [personalRank, setPersonalRank] = useState<any | null>(null);
@@ -178,7 +180,7 @@ export default function RankingsScreen() {
         data={filteredData}
         renderItem={renderRankCard}
         keyExtractor={(item, index) => `${item.userId}-${item.testName}-${index}`}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: tabClearance }]}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.3}
         refreshControl={

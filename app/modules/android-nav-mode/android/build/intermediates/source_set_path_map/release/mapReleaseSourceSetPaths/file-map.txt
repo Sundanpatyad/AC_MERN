@@ -1,0 +1,7 @@
+expo.modules.androidnavmode.android-nav-mode-pngs-0 /Users/relaince/Desktop/AC_MERN/app/modules/android-nav-mode/android/build/generated/res/pngs/release
+expo.modules.androidnavmode.android-nav-mode-resValues-1 /Users/relaince/Desktop/AC_MERN/app/modules/android-nav-mode/android/build/generated/res/resValues/release
+expo.modules.androidnavmode.android-nav-mode-mergeReleaseResources-2 /Users/relaince/Desktop/AC_MERN/app/modules/android-nav-mode/android/build/intermediates/incremental/release/mergeReleaseResources/merged.dir
+expo.modules.androidnavmode.android-nav-mode-mergeReleaseResources-3 /Users/relaince/Desktop/AC_MERN/app/modules/android-nav-mode/android/build/intermediates/incremental/release/mergeReleaseResources/stripped.dir
+expo.modules.androidnavmode.android-nav-mode-release-4 /Users/relaince/Desktop/AC_MERN/app/modules/android-nav-mode/android/build/intermediates/merged_res/release/mergeReleaseResources
+expo.modules.androidnavmode.android-nav-mode-main-5 /Users/relaince/Desktop/AC_MERN/app/modules/android-nav-mode/android/src/main/res
+expo.modules.androidnavmode.android-nav-mode-release-6 /Users/relaince/Desktop/AC_MERN/app/modules/android-nav-mode/android/src/release/res

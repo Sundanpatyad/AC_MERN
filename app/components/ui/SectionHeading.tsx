@@ -11,6 +11,7 @@ type Props = {
   style?: StyleProp<ViewStyle>;
   /** Large editorial serif title (home / marketing sections) */
   serif?: boolean;
+  compact?: boolean;
 };
 
 export function SectionHeading({
@@ -20,6 +21,7 @@ export function SectionHeading({
   onPressRight,
   style,
   serif = false,
+  compact = false,
 }: Props) {
   const { colors } = useTheme();
   const styles = createStyles(colors);
@@ -27,10 +29,12 @@ export function SectionHeading({
   return (
     <View style={[styles.root, style]}>
       <View style={styles.row}>
-        <Text style={[styles.title, serif && styles.titleSerif]}>{title}</Text>
+        <Text style={[styles.title, serif && styles.titleSerif, compact && styles.titleCompact]}>
+          {title}
+        </Text>
         {rightText && onPressRight && (
           <TouchableOpacity onPress={onPressRight} hitSlop={8}>
-            <Text style={styles.right}>{rightText}</Text>
+            <Text style={[styles.right, compact && styles.rightCompact]}>{rightText}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -45,7 +49,7 @@ function createStyles(colors: AppPalette) {
     },
     row: {
       flexDirection: 'row',
-      alignItems: 'flex-end',
+      alignItems: 'center',
       justifyContent: 'space-between',
       gap: 12,
     },
@@ -56,11 +60,19 @@ function createStyles(colors: AppPalette) {
     titleSerif: {
       ...Type.h3,
     },
+    titleCompact: {
+      fontSize: 16,
+      lineHeight: 20,
+      letterSpacing: -0.2,
+    },
     right: {
       ...Type.caption,
       fontFamily: Type.nav.fontFamily,
       color: colors.textSecondary,
-      paddingBottom: 4,
+    },
+    rightCompact: {
+      fontSize: 13,
+      lineHeight: 18,
     },
     subtitle: {
       ...Type.bodySmall,

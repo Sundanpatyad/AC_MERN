@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTabScreenBottomPadding } from '../../lib/safeArea';
 import { useRouter } from 'expo-router';
 import { ScreenBackground } from '../ui/ScreenBackground';
 import { MeshHero } from '../ui/MeshHero';
@@ -18,6 +19,7 @@ export function InstructorTests() {
   const isAdmin = user?.accountType === 'Admin';
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabClearance = useTabScreenBottomPadding();
   const router = useRouter();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [tests, setTests] = useState<any[]>([]);
@@ -65,7 +67,7 @@ export function InstructorTests() {
       </MeshHero>
 
       <ScrollView
-        contentContainerStyle={styles.scroll}
+        contentContainerStyle={[styles.scroll, { paddingBottom: tabClearance }]}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
