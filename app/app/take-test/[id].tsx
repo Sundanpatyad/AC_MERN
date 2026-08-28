@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -12,8 +12,9 @@ import { isInstructorAccount, useAuthStore } from '../../store/authStore';
 import { Button } from '../../components/ui/Button';
 import { ConfirmationSheet } from '../../components/ui/ConfirmationSheet';
 import { DetailSkeleton } from '../../components/ui/Skeleton';
-import { AppPalette, Radii } from '../../constants/theme';
+import { AppPalette, Fonts, Radii } from '../../constants/theme';
 import { useTheme } from '../../providers/AppThemeProvider';
+import { showMessage } from '../../providers/DialogProvider';
 
 /** Normalise an option that may be a plain string (legacy) or {text, image} object — same as web. */
 const normaliseOption = (opt: any): { text: string; image: string } => {
@@ -36,6 +37,34 @@ function hasSeriesAccess(series: any, userId?: string, accountType?: string) {
   );
 }
 
+function shuffleArray<T>(array: T[]): T[] {
+  const next = [...array];
+  for (let i = next.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [next[i], next[j]] = [next[j], next[i]];
+  }
+  return next;
+}
+
+function buildShuffledQuestions(questions: any[]) {
+  const prepared = questions.map((q: any) => {
+    const rawOptions = Array.isArray(q.options) ? q.options : [];
+    const optionsToProcess =
+      q.questionType === 'MATCH' ? rawOptions.slice(0, 4) : rawOptions;
+    const shuffledOptions = shuffleArray(
+      optionsToProcess.map((opt: any, idx: number) => ({
+        content: opt,
+        originalIndex: idx,
+      }))
+    );
+    return {
+      ...q,
+      shuffledOptions,
+    };
+  });
+  return shuffleArray(prepared);
+}
+
 export default function TakeTestScreen() {
   const { id: rawId, seriesId: rawSeriesId } = useLocalSearchParams();
   const id = paramValue(rawId);
@@ -52,26 +81,28 @@ export default function TakeTestScreen() {
   const [shuffledQuestions, setShuffledQuestions] = useState<any[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isTestReady, setIsTestReady] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmSheetVisible, setIsConfirmSheetVisible] = useState(false);
   const [skippedQuestions, setSkippedQuestions] = useState<number[]>([]);
   const navScrollViewRef = React.useRef<ScrollView>(null);
-
-  // Helper to shuffle array
-  const shuffle = (array: any[]) => {
-    const newArray = [...array];
-    for (let i = newArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-    }
-    return newArray;
-  };
+  const loadRequestRef = useRef(0);
 
   const fetchTest = useCallback(async () => {
     if (!id) {
       setIsLoading(false);
+      setIsTestReady(false);
       return;
     }
+
+    const requestId = ++loadRequestRef.current;
+    setIsLoading(true);
+    setIsTestReady(false);
+    setTestData(null);
+    setShuffledQuestions([]);
+    setCurrentQuestionIndex(0);
+    setSkippedQuestions([]);
+    resetTest();
 
     try {
       let seriesId = seriesIdParam;
@@ -109,6 +140,28 @@ export default function TakeTestScreen() {
         return;
       }
 
+      if (foundNested.status === 'draft' && !isInstructorAccount(user?.accountType)) {
+        resetTest();
+        showMessage({
+          title: 'Coming soon',
+          message: 'This test is not available yet. Please check back later.',
+        });
+        router.replace(`/mock-test/${parentSeries._id}`);
+        return;
+      }
+
+      const questionCount =
+        foundNested.totalQuestions ?? foundNested.questions?.length ?? 0;
+      if (questionCount === 0) {
+        resetTest();
+        showMessage({
+          title: 'No questions yet',
+          message: 'Questions for this test are still being prepared.',
+        });
+        router.replace(`/mock-test/${parentSeries._id}`);
+        return;
+      }
+
       if (!hasSeriesAccess(parentSeries, user?._id, user?.accountType)) {
         resetTest();
         router.replace(`/mock-test/${parentSeries._id}`);
@@ -118,40 +171,49 @@ export default function TakeTestScreen() {
       const foundTest = { ...foundNested, seriesId: parentSeries._id };
       const questions = Array.isArray(foundTest.questions) ? foundTest.questions : [];
 
-      const questionsWithOriginalData = questions.map((q: any) => {
-        const rawOptions = Array.isArray(q.options) ? q.options : [];
-        const optionsToProcess =
-          q.questionType === 'MATCH' ? rawOptions.slice(0, 4) : rawOptions;
-        const optionsWithOriginalIndex = optionsToProcess.map((opt: any, idx: number) => ({
-          content: opt,
-          originalIndex: idx,
-        }));
-        const shuffledOptions = shuffle(optionsWithOriginalIndex);
-        return {
-          ...q,
-          shuffledOptions,
-        };
-      });
+      if (!questions.length) {
+        resetTest();
+        showMessage({
+          title: 'No questions yet',
+          message: 'Questions for this test are still being prepared.',
+        });
+        router.replace(`/mock-test/${parentSeries._id}`);
+        return;
+      }
 
-      const randomizedQuestions = shuffle(questionsWithOriginalData);
+      const randomizedQuestions = buildShuffledQuestions(questions);
+
+      if (requestId !== loadRequestRef.current) return;
+
       setTestData(foundTest);
       setShuffledQuestions(randomizedQuestions);
-      setSkippedQuestions([]);
-      setCurrentQuestionIndex(0);
-
-      if (!isTestActive && foundTest.duration) {
-        startTest(foundTest.duration);
-      }
+      setIsTestReady(true);
     } catch (error) {
+      if (requestId !== loadRequestRef.current) return;
       console.error('Failed to fetch test:', error);
+      showMessage({
+        title: 'Could not load test',
+        message: 'Please check your connection and try again.',
+        tone: 'danger',
+      });
+      router.back();
     } finally {
-      setIsLoading(false);
+      if (requestId === loadRequestRef.current) {
+        setIsLoading(false);
+      }
     }
-  }, [id, seriesIdParam, user?._id, user?.accountType, isTestActive, resetTest, router, startTest]);
+  }, [id, seriesIdParam, user?._id, user?.accountType, resetTest, router]);
 
   useEffect(() => {
     fetchTest();
   }, [fetchTest]);
+
+  useEffect(() => {
+    if (!isTestReady || !testData?.duration) return;
+    startTest(testData.duration);
+  }, [isTestReady, testData, startTest]);
+
+  const showPreparing = isLoading || !isTestReady;
 
   // Auto-scroll logic for question navigation dots
   useEffect(() => {
@@ -231,9 +293,11 @@ export default function TakeTestScreen() {
       let incorrectCount = 0;
       const correctAnswers: any[] = [];
       const incorrectAnswerDetails: any[] = [];
+      const skippedAnswerDetails: any[] = [];
+      const allQuestionsReview: any[] = [];
       const negativeMarkValue = testData.negative || 0;
       
-      shuffledQuestions.forEach((q: any) => {
+      shuffledQuestions.forEach((q: any, questionIndex: number) => {
         const answer = answers[q._id];
         const selectedOptionIndex = answer?.selectedOption;
         
@@ -245,11 +309,12 @@ export default function TakeTestScreen() {
         
         // Determine if correct
         let isCorrect = false;
-        let userSelectedText = "Not Answered";
+        let userSelectedText = 'Not answered';
+        const hasAnswer = selectedOptionIndex !== undefined && selectedOptionIndex !== null;
 
-        if (selectedOptionIndex !== undefined && selectedOptionIndex !== null) {
+        if (hasAnswer) {
           const option = q.options[selectedOptionIndex];
-          userSelectedText = typeof option === 'string' ? option : option.text;
+          userSelectedText = typeof option === 'string' ? option : option?.text || String(option);
 
           // Compare index or text
           if (selectedOptionIndex.toString() === String(trueCorrectAnswer).trim() || 
@@ -259,25 +324,32 @@ export default function TakeTestScreen() {
         }
 
         const detail = {
+          questionIndex,
           questionText: q.text,
           userAnswer: userSelectedText,
           correctAnswer: trueCorrectAnswer,
           questionType: q.questionType,
           leftColumn: q.leftColumn,
           rightColumn: q.rightColumn,
-          questionImage: q.questionImage
+          questionImage: q.questionImage,
         };
 
         if (isCorrect) {
           score += 1;
           correctCount += 1;
-          correctAnswers.push(detail);
+          const item = { ...detail, type: 'correct' };
+          correctAnswers.push(item);
+          allQuestionsReview.push(item);
+        } else if (hasAnswer) {
+          score -= negativeMarkValue;
+          incorrectCount += 1;
+          const item = { ...detail, type: 'incorrect' };
+          incorrectAnswerDetails.push(item);
+          allQuestionsReview.push(item);
         } else {
-          if (selectedOptionIndex !== undefined) {
-            score -= negativeMarkValue; // Apply negative marking
-            incorrectCount += 1;
-            incorrectAnswerDetails.push(detail);
-          }
+          const item = { ...detail, type: 'skipped', userAnswer: 'Not answered' };
+          skippedAnswerDetails.push(item);
+          allQuestionsReview.push(item);
         }
       });
 
@@ -286,11 +358,14 @@ export default function TakeTestScreen() {
         mockId: testData.seriesId,
         testName: testData.testName,
         score,
-        totalQuestions: testData.questions.length,
+        totalQuestions: shuffledQuestions.length,
         timeTaken: testDetailsDurationInSeconds - timeRemaining,
         correctAnswers,
         incorrectAnswers: incorrectCount,
-        incorrectAnswerDetails
+        incorrectAnswerDetails,
+        skippedAnswers: skippedAnswerDetails.length,
+        skippedAnswerDetails,
+        allQuestionsReview,
       };
 
       const response = await apiConnector.post(endpoints.CREATE_ATTEMPT_DETAILS, attemptData);
@@ -310,15 +385,20 @@ export default function TakeTestScreen() {
     }
   };
 
-  if (isLoading) {
+  if (showPreparing) {
     return (
-      <View style={[styles.container, { paddingTop: Math.max(insets.top, 12) + 8 }]}>
-        <DetailSkeleton />
+      <View style={[styles.container, styles.preparingScreen, { paddingTop: Math.max(insets.top, 12) + 8 }]}>
+        <ActivityIndicator size="large" color={colors.text} />
+        <Text style={styles.preparingTitle}>Preparing your test</Text>
+        <Text style={styles.preparingSubtitle}>Loading and shuffling questions…</Text>
+        <View style={styles.preparingSkeleton}>
+          <DetailSkeleton />
+        </View>
       </View>
     );
   }
 
-  if (!testData || !shuffledQuestions?.length) {
+  if (!testData || !shuffledQuestions.length) {
     return (
       <View style={[styles.container, styles.centered]}>
         <Text style={{ color: colors.text }}>No questions available for this test.</Text>
@@ -452,7 +532,7 @@ export default function TakeTestScreen() {
 
         {/* Options */}
         <View style={styles.optionsContainer}>
-          {currentQuestion.shuffledOptions.map((optionData: any, idx: number) => {
+          {currentQuestion.shuffledOptions?.map((optionData: any, idx: number) => {
             const { content, originalIndex } = optionData;
             const isSelected = currentAnswer?.selectedOption === originalIndex;
             const { text: optionText, image: optionImage } = normaliseOption(content);
@@ -460,7 +540,7 @@ export default function TakeTestScreen() {
 
             return (
               <TouchableOpacity
-                key={idx}
+                key={`opt-${originalIndex}`}
                 style={[
                   styles.optionCard,
                   isSelected && styles.optionCardSelected
@@ -560,6 +640,29 @@ function createStyles(colors: AppPalette, isDark: boolean) {
     centered: {
       justifyContent: 'center',
       alignItems: 'center',
+    },
+    preparingScreen: {
+      paddingHorizontal: 20,
+      gap: 12,
+    },
+    preparingTitle: {
+      marginTop: 8,
+      fontSize: 18,
+      fontFamily: Fonts.semiBold,
+      color: colors.text,
+      textAlign: 'center',
+    },
+    preparingSubtitle: {
+      fontSize: 14,
+      fontFamily: Fonts.sans,
+      color: colors.textMuted,
+      textAlign: 'center',
+      marginBottom: 8,
+    },
+    preparingSkeleton: {
+      width: '100%',
+      marginTop: 8,
+      opacity: 0.55,
     },
     header: {
       flexDirection: 'row',

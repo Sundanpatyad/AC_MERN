@@ -1,5 +1,14 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, Pressable } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Pressable,
+  FlatList,
+  ActivityIndicator,
+  ListRenderItem,
+} from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,12 +24,14 @@ const GREEN = '#2F6F4E';
 const RED = '#B10207';
 const SKIP = '#B86A2A';
 const H_PAD = 16;
+const PAGE_SIZE = 10;
 
 const formatMultiline = (value?: string) =>
   String(value ?? '').replace(/\\n/g, '\n');
 
 type ReviewItem = {
-  type: 'correct' | 'incorrect';
+  type: 'correct' | 'incorrect' | 'skipped';
+  questionIndex?: number;
   questionText?: string;
   userAnswer?: string;
   correctAnswer?: string;
@@ -29,6 +40,12 @@ type ReviewItem = {
   rightColumn?: string[];
   questionImage?: string;
 };
+
+function answerColor(type: ReviewItem['type']): string {
+  if (type === 'correct') return GREEN;
+  if (type === 'incorrect') return RED;
+  return SKIP;
+}
 
 function AnswerPane({
   label,
@@ -85,18 +102,20 @@ const paneStyles = StyleSheet.create({
 
 function ReviewBlock({
   item,
-  index,
+  displayIndex,
   colors,
   styles,
 }: {
   item: ReviewItem;
-  index: number;
+  displayIndex: number;
   colors: AppPalette;
   styles: ReturnType<typeof createStyles>;
 }) {
+  const showCorrectAnswer = item.type === 'incorrect' || item.type === 'skipped';
+
   return (
     <View style={styles.reviewItem}>
-      <Text style={styles.reviewIndex}>{String(index + 1).padStart(2, '0')}</Text>
+      <Text style={styles.reviewIndex}>{String(displayIndex).padStart(2, '0')}</Text>
       <Text style={styles.questionText}>{formatMultiline(item.questionText)}</Text>
       {item.questionImage ? (
         <Image source={{ uri: item.questionImage }} style={styles.questionImage} resizeMode="contain" />
@@ -127,11 +146,11 @@ function ReviewBlock({
         <AnswerPane
           label="Your answer"
           value={item.userAnswer || 'Not answered'}
-          color={item.type === 'correct' ? GREEN : RED}
+          color={answerColor(item.type)}
           surface={colors.surface}
           muted={colors.textMuted}
         />
-        {item.type === 'incorrect' ? (
+        {showCorrectAnswer ? (
           <AnswerPane
             label="Correct answer"
             value={item.correctAnswer || ''}
@@ -152,70 +171,113 @@ export default function TestResultScreen() {
   const bottomInset = useNativeBottomInset();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [loadingMore, setLoadingMore] = useState(false);
 
-  const data = attemptData ? JSON.parse(attemptData as string) : null;
-
-  if (!data) {
-    return (
-      <View style={[styles.container, styles.centered]}>
-        <Text style={styles.errorText}>Result data not found.</Text>
-        <Button title="Go Home" onPress={() => router.replace('/(tabs)')} />
-      </View>
-    );
-  }
+  const data = useMemo(() => {
+    if (!attemptData) return null;
+    try {
+      return JSON.parse(attemptData as string);
+    } catch {
+      return null;
+    }
+  }, [attemptData]);
 
   const {
-    score,
-    totalQuestions,
+    score = 0,
+    totalQuestions = 0,
     correctAnswers = [],
     incorrectAnswerDetails = [],
+    skippedAnswerDetails = [],
+    allQuestionsReview = [],
     incorrectAnswers = 0,
-    testName,
-  } = data;
+    skippedAnswers = 0,
+    testName = '',
+  } = data ?? {};
 
-  const correctItems: ReviewItem[] = Array.isArray(correctAnswers)
-    ? correctAnswers.map((a: any) => ({ ...a, type: 'correct' as const }))
-    : [];
-  const incorrectItems: ReviewItem[] = Array.isArray(incorrectAnswerDetails)
-    ? incorrectAnswerDetails.map((a: any) => ({ ...a, type: 'incorrect' as const }))
-    : [];
+  const allItems: ReviewItem[] = useMemo(() => {
+    const correctItems: ReviewItem[] = Array.isArray(correctAnswers)
+      ? correctAnswers.map((a: any) => ({ ...a, type: a.type || 'correct' }))
+      : [];
+    const incorrectItems: ReviewItem[] = Array.isArray(incorrectAnswerDetails)
+      ? incorrectAnswerDetails.map((a: any) => ({ ...a, type: a.type || 'incorrect' }))
+      : [];
+    const skippedItems: ReviewItem[] = Array.isArray(skippedAnswerDetails)
+      ? skippedAnswerDetails.map((a: any) => ({ ...a, type: a.type || 'skipped' }))
+      : [];
 
-  const correctCount = correctItems.length;
-  const incorrectCount = Number(incorrectAnswers) || incorrectItems.length;
-  const skippedCount = Math.max(0, totalQuestions - (correctCount + incorrectCount));
+    if (Array.isArray(allQuestionsReview) && allQuestionsReview.length > 0) {
+      return [...allQuestionsReview]
+        .map((a: any) => ({
+          ...a,
+          type: a.type || 'skipped',
+        }))
+        .sort((a, b) => (a.questionIndex ?? 0) - (b.questionIndex ?? 0));
+    }
+    return [...correctItems, ...incorrectItems, ...skippedItems].sort(
+      (a, b) => (a.questionIndex ?? 0) - (b.questionIndex ?? 0)
+    );
+  }, [allQuestionsReview, correctAnswers, incorrectAnswerDetails, skippedAnswerDetails]);
+
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [allItems.length, testName]);
+
+  const correctCount = allItems.filter((item) => item.type === 'correct').length;
+  const incorrectCount =
+    Number(incorrectAnswers) || allItems.filter((item) => item.type === 'incorrect').length;
+  const skippedCount =
+    Number(skippedAnswers) ||
+    allItems.filter((item) => item.type === 'skipped').length ||
+    Math.max(0, totalQuestions - (correctCount + incorrectCount));
+
+  const visibleItems = useMemo(
+    () => allItems.slice(0, visibleCount),
+    [allItems, visibleCount]
+  );
+  const hasMore = visibleCount < allItems.length;
+
+  const loadMore = useCallback(() => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    requestAnimationFrame(() => {
+      setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, allItems.length));
+      setLoadingMore(false);
+    });
+  }, [allItems.length, hasMore, loadingMore]);
+
   const pct = totalQuestions > 0 ? Math.round((Math.max(0, Number(score)) / totalQuestions) * 100) : 0;
 
-  const bars = [
-    { label: 'Correct', value: correctCount, color: GREEN },
-    { label: 'Incorrect', value: incorrectCount, color: RED },
-    { label: 'Skipped', value: skippedCount, color: SKIP },
-  ];
+  const bars = useMemo(
+    () => [
+      { label: 'Correct', value: correctCount, color: GREEN },
+      { label: 'Incorrect', value: incorrectCount, color: RED },
+      { label: 'Skipped', value: skippedCount, color: SKIP },
+    ],
+    [correctCount, incorrectCount, skippedCount]
+  );
   const barMax = Math.max(totalQuestions, 1);
 
-  return (
-    <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: Math.max(insets.top, 12) + 4 }]}>
-        <Pressable
-          onPress={() => router.replace('/(tabs)')}
-          hitSlop={12}
-          style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.5 }]}
-          accessibilityRole="button"
-          accessibilityLabel="Back to home"
-        >
-          <Ionicons name="chevron-back" size={22} color={colors.text} />
-        </Pressable>
-        <View style={styles.headerCopy}>
-          <Text style={styles.headerTitle}>Results</Text>
-          <Text style={styles.testName} numberOfLines={1}>
-            {testName}
-          </Text>
-        </View>
-      </View>
+  const renderItem: ListRenderItem<ReviewItem> = useCallback(
+    ({ item, index }) => (
+      <ReviewBlock
+        item={item}
+        displayIndex={(item.questionIndex ?? index) + 1}
+        colors={colors}
+        styles={styles}
+      />
+    ),
+    [colors, styles]
+  );
 
-      <ScrollView
-        contentContainerStyle={{ paddingBottom: bottomInset + 36 }}
-        showsVerticalScrollIndicator={false}
-      >
+  const keyExtractor = useCallback(
+    (item: ReviewItem, index: number) => `q-${item.questionIndex ?? index}`,
+    []
+  );
+
+  const listHeader = useMemo(
+    () => (
+      <>
         <View style={styles.sectionPad}>
           <SectionHeading title="Score" compact />
           <View style={styles.glance}>
@@ -254,38 +316,57 @@ export default function TestResultScreen() {
             </View>
           </View>
           <Text style={styles.scoreMeta}>
-            {score} of {totalQuestions} questions
+            {Number(score).toFixed(Number(score) % 1 === 0 ? 0 : 2)} of {totalQuestions} questions
           </Text>
         </View>
 
-        {correctItems.length > 0 ? (
-          <View style={styles.sectionPad}>
+        {allItems.length > 0 ? (
+          <View style={[styles.sectionPad, styles.listHeadingPad]}>
             <SectionHeading
-              title="Correct"
-              subtitle={`${correctItems.length} ${correctItems.length === 1 ? 'question' : 'questions'}`}
+              title="All questions"
+              subtitle={`${correctCount} correct · ${incorrectCount} incorrect · ${skippedCount} skipped`}
               compact
             />
-            {correctItems.map((item, index) => (
-              <ReviewBlock key={`c-${index}`} item={item} index={index} colors={colors} styles={styles} />
-            ))}
+            {allItems.length > PAGE_SIZE ? (
+              <Text style={styles.paginationMeta}>
+                Showing {visibleItems.length} of {allItems.length}
+              </Text>
+            ) : null}
           </View>
-        ) : null}
-
-        {incorrectItems.length > 0 ? (
-          <View style={styles.sectionPad}>
-            <SectionHeading
-              title="Incorrect"
-              subtitle={`${incorrectItems.length} ${incorrectItems.length === 1 ? 'question' : 'questions'}`}
-              compact
-            />
-            {incorrectItems.map((item, index) => (
-              <ReviewBlock key={`i-${index}`} item={item} index={index} colors={colors} styles={styles} />
-            ))}
-          </View>
-        ) : null}
-
-        {correctItems.length === 0 && incorrectItems.length === 0 ? (
+        ) : (
           <Text style={styles.emptyReview}>No answers to review.</Text>
+        )}
+      </>
+    ),
+    [
+      allItems.length,
+      barMax,
+      bars,
+      colors.border,
+      colors.surfaceRaised,
+      correctCount,
+      incorrectCount,
+      pct,
+      score,
+      skippedCount,
+      styles,
+      totalQuestions,
+      visibleItems.length,
+    ]
+  );
+
+  const listFooter = useMemo(
+    () => (
+      <View style={styles.listFooter}>
+        {hasMore ? (
+          <View style={styles.loadMoreRow}>
+            {loadingMore ? <ActivityIndicator color={colors.textMuted} /> : null}
+            <Text style={styles.loadMoreText}>
+              {loadingMore ? 'Loading more…' : 'Scroll for more questions'}
+            </Text>
+          </View>
+        ) : allItems.length > PAGE_SIZE ? (
+          <Text style={styles.loadMoreDone}>All {allItems.length} questions loaded</Text>
         ) : null}
 
         <View style={styles.footer}>
@@ -297,7 +378,56 @@ export default function TestResultScreen() {
             <Text style={styles.rankLinkText}>View global rankings</Text>
           </Pressable>
         </View>
-      </ScrollView>
+      </View>
+    ),
+    [allItems.length, colors.textMuted, hasMore, loadingMore, router, styles]
+  );
+
+  if (!data) {
+    return (
+      <View style={[styles.container, styles.centered]}>
+        <Text style={styles.errorText}>Result data not found.</Text>
+        <Button title="Go Home" onPress={() => router.replace('/(tabs)')} />
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <View style={[styles.header, { paddingTop: Math.max(insets.top, 12) + 4 }]}>
+        <Pressable
+          onPress={() => router.replace('/(tabs)')}
+          hitSlop={12}
+          style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.5 }]}
+          accessibilityRole="button"
+          accessibilityLabel="Back to home"
+        >
+          <Ionicons name="chevron-back" size={22} color={colors.text} />
+        </Pressable>
+        <View style={styles.headerCopy}>
+          <Text style={styles.headerTitle}>Results</Text>
+          <Text style={styles.testName} numberOfLines={1}>
+            {testName}
+          </Text>
+        </View>
+      </View>
+
+      <FlatList
+        data={visibleItems}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        ListHeaderComponent={listHeader}
+        ListFooterComponent={listFooter}
+        contentContainerStyle={{ paddingBottom: bottomInset + 24 }}
+        showsVerticalScrollIndicator={false}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.35}
+        initialNumToRender={8}
+        maxToRenderPerBatch={6}
+        updateCellsBatchingPeriod={50}
+        windowSize={9}
+        removeClippedSubviews
+      />
     </View>
   );
 }
@@ -347,6 +477,37 @@ function createStyles(colors: AppPalette) {
     sectionPad: {
       paddingHorizontal: H_PAD,
       paddingTop: 20,
+    },
+    listHeadingPad: {
+      paddingBottom: 4,
+    },
+    paginationMeta: {
+      marginTop: 6,
+      fontSize: 12,
+      fontFamily: Fonts.sans,
+      color: colors.textMuted,
+    },
+    listFooter: {
+      paddingTop: 4,
+    },
+    loadMoreRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      paddingVertical: 16,
+    },
+    loadMoreText: {
+      fontSize: 13,
+      fontFamily: Fonts.sans,
+      color: colors.textMuted,
+    },
+    loadMoreDone: {
+      textAlign: 'center',
+      fontSize: 12,
+      fontFamily: Fonts.sans,
+      color: colors.textMuted,
+      paddingVertical: 12,
     },
     glance: {
       flexDirection: 'row',
@@ -435,6 +596,7 @@ function createStyles(colors: AppPalette) {
     reviewItem: {
       paddingTop: 16,
       paddingBottom: 8,
+      paddingHorizontal: H_PAD,
       gap: 10,
     },
     reviewIndex: {
