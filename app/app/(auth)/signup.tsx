@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { ScreenBackground } from '../../components/ui/ScreenBackground';
 import { BrandLogo } from '../../components/ui/BrandLogo';
+import { useNativeBottomInset } from '../../lib/safeArea';
 import { showMessage } from '../../providers/DialogProvider';
 import { AppPalette, Fonts, Radii } from '../../constants/theme';
 import { useTheme } from '../../providers/AppThemeProvider';
@@ -13,6 +14,7 @@ export default function SignupScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { colors } = useTheme();
+  const bottomInset = useNativeBottomInset();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   const onGoogle = async () => {
@@ -70,7 +72,7 @@ export default function SignupScreen() {
 
   return (
     <ScreenBackground>
-      <View style={styles.content}>
+      <View style={[styles.content, { paddingBottom: 24 + bottomInset }]}>
         <View>
           <View style={styles.brandRow}>
             <BrandLogo size={32} />

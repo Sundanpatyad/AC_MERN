@@ -20,6 +20,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNativeBottomInset } from '@/lib/safeArea';
 import {
   getTabBarIconName,
   getTabBarLabel,
@@ -101,7 +102,8 @@ export function GlassFloatingTabBar({ state, navigation }: BottomTabBarProps) {
   const { colors } = useTheme();
   const { user } = useAuthStore();
   const instructor = isInstructorAccount(user?.accountType);
-  const { bottom: nativeBottomInset, left: insetLeft, right: insetRight } = useSafeAreaInsets();
+  const { left: insetLeft, right: insetRight } = useSafeAreaInsets();
+  const nativeBottomInset = useNativeBottomInset();
   const onHeightChange = React.useContext(BottomTabBarHeightCallbackContext);
 
   const visibleRoutes = useMemo(

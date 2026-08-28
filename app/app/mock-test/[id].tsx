@@ -9,6 +9,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNativeBottomInset } from '../../lib/safeArea';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -57,6 +58,18 @@ function paramValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
 
+function getQuestionCount(test: any): number {
+  return test?.totalQuestions ?? test?.questions?.length ?? 0;
+}
+
+function isDraftTest(test: any): boolean {
+  return test?.status === 'draft';
+}
+
+function canStartTest(test: any): boolean {
+  return !isDraftTest(test) && getQuestionCount(test) > 0;
+}
+
 function hasAccess(testDetails: any, userId?: string, accountType?: string) {
   if (!testDetails) return false;
   if (isInstructorAccount(accountType)) return true;
@@ -75,6 +88,7 @@ export default function MockTestDetailScreen() {
   const { user } = useAuthStore();
   const { colors, isDark } = useTheme();
   const insets = useSafeAreaInsets();
+  const bottomInset = useNativeBottomInset();
   const { height: screenHeight } = useWindowDimensions();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
@@ -108,9 +122,13 @@ export default function MockTestDetailScreen() {
   const totalQuestions = useMemo(() => {
     if (!testDetails?.mockTests?.length) return 0;
     return testDetails.mockTests.reduce(
-      (sum: number, t: any) => sum + (t.questions?.length || t.totalQuestions || 0),
+      (sum: number, t: any) => sum + getQuestionCount(t),
       0
     );
+  }, [testDetails]);
+
+  const firstStartableTest = useMemo(() => {
+    return testDetails?.mockTests?.find((t: any) => canStartTest(t)) ?? null;
   }, [testDetails]);
 
   const avgDuration = useMemo(() => {
@@ -123,8 +141,22 @@ export default function MockTestDetailScreen() {
   const priceLabel =
     testDetails?.price === 0 ? 'Free' : `₹${testDetails?.price ?? 0}`;
 
-  const handleStartTest = (testId: string) => {
-    router.push(`/take-test/${testId}?seriesId=${id}`);
+  const handleStartTest = (test: any) => {
+    if (isDraftTest(test)) {
+      showMessage({
+        title: 'Coming soon',
+        message: 'This test is not available yet. Please check back later.',
+      });
+      return;
+    }
+    if (getQuestionCount(test) === 0) {
+      showMessage({
+        title: 'No questions yet',
+        message: 'Questions for this test are still being prepared. Please check back later.',
+      });
+      return;
+    }
+    router.push(`/take-test/${test._id}?seriesId=${id}`);
   };
 
   const handleEnroll = async () => {
@@ -133,8 +165,13 @@ export default function MockTestDetailScreen() {
       return;
     }
     if (isInstructorAccount(user.accountType)) {
-      const firstId = testDetails?.mockTests?.[0]?._id;
-      if (firstId) handleStartTest(firstId);
+      if (firstStartableTest) handleStartTest(firstStartableTest);
+      else {
+        showMessage({
+          title: 'No tests ready',
+          message: 'Publish a test with questions before starting.',
+        });
+      }
       return;
     }
 
@@ -368,13 +405,20 @@ export default function MockTestDetailScreen() {
   ];
 
   const ctaTitle = instructor || canAccess || Number(testDetails.price) === 0
-    ? 'Start now'
+    ? firstStartableTest
+      ? 'Start now'
+      : 'Coming soon'
     : 'Buy now';
 
   const onCtaPress = () => {
     if (canAccess) {
-      const firstId = testDetails.mockTests?.[0]?._id;
-      if (firstId) handleStartTest(firstId);
+      if (firstStartableTest) handleStartTest(firstStartableTest);
+      else {
+        showMessage({
+          title: 'No tests ready',
+          message: 'Tests in this series are still being prepared. Please check back later.',
+        });
+      }
       return;
     }
     handleEnroll();
@@ -385,7 +429,7 @@ export default function MockTestDetailScreen() {
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: 110 + insets.bottom },
+          { paddingBottom: 110 + bottomInset },
         ]}
         showsVerticalScrollIndicator={false}
         bounces={false}
@@ -477,42 +521,57 @@ export default function MockTestDetailScreen() {
 
           <Text style={styles.sectionTitle}>Tests in this series</Text>
           <View style={styles.testList}>
-            {testDetails.mockTests?.map((test: any, index: number) => (
+            {testDetails.mockTests?.map((test: any, index: number) => {
+              const questionCount = getQuestionCount(test);
+              const draft = isDraftTest(test);
+              const startable = canStartTest(test);
+
+              return (
               <View key={test._id || index} style={styles.testItem}>
                 <View style={styles.testItemInfo}>
                   <Text style={styles.testItemTitle} numberOfLines={2}>
                     {test.testName}
                   </Text>
                   <Text style={styles.testItemMeta}>
-                    {test.duration} mins · {test.questions?.length || 0} questions
+                    {test.duration} mins · {questionCount} question{questionCount === 1 ? '' : 's'}
                   </Text>
                 </View>
 
                 {canAccess ? (
-                  <Pressable
-                    style={({ pressed }) => [
-                      styles.startButton,
-                      pressed && { opacity: 0.9 },
-                    ]}
-                    onPress={() => handleStartTest(test._id)}
-                  >
-                    <Text style={styles.startButtonText}>Start</Text>
-                  </Pressable>
+                  draft || !startable ? (
+                    <View style={styles.draftBadge}>
+                      <Text style={styles.draftBadgeText}>Coming soon</Text>
+                    </View>
+                  ) : (
+                    <Pressable
+                      style={({ pressed }) => [
+                        styles.startButton,
+                        pressed && { opacity: 0.9 },
+                      ]}
+                      onPress={() => handleStartTest(test)}
+                    >
+                      <Text style={styles.startButtonText}>Start</Text>
+                    </Pressable>
+                  )
                 ) : (
                   <Ionicons name="lock-closed" size={18} color={colors.textMuted} />
                 )}
               </View>
-            ))}
+            );
+            })}
           </View>
         </View>
       </ScrollView>
 
-      <View style={[styles.ctaBar, { paddingBottom: Math.max(insets.bottom, 16) }]}>
+      <View style={[styles.ctaBar, { paddingBottom: bottomInset + 16 }]}>
         <Button
           title={isProcessing ? 'Please wait…' : ctaTitle}
           onPress={onCtaPress}
           isLoading={isProcessing}
-          disabled={canAccess && !testDetails.mockTests?.length}
+          disabled={
+            isProcessing ||
+            (canAccess && !firstStartableTest && (instructor || Number(testDetails.price) === 0))
+          }
           style={styles.ctaButton}
           textStyle={styles.ctaButtonText}
         />
@@ -688,6 +747,19 @@ function createStyles(colors: AppPalette) {
     },
     startButtonText: {
       color: colors.primaryButtonText,
+      fontSize: 12,
+      fontFamily: Fonts.semiBold,
+    },
+    draftBadge: {
+      backgroundColor: colors.surfaceRaised,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: Radii.pill,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
+    },
+    draftBadgeText: {
+      color: colors.textMuted,
       fontSize: 12,
       fontFamily: Fonts.semiBold,
     },

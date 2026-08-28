@@ -5,6 +5,7 @@ import { Link, useRouter, useLocalSearchParams } from 'expo-router';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { ScreenBackground } from '../../components/ui/ScreenBackground';
+import { useNativeBottomInset } from '../../lib/safeArea';
 import { AppPalette } from '../../constants/theme';
 import { useTheme } from '../../providers/AppThemeProvider';
 import { apiConnector } from '../../services/api';
@@ -18,6 +19,7 @@ export default function UpdatePasswordScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { colors } = useTheme();
+  const bottomInset = useNativeBottomInset();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   useEffect(() => {
@@ -62,7 +64,7 @@ export default function UpdatePasswordScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomInset + 24 }]}>
         <View style={styles.header}>
           <Text style={styles.title}>Choose new password</Text>
           <Text style={styles.subtitle}>

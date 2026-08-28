@@ -8,6 +8,7 @@ import { MockTestCard } from '../../components/MockTestCard';
 import { ScreenBackground } from '../../components/ui/ScreenBackground';
 import { MeshHero } from '../../components/ui/MeshHero';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTabScreenBottomPadding } from '../../lib/safeArea';
 import { Card } from '../../components/ui/Card';
 import { MyTestsSkeleton } from '../../components/ui/Skeleton';
 import { AppPalette, Radii } from '../../constants/theme';
@@ -25,6 +26,7 @@ export default function MyTestsScreen() {
 function StudentMyTestsScreen() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabClearance = useTabScreenBottomPadding();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [enrolledTests, setEnrolledTests] = useState([]);
   const [attempts, setAttempts] = useState([]);
@@ -76,7 +78,7 @@ function StudentMyTestsScreen() {
       </MeshHero>
 
       <ScrollView 
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: tabClearance }]}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}

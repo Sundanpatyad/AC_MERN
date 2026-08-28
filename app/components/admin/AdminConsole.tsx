@@ -15,6 +15,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTabScreenBottomPadding } from '../../lib/safeArea';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenBackground } from '../ui/ScreenBackground';
@@ -43,6 +44,7 @@ type TabId = (typeof TABS)[number]['id'];
 export function AdminConsole() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabClearance = useTabScreenBottomPadding();
   const router = useRouter();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
@@ -190,7 +192,7 @@ export function AdminConsole() {
       </MeshHero>
 
       <ScrollView
-        contentContainerStyle={styles.scroll}
+        contentContainerStyle={[styles.scroll, { paddingBottom: tabClearance }]}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl

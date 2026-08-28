@@ -7,7 +7,7 @@ type Props = {
   style?: StyleProp<ViewStyle>;
 };
 
-/** Solid page canvas. Mesh gradient lives only in the top header. */
+/** Solid page canvas. */
 export function ScreenBackground({ children, style }: Props) {
   const { colors } = useTheme();
 

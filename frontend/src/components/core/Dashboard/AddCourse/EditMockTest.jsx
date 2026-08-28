@@ -23,6 +23,8 @@ const EditMockTestSeries = () => {
   const [bulkImportQuestionType, setBulkImportQuestionType] = useState('mcq'); // 'mcq' or 'match'
   const [currentBulkImportTestIndex, setCurrentBulkImportTestIndex] = useState(null);
   const [expandedTests, setExpandedTests] = useState({});
+  const [thumbnailFile, setThumbnailFile] = useState(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState(null);
 
   const toggleTest = (testIndex) => {
     setExpandedTests(prev => ({
@@ -69,6 +71,28 @@ const EditMockTestSeries = () => {
   const handleSeriesChange = (e) => {
     setSeries({ ...series, [e.target.name]: e.target.value });
   };
+
+  const handleThumbnailChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
+    setThumbnailFile(file);
+    setThumbnailPreview(URL.createObjectURL(file));
+    e.target.value = '';
+  };
+
+  const handleRemoveThumbnail = () => {
+    if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
+    setThumbnailFile(null);
+    setThumbnailPreview(null);
+    setSeries((prev) => ({ ...prev, thumbnail: '' }));
+  };
+
+  useEffect(() => {
+    return () => {
+      if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
+    };
+  }, [thumbnailPreview]);
 
   const handleTestChange = (e, testIndex) => {
     const updatedTests = [...series.mockTests];
@@ -356,13 +380,23 @@ const EditMockTestSeries = () => {
           return baseQuestion;
         })
       })),
-      attachments: series.attachments
+      attachments: series.attachments,
     };
 
-    const result = await saveSeries(seriesId, seriesData, token);
+    if (!thumbnailFile && series.thumbnail === '') {
+      seriesData.thumbnail = '';
+    }
+
+    const result = await saveSeries(seriesId, seriesData, token, { thumbnailFile });
     setIsLoading(false);
 
     if (result) {
+      setThumbnailFile(null);
+      if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
+      setThumbnailPreview(null);
+      if (result.thumbnail !== undefined) {
+        setSeries((prev) => (prev ? { ...prev, thumbnail: result.thumbnail } : prev));
+      }
       setSubmitStatus('success');
       setTimeout(() => {
         navigate('/dashboard/instructor');
@@ -446,6 +480,57 @@ const EditMockTestSeries = () => {
                   rows="4"
                   className="w-full px-4 py-3 rounded-lg bg-page border border-line text-fg placeholder-muted focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-fg">
+                  Series Thumbnail
+                </label>
+                {(thumbnailPreview || series.thumbnail) ? (
+                  <div className="space-y-3">
+                    <div className="relative inline-block w-full max-w-md overflow-hidden rounded-xl border border-line bg-page">
+                      <img
+                        src={thumbnailPreview || series.thumbnail}
+                        alt="Series thumbnail"
+                        className="h-48 w-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleRemoveThumbnail}
+                        className="absolute top-2 right-2 rounded-lg bg-red-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-600 transition-colors"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                    <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-line bg-elevated px-4 py-2.5 text-sm text-muted transition-colors hover:bg-page">
+                      <FaImage />
+                      Change image
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleThumbnailChange}
+                      />
+                    </label>
+                  </div>
+                ) : (
+                  <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-line bg-page px-6 py-10 text-center transition-colors hover:border-blue-500 hover:bg-elevated">
+                    <FaImage className="text-2xl text-muted" />
+                    <span className="text-sm font-medium text-fg">Upload series thumbnail</span>
+                    <span className="text-xs text-muted">PNG, JPG or WebP · 16:9 recommended</span>
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleThumbnailChange}
+                    />
+                  </label>
+                )}
+                {thumbnailFile ? (
+                  <p className="text-xs text-blue-400">
+                    New image selected — click Save Series to upload.
+                  </p>
+                ) : null}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1048,6 +1133,10 @@ const EditMockTestSeries = () => {
           <li className="flex items-start gap-3 p-3 rounded-lg bg-page border border-line hover:bg-elevated transition-colors duration-200">
             <span className="text-purple-400 mt-0.5">•</span>
             <span>Set an appropriate price for the series.</span>
+          </li>
+          <li className="flex items-start gap-3 p-3 rounded-lg bg-page border border-line hover:bg-elevated transition-colors duration-200">
+            <span className="text-cyan-400 mt-0.5">•</span>
+            <span>Update the series thumbnail — it appears on mock test cards and detail pages.</span>
           </li>
           <li className="flex items-start gap-3 p-3 rounded-lg bg-page border border-line hover:bg-elevated transition-colors duration-200">
             <span className="text-pink-400 mt-0.5">•</span>

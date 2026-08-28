@@ -118,18 +118,32 @@ export async function getInstructorData(token) {
   return result
 }
 
-export const saveSeries = async (seriesId, seriesData, token) => {
+export const saveSeries = async (seriesId, seriesData, token, options = {}) => {
+  const { thumbnailFile } = options;
   const toastId = toast.loading("Saving...");
   let result = null;
 
   try {
+    let bodyData = seriesData;
+    const headers = { Authorization: `Bearer ${token}` };
+
+    if (thumbnailFile) {
+      const formData = new FormData();
+      formData.append("seriesName", seriesData.seriesName ?? "");
+      formData.append("description", seriesData.description ?? "");
+      formData.append("price", String(seriesData.price ?? ""));
+      formData.append("status", seriesData.status ?? "draft");
+      formData.append("mockTests", JSON.stringify(seriesData.mockTests ?? []));
+      formData.append("attachments", JSON.stringify(seriesData.attachments ?? []));
+      formData.append("thumbnail", thumbnailFile);
+      bodyData = formData;
+    }
+
     const response = await apiConnector(
       "PUT",
       `${UPDATE_MOCKTEST_API}/${seriesId}`,
-      seriesData,
-      {
-        Authorization: `Bearer ${token}`,
-      }
+      bodyData,
+      headers
     );
 
     //console.log("Save Series API RESPONSE", response);

@@ -22,19 +22,19 @@ import { apiConnector } from '../../services/api';
 import { endpoints } from '../../constants/api';
 import { MockTestCard } from '../../components/MockTestCard';
 import { MeshHero } from '../../components/ui/MeshHero';
-import { Card } from '../../components/ui/Card';
-import { ScoreBarChart } from '../../components/ui/ScoreBarChart';
 import { HomeSkeleton } from '../../components/ui/Skeleton';
 import { AppPalette, Fonts, Radii } from '../../constants/theme';
 import { useTheme } from '../../providers/AppThemeProvider';
 import { SectionHeading } from '../../components/ui/SectionHeading';
+import { ProgressGlance } from '../../components/ui/ProgressGlance';
+import { useTabScreenBottomPadding } from '../../lib/safeArea';
 
 const YOUTUBE_CHANNEL = 'https://www.youtube.com/@awakeningclasses';
 const RANK_STORY_URL = 'https://youtu.be/zZqPFZo8IUo?si=MbeDgOr_YtO9bH_x';
 const BANNER_ASPECT = 1024 / 535;
 const H_PAD = 16;
-const BLOCK_GAP = 14;
-const SECTION_GAP = 8;
+const SECTION = 20;
+const STACK = 8;
 
 const FILTERS = [
   { id: 'all', label: 'All courses' },
@@ -79,6 +79,8 @@ function StudentHomeScreen() {
 
   const bannerHeight = Math.round((screenWidth - H_PAD * 2) / BANNER_ASPECT);
   const heroCardWidth = Math.min(260, screenWidth * 0.72);
+  const cardGap = 12;
+  const tabClearance = useTabScreenBottomPadding();
 
   const fetchHomeData = useCallback(async () => {
     try {
@@ -148,12 +150,10 @@ function StudentHomeScreen() {
     const list = [...attempts].sort(
       (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     );
-    const chartData = list.slice(-6).map((a, i) => ({
-      label: `T${i + 1}`,
+    const chartData = list.slice(-6).map((a) => ({
       value: Number(a.score) || 0,
       max: Number(a.totalQuestions) || Number(a.totalScore) || 100,
     }));
-
     const scores = list
       .map((a) => {
         const max = Number(a.totalQuestions) || Number(a.totalScore) || 0;
@@ -169,7 +169,6 @@ function StudentHomeScreen() {
         scores.length > 0
           ? Math.round(scores.reduce((s, n) => s + n, 0) / scores.length)
           : 0,
-      bestScore: scores.length > 0 ? Math.round(Math.max(...scores)) : 0,
     };
   }, [attempts]);
 
@@ -180,9 +179,7 @@ function StudentHomeScreen() {
       <ScrollView
         contentContainerStyle={[
           styles.content,
-          {
-            paddingBottom: 16,
-          },
+          { paddingBottom: tabClearance },
         ]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -198,7 +195,7 @@ function StudentHomeScreen() {
         }
       >
         {isLoading ? (
-          <View style={{ paddingTop: Math.max(insets.top, 16) + 6 }}>
+          <View style={{ paddingTop: Math.max(insets.top, 8) + 6, paddingHorizontal: H_PAD }}>
             <HomeSkeleton bannerHeight={bannerHeight} />
           </View>
         ) : (
@@ -206,8 +203,8 @@ function StudentHomeScreen() {
             <MeshHero
               fadeTo={colors.background}
               style={{
-                paddingTop: Math.max(insets.top, 12) + 4,
-                paddingBottom: 16,
+                paddingTop: Math.max(insets.top, 8) + 6,
+                paddingBottom: 12,
               }}
             >
               <View style={styles.header}>
@@ -225,12 +222,9 @@ function StudentHomeScreen() {
                       <Text style={styles.avatarLetter}>{user?.firstName?.[0] || 'A'}</Text>
                     )}
                   </View>
-                  <View style={styles.greetingBlock}>
-                    <Text style={styles.greetingLine}>Good to see you,</Text>
-                    <Text style={styles.userName} numberOfLines={1}>
-                      {displayName}
-                    </Text>
-                  </View>
+                  <Text style={styles.userName} numberOfLines={1}>
+                    {displayName}
+                  </Text>
                 </Pressable>
 
                 <Pressable
@@ -238,7 +232,7 @@ function StudentHomeScreen() {
                   hitSlop={10}
                   accessibilityRole="button"
                   accessibilityLabel="Notifications"
-                  style={({ pressed }) => [styles.bellBtn, pressed && { opacity: 0.8 }]}
+                  style={({ pressed }) => [styles.bellBtn, pressed && { opacity: 0.7 }]}
                 >
                   <Ionicons name="notifications-outline" size={22} color={colors.text} />
                 </Pressable>
@@ -249,7 +243,7 @@ function StudentHomeScreen() {
                 <TextInput
                   value={query}
                   onChangeText={setQuery}
-                  placeholder="Search..."
+                  placeholder="Search courses"
                   placeholderTextColor={colors.textMuted}
                   style={styles.searchInput}
                   returnKeyType="search"
@@ -290,19 +284,19 @@ function StudentHomeScreen() {
             <View style={styles.section}>
               <View style={styles.sectionPad}>
                 <SectionHeading
-                  title="Popular courses"
-                  serif
+                  title="Courses"
+                  compact
                   rightText="See all"
                   onPressRight={() => router.push('/(tabs)/mock-tests')}
                 />
               </View>
-
               {filteredTests.length > 0 ? (
                 <ScrollView
                   horizontal
                   showsHorizontalScrollIndicator={false}
                   decelerationRate="fast"
-                  snapToInterval={heroCardWidth + 14}
+                  snapToInterval={heroCardWidth + cardGap}
+                  snapToAlignment="start"
                   contentContainerStyle={styles.carousel}
                 >
                   {filteredTests.map((test: any) => (
@@ -323,81 +317,21 @@ function StudentHomeScreen() {
 
             <View style={[styles.section, styles.sectionPad]}>
               <SectionHeading
-                title="Your progress"
-                serif
+                title="Progress"
+                compact
                 rightText="History"
                 onPressRight={() => router.push('/(tabs)/my-tests')}
               />
-              <Card padding={10}>
-                {analytics.chartData.length > 0 ? (
-                  <>
-                    <View style={styles.progressMeta}>
-                      <Text style={styles.metaPill}>{analytics.testsTaken} attempts</Text>
-                      <Text style={styles.metaPill}>Avg {analytics.avgScore}%</Text>
-                      <Text style={styles.metaPill}>Best {analytics.bestScore}%</Text>
-                    </View>
-                    <ScoreBarChart data={analytics.chartData} height={88} />
-                  </>
-                ) : (
-                  <Pressable
-                    onPress={() => router.push('/(tabs)/mock-tests')}
-                    style={({ pressed }) => [
-                      styles.emptyRow,
-                      pressed && { opacity: 0.88 },
-                    ]}
-                  >
-                    <View style={styles.emptyIcon}>
-                      <Ionicons name="bar-chart-outline" size={18} color={colors.textSecondary} />
-                    </View>
-                    <Text style={styles.emptyRowText}>
-                      Take a test to unlock your score trend
-                    </Text>
-                    <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
-                  </Pressable>
-                )}
-              </Card>
-            </View>
-
-            <View style={[styles.section, styles.sectionPad]}>
-              <SectionHeading
-                title="Standing"
-                serif
-                rightText="Leaderboard"
-                onPressRight={() => router.push('/(tabs)/rankings')}
+              <ProgressGlance
+                avgScore={analytics.avgScore}
+                testsTaken={analytics.testsTaken}
+                rank={personalRank?.rank ?? null}
+                chartData={analytics.chartData}
               />
-              <Pressable
-                onPress={() => router.push('/(tabs)/rankings')}
-                style={({ pressed }) => pressed && { opacity: 0.92 }}
-              >
-                <Card padding={10}>
-                  <View style={styles.standing}>
-                    <View style={styles.standingIcon}>
-                      <Ionicons name="trophy-outline" size={18} color={colors.textSecondary} />
-                    </View>
-                    <View style={styles.standingCopy}>
-                      <Text style={styles.standingTitle} numberOfLines={1}>
-                        {personalRank?.rank != null
-                          ? `Ranked #${personalRank.rank}`
-                          : 'No rank yet'}
-                      </Text>
-                      <Text style={styles.standingSub} numberOfLines={1}>
-                        {personalRank?.testName
-                          ? `${personalRank.score}${
-                              personalRank.totalQuestions
-                                ? `/${personalRank.totalQuestions}`
-                                : ''
-                            } · ${personalRank.testName}`
-                          : 'Appear on the board after your first attempt'}
-                      </Text>
-                    </View>
-                    <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
-                  </View>
-                </Card>
-              </Pressable>
             </View>
 
             <View style={[styles.section, styles.sectionPad]}>
-              <SectionHeading title="Spotlight" serif />
+              <SectionHeading title="Spotlight" compact />
               <Pressable
                 onPress={() => openExternal(RANK_STORY_URL)}
                 style={({ pressed }) => [
@@ -413,18 +347,16 @@ function StudentHomeScreen() {
                   resizeMode="cover"
                 />
               </Pressable>
-
               <Pressable
                 onPress={() => openExternal(YOUTUBE_CHANNEL)}
-                style={({ pressed }) => [
-                  styles.lectureRow,
-                  pressed && { opacity: 0.9 },
-                ]}
+                style={({ pressed }) => [styles.lectureRow, pressed && { opacity: 0.9 }]}
                 accessibilityRole="button"
                 accessibilityLabel="Watch lectures"
               >
-                <Ionicons name="play-circle-outline" size={20} color={colors.text} />
-                <Text style={styles.lectureText}>Watch free lectures on YouTube</Text>
+                <View style={styles.lectureIcon}>
+                  <Ionicons name="logo-youtube" size={18} color={colors.text} />
+                </View>
+                <Text style={styles.lectureText}>Free lectures on YouTube</Text>
                 <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
               </Pressable>
             </View>
@@ -441,10 +373,7 @@ function createStyles(colors: AppPalette) {
       flex: 1,
     },
     content: {
-      gap: BLOCK_GAP,
-    },
-    sectionPad: {
-      paddingHorizontal: H_PAD,
+      flexGrow: 1,
     },
     header: {
       paddingHorizontal: H_PAD,
@@ -457,98 +386,81 @@ function createStyles(colors: AppPalette) {
       flex: 1,
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 12,
+      gap: 10,
       minWidth: 0,
     },
     avatar: {
-      width: 34,
-      height: 34,
+      width: 36,
+      height: 36,
       borderRadius: 999,
       backgroundColor: colors.surface,
-      borderWidth: 1.5,
-      borderColor: colors.borderStrong,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
       alignItems: 'center',
       justifyContent: 'center',
       overflow: 'hidden',
     },
     avatarImage: {
-      width: 34,
-      height: 34,
+      width: 36,
+      height: 36,
     },
     avatarLetter: {
       fontSize: 13,
       fontWeight: '700',
       color: colors.text,
     },
-    greetingBlock: {
-      flex: 1,
-      minWidth: 0,
-      gap: 2,
-    },
-    greetingLine: {
-      fontSize: 11,
-      color: colors.textSecondary,
-      fontWeight: '400',
-    },
     userName: {
-      fontSize: 20,
-      lineHeight: 24,
+      flex: 1,
+      fontSize: 17,
+      lineHeight: 22,
       color: colors.text,
       fontFamily: Fonts.semiBold,
       letterSpacing: -0.3,
     },
     bellBtn: {
-      width: 34,
-      height: 34,
-      borderRadius: 999,
+      width: 36,
+      height: 36,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
     },
     searchBar: {
       marginHorizontal: H_PAD,
-      marginTop: 12,
+      marginTop: 10,
       flexDirection: 'row',
       alignItems: 'center',
       backgroundColor: colors.surface,
-      borderRadius: Radii.pill,
-      borderWidth: 1,
+      borderRadius: Radii.md,
+      borderWidth: StyleSheet.hairlineWidth,
       borderColor: colors.border,
       paddingHorizontal: 12,
-      paddingVertical: 4,
       gap: 8,
-      minHeight: 38,
+      height: 40,
     },
     searchInput: {
       flex: 1,
       color: colors.text,
-      fontSize: 13,
-      paddingVertical: 6,
+      fontSize: 15,
+      paddingVertical: 0,
+      ...(Platform.OS === 'android' ? { includeFontPadding: false } : null),
     },
     chipsScroll: {
       flexGrow: 0,
+      marginTop: 10,
     },
     chips: {
       paddingHorizontal: H_PAD,
-      paddingTop: 10,
       gap: 8,
       alignItems: 'center',
     },
     chip: {
-      paddingHorizontal: 14,
-      paddingVertical: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
       borderRadius: Radii.pill,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
+      backgroundColor: colors.surfaceRaised,
       flexShrink: 0,
-      alignSelf: 'flex-start',
     },
     chipActive: {
       backgroundColor: colors.text,
-      borderColor: colors.text,
     },
     chipText: {
       color: colors.text,
@@ -562,91 +474,25 @@ function createStyles(colors: AppPalette) {
       fontFamily: Fonts.semiBold,
     },
     section: {
-      gap: SECTION_GAP,
+      paddingTop: SECTION,
+      gap: STACK,
+    },
+    sectionPad: {
+      paddingHorizontal: H_PAD,
     },
     carousel: {
       paddingHorizontal: H_PAD,
-      gap: 14,
+      gap: 12,
     },
     empty: {
-      textAlign: 'center',
       color: colors.textMuted,
       fontSize: 13,
-      paddingVertical: 12,
-    },
-    progressMeta: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 8,
-      marginBottom: 12,
-    },
-    metaPill: {
-      fontSize: 11,
-      fontWeight: '600',
-      color: colors.textSecondary,
-      backgroundColor: colors.surfaceRaised,
-      overflow: 'hidden',
-      paddingHorizontal: 10,
-      paddingVertical: 5,
-      borderRadius: Radii.pill,
-    },
-    emptyRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 12,
-      paddingVertical: 2,
-    },
-    emptyIcon: {
-      width: 36,
-      height: 36,
-      borderRadius: 10,
-      backgroundColor: colors.surfaceRaised,
-      borderWidth: 1,
-      borderColor: colors.border,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    emptyRowText: {
-      flex: 1,
-      fontSize: 13,
-      color: colors.textSecondary,
-      lineHeight: 18,
-    },
-    standing: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 12,
-    },
-    standingIcon: {
-      width: 38,
-      height: 38,
-      borderRadius: 11,
-      backgroundColor: colors.surfaceRaised,
-      borderWidth: 1,
-      borderColor: colors.border,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    standingCopy: {
-      flex: 1,
-      minWidth: 0,
-      gap: 2,
-    },
-    standingTitle: {
-      fontSize: 14,
-      fontWeight: '700',
-      color: colors.text,
-    },
-    standingSub: {
-      fontSize: 12,
-      color: colors.textSecondary,
+      paddingVertical: 8,
     },
     banner: {
       width: '100%',
-      borderRadius: 16,
+      borderRadius: Radii.md,
       overflow: 'hidden',
-      borderWidth: 1,
-      borderColor: colors.border,
       backgroundColor: colors.surfaceRaised,
     },
     bannerImage: {
@@ -656,13 +502,26 @@ function createStyles(colors: AppPalette) {
     lectureRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 10,
-      paddingVertical: 4,
+      gap: 12,
+      paddingVertical: 10,
+      paddingHorizontal: 12,
+      borderRadius: Radii.md,
+      backgroundColor: colors.surface,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
+    },
+    lectureIcon: {
+      width: 36,
+      height: 36,
+      borderRadius: 10,
+      backgroundColor: colors.surfaceRaised,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     lectureText: {
       flex: 1,
       fontSize: 14,
-      fontWeight: '500',
+      fontFamily: Fonts.medium,
       color: colors.text,
     },
   });
