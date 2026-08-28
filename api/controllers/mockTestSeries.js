@@ -274,8 +274,9 @@ exports.updateMockTestSeries = async (req, res) => {
             );
             console.log("Cloudinary Upload Response:", thumbnailDetails?.secure_url);
             updateData.thumbnail = thumbnailDetails.secure_url;
-        } else {
-            console.log("No thumbnail file provided in this update request.");
+        } else if (req.body.thumbnail !== undefined) {
+            // Allow clearing or setting thumbnail URL without a new file upload
+            updateData.thumbnail = req.body.thumbnail || '';
         }
 
         // Handle mockTests with negative marking and question types
