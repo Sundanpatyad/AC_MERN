@@ -131,10 +131,10 @@ function ReviewBlock({
           ]}
         >
           {item.type === 'correct'
-            ? 'Correct'
+            ? 'Attempted · Correct'
             : item.type === 'incorrect'
-              ? 'Incorrect'
-              : 'Skipped'}
+              ? 'Attempted · Incorrect'
+              : 'Not Attempted'}
         </Text>
       </View>
       <Text style={styles.questionText}>{formatMultiline(item.questionText)}</Text>
@@ -166,14 +166,14 @@ function ReviewBlock({
       <View style={styles.answers}>
         <AnswerPane
           label="Your answer"
-          value={item.userAnswer || 'Not answered'}
+          value={item.type === 'skipped' ? 'Not Attempted' : (item.userAnswer || 'Not answered')}
           color={answerColor(item.type)}
           surface={colors.surface}
           muted={colors.textMuted}
         />
         <AnswerPane
           label="Correct answer"
-          value={item.correctAnswer || item.userAnswer || ''}
+          value={item.correctAnswer || (item.type === 'correct' ? item.userAnswer : '') || '—'}
           color={GREEN}
           surface={colors.surface}
           muted={colors.textMuted}

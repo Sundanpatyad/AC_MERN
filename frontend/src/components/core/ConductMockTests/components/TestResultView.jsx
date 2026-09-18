@@ -54,94 +54,221 @@ const TestResultView = ({
         return <p className={`font-medium ${colorClass}`}>{value}</p>;
     };
 
+    const [resultFilter, setResultFilter] = useState('all');
+
     const renderAttemptDetails = () => {
+        const totalQuestions = currentTest.questions.length;
+        const correctCount = correctAnswers.length;
+        const incorrectCount = incorrectAnswers.length;
+        const attemptedCount = correctCount + incorrectCount;
+        const unattemptedCount = Math.max(0, totalQuestions - attemptedCount);
+
+        const filterTabs = [
+            { key: 'all', label: 'All Questions', count: totalQuestions },
+            { key: 'attempted', label: 'Attempted', count: attemptedCount },
+            { key: 'correct', label: 'Correct', count: correctCount },
+            { key: 'incorrect', label: 'Incorrect', count: incorrectCount },
+            { key: 'unattempted', label: 'Not Attempted', count: unattemptedCount },
+        ];
+
+        const filteredQuestionsWithIndex = currentTest.questions
+            .map((question, index) => {
+                const isCorrect = correctAnswers.some((item) => item.questionIndex === index);
+                const isIncorrect = incorrectAnswers.some((item) => item.questionIndex === index);
+                const isAttempted = isCorrect || isIncorrect;
+                return { question, index, isCorrect, isIncorrect, isAttempted };
+            })
+            .filter(({ isCorrect, isIncorrect, isAttempted }) => {
+                if (resultFilter === 'attempted') return isAttempted;
+                if (resultFilter === 'correct') return isCorrect;
+                if (resultFilter === 'incorrect') return isIncorrect;
+                if (resultFilter === 'unattempted') return !isAttempted;
+                return true;
+            });
+
         return (
             <div className="space-y-6">
-                <div className="flex items-center gap-2 mb-6">
-                    <h3 className="text-xl font-bold text-fg">View Correct Answers</h3>
-                    <span className="bg-surface text-muted text-xs px-2 py-1 rounded-full">{currentTest.questions.length} Questions</span>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+                    <div className="flex items-center gap-2">
+                        <h3 className="text-xl font-bold text-fg">Questions Review</h3>
+                        <span className="bg-surface text-muted text-xs px-2.5 py-1 rounded-full border border-line">
+                            {currentTest.questions.length} Questions
+                        </span>
+                    </div>
+
+                    {/* Filter Tabs */}
+                    <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+                        {filterTabs.map((tab) => {
+                            const isActive = resultFilter === tab.key;
+                            return (
+                                <button
+                                    key={tab.key}
+                                    type="button"
+                                    onClick={() => setResultFilter(tab.key)}
+                                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                                        isActive
+                                            ? 'bg-solid text-solid-fg border-solid shadow-sm'
+                                            : 'bg-surface text-muted border-line hover:text-fg hover:bg-elevated'
+                                    }`}
+                                >
+                                    <span>{tab.label}</span>
+                                    <span
+                                        className={`text-[11px] px-1.5 py-0.2 rounded-full ${
+                                            isActive ? 'bg-black/20 text-solid-fg' : 'bg-page text-subtle'
+                                        }`}
+                                    >
+                                        {tab.count}
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-6">
-                    {currentTest.questions.map((question, index) => {
-                        const isCorrect = correctAnswers.some(item => item.questionIndex === index);
-                        const isIncorrect = incorrectAnswers.some(item => item.questionIndex === index);
-                        const userAnswer = userAnswers[index] || "Not answered";
+                    {filteredQuestionsWithIndex.length === 0 ? (
+                        <div className="text-center py-12 rounded-2xl border border-line bg-surface p-6">
+                            <p className="text-sm font-medium text-fg">No questions found in this category.</p>
+                        </div>
+                    ) : (
+                        filteredQuestionsWithIndex.map(({ question, index, isCorrect, isIncorrect, isAttempted }) => {
+                            const rawUserAnswer = userAnswers[index];
+                            const hasUserAnswer = isAttempted && rawUserAnswer && rawUserAnswer !== 'Not answered';
+                            const userAnswer = hasUserAnswer ? rawUserAnswer : 'Not Attempted';
 
-                        const correctAns = (question.questionType === "MATCH" && question.options && question.options.length >= 5)
-                            ? question.options[4]
-                            : question.correctAnswer;
+                            const correctAns =
+                                question.questionType === 'MATCH' &&
+                                question.options &&
+                                question.options.length >= 5
+                                    ? question.options[4]
+                                    : question.correctAnswer;
 
-                        return (
-                            <div
-                                key={index}
-                                className={`flex flex-col md:flex-row gap-6 p-6 rounded-2xl border transition-all duration-300 ${isCorrect ? 'bg-green-500/5 border-green-500/20 hover:bg-green-500/10' :
-                                    isIncorrect ? 'bg-red-500/5 border-red-500/20 hover:bg-red-500/10' :
-                                        'bg-surface border-line hover:bg-elevated'
+                            return (
+                                <div
+                                    key={index}
+                                    className={`flex flex-col md:flex-row gap-6 p-6 rounded-2xl border transition-all duration-300 ${
+                                        isCorrect
+                                            ? 'bg-green-500/5 border-green-500/20 hover:bg-green-500/10'
+                                            : isIncorrect
+                                              ? 'bg-red-500/5 border-red-500/20 hover:bg-red-500/10'
+                                              : 'bg-surface border-line hover:bg-elevated'
                                     }`}
-                            >
-                                {/* Status Icon & Number */}
-                                <div className="flex-shrink-0 flex md:flex-col items-center gap-3">
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm border-2 ${isCorrect ? 'bg-green-500 text-white border-green-400' :
-                                        isIncorrect ? 'bg-red-500 text-white border-red-400' :
-                                            'bg-surface text-muted border-line'
-                                        }`}>
-                                        {index + 1}
+                                >
+                                    {/* Status Icon & Number */}
+                                    <div className="flex-shrink-0 flex md:flex-col items-center gap-3">
+                                        <div
+                                            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm border-2 ${
+                                                isCorrect
+                                                    ? 'bg-green-500 text-white border-green-400'
+                                                    : isIncorrect
+                                                      ? 'bg-red-500 text-white border-red-400'
+                                                      : 'bg-surface text-muted border-line'
+                                            }`}
+                                        >
+                                            {index + 1}
+                                        </div>
+                                        <div
+                                            className={`text-2xl ${
+                                                isCorrect
+                                                    ? 'text-green-500'
+                                                    : isIncorrect
+                                                      ? 'text-red-500'
+                                                      : 'text-amber-500'
+                                            }`}
+                                        >
+                                            {isCorrect ? (
+                                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            ) : isIncorrect ? (
+                                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            ) : (
+                                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M20 12H4" />
+                                                </svg>
+                                            )}
+                                        </div>
                                     </div>
-                                    <div className={`text-2xl ${isCorrect ? 'text-green-500' :
-                                        isIncorrect ? 'text-red-500' :
-                                            'text-muted'
-                                        }`}>
-                                        {isCorrect ? (
-                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-                                        ) : isIncorrect ? (
-                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
-                                        ) : (
-                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M20 12H4" /></svg>
-                                        )}
-                                    </div>
-                                </div>
 
-                                {/* Content */}
-                                <div className="flex-1 space-y-4">
-                                    {/* Question image + text */}
-                                    <div className="space-y-2">
-                                        {question.questionImage && (
-                                            <div className="rounded-xl overflow-hidden border border-line">
-                                                <img
-                                                    src={question.questionImage}
-                                                    alt={`Question ${index + 1}`}
-                                                    className="w-full h-auto max-h-56 object-contain bg-surface"
-                                                    loading="lazy"
-                                                />
+                                    {/* Content */}
+                                    <div className="flex-1 space-y-4">
+                                        {/* Status badge row */}
+                                        <div className="flex items-center justify-between gap-3">
+                                            <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-elevated text-subtle border border-line">
+                                                {question.questionType || 'MCQ'}
+                                            </span>
+                                            {isCorrect ? (
+                                                <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full border bg-green-500/15 text-green-400 border-green-500/30">
+                                                    Attempted · Correct
+                                                </span>
+                                            ) : isIncorrect ? (
+                                                <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full border bg-red-500/15 text-red-400 border-red-500/30">
+                                                    Attempted · Incorrect
+                                                </span>
+                                            ) : (
+                                                <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full border bg-amber-500/15 text-amber-400 border-amber-500/30">
+                                                    Not Attempted
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        {/* Question image + text */}
+                                        <div className="space-y-2">
+                                            {question.questionImage && (
+                                                <div className="rounded-xl overflow-hidden border border-line">
+                                                    <img
+                                                        src={question.questionImage}
+                                                        alt={`Question ${index + 1}`}
+                                                        className="w-full h-auto max-h-56 object-contain bg-surface"
+                                                        loading="lazy"
+                                                    />
+                                                </div>
+                                            )}
+                                            {question.text && (
+                                                <p className="text-fg text-lg leading-relaxed font-medium whitespace-pre-line">
+                                                    {question.text.replace(/\\n/g, '\n')}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        {/* Answer boxes */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                                            <div
+                                                className={`p-4 rounded-xl border ${
+                                                    isCorrect
+                                                        ? 'bg-green-500/10 border-green-500/20'
+                                                        : isIncorrect
+                                                          ? 'bg-red-500/10 border-red-500/20'
+                                                          : 'bg-surface border-line'
+                                                }`}
+                                            >
+                                                <p className="text-xs uppercase tracking-wider font-semibold mb-2 text-muted">
+                                                    Your Answer
+                                                </p>
+                                                {renderAnswerValue(
+                                                    userAnswer,
+                                                    isCorrect
+                                                        ? 'text-green-400'
+                                                        : isIncorrect
+                                                          ? 'text-red-400'
+                                                          : 'text-amber-400'
+                                                )}
                                             </div>
-                                        )}
-                                        {question.text && (
-                                            <p className="text-fg text-lg leading-relaxed font-medium whitespace-pre-line">
-                                                {question.text.replace(/\\n/g, '\n')}
-                                            </p>
-                                        )}
-                                    </div>
 
-                                    {/* Answer boxes */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                                        <div className={`p-4 rounded-xl border ${isCorrect ? 'bg-green-500/10 border-green-500/20' :
-                                            isIncorrect ? 'bg-red-500/10 border-red-500/20' :
-                                                'bg-surface border-line'
-                                            }`}>
-                                            <p className="text-xs uppercase tracking-wider font-semibold mb-2 text-muted">Your Answer</p>
-                                            {renderAnswerValue(userAnswer, isCorrect ? 'text-green-400' : isIncorrect ? 'text-red-400' : 'text-muted')}
-                                        </div>
-
-                                        <div className="p-4 rounded-xl border bg-blue-500/5 border-blue-500/20">
-                                            <p className="text-xs uppercase tracking-wider font-semibold mb-2 text-blue-400">Correct Answer</p>
-                                            {renderAnswerValue(correctAns, 'text-blue-400')}
+                                            <div className="p-4 rounded-xl border bg-emerald-500/10 border-emerald-500/25">
+                                                <p className="text-xs uppercase tracking-wider font-semibold mb-2 text-emerald-400">
+                                                    Correct Answer
+                                                </p>
+                                                {renderAnswerValue(correctAns, 'text-emerald-400 font-semibold')}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        );
-                    })}
+                            );
+                        })
+                    )}
                 </div>
             </div>
         );

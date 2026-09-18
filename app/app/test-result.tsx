@@ -111,11 +111,25 @@ function ReviewBlock({
   colors: AppPalette;
   styles: ReturnType<typeof createStyles>;
 }) {
-  const showCorrectAnswer = item.type === 'incorrect' || item.type === 'skipped';
-
   return (
     <View style={styles.reviewItem}>
-      <Text style={styles.reviewIndex}>{String(displayIndex).padStart(2, '0')}</Text>
+      <View style={styles.reviewHead}>
+        <Text style={styles.reviewIndex}>{String(displayIndex).padStart(2, '0')}</Text>
+        <Text
+          style={[
+            styles.badge,
+            {
+              color: answerColor(item.type),
+            },
+          ]}
+        >
+          {item.type === 'correct'
+            ? 'Attempted · Correct'
+            : item.type === 'incorrect'
+              ? 'Attempted · Incorrect'
+              : 'Not Attempted'}
+        </Text>
+      </View>
       <Text style={styles.questionText}>{formatMultiline(item.questionText)}</Text>
       {item.questionImage ? (
         <Image source={{ uri: item.questionImage }} style={styles.questionImage} resizeMode="contain" />
@@ -145,20 +159,18 @@ function ReviewBlock({
       <View style={styles.answers}>
         <AnswerPane
           label="Your answer"
-          value={item.userAnswer || 'Not answered'}
+          value={item.type === 'skipped' ? 'Not Attempted' : (item.userAnswer || 'Not answered')}
           color={answerColor(item.type)}
           surface={colors.surface}
           muted={colors.textMuted}
         />
-        {showCorrectAnswer ? (
-          <AnswerPane
-            label="Correct answer"
-            value={item.correctAnswer || ''}
-            color={GREEN}
-            surface={colors.surface}
-            muted={colors.textMuted}
-          />
-        ) : null}
+        <AnswerPane
+          label="Correct answer"
+          value={item.correctAnswer || (item.type === 'correct' ? item.userAnswer : '') || '—'}
+          color={GREEN}
+          surface={colors.surface}
+          muted={colors.textMuted}
+        />
       </View>
     </View>
   );
@@ -599,11 +611,21 @@ function createStyles(colors: AppPalette) {
       paddingHorizontal: H_PAD,
       gap: 10,
     },
+    reviewHead: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
     reviewIndex: {
       fontSize: 11,
       fontFamily: Fonts.medium,
       color: colors.textMuted,
       letterSpacing: 1.2,
+    },
+    badge: {
+      fontSize: 11,
+      fontFamily: Fonts.semiBold,
+      letterSpacing: 0.3,
     },
     questionText: {
       fontSize: 16,
