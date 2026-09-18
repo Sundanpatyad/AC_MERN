@@ -9,7 +9,7 @@ export function getTabBarLabel(routeName: string, instructor: boolean): string {
     case 'mock-tests':
       return 'Tests';
     case 'my-tests':
-      return instructor ? 'Admin' : 'My Tests';
+      return instructor ? 'Admin' : 'Attempts';
     case 'rankings':
       return 'Rankings';
     case 'profile':
@@ -32,7 +32,7 @@ export function getTabBarIconName(
       return focused ? 'list' : 'list-outline';
     case 'my-tests':
       if (instructor) return focused ? 'grid' : 'grid-outline';
-      return focused ? 'book' : 'book-outline';
+      return focused ? 'clipboard' : 'clipboard-outline';
     case 'rankings':
       return focused ? 'trophy' : 'trophy-outline';
     case 'profile':

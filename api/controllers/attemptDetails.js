@@ -13,9 +13,28 @@ exports.createAttempt = async (req, res) => {
       timeTaken,
       correctAnswers,
       incorrectAnswers,
-      incorrectAnswerDetails
+      incorrectAnswerDetails,
+      skippedAnswers,
+      skippedAnswerDetails,
     } = req.body;
     const userId = req.user.id;
+
+    const normalizeItems = (items = [], type) =>
+      (Array.isArray(items) ? items : []).map((item) => ({
+        questionIndex: item.questionIndex,
+        questionText: item.questionText || '',
+        userAnswer: item.userAnswer || (type === 'skipped' ? 'Not answered' : ''),
+        correctAnswer: item.correctAnswer || '',
+        questionType: item.questionType || 'MCQ',
+        questionImage: item.questionImage || '',
+        leftColumn: item.leftColumn,
+        rightColumn: item.rightColumn,
+        type: item.type || type,
+      }));
+
+    const correctItems = normalizeItems(correctAnswers, 'correct');
+    const incorrectItems = normalizeItems(incorrectAnswerDetails, 'incorrect');
+    const skippedItems = normalizeItems(skippedAnswerDetails, 'skipped');
 
     const newAttempt = new AttemptDetails({
       user: userId,
@@ -24,9 +43,11 @@ exports.createAttempt = async (req, res) => {
       score,
       totalQuestions,
       timeTaken,
-      correctAnswers,
-      incorrectAnswers,
-      incorrectAnswerDetails
+      correctAnswers: correctItems,
+      incorrectAnswers: Number(incorrectAnswers) || incorrectItems.length,
+      incorrectAnswerDetails: incorrectItems,
+      skippedAnswers: Number(skippedAnswers) || skippedItems.length,
+      skippedAnswerDetails: skippedItems,
     });
 
     await newAttempt.save();
@@ -34,21 +55,21 @@ exports.createAttempt = async (req, res) => {
     await User.findByIdAndUpdate(userId, {
       $addToSet: {
         mocktests: mockId,
-        attempts: newAttempt._id
-      }
+        attempts: newAttempt._id,
+      },
     });
 
     res.status(201).json({
       success: true,
       message: 'Attempt recorded successfully',
-      attempt: newAttempt
+      attempt: newAttempt,
     });
   } catch (error) {
     console.error('Error in createAttempt:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to record attempt',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -56,8 +77,10 @@ exports.createAttempt = async (req, res) => {
 exports.getAttemptsByUser = async (req, res) => {
   try {
     const userId = req.user.id;
+    const pageNum = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limitNum = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 10));
+    const skip = (pageNum - 1) * limitNum;
 
-    // Fetch user details
     const user = await User.findById(userId)
       .select('firstName lastName email accountType image')
       .lean();
@@ -65,38 +88,80 @@ exports.getAttemptsByUser = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: 'User not found',
       });
     }
 
-    // Fetch attempts with populated fields
-    const attempts = await AttemptDetails.find({ user: userId })
-      .select('testName score totalQuestions timeTaken incorrectAnswers correctAnswers createdAt attemptDate mockTestSeries')
-      .populate('mockTestSeries', 'seriesName')
-      .sort({ createdAt: -1 })
-      .lean();
+    const filter = { user: userId };
+    const [totalAttempts, attempts] = await Promise.all([
+      AttemptDetails.countDocuments(filter),
+      AttemptDetails.find(filter)
+        .select(
+          'testName score totalQuestions timeTaken incorrectAnswers skippedAnswers createdAt attemptDate mockTestSeries'
+        )
+        .populate('mockTestSeries', 'seriesName thumbnail')
+        .sort({ attemptDate: -1, createdAt: -1 })
+        .skip(skip)
+        .limit(limitNum)
+        .lean(),
+    ]);
 
-    // Calculate some statistics
-    const totalAttempts = attempts.length;
+    const summaryAttempts = attempts.map((attempt) => {
+      const incorrectCount = Number(attempt.incorrectAnswers) || 0;
+      const skippedCount = Number(attempt.skippedAnswers) || 0;
+      const correctCount = Math.max(
+        0,
+        (Number(attempt.totalQuestions) || 0) - incorrectCount - skippedCount
+      );
+      return {
+        _id: attempt._id,
+        testName: attempt.testName,
+        score: attempt.score,
+        totalQuestions: attempt.totalQuestions,
+        timeTaken: attempt.timeTaken,
+        incorrectAnswers: incorrectCount,
+        skippedAnswers: skippedCount,
+        correctCount,
+        createdAt: attempt.createdAt,
+        attemptDate: attempt.attemptDate,
+        mockTestSeries: attempt.mockTestSeries,
+      };
+    });
+
     const averageScore = totalAttempts
-      ? attempts.reduce((sum, attempt) => sum + (attempt.score || 0), 0) / totalAttempts
-      : 0;
+      ? (
+          (
+            await AttemptDetails.aggregate([
+              { $match: { user: new mongoose.Types.ObjectId(userId) } },
+              { $group: { _id: null, avg: { $avg: '$score' } } },
+            ])
+          )[0]?.avg || 0
+        ).toFixed(2)
+      : '0.00';
 
     res.status(200).json({
       success: true,
       user: {
         ...user,
         totalAttempts,
-        averageScore: averageScore.toFixed(2)
+        averageScore,
       },
-      attempts
+      attempts: summaryAttempts,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total: totalAttempts,
+        totalPages: Math.max(1, Math.ceil(totalAttempts / limitNum)),
+        hasNextPage: pageNum * limitNum < totalAttempts,
+        hasPrevPage: pageNum > 1,
+      },
     });
   } catch (error) {
     console.error('Error in getAttemptsByUser:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve attempts and user details',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -104,27 +169,67 @@ exports.getAttemptsByUser = async (req, res) => {
 exports.getAttemptById = async (req, res) => {
   try {
     const { attemptId } = req.params;
+    const userId = req.user.id;
+
+    if (!mongoose.Types.ObjectId.isValid(attemptId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid attempt id',
+      });
+    }
+
     const attempt = await AttemptDetails.findById(attemptId)
-      .populate('user', 'firstName lastName email')
-      .populate('mockTestSeries', 'seriesName');
+      .populate('mockTestSeries', 'seriesName thumbnail')
+      .lean();
 
     if (!attempt) {
       return res.status(404).json({
         success: false,
-        message: 'Attempt not found'
+        message: 'Attempt not found',
       });
     }
 
+    if (String(attempt.user) !== String(userId) && req.user.accountType !== 'Instructor' && req.user.accountType !== 'Admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'You can only view your own attempts',
+      });
+    }
+
+    const incorrectCount = Number(attempt.incorrectAnswers) || 0;
+    const skippedCount =
+      Number(attempt.skippedAnswers) ||
+      (Array.isArray(attempt.skippedAnswerDetails) ? attempt.skippedAnswerDetails.length : 0);
+    const correctItems = Array.isArray(attempt.correctAnswers) ? attempt.correctAnswers : [];
+    const incorrectItems = Array.isArray(attempt.incorrectAnswerDetails)
+      ? attempt.incorrectAnswerDetails
+      : [];
+    const skippedItems = Array.isArray(attempt.skippedAnswerDetails)
+      ? attempt.skippedAnswerDetails
+      : [];
+
+    const allQuestionsReview = [
+      ...correctItems.map((item) => ({ ...item, type: item.type || 'correct' })),
+      ...incorrectItems.map((item) => ({ ...item, type: item.type || 'incorrect' })),
+      ...skippedItems.map((item) => ({ ...item, type: item.type || 'skipped' })),
+    ].sort((a, b) => (a.questionIndex ?? 0) - (b.questionIndex ?? 0));
+
     res.status(200).json({
       success: true,
-      attempt
+      attempt: {
+        ...attempt,
+        correctCount: correctItems.length,
+        incorrectAnswers: incorrectCount,
+        skippedAnswers: skippedCount,
+        allQuestionsReview,
+      },
     });
   } catch (error) {
     console.error('Error in getAttemptById:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve attempt',
-      error: error.message
+      error: error.message,
     });
   }
 };

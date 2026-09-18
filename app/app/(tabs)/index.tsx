@@ -71,6 +71,7 @@ function StudentHomeScreen() {
 
   const [featuredTests, setFeaturedTests] = useState<any[]>([]);
   const [attempts, setAttempts] = useState<any[]>([]);
+  const [totalAttempts, setTotalAttempts] = useState(0);
   const [personalRank, setPersonalRank] = useState<any | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -86,7 +87,9 @@ function StudentHomeScreen() {
     try {
       const [testsRes, attemptsRes, ranksRes] = await Promise.all([
         apiConnector.get(endpoints.GET_ALL_MOCK_TESTS),
-        apiConnector.get(endpoints.GET_USER_ATTEMPTS).catch(() => null),
+        apiConnector
+          .get(endpoints.GET_USER_ATTEMPTS, { params: { page: 1, limit: 6 } })
+          .catch(() => null),
         apiConnector
           .get(endpoints.GET_RANKINGS, { params: { page: 1, limit: 5 } })
           .catch(() => null),
@@ -105,6 +108,11 @@ function StudentHomeScreen() {
 
       if (attemptsRes?.data?.success) {
         setAttempts(attemptsRes.data.attempts || attemptsRes.data.data || []);
+        setTotalAttempts(
+          attemptsRes.data.user?.totalAttempts ??
+            attemptsRes.data.pagination?.total ??
+            (attemptsRes.data.attempts || []).length
+        );
       }
 
       if (ranksRes?.data?.success) {
@@ -147,10 +155,9 @@ function StudentHomeScreen() {
   }, [featuredTests, query, activeFilter]);
 
   const analytics = useMemo(() => {
-    const list = [...attempts].sort(
-      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-    );
-    const chartData = list.slice(-6).map((a) => ({
+    // API returns newest first — reverse for chronological chart
+    const list = [...attempts].reverse();
+    const chartData = list.map((a) => ({
       value: Number(a.score) || 0,
       max: Number(a.totalQuestions) || Number(a.totalScore) || 100,
     }));
@@ -164,13 +171,13 @@ function StudentHomeScreen() {
 
     return {
       chartData,
-      testsTaken: attempts.length,
+      testsTaken: totalAttempts,
       avgScore:
         scores.length > 0
           ? Math.round(scores.reduce((s, n) => s + n, 0) / scores.length)
           : 0,
     };
-  }, [attempts]);
+  }, [attempts, totalAttempts]);
 
   const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Student';
 

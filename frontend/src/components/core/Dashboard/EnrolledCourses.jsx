@@ -54,8 +54,8 @@ export default function EnrolledCourses() {
     if (!mockAttempts && !loading.attempts) {
       dispatch(setMockAttemptsStart())
       try {
-        const res = await getUserAttempts(token)
-        dispatch(setMockAttemptsSuccess(res.attempts))
+        const res = await getUserAttempts(token, { page: 1, limit: 100 })
+        dispatch(setMockAttemptsSuccess(res?.attempts || []))
       } catch (error) {
         dispatch(setMockAttemptsFailure(error.message))
       }
@@ -176,9 +176,16 @@ export default function EnrolledCourses() {
                             <span className="text-purple-400 font-medium">Time: {attempt.timeTaken}</span>
                           </div>
                           <div className="flex justify-between items-center">
-                            <span className="text-green-400">Correct: {attempt.correctAnswers}</span>
-                            <span className="text-red-400">Incorrect: {attempt.incorrectAnswers}</span>
+                            <span className="text-green-400">Correct: {attempt.correctCount ?? 0}</span>
+                            <span className="text-red-400">Incorrect: {attempt.incorrectAnswers ?? 0}</span>
                           </div>
+                          <button
+                            type="button"
+                            onClick={() => navigate(`/dashboard/attempts/${attempt._id}`)}
+                            className="mt-3 text-sm text-blue-400 hover:text-blue-300"
+                          >
+                            View review →
+                          </button>
                         </div>
                       ))}
                     </div>

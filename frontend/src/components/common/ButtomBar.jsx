@@ -1,15 +1,13 @@
 import React from 'react';
 import { AiOutlineHome } from 'react-icons/ai';
-import { PiNotebook } from 'react-icons/pi';
+import { PiNotebook, PiClipboardText } from 'react-icons/pi';
 import { HiAcademicCap } from 'react-icons/hi2';
-import { CgShoppingCart } from 'react-icons/cg';
 import { MdOutlineAdminPanelSettings } from 'react-icons/md';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { CiCirclePlus } from 'react-icons/ci';
 
 const BottomBar = () => {
-  const { totalItems } = useSelector((state) => state.cart);
   const { user } = useSelector((state) => state.profile);
   const location = useLocation();
 
@@ -47,11 +45,10 @@ const BottomBar = () => {
 
         {user?.accountType !== 'Instructor' ? (
           <NavItem
-            to="/dashboard/cart"
-            icon={CgShoppingCart}
-            label="Cart"
-            badge={totalItems}
-            active={isActive('/dashboard/cart')}
+            to="/dashboard/attempts"
+            icon={PiClipboardText}
+            label="Attempts"
+            active={isActive('/dashboard/attempts')}
           />
         ) : (
           <NavItem
@@ -82,7 +79,7 @@ const BottomBar = () => {
   );
 };
 
-const NavItem = ({ to, icon: Icon, label, badge, active }) => (
+const NavItem = ({ to, icon: Icon, label, active }) => (
   <Link
     to={to}
     className={`relative flex flex-col items-center justify-center gap-0.5 transition-colors ${
@@ -90,11 +87,6 @@ const NavItem = ({ to, icon: Icon, label, badge, active }) => (
     }`}
   >
     <Icon className="text-xl" />
-    {badge > 0 && (
-      <span className="absolute top-1.5 right-[22%] min-w-[14px] h-3.5 px-1 bg-brand text-brand-fg text-[9px] font-bold rounded-full flex items-center justify-center">
-        {badge}
-      </span>
-    )}
     <span className="text-[10px] font-medium">{label}</span>
   </Link>
 );

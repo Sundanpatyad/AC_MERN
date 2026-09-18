@@ -25,6 +25,7 @@ export const endpoints = {
   DELETE_PROFILE_API: `${BASE_URL}/api/v1/profile/deleteProfile`,
   CHANGE_PASSWORD_API: `${BASE_URL}/api/v1/auth/changepassword`,
   GET_USER_ATTEMPTS: `${BASE_URL}/api/v1/mock/getAttemptsByUser`,
+  GET_ATTEMPT_BY_ID: `${BASE_URL}/api/v1/mock/getAttemptById`,
 
   // Payment
   CAPTURE_MOCK_PAYMENT: `${BASE_URL}/api/v1/payment/captureMockPayment`,

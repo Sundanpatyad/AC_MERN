@@ -9,7 +9,8 @@ import {
   Users,
   Edit,
   LayoutDashboard,
-  Shield
+  Shield,
+  ClipboardList,
 } from 'lucide-react';
 
 const MyProfile = () => {
@@ -67,6 +68,16 @@ const MyProfile = () => {
               <LayoutDashboard className="w-4 h-4" />
               Dashboard
             </button>
+
+            {user?.accountType === 'Student' && (
+              <button
+                onClick={() => navigate("/dashboard/attempts")}
+                className="btn-secondary"
+              >
+                <ClipboardList className="w-4 h-4" />
+                Attempts
+              </button>
+            )}
 
             {user?.accountType === 'Instructor' && (
               <button

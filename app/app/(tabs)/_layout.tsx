@@ -42,17 +42,17 @@ function SharedTabScreens({ instructor }: { instructor: boolean }) {
       <Tabs.Screen
         name="my-tests"
         options={{
-          title: instructor ? 'Admin' : 'My Tests',
+          title: instructor ? 'Admin' : 'Attempts',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={
                 focused
                   ? instructor
                     ? 'grid'
-                    : 'book'
+                    : 'clipboard'
                   : instructor
                     ? 'grid-outline'
-                    : 'book-outline'
+                    : 'clipboard-outline'
               }
               size={24}
               color={color}
@@ -165,11 +165,11 @@ function NativeLiquidGlassTabLayout() {
       <NativeTabs.Trigger name="my-tests">
         <Icon
           sf={{
-            default: instructor ? 'square.grid.2x2' : 'book',
-            selected: instructor ? 'square.grid.2x2.fill' : 'book.fill',
+            default: instructor ? 'square.grid.2x2' : 'clipboard',
+            selected: instructor ? 'square.grid.2x2.fill' : 'clipboard.fill',
           }}
         />
-        <Label>{instructor ? 'Admin' : 'My Tests'}</Label>
+        <Label>{instructor ? 'Admin' : 'Attempts'}</Label>
       </NativeTabs.Trigger>
 
       {!instructor ? (
