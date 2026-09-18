@@ -1,6 +1,7 @@
 const { request } = require('express');
 const AttemptDetails = require('../models/attemptDetails'); // Adjust the path as needed
 const User = require('../models/user'); // Adjust the path as needed
+const { MockTestSeries } = require('../models/mockTestSeries');
 const mongoose = require('mongoose');
 
 exports.createAttempt = async (req, res) => {
@@ -34,19 +35,62 @@ exports.createAttempt = async (req, res) => {
 
     const correctItems = normalizeItems(correctAnswers, 'correct');
     const incorrectItems = normalizeItems(incorrectAnswerDetails, 'incorrect');
-    const skippedItems = normalizeItems(skippedAnswerDetails, 'skipped');
+    let skippedItems = normalizeItems(skippedAnswerDetails, 'skipped');
+
+    // Auto-populate any unattempted questions from MockTestSeries if available
+    try {
+      if (mockId && testName) {
+        const series = await MockTestSeries.findById(mockId).lean();
+        const matchedTest = series?.mockTests?.find((t) => t.testName === testName);
+        if (matchedTest && Array.isArray(matchedTest.questions)) {
+          const answeredIndices = new Set([
+            ...correctItems.map((c) => c.questionIndex).filter((x) => x !== undefined),
+            ...incorrectItems.map((inc) => inc.questionIndex).filter((x) => x !== undefined),
+            ...skippedItems.map((s) => s.questionIndex).filter((x) => x !== undefined),
+          ]);
+
+          matchedTest.questions.forEach((q, idx) => {
+            if (!answeredIndices.has(idx)) {
+              let trueCorrect = q.correctAnswer;
+              if (
+                q.questionType === 'MATCH' &&
+                (!trueCorrect || String(trueCorrect).trim() === '') &&
+                Array.isArray(q.options) &&
+                q.options.length >= 5
+              ) {
+                trueCorrect = q.options[4];
+              }
+              skippedItems.push({
+                questionIndex: idx,
+                questionText: q.text || '',
+                userAnswer: 'Not answered',
+                correctAnswer: trueCorrect || '',
+                questionType: q.questionType || 'MCQ',
+                questionImage: q.questionImage || '',
+                leftColumn: q.leftColumn || [],
+                rightColumn: q.rightColumn || [],
+                type: 'skipped',
+              });
+            }
+          });
+          skippedItems.sort((a, b) => (a.questionIndex ?? 0) - (b.questionIndex ?? 0));
+        }
+      }
+    } catch (populateErr) {
+      console.warn('Error auto-populating skipped questions in createAttempt:', populateErr.message);
+    }
 
     const newAttempt = new AttemptDetails({
       user: userId,
       mockTestSeries: mockId,
       testName,
       score,
-      totalQuestions,
+      totalQuestions: Math.max(totalQuestions || 0, correctItems.length + incorrectItems.length + skippedItems.length),
       timeTaken,
       correctAnswers: correctItems,
       incorrectAnswers: Number(incorrectAnswers) || incorrectItems.length,
       incorrectAnswerDetails: incorrectItems,
-      skippedAnswers: Number(skippedAnswers) || skippedItems.length,
+      skippedAnswers: skippedItems.length,
       skippedAnswerDetails: skippedItems,
     });
 
@@ -178,9 +222,7 @@ exports.getAttemptById = async (req, res) => {
       });
     }
 
-    const attempt = await AttemptDetails.findById(attemptId)
-      .populate('mockTestSeries', 'seriesName thumbnail')
-      .lean();
+    const attempt = await AttemptDetails.findById(attemptId).lean();
 
     if (!attempt) {
       return res.status(404).json({
@@ -196,10 +238,10 @@ exports.getAttemptById = async (req, res) => {
       });
     }
 
-    const incorrectCount = Number(attempt.incorrectAnswers) || 0;
-    const skippedCount =
-      Number(attempt.skippedAnswers) ||
-      (Array.isArray(attempt.skippedAnswerDetails) ? attempt.skippedAnswerDetails.length : 0);
+    const series = await MockTestSeries.findById(attempt.mockTestSeries)
+      .select('seriesName thumbnail mockTests')
+      .lean();
+
     const correctItems = Array.isArray(attempt.correctAnswers) ? attempt.correctAnswers : [];
     const incorrectItems = Array.isArray(attempt.incorrectAnswerDetails)
       ? attempt.incorrectAnswerDetails
@@ -208,19 +250,140 @@ exports.getAttemptById = async (req, res) => {
       ? attempt.skippedAnswerDetails
       : [];
 
-    const allQuestionsReview = [
-      ...correctItems.map((item) => ({ ...item, type: item.type || 'correct' })),
-      ...incorrectItems.map((item) => ({ ...item, type: item.type || 'incorrect' })),
-      ...skippedItems.map((item) => ({ ...item, type: item.type || 'skipped' })),
-    ].sort((a, b) => (a.questionIndex ?? 0) - (b.questionIndex ?? 0));
+    let allQuestionsReview = [];
+    const matchedTest = series?.mockTests?.find(
+      (t) => t.testName === attempt.testName || String(t._id) === String(attempt.mockTestId)
+    );
+
+    if (matchedTest && Array.isArray(matchedTest.questions) && matchedTest.questions.length > 0) {
+      // Reconstruct ALL questions from the original test series questions
+      allQuestionsReview = matchedTest.questions.map((q, i) => {
+        let trueCorrectAnswer = q.correctAnswer;
+        if (
+          q.questionType === 'MATCH' &&
+          (!trueCorrectAnswer || String(trueCorrectAnswer).trim() === '') &&
+          Array.isArray(q.options) &&
+          q.options.length >= 5
+        ) {
+          trueCorrectAnswer = q.options[4];
+        }
+
+        // Match with user's recorded answers
+        const correctMatch = correctItems.find(
+          (item) => item.questionIndex === i || (item.questionIndex === undefined && item.questionText && q.text && item.questionText.trim() === q.text.trim())
+        );
+        const incorrectMatch = incorrectItems.find(
+          (item) => item.questionIndex === i || (item.questionIndex === undefined && item.questionText && q.text && item.questionText.trim() === q.text.trim())
+        );
+        const skippedMatch = skippedItems.find(
+          (item) => item.questionIndex === i || (item.questionIndex === undefined && item.questionText && q.text && item.questionText.trim() === q.text.trim())
+        );
+
+        let type = 'skipped';
+        let userAnswer = 'Not answered';
+        let isAttempted = false;
+
+        if (correctMatch) {
+          type = 'correct';
+          userAnswer = correctMatch.userAnswer || trueCorrectAnswer || 'Correct answer selected';
+          isAttempted = true;
+        } else if (incorrectMatch) {
+          type = 'incorrect';
+          userAnswer = incorrectMatch.userAnswer || 'Not answered';
+          isAttempted = true;
+        } else if (skippedMatch) {
+          type = 'skipped';
+          userAnswer = skippedMatch.userAnswer || 'Not answered';
+          isAttempted = false;
+        }
+
+        return {
+          questionIndex: i,
+          questionText: q.text || '',
+          questionImage: q.questionImage || '',
+          questionType: q.questionType || 'MCQ',
+          leftColumn: q.leftColumn || [],
+          rightColumn: q.rightColumn || [],
+          options: q.options || [],
+          userAnswer,
+          correctAnswer: trueCorrectAnswer || '',
+          type,
+          isAttempted,
+        };
+      });
+    } else {
+      // Fallback if test series or mockTest questions are not found in DB
+      const existingMap = new Map();
+      correctItems.forEach((item) => {
+        const idx = item.questionIndex ?? existingMap.size;
+        existingMap.set(idx, {
+          ...item,
+          questionIndex: idx,
+          type: 'correct',
+          isAttempted: true,
+          correctAnswer: item.correctAnswer || item.userAnswer || '',
+        });
+      });
+      incorrectItems.forEach((item) => {
+        const idx = item.questionIndex ?? existingMap.size;
+        existingMap.set(idx, {
+          ...item,
+          questionIndex: idx,
+          type: 'incorrect',
+          isAttempted: true,
+        });
+      });
+      skippedItems.forEach((item) => {
+        const idx = item.questionIndex ?? existingMap.size;
+        existingMap.set(idx, {
+          ...item,
+          questionIndex: idx,
+          type: 'skipped',
+          isAttempted: false,
+          userAnswer: item.userAnswer || 'Not answered',
+        });
+      });
+
+      // Fill in any gaps up to totalQuestions
+      const totalQ = Math.max(attempt.totalQuestions || 0, existingMap.size);
+      for (let i = 0; i < totalQ; i++) {
+        if (!existingMap.has(i)) {
+          existingMap.set(i, {
+            questionIndex: i,
+            questionText: `Question ${i + 1}`,
+            userAnswer: 'Not answered',
+            correctAnswer: '',
+            questionType: 'MCQ',
+            type: 'skipped',
+            isAttempted: false,
+          });
+        }
+      }
+
+      allQuestionsReview = Array.from(existingMap.values()).sort(
+        (a, b) => (a.questionIndex ?? 0) - (b.questionIndex ?? 0)
+      );
+    }
+
+    const calculatedCorrectCount = allQuestionsReview.filter((q) => q.type === 'correct').length;
+    const calculatedIncorrectCount = allQuestionsReview.filter((q) => q.type === 'incorrect').length;
+    const calculatedSkippedCount = allQuestionsReview.filter((q) => q.type === 'skipped').length;
 
     res.status(200).json({
       success: true,
       attempt: {
         ...attempt,
-        correctCount: correctItems.length,
-        incorrectAnswers: incorrectCount,
-        skippedAnswers: skippedCount,
+        mockTestSeries: series
+          ? {
+              _id: series._id,
+              seriesName: series.seriesName,
+              thumbnail: series.thumbnail,
+            }
+          : attempt.mockTestSeries,
+        totalQuestions: allQuestionsReview.length || attempt.totalQuestions,
+        correctCount: calculatedCorrectCount,
+        incorrectAnswers: calculatedIncorrectCount,
+        skippedAnswers: calculatedSkippedCount,
         allQuestionsReview,
       },
     });
