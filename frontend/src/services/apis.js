@@ -34,6 +34,7 @@ export const profileEndpoints = {
   GET_USER_ENROLLED_COURSES_API: `${BASE_URL}/api/v1/profile/getEnrolledCourses`,
   GET_INSTRUCTOR_DATA_API: `${BASE_URL}/api/v1/profile/instructorDashboard`,
   GET_ATTEMPT_DATA_API: `${BASE_URL}/api/v1/mock/getAttemptsByUser`,
+  GET_ATTEMPT_BY_ID_API: `${BASE_URL}/api/v1/mock/getAttemptById`,
   GET_USER_ENROLLED_MOCK_TESTS_API: `${BASE_URL}/api/v1/profile/getEnrolledMockTests`,
   UPDATE_MOCKTEST_API: `${BASE_URL}/api/v1/mock/updateMockTestSeries`
 }
