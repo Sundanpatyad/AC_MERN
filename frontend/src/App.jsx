@@ -61,6 +61,12 @@ const Cart = lazy(() => import("./components/core/Dashboard/Cart/Cart"));
 const EnrolledCourses = lazy(() =>
   import("./components/core/Dashboard/EnrolledCourses")
 );
+const MyAttempts = lazy(() =>
+  import("./components/core/Dashboard/MyAttempts")
+);
+const AttemptDetail = lazy(() =>
+  import("./components/core/Dashboard/AttemptDetail")
+);
 const AddCourse = lazy(() =>
   import("./components/core/Dashboard/AddCourse/AddCourse")
 );
@@ -290,6 +296,14 @@ function App() {
                     <Route
                       path="dashboard/enrolled-courses"
                       element={<EnrolledCourses />}
+                    />
+                    <Route
+                      path="dashboard/attempts"
+                      element={<MyAttempts />}
+                    />
+                    <Route
+                      path="dashboard/attempts/:attemptId"
+                      element={<AttemptDetail />}
                     />
                   </>
                 )}

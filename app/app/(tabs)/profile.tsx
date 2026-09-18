@@ -34,6 +34,8 @@ export default function ProfileScreen() {
 
   const [purchased, setPurchased] = useState<any[]>([]);
   const [attempts, setAttempts] = useState<any[]>([]);
+  const [totalAttempts, setTotalAttempts] = useState(0);
+  const [averageScoreLabel, setAverageScoreLabel] = useState<string | null>(null);
   const [personalRank, setPersonalRank] = useState<any | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -42,7 +44,9 @@ export default function ProfileScreen() {
     try {
       const [enrolledRes, attemptsRes, ranksRes] = await Promise.all([
         apiConnector.get(endpoints.GET_ENROLLED_MOCK_TESTS).catch(() => null),
-        apiConnector.get(endpoints.GET_USER_ATTEMPTS).catch(() => null),
+        apiConnector
+          .get(endpoints.GET_USER_ATTEMPTS, { params: { page: 1, limit: 10 } })
+          .catch(() => null),
         apiConnector
           .get(endpoints.GET_RANKINGS, { params: { page: 1, limit: 5 } })
           .catch(() => null),
@@ -53,6 +57,14 @@ export default function ProfileScreen() {
       }
       if (attemptsRes?.data?.success) {
         setAttempts(attemptsRes.data.attempts || attemptsRes.data.data || []);
+        setTotalAttempts(
+          attemptsRes.data.user?.totalAttempts ??
+            attemptsRes.data.pagination?.total ??
+            (attemptsRes.data.attempts || []).length
+        );
+        if (attemptsRes.data.user?.averageScore != null) {
+          setAverageScoreLabel(String(attemptsRes.data.user.averageScore));
+        }
       }
       if (ranksRes?.data?.success) {
         setPersonalRank(ranksRes.data.loggedInUserRank?.[0] ?? null);
@@ -80,13 +92,15 @@ export default function ProfileScreen() {
 
     return {
       rank: personalRank?.rank != null ? `#${personalRank.rank}` : '—',
-      attempts: String(attempts.length),
+      attempts: String(totalAttempts),
       avg:
-        scores.length > 0
-          ? `${Math.round(scores.reduce((s, n) => s + n, 0) / scores.length)}%`
-          : '—',
+        averageScoreLabel != null
+          ? averageScoreLabel
+          : scores.length > 0
+            ? `${Math.round(scores.reduce((s, n) => s + n, 0) / scores.length)}%`
+            : '—',
     };
-  }, [attempts, personalRank]);
+  }, [attempts, averageScoreLabel, personalRank, totalAttempts]);
 
   const instructor = isInstructorAccount(user?.accountType);
   const displayName =
@@ -218,7 +232,7 @@ export default function ProfileScreen() {
             <View style={styles.sectionHead}>
               <Text style={styles.sectionTitle}>Purchased mocks</Text>
               {purchased.length > 0 ? (
-                <Pressable onPress={() => router.push('/(tabs)/my-tests')} hitSlop={8}>
+                <Pressable onPress={() => router.push('/(tabs)/mock-tests')} hitSlop={8}>
                   <Text style={styles.sectionLink}>See all</Text>
                 </Pressable>
               ) : null}

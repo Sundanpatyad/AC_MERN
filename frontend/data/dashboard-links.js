@@ -43,11 +43,18 @@ export const sidebarLinks = [
     icon: "VscMortarBoard",
   },
   {
+    id: 9,
+    name: "Attempts",
+    path: "/dashboard/attempts",
+    type: ACCOUNT_TYPE.STUDENT,
+    icon: "VscListOrdered",
+  },
+  {
     id: 6,
     name: "Rankings",
     path: "/rankings",
     type: ACCOUNT_TYPE.STUDENT,
-    icon: "VscHistory",
+    icon: "VscGraph",
   },
   {
     id: 7,

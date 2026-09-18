@@ -18,7 +18,7 @@ const CLIENT_ID = '217412143147-6l1q2l190t36rp0452f3hl5mtl3nrhjq.apps.googleuser
 const store = configureStore({
   reducer: rootReducer,
 });
-
+//Google OAuth Provider
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById('root')).render(

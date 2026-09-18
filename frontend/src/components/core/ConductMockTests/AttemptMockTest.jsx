@@ -284,61 +284,54 @@ const AttemptMockTest = () => {
         let newScore = 0;
         let newCorrectAnswers = [];
         let newIncorrectAnswers = [];
+        let newSkippedAnswers = [];
 
         // Ensure negative marking is a valid positive number for deduction
         const negativeMarking = Math.abs(Number(currentTest.negative) || 0);
 
-        console.group("Score Calculation Debugging");
-        console.log("Negative Marking per wrong answer:", negativeMarking);
-
         currentTest.questions.forEach((question, index) => {
             let trueCorrectAnswer = question.correctAnswer;
-            // Fallback for match questions if correctAnswer isn't directly set (redundant check but safe)
             if (question.questionType === "MATCH" && (!trueCorrectAnswer || String(trueCorrectAnswer).trim() === "") && question.options && question.options.length >= 5) {
                 trueCorrectAnswer = question.options[4];
             }
 
             const userAnswer = userAnswers[index];
-
-            // Normalize for comparison
             const normalizedUserAnswer = userAnswer ? String(userAnswer).trim() : "";
             const normalizedCorrectAnswer = trueCorrectAnswer ? String(trueCorrectAnswer).trim() : "";
 
             const isCorrect = normalizedUserAnswer !== "" && normalizedUserAnswer === normalizedCorrectAnswer;
             const isAttempted = normalizedUserAnswer !== "";
 
-            console.log(`Q${index + 1}: User: "${normalizedUserAnswer}" | Correct: "${normalizedCorrectAnswer}" | Match: ${isCorrect}`);
+            const detail = {
+                questionIndex: index,
+                questionText: question.text || '',
+                userAnswer: isAttempted ? userAnswer : 'Not answered',
+                correctAnswer: trueCorrectAnswer,
+                questionType: question.questionType || 'MCQ',
+                questionImage: question.questionImage || '',
+                leftColumn: question.leftColumn,
+                rightColumn: question.rightColumn,
+            };
 
             if (isCorrect) {
                 newScore += 1;
-                newCorrectAnswers.push({
-                    questionIndex: index,
-                    userAnswer: userAnswer,
-                    correctAnswer: trueCorrectAnswer
-                });
+                newCorrectAnswers.push({ ...detail, type: 'correct' });
             } else if (isAttempted) {
-                // Apply negative marking
                 newScore -= negativeMarking;
-                newIncorrectAnswers.push({
-                    questionIndex: index,
-                    userAnswer: userAnswer,
-                    correctAnswer: trueCorrectAnswer
-                });
-                console.log(`   -> Incorrect. Deducting ${negativeMarking}`);
+                newIncorrectAnswers.push({ ...detail, type: 'incorrect' });
             } else {
-                console.log(`   -> Skipped.`);
+                newSkippedAnswers.push({ ...detail, type: 'skipped' });
             }
         });
-
-        console.log("Final Score:", newScore);
-        console.groupEnd();
 
         return {
             score: newScore,
             correctAnswers: newCorrectAnswers,
             incorrectAnswers: newIncorrectAnswers.length,
             correctAnswerDetails: newCorrectAnswers,
-            incorrectAnswerDetails: newIncorrectAnswers
+            incorrectAnswerDetails: newIncorrectAnswers,
+            skippedAnswers: newSkippedAnswers.length,
+            skippedAnswerDetails: newSkippedAnswers,
         };
     };
 
@@ -352,17 +345,11 @@ const AttemptMockTest = () => {
                     score: scoreData.score,
                     totalQuestions: currentTest.questions.length,
                     timeTaken: currentTest.duration * 60 - timeLeft,
-                    correctAnswers: scoreData.correctAnswerDetails.map(item => ({
-                        questionText: currentTest.questions[item.questionIndex].text,
-                        userAnswer: item.userAnswer,
-                        correctAnswer: item.correctAnswer
-                    })),
+                    correctAnswers: scoreData.correctAnswerDetails,
                     incorrectAnswers: scoreData.incorrectAnswers,
-                    incorrectAnswerDetails: scoreData.incorrectAnswerDetails.map(item => ({
-                        questionText: currentTest.questions[item.questionIndex].text,
-                        userAnswer: item.userAnswer,
-                        correctAnswer: item.correctAnswer
-                    }))
+                    incorrectAnswerDetails: scoreData.incorrectAnswerDetails,
+                    skippedAnswers: scoreData.skippedAnswers,
+                    skippedAnswerDetails: scoreData.skippedAnswerDetails,
                 },
                 {
                     headers: { Authorization: `Bearer ${token}` }

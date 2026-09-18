@@ -14,7 +14,7 @@ const {
     updateNegativeMarking,
     getMockTestById
 } = require('../controllers/mockTestSeries');
-const { createAttempt, getAttemptsByUser, getRankings, getUserRankingByName, getAllAttemptedTestNames } = require('../controllers/attemptDetails');
+const { createAttempt, getAttemptsByUser, getAttemptById, getRankings, getUserRankingByName, getAllAttemptedTestNames } = require('../controllers/attemptDetails');
 
 // Mock test series routes
 router.post('/createMockTestSeries', auth, isInstructor, createMockTestSeries);
@@ -36,6 +36,7 @@ router.get('/series/:seriesId/mocktest/:mockTestId', auth, getMockTestById);
 
 // Attempt routes
 router.get('/getAttemptsByUser', auth, getAttemptsByUser);
+router.get('/getAttemptById/:attemptId', auth, getAttemptById);
 router.post('/createAttemptDetails', auth, createAttempt);
 router.get('/getRankings', auth, getRankings);
 router.get('/getRankingByName', auth, getUserRankingByName);

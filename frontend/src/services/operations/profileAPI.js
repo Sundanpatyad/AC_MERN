@@ -4,7 +4,7 @@ import { apiConnector } from "../apiConnector"
 import { profileEndpoints } from "../apis"
 import { logout } from "./authAPI"
 
-const { GET_USER_DETAILS_API, GET_USER_ENROLLED_COURSES_API, GET_INSTRUCTOR_DATA_API, GET_ATTEMPT_DATA_API, GET_USER_ENROLLED_MOCK_TESTS_API , UPDATE_MOCKTEST_API} = profileEndpoints
+const { GET_USER_DETAILS_API, GET_USER_ENROLLED_COURSES_API, GET_INSTRUCTOR_DATA_API, GET_ATTEMPT_DATA_API, GET_ATTEMPT_BY_ID_API, GET_USER_ENROLLED_MOCK_TESTS_API , UPDATE_MOCKTEST_API} = profileEndpoints
 
 
 // ================ get User Details  ================
@@ -77,8 +77,8 @@ export async function getUserEnrolledMockTests(token) {
   return result
 }
 
-export async function getUserAttempts(token) {
-  let result = []
+export async function getUserAttempts(token, { page = 1, limit = 10 } = {}) {
+  let result = null
   try {
     const response = await apiConnector(
       "GET",
@@ -86,18 +86,38 @@ export async function getUserAttempts(token) {
       null,
       {
         Authorization: `Bearer ${token}`,
-      }
+      },
+      { page, limit }
     )
-
-    //console.log("GET_USER_ATTEMPTS_API API RESPONSE............", response)
 
     if (!response.data.success) {
       throw new Error(response.data.message)
     }
     result = response.data
   } catch (error) {
-    //console.log("GET_USER_ATTEMPTS_API API ERROR............", error)
     toast.error("Couldn't load attempts")
+  }
+  return result
+}
+
+export async function getAttemptById(token, attemptId) {
+  let result = null
+  try {
+    const response = await apiConnector(
+      "GET",
+      `${GET_ATTEMPT_BY_ID_API}/${attemptId}`,
+      null,
+      {
+        Authorization: `Bearer ${token}`,
+      }
+    )
+
+    if (!response.data.success) {
+      throw new Error(response.data.message)
+    }
+    result = response.data.attempt
+  } catch (error) {
+    toast.error(error.message || "Couldn't load attempt details")
   }
   return result
 }
