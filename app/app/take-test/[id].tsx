@@ -331,6 +331,7 @@ export default function TakeTestScreen() {
           questionType: q.questionType,
           leftColumn: q.leftColumn,
           rightColumn: q.rightColumn,
+          options: q.options || [],
           questionImage: q.questionImage,
         };
 
