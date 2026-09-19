@@ -8,6 +8,7 @@ import {
   FlatList,
   ActivityIndicator,
   ListRenderItem,
+  ScrollView,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -46,6 +47,7 @@ type ReviewItem = {
   questionType?: string;
   leftColumn?: string[];
   rightColumn?: string[];
+  options?: any[];
   questionImage?: string;
 };
 
@@ -163,6 +165,67 @@ function ReviewBlock({
         </View>
       ) : null}
 
+      {Array.isArray(item.options) && item.options.length > 0 ? (
+        <View style={styles.optionsList}>
+          {item.options
+            .slice(0, item.questionType === 'MATCH' ? 4 : item.options.length)
+            .map((opt: any, optIdx: number) => {
+              const optText = typeof opt === 'string' ? opt : opt?.text || '';
+              const optLabel = String.fromCharCode(65 + optIdx);
+              const isUserChoice =
+                item.type !== 'skipped' &&
+                item.userAnswer &&
+                (String(item.userAnswer).trim() === String(optText).trim() ||
+                  String(item.userAnswer).trim() === String(optIdx));
+              const isRightChoice =
+                item.correctAnswer &&
+                (String(item.correctAnswer).trim() === String(optText).trim() ||
+                  String(item.correctAnswer).trim() === String(optIdx));
+
+              const borderColor = isRightChoice
+                ? GREEN
+                : isUserChoice
+                  ? RED
+                  : colors.border;
+              const bgColor = isRightChoice
+                ? `${GREEN}15`
+                : isUserChoice
+                  ? `${RED}15`
+                  : colors.surface;
+
+              return (
+                <View
+                  key={optIdx}
+                  style={[styles.optionRow, { borderColor, backgroundColor: bgColor }]}
+                >
+                  <View
+                    style={[
+                      styles.optBadge,
+                      {
+                        backgroundColor: isRightChoice
+                          ? GREEN
+                          : isUserChoice
+                            ? RED
+                            : colors.border,
+                      },
+                    ]}
+                  >
+                    <Text style={styles.optBadgeText}>{optLabel}</Text>
+                  </View>
+                  <Text style={[styles.optText, { color: colors.text }]} numberOfLines={3}>
+                    {optText}
+                  </Text>
+                  {isRightChoice ? (
+                    <Text style={[styles.choiceTag, { color: GREEN }]}>Correct</Text>
+                  ) : isUserChoice ? (
+                    <Text style={[styles.choiceTag, { color: RED }]}>Your answer</Text>
+                  ) : null}
+                </View>
+              );
+            })}
+        </View>
+      ) : null}
+
       <View style={styles.answers}>
         <AnswerPane
           label="Your answer"
@@ -241,9 +304,27 @@ export default function AttemptDetailScreen() {
     ].sort((a, b) => (a.questionIndex ?? 0) - (b.questionIndex ?? 0));
   }, [attempt]);
 
+  const [filter, setFilter] = useState<'all' | 'attempted' | 'correct' | 'incorrect' | 'unattempted'>('all');
+
+  const filteredItems = useMemo(() => {
+    if (filter === 'attempted') {
+      return allItems.filter((item) => item.type === 'correct' || item.type === 'incorrect');
+    }
+    if (filter === 'correct') {
+      return allItems.filter((item) => item.type === 'correct');
+    }
+    if (filter === 'incorrect') {
+      return allItems.filter((item) => item.type === 'incorrect');
+    }
+    if (filter === 'unattempted') {
+      return allItems.filter((item) => item.type === 'skipped');
+    }
+    return allItems;
+  }, [allItems, filter]);
+
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
-  }, [allItems.length, attempt?._id]);
+  }, [allItems.length, attempt?._id, filter]);
 
   const correctCount =
     attempt?.correctCount ?? allItems.filter((item) => item.type === 'correct').length;
@@ -255,23 +336,23 @@ export default function AttemptDetailScreen() {
     allItems.filter((item) => item.type === 'skipped').length;
 
   const score = Number(attempt?.score) || 0;
-  const totalQuestions = Number(attempt?.totalQuestions) || 0;
+  const totalQuestions = Number(attempt?.totalQuestions) || allItems.length;
   const pct = totalQuestions > 0 ? Math.round((Math.max(0, score) / totalQuestions) * 100) : 0;
 
   const visibleItems = useMemo(
-    () => allItems.slice(0, visibleCount),
-    [allItems, visibleCount]
+    () => filteredItems.slice(0, visibleCount),
+    [filteredItems, visibleCount]
   );
-  const hasMore = visibleCount < allItems.length;
+  const hasMore = visibleCount < filteredItems.length;
 
   const loadMore = useCallback(() => {
     if (loadingMore || !hasMore) return;
     setLoadingMore(true);
     requestAnimationFrame(() => {
-      setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, allItems.length));
+      setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, filteredItems.length));
       setLoadingMore(false);
     });
-  }, [allItems.length, hasMore, loadingMore]);
+  }, [filteredItems.length, hasMore, loadingMore]);
 
   const bars = useMemo(
     () => [
@@ -349,13 +430,53 @@ export default function AttemptDetailScreen() {
         </View>
 
         {allItems.length > 0 ? (
-          <View style={[styles.sectionPad, styles.listHeadingPad]}>
-            <SectionHeading
-              title="All questions"
-              subtitle={`${correctCount} correct · ${incorrectCount} incorrect · ${skippedCount} skipped`}
-              compact
-            />
-          </View>
+          <>
+            <View style={[styles.sectionPad, styles.listHeadingPad]}>
+              <SectionHeading
+                title="All questions"
+                subtitle={`${correctCount} correct · ${incorrectCount} incorrect · ${skippedCount} not attempted`}
+                compact
+              />
+            </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.filterTabsRow}
+            >
+              {[
+                { key: 'all' as const, label: 'All', count: allItems.length },
+                {
+                  key: 'attempted' as const,
+                  label: 'Attempted',
+                  count: correctCount + incorrectCount,
+                },
+                { key: 'correct' as const, label: 'Correct', count: correctCount },
+                { key: 'incorrect' as const, label: 'Incorrect', count: incorrectCount },
+                { key: 'unattempted' as const, label: 'Not Attempted', count: skippedCount },
+              ].map((tab) => {
+                const active = filter === tab.key;
+                return (
+                  <Pressable
+                    key={tab.key}
+                    onPress={() => setFilter(tab.key)}
+                    style={[
+                      styles.filterTab,
+                      active && { backgroundColor: BRAND, borderColor: BRAND },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.filterTabText,
+                        active && { color: '#FFF' },
+                      ]}
+                    >
+                      {tab.label} ({tab.count})
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          </>
         ) : (
           <Text style={styles.emptyReview}>
             Detailed answers were not saved for this older attempt. New attempts will show full
@@ -675,6 +796,63 @@ function createStyles(colors: AppPalette) {
       fontFamily: Fonts.sans,
       color: colors.textMuted,
       lineHeight: 22,
+    },
+    filterTabsRow: {
+      flexDirection: 'row',
+      gap: 8,
+      paddingHorizontal: H_PAD,
+      paddingTop: 8,
+      paddingBottom: 10,
+    },
+    filterTab: {
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: Radii.pill,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+    },
+    filterTabText: {
+      fontSize: 12,
+      fontFamily: Fonts.medium,
+      color: colors.textSecondary,
+    },
+    optionsList: {
+      gap: 6,
+      paddingTop: 4,
+    },
+    optionRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      paddingVertical: 8,
+      paddingHorizontal: 10,
+      borderRadius: Radii.md,
+      borderWidth: 1,
+    },
+    optBadge: {
+      width: 20,
+      height: 20,
+      borderRadius: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    optBadgeText: {
+      fontSize: 10,
+      fontFamily: Fonts.semiBold,
+      color: '#FFFFFF',
+    },
+    optText: {
+      flex: 1,
+      fontSize: 13,
+      fontFamily: Fonts.sans,
+      lineHeight: 18,
+    },
+    choiceTag: {
+      fontSize: 10,
+      fontFamily: Fonts.semiBold,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
     },
     footer: {
       paddingHorizontal: H_PAD,
