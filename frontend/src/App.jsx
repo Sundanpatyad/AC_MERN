@@ -16,6 +16,7 @@ import AdminCountMock from "./components/core/Admin/MockCountAdmin";
 import PrivacyPolicy from "./pages/PrivicyPolicy";
 import CookiePolicy from "./pages/CookiePolicy";
 import TermsOfService from "./pages/Terms";
+import DeleteAccountPage from "./pages/DeleteAccount";
 import { useTokenExpiry } from "./hooks/useTokenExpiry";
 import { enablePushNotifications, listenForForegroundMessages } from "./services/pushNotifications";
 import { resumePendingPayment } from "./services/operations/studentFeaturesAPI";
@@ -218,6 +219,7 @@ function App() {
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/cookie-policy" element={<CookiePolicy />} />
               <Route path="/terms" element={<TermsOfService />} />
+              <Route path="/delete-account" element={<DeleteAccountPage />} />
               <Route path="/about" element={<About />} />
               <Route path="/rankings" element={<RankingsPage />} />
               <Route path="/rankings/:testName" element={<RankingsPage />} />

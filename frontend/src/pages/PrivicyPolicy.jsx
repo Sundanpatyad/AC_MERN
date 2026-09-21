@@ -45,7 +45,7 @@ export default function PrivacyPolicy() {
 
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">5. Your Rights and Choices</h2>
-          <p className="mb-4">You have the right to access, correct, or delete your personal information. You can also opt out of receiving marketing communications from us at any time.</p>
+          <p className="mb-4">You have the right to access, correct, or delete your personal information. You can also opt out of receiving marketing communications from us at any time. To delete your Awakening Classes account, follow the steps at <Link to="/delete-account">awakeningclasses.in/delete-account</Link>.</p>
         </section>
 
         <section className="mb-8">

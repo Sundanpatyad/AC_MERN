@@ -3,6 +3,8 @@ const User = require('../models/user');
 const CourseProgress = require('../models/courseProgress')
 const Course = require('../models/course')
 const mongoose = require('mongoose');
+const AttemptDetails = require('../models/attemptDetails');
+const AppUsageDay = require('../models/appUsageDay');
 
 const { uploadImageToCloudinary, deleteResourceFromCloudinary } = require('../utils/imageUploader');
 const { convertSecondsToDuration } = require('../utils/secToDuration');
@@ -96,6 +98,14 @@ exports.deleteAccount = async (req, res) => {
                 { $pull: { studentsEnrolled: userId } }
             )
         }
+
+        await MockTestSeries.updateMany(
+            { studentsEnrolled: userId },
+            { $pull: { studentsEnrolled: userId } }
+        );
+        await AttemptDetails.deleteMany({ user: userId });
+        await AppUsageDay.deleteMany({ user: userId });
+        await CourseProgress.deleteMany({ userId });
 
         // first - delete profie (profileDetails)
         await Profile.findByIdAndDelete(userDetails.additionalDetails);
