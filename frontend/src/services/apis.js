@@ -16,6 +16,7 @@ export const studyMaterialEndPoints = {
   DELETE_STUDY_MATERIALS: `${BASE_URL}/api/v1/materials/deleteStudyMaterial`,
   ADMIN_MOCK_LIST: `${BASE_URL}/api/v1/admin/users-by-mock-test`,
   ADMIN_MOCK_PURCHASERS: `${BASE_URL}/api/v1/admin/users-by-mock-test`,
+  ADMIN_APP_USAGE: `${BASE_URL}/api/v1/usage/admin`,
 
 }
 

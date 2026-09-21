@@ -18,6 +18,7 @@ const adminRoutes = require("./routes/adminRoutes");
 const materialRoutes = require('./routes/studyMaterialsRoutes');
 const uploadRoutes = require('./routes/upload');
 const notificationRoutes = require('./routes/notifications');
+const usageRoutes = require('./routes/appUsage');
 const { initFirebaseAdmin } = require('./config/firebase');
 
 const app = express();
@@ -75,6 +76,7 @@ app.use('/api/v1/materials', materialRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/upload', uploadRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
+app.use('/api/v1/usage', usageRoutes);
 
 /* =========================
    HEALTH / DEFAULT ROUTE

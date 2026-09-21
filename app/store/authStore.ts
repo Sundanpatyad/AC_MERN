@@ -49,6 +49,12 @@ export const useAuthStore = create<AuthState>((set) => ({
   setLoading: (isLoading) => set({ isLoading }),
   logout: async () => {
     try {
+      const { stopAppUsageTracking } = await import('../services/appUsage');
+      await stopAppUsageTracking();
+    } catch {
+      // Usage tracking is best-effort
+    }
+    try {
       const { disablePushNotifications } = await import('../services/pushNotifications');
       await disablePushNotifications();
     } catch {

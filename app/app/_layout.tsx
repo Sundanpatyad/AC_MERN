@@ -2,7 +2,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Text, TextInput } from 'react-native';
 import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-context';
 import 'react-native-reanimated';
@@ -83,6 +83,26 @@ function RootNavigator() {
     if (!token || !appReady) return;
     import('../services/pushNotifications')
       .then(({ enablePushNotifications }) => enablePushNotifications())
+      .catch(() => {});
+  }, [token, appReady]);
+
+  // Login vs later-day app-open tracking for admin tester activity
+  const previousTokenRef = useRef<string | null | undefined>(undefined);
+  useEffect(() => {
+    if (!appReady) return;
+    const previous = previousTokenRef.current;
+    previousTokenRef.current = token;
+
+    import('../services/appUsage')
+      .then(({ startAppUsageTracking, stopAppUsageTracking }) => {
+        if (!token) {
+          stopAppUsageTracking();
+          return;
+        }
+        // Hydrate with an existing session = open. Fresh sign-in (null → token) = login.
+        const eventType = previous === null ? 'login' : 'open';
+        startAppUsageTracking(eventType);
+      })
       .catch(() => {});
   }, [token, appReady]);
 

@@ -12,6 +12,7 @@ import { useTheme } from '../../providers/AppThemeProvider';
 
 const PAGES = [
   { icon: 'grid-outline', label: 'Dashboard', route: '/admin/dashboard' },
+  { icon: 'people-outline', label: 'Tester activity', route: '/admin/tester-activity' },
   { icon: 'stats-chart-outline', label: 'Admin Console', route: '/(tabs)' },
   { icon: 'document-text-outline', label: 'My Tests', route: '/(tabs)/mock-tests' },
   { icon: 'add-circle-outline', label: 'Create Mock Test', route: '/admin/create-series' },
