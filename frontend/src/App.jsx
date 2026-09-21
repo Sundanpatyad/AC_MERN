@@ -57,6 +57,9 @@ const Instructor = lazy(() => import("./components/core/Dashboard/Instructor"));
 const SendNotification = lazy(() =>
   import("./components/core/Dashboard/SendNotification")
 );
+const AppUsage = lazy(() =>
+  import("./components/core/Dashboard/AppUsage")
+);
 const Cart = lazy(() => import("./components/core/Dashboard/Cart/Cart"));
 const EnrolledCourses = lazy(() =>
   import("./components/core/Dashboard/EnrolledCourses")
@@ -336,6 +339,10 @@ function App() {
                     <Route
                       path="dashboard/send-notification"
                       element={<SendNotification />}
+                    />
+                    <Route
+                      path="dashboard/tester-activity"
+                      element={<AppUsage />}
                     />
                     <Route
                       path="/createStudyMaterial"

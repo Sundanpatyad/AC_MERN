@@ -64,6 +64,13 @@ export const sidebarLinks = [
     icon: "VscBell",
   },
   {
+    id: 10,
+    name: "Tester Activity",
+    path: "/dashboard/tester-activity",
+    type: ACCOUNT_TYPE.INSTRUCTOR,
+    icon: "VscHistory",
+  },
+  {
     id: 8,
     name: "Admin Console",
     path: "/adminMockTest",

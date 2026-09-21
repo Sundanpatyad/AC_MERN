@@ -15,6 +15,7 @@ const SKIP_LOGOUT_ON_401 = [
   '/api/v1/auth/reset-password-token',
   '/api/v1/auth/reset-password',
   '/api/v1/auth/changepassword',
+  '/api/v1/usage/session/',
 ];
 
 let isHandlingUnauthorized = false;

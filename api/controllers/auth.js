@@ -212,7 +212,8 @@ exports.signup = async (req, res) => {
 // ================ LOGIN ================
 exports.login = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const email = String(req.body?.email || '').trim().toLowerCase();
+        const password = String(req.body?.password || '');
 
         // validation
         if (!email || !password) {
@@ -232,6 +233,12 @@ exports.login = async (req, res) => {
             });
         }
 
+        if (!user.password) {
+            return res.status(401).json({
+                success: false,
+                message: 'This account uses Google Sign-In. Continue with Google instead.'
+            });
+        }
 
         // comapare given password and saved password from DB
         if (await bcrypt.compare(password, user.password)) {

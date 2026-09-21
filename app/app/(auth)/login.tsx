@@ -2,12 +2,15 @@ import React, { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNativeBottomInset } from '../../lib/safeArea';
@@ -15,22 +18,63 @@ import * as Haptics from 'expo-haptics';
 
 import { MeshHero } from '../../components/ui/MeshHero';
 import { BrandLogo } from '../../components/ui/BrandLogo';
+import { Input } from '../../components/ui/Input';
 import { showMessage } from '../../providers/DialogProvider';
 import { useTheme } from '../../providers/AppThemeProvider';
 import { AppPalette, Fonts, Type } from '../../constants/theme';
+import { loginWithPassword } from '../../services/emailAuth';
+
+type Busy = 'email' | 'google' | null;
 
 export default function LoginScreen() {
-  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [busy, setBusy] = useState<Busy>(null);
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const bottomInset = useNativeBottomInset();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
-  const onGoogle = async () => {
-    if (isLoading) return;
+  const onEmailLogin = async () => {
+    if (busy) return;
+    const trimmed = email.trim();
+    if (!trimmed || !password) {
+      await showMessage({
+        title: 'Missing details',
+        message: 'Enter email and password to continue.',
+      });
+      return;
+    }
+
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
-    setIsLoading(true);
+    setBusy('email');
+    try {
+      const result = await loginWithPassword(trimmed, password);
+      if (result.success) {
+        router.replace('/(tabs)');
+        return;
+      }
+      await showMessage({
+        title: 'Sign in failed',
+        message: result.message || 'Check your email and password.',
+        tone: 'danger',
+      });
+    } catch (error: any) {
+      await showMessage({
+        title: 'Sign in failed',
+        message: error?.response?.data?.message || error?.message || 'Could not sign in.',
+        tone: 'danger',
+      });
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const onGoogle = async () => {
+    if (busy) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+    setBusy('google');
     try {
       const googleAuth = await import('../../services/googleAuth');
       const imported = googleAuth as {
@@ -46,7 +90,7 @@ export default function LoginScreen() {
       if (typeof handleGoogleLogin !== 'function') {
         await showMessage({
           title: 'Sign in unavailable',
-          message: 'Google Sign-In is not available. Use a development build, not Expo Go.',
+          message: 'Google Sign-In is not available. Use email and password, or a development build.',
           tone: 'danger',
         });
         return;
@@ -77,92 +121,125 @@ export default function LoginScreen() {
         tone: 'danger',
       });
     } finally {
-      setIsLoading(false);
+      setBusy(null);
     }
   };
 
   return (
     <View style={styles.root}>
       <StatusBar style={colors.statusBarStyle} />
-
-      <MeshHero
-        fadeTo={colors.background}
-        divided={false}
-        style={{ paddingTop: insets.top + 16, paddingBottom: 28 }}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <View style={styles.brandRow}>
-          <BrandLogo size={36} />
-          <Text style={styles.brand}>Awakening Classes</Text>
-        </View>
-        <Text style={styles.headline}>
-          Learn more.{'\n'}
-          <Text style={styles.headlineMuted}>Achieve more.</Text>
-        </Text>
-      </MeshHero>
-
-      <View style={styles.body}>
-        <View style={styles.mock} pointerEvents="none">
-          <View style={styles.mockTop}>
-            <Text style={styles.mockMeta}>Full Mock · Q 12 / 100</Text>
-            <Text style={styles.mockTimer}>29:41</Text>
-          </View>
-          <Text style={styles.mockQuestion}>If x² + 5x + 6 = 0, the roots are</Text>
-          {[
-            { label: 'A', text: '−2 and −3', selected: true },
-            { label: 'B', text: '−1 and −6', selected: false },
-            { label: 'C', text: '2 and 3', selected: false },
-            { label: 'D', text: '1 and 6', selected: false },
-          ].map((option) => (
-            <View
-              key={option.label}
-              style={[styles.mockOption, option.selected && styles.mockOptionOn]}
-            >
-              <View style={[styles.mockRadio, option.selected && styles.mockRadioOn]}>
-                <Text style={[styles.mockLabel, option.selected && styles.mockLabelOn]}>
-                  {option.label}
-                </Text>
-              </View>
-              <Text style={[styles.mockOptionText, option.selected && styles.mockOptionTextOn]}>
-                {option.text}
-              </Text>
-            </View>
-          ))}
-        </View>
-
-        <View style={[styles.actions, { paddingBottom: bottomInset + 16 }]}>
-          <Pressable
-            onPress={onGoogle}
-            disabled={isLoading}
-            accessibilityRole="button"
-            accessibilityLabel="Login with Google"
-            style={({ pressed }) => [
-              styles.cta,
-              { opacity: isLoading ? 0.72 : pressed ? 0.9 : 1 },
-            ]}
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: bottomInset + 16 }}
+        >
+          <MeshHero
+            fadeTo={colors.background}
+            divided={false}
+            style={{ paddingTop: insets.top + 16, paddingBottom: 24 }}
           >
-            {isLoading ? (
-              <ActivityIndicator color={colors.primaryButtonText} />
-            ) : (
-              <>
-                <View style={styles.googleMark}>
-                  <Image
-                    source={require('../../assets/images/google-g.png')}
-                    style={styles.googleIcon}
-                    resizeMode="contain"
-                  />
-                </View>
-                <Text style={styles.ctaText}>Login with Google</Text>
-              </>
-            )}
-          </Pressable>
+            <View style={styles.brandRow}>
+              <BrandLogo size={36} />
+              <Text style={styles.brand}>Awakening Classes</Text>
+            </View>
+            <Text style={styles.headline}>
+              Learn more.{'\n'}
+              <Text style={styles.headlineMuted}>Achieve more.</Text>
+            </Text>
+          </MeshHero>
 
-          <Text style={styles.footer}>
-            By continuing you confirm that you agree to our{' '}
-            <Text style={styles.footerLink}>Terms of Use</Text> and{' '}
-            <Text style={styles.footerLink}>Privacy Policy</Text>.
-          </Text>
-        </View>
-      </View>
+          <View style={styles.body}>
+            <Input
+              label="Email"
+              placeholder="you@email.com"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="email"
+              textContentType="username"
+              value={email}
+              onChangeText={setEmail}
+              returnKeyType="next"
+            />
+            <Input
+              label="Password"
+              placeholder="Password"
+              isPassword
+              autoCapitalize="none"
+              autoComplete="password"
+              textContentType="password"
+              value={password}
+              onChangeText={setPassword}
+              returnKeyType="done"
+              onSubmitEditing={onEmailLogin}
+            />
+
+            <Link href="/(auth)/forgot-password" asChild>
+              <Pressable hitSlop={8} style={styles.forgotWrap}>
+                <Text style={styles.forgot}>Forgot password?</Text>
+              </Pressable>
+            </Link>
+
+            <Pressable
+              onPress={onEmailLogin}
+              disabled={!!busy}
+              accessibilityRole="button"
+              accessibilityLabel="Log in"
+              style={({ pressed }) => [
+                styles.cta,
+                { opacity: busy === 'email' ? 0.72 : pressed ? 0.9 : 1 },
+              ]}
+            >
+              {busy === 'email' ? (
+                <ActivityIndicator color={colors.primaryButtonText} />
+              ) : (
+                <Text style={styles.ctaText}>Log in</Text>
+              )}
+            </Pressable>
+
+            <View style={styles.dividerRow}>
+              <View style={styles.divider} />
+              <Text style={styles.dividerText}>or</Text>
+              <View style={styles.divider} />
+            </View>
+
+            <Pressable
+              onPress={onGoogle}
+              disabled={!!busy}
+              accessibilityRole="button"
+              accessibilityLabel="Login with Google"
+              style={({ pressed }) => [
+                styles.googleBtn,
+                { opacity: busy === 'google' ? 0.72 : pressed ? 0.9 : 1 },
+              ]}
+            >
+              {busy === 'google' ? (
+                <ActivityIndicator color={colors.text} />
+              ) : (
+                <>
+                  <View style={styles.googleMark}>
+                    <Image
+                      source={require('../../assets/images/google-g.png')}
+                      style={styles.googleIcon}
+                      resizeMode="contain"
+                    />
+                  </View>
+                  <Text style={styles.googleText}>Continue with Google</Text>
+                </>
+              )}
+            </Pressable>
+
+            <Text style={styles.footer}>
+              By continuing you confirm that you agree to our{' '}
+              <Text style={styles.footerLink}>Terms of Use</Text> and{' '}
+              <Text style={styles.footerLink}>Privacy Policy</Text>.
+            </Text>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
@@ -197,85 +274,51 @@ function createStyles(colors: AppPalette) {
     body: {
       flex: 1,
       paddingHorizontal: 24,
-      justifyContent: 'space-between',
+      paddingTop: 8,
     },
-    mock: {
-      backgroundColor: colors.surface,
-      borderRadius: 20,
-      padding: 16,
-      borderWidth: 1,
-      borderColor: colors.border,
+    forgotWrap: {
+      alignSelf: 'flex-end',
+      marginBottom: 14,
+      marginTop: 2,
     },
-    mockTop: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: 12,
-    },
-    mockMeta: {
-      color: colors.textSecondary,
-      fontSize: 12,
-      fontFamily: Fonts.medium,
-    },
-    mockTimer: {
-      color: colors.text,
+    forgot: {
       fontSize: 13,
-      fontFamily: Fonts.semiBold,
-    },
-    mockQuestion: {
-      color: colors.text,
-      fontSize: 16,
-      lineHeight: 22,
-      fontFamily: Fonts.semiBold,
-      marginBottom: 12,
-    },
-    mockOption: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 10,
-      minHeight: 40,
-      borderRadius: 12,
-      paddingHorizontal: 10,
-      marginBottom: 6,
-      backgroundColor: colors.surfaceRaised,
-    },
-    mockOptionOn: {
-      backgroundColor: colors.text,
-    },
-    mockRadio: {
-      width: 22,
-      height: 22,
-      borderRadius: 11,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: colors.border,
-    },
-    mockRadioOn: {
-      backgroundColor: colors.background,
-    },
-    mockLabel: {
-      fontSize: 11,
-      fontFamily: Fonts.semiBold,
-      color: colors.textSecondary,
-    },
-    mockLabelOn: {
-      color: colors.text,
-    },
-    mockOptionText: {
-      fontSize: 14,
       fontFamily: Fonts.medium,
-      color: colors.text,
-    },
-    mockOptionTextOn: {
-      color: colors.primaryButtonText,
-    },
-    actions: {
-      paddingTop: 16,
+      color: colors.textSecondary,
     },
     cta: {
       height: 56,
       borderRadius: 999,
       backgroundColor: colors.text,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    ctaText: {
+      ...Type.button,
+      color: colors.primaryButtonText,
+    },
+    dividerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      marginVertical: 18,
+    },
+    divider: {
+      flex: 1,
+      height: StyleSheet.hairlineWidth,
+      backgroundColor: colors.border,
+    },
+    dividerText: {
+      fontSize: 12,
+      fontFamily: Fonts.medium,
+      color: colors.textMuted,
+    },
+    googleBtn: {
+      height: 52,
+      borderRadius: 999,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
@@ -293,9 +336,9 @@ function createStyles(colors: AppPalette) {
       width: 16,
       height: 16,
     },
-    ctaText: {
+    googleText: {
       ...Type.button,
-      color: colors.primaryButtonText,
+      color: colors.text,
     },
     footer: {
       ...Type.caption,

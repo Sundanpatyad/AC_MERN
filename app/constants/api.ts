@@ -49,6 +49,10 @@ export const endpoints = {
   ADD_SERIES_ATTACHMENTS: `${BASE_URL}/api/v1/mock/series`,
   ADMIN_MOCK_LIST: `${BASE_URL}/api/v1/admin/users-by-mock-test`,
   ADMIN_MOCK_PURCHASERS: `${BASE_URL}/api/v1/admin/users-by-mock-test`,
+  USAGE_SESSION_START: `${BASE_URL}/api/v1/usage/session/start`,
+  USAGE_SESSION_HEARTBEAT: `${BASE_URL}/api/v1/usage/session/heartbeat`,
+  USAGE_SESSION_END: `${BASE_URL}/api/v1/usage/session/end`,
+  ADMIN_APP_USAGE: `${BASE_URL}/api/v1/usage/admin`,
 
   // Study materials
   GET_EXAMS: `${BASE_URL}/api/v1/materials/getExam`,
