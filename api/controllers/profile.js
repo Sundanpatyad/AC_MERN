@@ -17,7 +17,7 @@ const { MockTestSeries } = require('../models/mockTestSeries');
 exports.updateProfile = async (req, res) => {
     try {
         // extract data
-        const { gender = '', dateOfBirth = "", about = "", contactNumber = '', firstName, lastName } = req.body;
+        const { about = "", contactNumber = '', firstName, lastName } = req.body;
 
         // extract userId
         const userId = req.user.id;
@@ -35,8 +35,8 @@ exports.updateProfile = async (req, res) => {
         userDetails.lastName = lastName;
         await userDetails.save()
 
-        profileDetails.gender = gender;
-        profileDetails.dateOfBirth = dateOfBirth;
+        if (req.body.gender !== undefined) profileDetails.gender = req.body.gender;
+        if (req.body.dateOfBirth !== undefined) profileDetails.dateOfBirth = req.body.dateOfBirth;
         profileDetails.about = about;
         profileDetails.contactNumber = contactNumber;
 

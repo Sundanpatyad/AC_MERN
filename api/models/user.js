@@ -56,6 +56,12 @@ const userSchema = new mongoose.Schema(
         ref: 'PdfMaterial'
       }
     ],
+    studyExams: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'PdfExam'
+      }
+    ],
     attempts: [
       {
         type: mongoose.Schema.Types.ObjectId,
