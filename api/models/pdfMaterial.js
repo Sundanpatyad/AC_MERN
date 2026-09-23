@@ -5,6 +5,10 @@ const pdfMaterialSchema = new mongoose.Schema(
     title: { type: String, required: true, trim: true },
     description: { type: String, default: '', trim: true },
     category: { type: String, required: true, trim: true },
+    exam: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'PdfExam',
+    },
     access: { type: String, enum: ['free', 'paid'], default: 'free' },
     price: { type: Number, default: 0, min: 0 },
     cloudinaryPublicId: { type: String, required: true },
@@ -27,6 +31,7 @@ const pdfMaterialSchema = new mongoose.Schema(
 );
 
 pdfMaterialSchema.index({ category: 1, createdAt: -1 });
+pdfMaterialSchema.index({ exam: 1, title: 1 });
 pdfMaterialSchema.index({ mockTests: 1 });
 
 module.exports = mongoose.model('PdfMaterial', pdfMaterialSchema);

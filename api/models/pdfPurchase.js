@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const pdfPurchaseSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    pdf: { type: mongoose.Schema.Types.ObjectId, ref: 'PdfMaterial', required: true },
+    pdf: { type: mongoose.Schema.Types.ObjectId, ref: 'PdfMaterial' },
+    exam: { type: mongoose.Schema.Types.ObjectId, ref: 'PdfExam' },
     razorpayOrderId: { type: String, required: true, unique: true },
     razorpayPaymentId: { type: String, default: '' },
     amount: { type: Number, required: true },
