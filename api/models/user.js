@@ -50,6 +50,12 @@ const userSchema = new mongoose.Schema(
         ref: 'MockTestSeries'
       }
     ],
+    studyPdfs: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'PdfMaterial'
+      }
+    ],
     attempts: [
       {
         type: mongoose.Schema.Types.ObjectId,
