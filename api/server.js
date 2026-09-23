@@ -19,6 +19,8 @@ const materialRoutes = require('./routes/studyMaterialsRoutes');
 const uploadRoutes = require('./routes/upload');
 const notificationRoutes = require('./routes/notifications');
 const usageRoutes = require('./routes/appUsage');
+const pdfRoutes = require('./routes/pdfMaterial');
+const youtubeRoutes = require('./routes/youtube');
 const { initFirebaseAdmin } = require('./config/firebase');
 
 const app = express();
@@ -40,7 +42,7 @@ app.use(
   cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-AC-Viewer'],
   })
 );
 app.options('*', cors({ origin: '*' }));
@@ -50,7 +52,7 @@ app.use(fileUpload({
   useTempFiles: true,
   tempFileDir: '/tmp',
   limits: {
-    fileSize: 15 * 1024 * 1024, // 15 MB
+    fileSize: 40 * 1024 * 1024, // 40 MB — study PDFs
   },
 }));
 
@@ -77,6 +79,8 @@ app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/upload', uploadRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/usage', usageRoutes);
+app.use('/api/v1/pdfs', pdfRoutes);
+app.use('/api/v1/youtube', youtubeRoutes);
 
 /* =========================
    HEALTH / DEFAULT ROUTE

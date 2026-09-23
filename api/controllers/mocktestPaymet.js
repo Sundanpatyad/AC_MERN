@@ -6,6 +6,7 @@ const { default: mongoose } = require('mongoose');
 const User = require('../models/user');
 const instance = require('../config/rajorpay');
 const { enrollStudent } = require('./payments');
+const { grantStudyPdfPayment, refundStudyPdfPayment } = require('./pdfMaterial');
 
 const TERMINAL_PAID = new Set(['paid', 'refunded']);
 
@@ -622,13 +623,21 @@ exports.handleRazorpayWebhook = async (req, res) => {
 
                     if (!order) {
                         try {
-                            const enrolled = await enrollCourseFromNotes(paymentEntity.notes);
-                            if (!enrolled) {
-                                console.warn('[Webhook] Order not found for captured payment', paymentEntity.order_id);
+                            const unlocked = await grantStudyPdfPayment({
+                                orderId: paymentEntity.order_id,
+                                paymentId: paymentEntity.id,
+                                notes: paymentEntity.notes,
+                                session,
+                            });
+                            if (!unlocked) {
+                                const enrolled = await enrollCourseFromNotes(paymentEntity.notes);
+                                if (!enrolled) {
+                                    console.warn('[Webhook] Order not found for captured payment', paymentEntity.order_id);
+                                }
                             }
-                        } catch (courseError) {
-                            console.error('[Webhook] Course enroll from notes failed:', courseError.message);
-                            throw courseError;
+                        } catch (fulfillError) {
+                            console.error('[Webhook] Capture fulfill failed:', fulfillError.message);
+                            throw fulfillError;
                         }
                         break;
                     }
@@ -734,9 +743,14 @@ exports.handleRazorpayWebhook = async (req, res) => {
 
                     if (!order) {
                         try {
-                            await enrollCourseFromNotes(orderEntity.notes);
-                        } catch (courseError) {
-                            console.error('[Webhook] Course enroll on order.paid failed:', courseError.message);
+                            const unlocked = await grantStudyPdfPayment({
+                                orderId: orderEntity.id,
+                                notes: orderEntity.notes,
+                                session,
+                            });
+                            if (!unlocked) await enrollCourseFromNotes(orderEntity.notes);
+                        } catch (fulfillError) {
+                            console.error('[Webhook] order.paid fulfill failed:', fulfillError.message);
                         }
                     } else if (order.status !== 'paid') {
                         await fulfillPaidOrder({
@@ -815,6 +829,8 @@ exports.handleRazorpayWebhook = async (req, res) => {
                         order.refundId = refundEntity.id;
                         order.refundAmount = refundEntity.amount / 100;
                         await order.save({ session });
+                    } else {
+                        await refundStudyPdfPayment({ paymentId, session });
                     }
 
                     await PaymentVerification.findOneAndUpdate(
