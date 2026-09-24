@@ -9,6 +9,7 @@ const pdfMaterialSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'PdfExam',
     },
+    status: { type: String, enum: ['draft', 'published'], default: 'published' },
     access: { type: String, enum: ['free', 'paid'], default: 'free' },
     price: { type: Number, default: 0, min: 0 },
     cloudinaryPublicId: { type: String, required: true },

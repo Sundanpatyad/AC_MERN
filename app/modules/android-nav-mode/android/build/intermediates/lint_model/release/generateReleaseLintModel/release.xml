@@ -26,6 +26,6 @@
       applicationId="expo.modules.androidnavmode"
       generatedSourceFolders="build/generated/ap_generated_sources/release/out:build/generated/source/buildConfig/release"
       generatedResourceFolders="build/generated/res/resValues/release"
-      desugaredMethodsFiles="/Users/relaince/.gradle/caches/8.14.3/transforms/b17eb66608d95edac2e802c81c465aa9/transformed/D8BackportedDesugaredMethods.txt">
+      desugaredMethodsFiles="/Users/relaince/.gradle/caches/8.14.3/transforms/4afee2edd0d794d77e2c8ba1a26aafd9/transformed/D8BackportedDesugaredMethods.txt">
   </artifact>
 </variant>

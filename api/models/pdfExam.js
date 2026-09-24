@@ -5,6 +5,7 @@ const pdfExamSchema = new mongoose.Schema(
     name: { type: String, required: true, trim: true },
     category: { type: String, required: true, trim: true },
     description: { type: String, default: '', trim: true },
+    status: { type: String, enum: ['draft', 'published'], default: 'published' },
     access: { type: String, enum: ['free', 'paid'], default: 'free' },
     price: { type: Number, default: 0, min: 0 },
     createdBy: {

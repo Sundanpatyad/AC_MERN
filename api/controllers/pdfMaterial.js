@@ -263,6 +263,7 @@ const toPublic = (doc, user) => {
         : item
     ),
     canView,
+    status: doc.status === 'draft' ? 'draft' : 'published',
     createdAt: doc.createdAt,
   };
 };
@@ -295,14 +296,26 @@ exports.listPdfs = async (req, res) => {
       const pattern = new RegExp(escapeRegExp(q), 'i');
       search.$or = [{ title: pattern }, { description: pattern }, { category: pattern }];
     }
+    const includeDrafts = STAFF.has(user?.accountType) && req.query.manage === '1';
     const filter = { ...search };
     if (category && category.toLowerCase() !== 'all') filter.category = category;
     if (examId && mongoose.Types.ObjectId.isValid(examId)) filter.exam = examId;
+    if (!includeDrafts) {
+      filter.status = { $ne: 'draft' };
+      const publishedExamIds = await PdfExam.find({ status: { $ne: 'draft' } }).distinct('_id');
+      if (filter.exam) {
+        const allowed = publishedExamIds.some((id) => String(id) === String(filter.exam));
+        if (!allowed) filter.exam = { $in: [] };
+      } else {
+        filter.exam = { $in: publishedExamIds };
+      }
+    }
 
+    const latest = req.query.sort === 'latest';
     const query = PdfMaterial.find(filter)
-      .sort({ category: 1, title: 1 })
+      .sort(latest ? { createdAt: -1 } : { category: 1, title: 1 })
       .populate('mockTests', 'seriesName')
-      .populate('exam', 'name category access price');
+      .populate('exam', 'name category access price status');
 
     if (!paginate) {
       const materials = await query.lean();
@@ -415,7 +428,9 @@ exports.listForMock = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid mock test' });
     }
     const user = await loadOwnedIds(readUser(req));
-    const materials = await PdfMaterial.find({ mockTests: req.params.mockId })
+    const mockFilter = { mockTests: req.params.mockId, status: { $ne: 'draft' } };
+    mockFilter.exam = { $in: await PdfExam.find({ status: { $ne: 'draft' } }).distinct('_id') };
+    const materials = await PdfMaterial.find(mockFilter)
       .sort({ title: 1 })
       .populate('mockTests', 'seriesName')
       .populate('exam', 'name category access price')
@@ -479,6 +494,7 @@ exports.createPdf = async (req, res) => {
       description,
       category: exam.category,
       exam: exam._id,
+      status: req.body.status === 'published' ? 'published' : 'draft',
       access: price > 0 ? 'paid' : 'free',
       price,
       cloudinaryPublicId: uploaded.public_id,
@@ -532,6 +548,9 @@ exports.updatePdf = async (req, res) => {
     }
     material.access = price > 0 ? 'paid' : 'free';
     material.price = price;
+    if (req.body.status === 'draft' || req.body.status === 'published') {
+      material.status = req.body.status;
+    }
 
     if (!material.title) {
       return res.status(400).json({ success: false, message: 'Title is required' });
@@ -596,11 +615,21 @@ exports.deletePdf = async (req, res) => {
 const assertCanView = async (material, user) => {
   const fullUser = await loadOwnedIds(user);
   if (STAFF.has(fullUser?.accountType)) return fullUser;
+  if (material.status === 'draft') {
+    const error = new Error('Study material not found');
+    error.status = 404;
+    throw error;
+  }
 
   let exam = material.exam;
   if (exam && exam._id && exam.access == null) exam = exam._id;
   if (exam && !exam.access) {
-    exam = await PdfExam.findById(exam).select('access price').lean();
+    exam = await PdfExam.findById(exam).select('access price status').lean();
+  }
+  if (exam && exam.status === 'draft') {
+    const error = new Error('Study material not found');
+    error.status = 404;
+    throw error;
   }
   if (examSoldAsSet(exam)) {
     if (!ownsExam(fullUser, exam._id)) {
@@ -624,7 +653,7 @@ const assertCanView = async (material, user) => {
 
 exports.issueTicket = async (req, res) => {
   try {
-    const material = await PdfMaterial.findById(req.params.id).select('_id access price exam cloudinaryPublicId');
+    const material = await PdfMaterial.findById(req.params.id).select('_id access price status exam cloudinaryPublicId');
     if (!material) {
       return res.status(404).json({ success: false, message: 'Study material not found' });
     }
@@ -839,8 +868,8 @@ exports.streamPdf = async (req, res) => {
 
 exports.createOrder = async (req, res) => {
   try {
-    const material = await PdfMaterial.findById(req.params.id).populate('exam', 'access price name');
-    if (!material) {
+    const material = await PdfMaterial.findById(req.params.id).populate('exam', 'access price name status');
+    if (!material || material.status === 'draft' || material.exam?.status === 'draft') {
       return res.status(404).json({ success: false, message: 'Study material not found' });
     }
     if (examSoldAsSet(material.exam)) {
@@ -1009,6 +1038,7 @@ const publicExam = (exam, user, pdfCount) => {
     price: access === 'paid' ? Number(exam.price) || 0 : 0,
     pdfCount: pdfCount || 0,
     owned: access === 'paid' ? ownsExam(user, exam._id) : false,
+    status: exam.status === 'draft' ? 'draft' : 'published',
   };
 };
 
@@ -1017,20 +1047,31 @@ exports.listExams = async (req, res) => {
     const user = await loadOwnedIds(readUser(req));
     const category = String(req.query.category || '').trim();
     const q = String(req.query.q || '').trim();
+    const includeDrafts = STAFF.has(user?.accountType) && req.query.manage === '1';
     const filter = {};
+    if (!includeDrafts) filter.status = { $ne: 'draft' };
     if (category && category.toLowerCase() !== 'all') filter.category = category;
     if (q) filter.name = { $regex: escapeRegex(q), $options: 'i' };
 
-    const exams = await PdfExam.find(filter).sort({ category: 1, name: 1 }).lean();
+    const latest = req.query.sort === 'latest';
+    const exams = await PdfExam.find(filter)
+      .sort(latest ? { createdAt: -1 } : { category: 1, name: 1 })
+      .lean();
     const counts = exams.length
       ? await PdfMaterial.aggregate([
-          { $match: { exam: { $in: exams.map((item) => item._id) } } },
+          {
+            $match: {
+              exam: { $in: exams.map((item) => item._id) },
+              ...(includeDrafts ? {} : { status: { $ne: 'draft' } }),
+            },
+          },
           { $group: { _id: '$exam', count: { $sum: 1 } } },
         ])
       : [];
     const countMap = new Map(counts.map((item) => [String(item._id), item.count]));
     const categories = await PdfCategory.find().sort({ name: 1 }).lean();
     const examCounts = await PdfExam.aggregate([
+      ...(includeDrafts ? [] : [{ $match: { status: { $ne: 'draft' } } }]),
       { $group: { _id: '$category', count: { $sum: 1 } } },
     ]);
     const categoryMap = new Map(examCounts.map((item) => [item._id, item.count]));
@@ -1038,11 +1079,13 @@ exports.listExams = async (req, res) => {
     res.status(200).json({
       success: true,
       data: exams.map((exam) => publicExam(exam, user, countMap.get(String(exam._id)) || 0)),
-      categories: categories.map((item) => ({
-        _id: item._id,
-        name: item.name,
-        count: categoryMap.get(item.name) || 0,
-      })),
+      categories: categories
+        .map((item) => ({
+          _id: item._id,
+          name: item.name,
+          count: categoryMap.get(item.name) || 0,
+        }))
+        .filter((item) => includeDrafts || item.count > 0),
     });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Could not load exams' });
@@ -1081,6 +1124,7 @@ exports.createExam = async (req, res) => {
       description,
       access: price > 0 ? 'paid' : 'free',
       price,
+      status: req.body.status === 'published' ? 'published' : 'draft',
       createdBy: req.user.id,
     });
     res.status(201).json({ success: true, data: publicExam(exam, req.user, 0) });
@@ -1113,6 +1157,9 @@ exports.updateExam = async (req, res) => {
     }
     exam.access = price > 0 ? 'paid' : 'free';
     exam.price = price;
+    if (req.body.status === 'draft' || req.body.status === 'published') {
+      exam.status = req.body.status;
+    }
     if (!exam.name || !exam.category) {
       return res.status(400).json({ success: false, message: 'Name and category are required' });
     }
@@ -1154,6 +1201,9 @@ exports.deleteExam = async (req, res) => {
 exports.createExamOrder = async (req, res) => {
   try {
     const exam = await PdfExam.findById(req.params.id);
+    if (!exam || exam.status === 'draft') {
+      return res.status(404).json({ success: false, message: 'Exam not found' });
+    }
     if (!examSoldAsSet(exam)) {
       return res.status(400).json({ success: false, message: 'This exam is free. Buy individual PDFs if they are paid.' });
     }

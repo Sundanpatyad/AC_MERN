@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import CountryCode from '../../../../data/countrycode.json';
+import CustomSelect from '../../common/CustomSelect';
 
 const inputClass = "field";
 const labelClass = "text-sm font-medium text-fg";
@@ -11,6 +12,8 @@ const ContactUsForm = () => {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors, isSubmitSuccessful },
   } = useForm();
 
@@ -100,18 +103,15 @@ const ContactUsForm = () => {
           Phone number
         </label>
         <div className="flex gap-3">
-          <select
-            id="countrycode"
-            className={`${inputClass} w-[100px] shrink-0`}
-            {...register("countrycode", { required: "Country code is required." })}
-          >
-            <option value="">Code</option>
-            {CountryCode.map((ele, i) => (
-              <option key={i} value={ele.code} className="bg-page">
-                {ele.code}
-              </option>
-            ))}
-          </select>
+          <div className="w-[120px] shrink-0">
+            <input className="sr-only" tabIndex={-1} {...register("countrycode", { required: "Country code is required." })} />
+            <CustomSelect
+              value={watch("countrycode")}
+              onChange={(code) => setValue("countrycode", code, { shouldValidate: true })}
+              placeholder="Code"
+              options={CountryCode.map((ele) => ({ value: ele.code, label: ele.code }))}
+            />
+          </div>
           <input
             type="tel"
             id="phonenumber"

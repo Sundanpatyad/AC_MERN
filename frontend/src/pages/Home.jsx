@@ -15,6 +15,9 @@ import { FaTelegram, FaWhatsapp, FaInstagram } from "react-icons/fa";
 const MockTestSection = lazy(() =>
   import("../components/core/HomePage/MockTestSection")
 );
+const StudyPdfSection = lazy(() =>
+  import("../components/core/HomePage/StudyPdfSection")
+);
 const InstructorSection = lazy(() =>
   import("../components/core/HomePage/InstructorSection")
 );
@@ -44,6 +47,10 @@ const Home = () => {
 
       <Suspense fallback={<div className="h-24 md:h-32" />}>
         <MockTestSection setShowLoginModal={setShowLoginModal} />
+      </Suspense>
+
+      <Suspense fallback={<div className="h-24 md:h-32" />}>
+        <StudyPdfSection />
       </Suspense>
 
       <LandingFeaturesSection />

@@ -8,19 +8,12 @@ import {
   GOOGLE_IOS_CLIENT_ID,
 } from '../constants/google';
 
-// Android: webClientId from thematic-bonus Android client JSON
-// (1004017212123-5go5m596…). iOS uses iosClientId only.
-// offlineAccess needs a true Web client — keep off while using Android client ID.
+// Android uses the installed client from project 279937570516.
+// iOS uses its own client and does not send the Android webClientId.
 GoogleSignin.configure({
   iosClientId: GOOGLE_IOS_CLIENT_ID,
-  ...(Platform.OS === 'android'
-    ? {
-        webClientId: GOOGLE_WEB_CLIENT_ID,
-        offlineAccess: false,
-      }
-    : {
-        offlineAccess: false,
-      }),
+  ...(Platform.OS === 'android' ? { webClientId: GOOGLE_WEB_CLIENT_ID } : {}),
+  offlineAccess: false,
   scopes: ['profile', 'email', 'openid'],
 });
 

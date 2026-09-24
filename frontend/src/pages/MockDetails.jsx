@@ -12,6 +12,8 @@ import LoadingSpinner from "../components/core/ConductMockTests/Spinner";
 import ConfirmationModal from "../components/common/ConfirmationModal";
 import Footer from "../components/common/Footer";
 import { buyItem } from "../services/operations/studentFeaturesAPI";
+import { apiConnector } from "../services/apiConnector";
+import { pdfEndpoints } from "../services/apis";
 
 const MockTestDetails = () => {
   const { user } = useSelector((state) => state.profile);
@@ -25,6 +27,7 @@ const MockTestDetails = () => {
   const [confirmationModal, setConfirmationModal] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isInCart, setIsInCart] = useState(false);
+  const [linkedPdfs, setLinkedPdfs] = useState([]);
 
   const fetchTestDetails = useCallback(async () => {
     try {
@@ -42,6 +45,21 @@ const MockTestDetails = () => {
   useEffect(() => {
     fetchTestDetails();
   }, [fetchTestDetails]);
+
+  useEffect(() => {
+    if (!mockId) return undefined;
+    let cancelled = false;
+    apiConnector("GET", pdfEndpoints.FOR_MOCK(mockId))
+      .then((response) => {
+        if (!cancelled) setLinkedPdfs(response.data?.data || []);
+      })
+      .catch(() => {
+        if (!cancelled) setLinkedPdfs([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [mockId, token]);
 
   useEffect(() => {
     if (testDetails) {
@@ -228,6 +246,31 @@ const MockTestDetails = () => {
                 ))}
               </div>
             </div>
+
+            {linkedPdfs.length > 0 && (
+              <div className="bg-surface border border-line rounded-lg p-4 sm:p-6 mb-8">
+                <h2 className="text-lg sm:text-xl font-bold text-fg mb-4">Study material</h2>
+                <div className="space-y-3">
+                  {linkedPdfs.map((material) => (
+                    <div key={material._id} className="flex items-center justify-between gap-3 border-b border-line last:border-b-0 pb-3">
+                      <div>
+                        <p className="text-fg font-medium">{material.title}</p>
+                        <p className="text-muted text-sm">
+                          {material.category} · {material.access === "paid" ? `₹${material.price}` : "Free"}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => navigate(material.canView ? `/study-material/${material._id}` : "/study-material")}
+                        className="shrink-0 px-3 py-1.5 text-sm rounded-lg bg-solid text-solid-fg"
+                      >
+                        {material.canView ? "Read" : "View"}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Desktop Sidebar - Purchase Card */}

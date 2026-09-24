@@ -5,7 +5,7 @@ import { HiAcademicCap } from 'react-icons/hi2';
 import { MdOutlineAdminPanelSettings } from 'react-icons/md';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { CiCirclePlus } from 'react-icons/ci';
+import { BsFiletypePdf } from 'react-icons/bs';
 
 const BottomBar = () => {
   const { user } = useSelector((state) => state.profile);
@@ -36,10 +36,10 @@ const BottomBar = () => {
           />
         ) : (
           <NavItem
-            to="/createStudyMaterial"
-            icon={CiCirclePlus}
-            label="Add PDF"
-            active={isActive('/createStudyMaterial')}
+            to="/study-material"
+            icon={BsFiletypePdf}
+            label="Study Material"
+            active={isActive('/study-material')}
           />
         )}
 
@@ -87,7 +87,7 @@ const NavItem = ({ to, icon: Icon, label, active }) => (
     }`}
   >
     <Icon className="text-xl" />
-    <span className="text-[10px] font-medium">{label}</span>
+    <span className="max-w-[4.5rem] text-center text-[10px] font-medium leading-tight">{label}</span>
   </Link>
 );
 

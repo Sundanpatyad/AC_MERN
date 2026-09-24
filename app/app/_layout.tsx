@@ -4,6 +4,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Text, TextInput } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-context';
 import 'react-native-reanimated';
 import {
@@ -18,6 +19,7 @@ import { useAuthStore } from '../store/authStore';
 import { useThemeStore } from '../store/themeStore';
 import { AppThemeProvider, useTheme } from '../providers/AppThemeProvider';
 import { DialogProvider } from '../providers/DialogProvider';
+import { MiniPlayerProvider } from '../components/MiniPlayer';
 import { Fonts } from '../constants/theme';
 
 SplashScreen.preventAutoHideAsync();
@@ -44,22 +46,32 @@ function RootNavigator() {
   const hydrateAuth = useAuthStore((s) => s.hydrate);
   const hydrateTheme = useThemeStore((s) => s.hydrate);
 
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
     Inter_700Bold,
   });
+  const [gaveUpWaiting, setGaveUpWaiting] = useState(false);
 
   useEffect(() => {
     const init = async () => {
-      await Promise.all([hydrateAuth(), hydrateTheme()]);
+      await Promise.race([
+        Promise.all([hydrateAuth(), hydrateTheme()]),
+        new Promise((resolve) => setTimeout(resolve, 2500)),
+      ]);
       setIsReady(true);
     };
     init();
   }, [hydrateAuth, hydrateTheme]);
 
-  const appReady = isReady && !isLoading && fontsLoaded;
+  useEffect(() => {
+    const timer = setTimeout(() => setGaveUpWaiting(true), 2500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const fontsReady = fontsLoaded || Boolean(fontError) || gaveUpWaiting;
+  const appReady = gaveUpWaiting || (isReady && !isLoading && fontsReady);
 
   useEffect(() => {
     if (!appReady) return;
@@ -131,6 +143,8 @@ function RootNavigator() {
       <Stack
         screenOptions={{
           headerShown: false,
+          animation: 'simple_push',
+          animationDuration: 220,
           contentStyle: { backgroundColor: colors.background },
         }}
       >
@@ -145,12 +159,16 @@ function RootNavigator() {
 
 export default function RootLayout() {
   return (
-    <SafeAreaProvider initialMetrics={initialWindowMetrics ?? undefined}>
-      <AppThemeProvider>
-        <DialogProvider>
-          <RootNavigator />
-        </DialogProvider>
-      </AppThemeProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider initialMetrics={initialWindowMetrics ?? undefined}>
+        <AppThemeProvider>
+          <DialogProvider>
+            <MiniPlayerProvider>
+              <RootNavigator />
+            </MiniPlayerProvider>
+          </DialogProvider>
+        </AppThemeProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }

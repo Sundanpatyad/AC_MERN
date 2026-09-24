@@ -93,6 +93,7 @@ export default function MockTestDetailScreen() {
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   const [testDetails, setTestDetails] = useState<any>(null);
+  const [linkedPdfs, setLinkedPdfs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -115,6 +116,22 @@ export default function MockTestDetailScreen() {
   useEffect(() => {
     fetchDetails();
   }, [fetchDetails]);
+
+  useEffect(() => {
+    if (!id) return undefined;
+    let cancelled = false;
+    apiConnector
+      .get(endpoints.PDF_FOR_MOCK(id))
+      .then((response) => {
+        if (!cancelled) setLinkedPdfs(response.data?.data || []);
+      })
+      .catch(() => {
+        if (!cancelled) setLinkedPdfs([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
 
   const instructor = isInstructorAccount(user?.accountType);
   const canAccess = hasAccess(testDetails, user?._id, user?.accountType);
@@ -517,6 +534,31 @@ export default function MockTestDetailScreen() {
               variant="outline"
               style={{ marginBottom: 16 }}
             />
+          ) : null}
+
+          {linkedPdfs.length > 0 ? (
+            <>
+              <Text style={styles.sectionTitle}>Study material</Text>
+              <View style={[styles.testList, { marginBottom: 18 }]}>
+                {linkedPdfs.map((item) => (
+                  <Pressable
+                    key={item._id}
+                    onPress={() =>
+                      router.push(item.canView ? `/study-material/${item._id}` : '/study-material')
+                    }
+                    style={styles.testItem}
+                  >
+                    <View style={styles.testItemInfo}>
+                      <Text style={styles.testItemTitle} numberOfLines={1}>{item.title}</Text>
+                      <Text style={styles.testItemMeta}>
+                        {item.canView ? 'Read in the app' : `Unlock · ₹${item.price}`}
+                      </Text>
+                    </View>
+                    <Text style={[styles.testItemMeta, { color: colors.text }]}>{item.canView ? 'Read' : 'Buy'}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            </>
           ) : null}
 
           <Text style={styles.sectionTitle}>Tests in this series</Text>

@@ -36,6 +36,19 @@ export const sidebarLinks = [
     icon: "VscAdd",
   },
   {
+    id: 12,
+    name: "Study Material",
+    path: "/study-material",
+    icon: "VscNotebook",
+  },
+  {
+    id: 11,
+    name: "Study PDFs",
+    path: "/dashboard/study-pdfs",
+    type: ACCOUNT_TYPE.INSTRUCTOR,
+    icon: "VscBook",
+  },
+  {
     id: 5,
     name: "Enrolled Courses",
     path: "/dashboard/enrolled-courses",

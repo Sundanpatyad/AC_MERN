@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Image, ActivityIndicator } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { Ionicons } from '@expo/vector-icons';
 import { SettingsShell, SettingsCard } from '../components/ui/SettingsShell';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
@@ -7,10 +9,9 @@ import { DetailSkeleton } from '../components/ui/Skeleton';
 import { apiConnector } from '../services/api';
 import { endpoints } from '../constants/api';
 import { useAuthStore } from '../store/authStore';
-import { AppPalette, Radii } from '../constants/theme';
+import { AppPalette } from '../constants/theme';
 import { useTheme } from '../providers/AppThemeProvider';
-
-const GENDERS = ['Male', 'Female', 'Non-Binary', 'Prefer not to say', 'Other'];
+import { showMessage } from '../providers/DialogProvider';
 
 export default function EditProfileScreen() {
   const { user, setUser } = useAuthStore();
@@ -18,11 +19,11 @@ export default function EditProfileScreen() {
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const [photoUri, setPhotoUri] = useState(user?.image || '');
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
-    dateOfBirth: '',
-    gender: '',
     contactNumber: '',
     about: '',
   });
@@ -36,13 +37,10 @@ export default function EditProfileScreen() {
           setForm({
             firstName: details.firstName || user?.firstName || '',
             lastName: details.lastName || user?.lastName || '',
-            dateOfBirth: details.additionalDetails?.dateOfBirth
-              ? String(details.additionalDetails.dateOfBirth).slice(0, 10)
-              : '',
-            gender: details.additionalDetails?.gender || '',
             contactNumber: details.additionalDetails?.contactNumber || '',
             about: details.additionalDetails?.about || '',
           });
+          if (details.image) setPhotoUri(details.image);
         } else if (user) {
           setForm((f) => ({
             ...f,
@@ -69,8 +67,73 @@ export default function EditProfileScreen() {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
+  const applyUser = async (updated: any) => {
+    await setUser({
+      ...user!,
+      firstName: updated.firstName || user?.firstName || '',
+      lastName: updated.lastName || user?.lastName || '',
+      image: updated.image || user?.image || '',
+      email: updated.email || user?.email || '',
+      accountType: updated.accountType || user?.accountType || 'Student',
+      _id: updated._id || user?._id || '',
+    });
+    if (updated.image) setPhotoUri(updated.image);
+  };
+
+  const handleChangePhoto = async () => {
+    try {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) {
+        await showMessage({
+          title: 'Permission needed',
+          message: 'Allow photo access to update your profile picture.',
+        });
+        return;
+      }
+
+      const picked = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.85,
+      });
+      if (picked.canceled || !picked.assets?.[0]?.uri) return;
+
+      const asset = picked.assets[0];
+      setPhotoUri(asset.uri);
+      setPhotoBusy(true);
+
+      const body = new FormData();
+      body.append('profileImage', {
+        uri: asset.uri,
+        name: asset.fileName || 'profile.jpg',
+        type: asset.mimeType || 'image/jpeg',
+      } as any);
+
+      const res = await apiConnector.put(endpoints.UPDATE_DISPLAY_PICTURE_API, body, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 45000,
+      });
+      const updated = res.data?.data;
+      if (!res.data?.success || !updated) {
+        throw new Error(res.data?.message || 'Could not update photo');
+      }
+      await applyUser(updated);
+      await showMessage({ title: 'Photo updated', message: 'Your profile photo was saved.' });
+    } catch (error: any) {
+      setPhotoUri(user?.image || '');
+      await showMessage({
+        title: 'Could not update photo',
+        message: error?.response?.data?.message || error?.message || 'Try another image.',
+      });
+    } finally {
+      setPhotoBusy(false);
+    }
+  };
+
   const handleSave = async () => {
     if (!form.firstName.trim() || !form.lastName.trim()) {
+      await showMessage({ title: 'Missing name', message: 'First and last name are required.' });
       return;
     }
 
@@ -79,24 +142,20 @@ export default function EditProfileScreen() {
       const res = await apiConnector.put(endpoints.UPDATE_PROFILE_API, form);
       if (res.data?.success) {
         const updated = res.data.updatedUserDetails;
-        if (updated) {
-          await setUser({
-            ...user!,
-            firstName: updated.firstName,
-            lastName: updated.lastName,
-            image: updated.image || user?.image || '',
-            email: updated.email || user?.email || '',
-            accountType: updated.accountType || user?.accountType || 'Student',
-            _id: updated._id || user?._id || '',
-          });
-        }
+        if (updated) await applyUser(updated);
+        await showMessage({ title: 'Saved', message: 'Your profile was updated.' });
       }
-    } catch {
-      // ignore
+    } catch (error: any) {
+      await showMessage({
+        title: 'Could not save',
+        message: error?.response?.data?.message || 'Try again.',
+      });
     } finally {
       setIsSaving(false);
     }
   };
+
+  const letter = (form.firstName || user?.firstName || 'A').slice(0, 1).toUpperCase();
 
   return (
     <SettingsShell title="Edit Profile">
@@ -104,6 +163,32 @@ export default function EditProfileScreen() {
         <DetailSkeleton />
       ) : (
         <>
+          <Text style={styles.sectionLabel}>Photo</Text>
+          <SettingsCard>
+            <View style={styles.photoRow}>
+              <Pressable onPress={handleChangePhoto} disabled={photoBusy} style={styles.avatarWrap}>
+                {photoUri ? (
+                  <Image source={{ uri: photoUri }} style={styles.avatar} />
+                ) : (
+                  <View style={[styles.avatar, styles.avatarFallback]}>
+                    <Text style={styles.avatarLetter}>{letter}</Text>
+                  </View>
+                )}
+                <View style={styles.cameraBadge}>
+                  {photoBusy ? (
+                    <ActivityIndicator color={colors.primaryButtonText} size="small" />
+                  ) : (
+                    <Ionicons name="camera" size={14} color={colors.primaryButtonText} />
+                  )}
+                </View>
+              </Pressable>
+              <View style={styles.photoCopy}>
+                <Text style={styles.photoTitle}>Profile photo</Text>
+                <Text style={styles.photoHint}>Tap the photo to choose a new one.</Text>
+              </View>
+            </View>
+          </SettingsCard>
+
           <Text style={styles.sectionLabel}>Personal info</Text>
           <SettingsCard>
             <View style={styles.formPad}>
@@ -119,30 +204,6 @@ export default function EditProfileScreen() {
                 onChangeText={(t) => update('lastName', t)}
                 placeholder="Last name"
               />
-              <Input
-                label="Date of Birth"
-                value={form.dateOfBirth}
-                onChangeText={(t) => update('dateOfBirth', t)}
-                placeholder="YYYY-MM-DD"
-                autoCapitalize="none"
-              />
-              <Text style={styles.fieldLabel}>Gender</Text>
-              <View style={styles.genderWrap}>
-                {GENDERS.map((g) => {
-                  const active = form.gender === g;
-                  return (
-                    <TouchableOpacity
-                      key={g}
-                      style={[styles.genderChip, active && styles.genderChipActive]}
-                      onPress={() => update('gender', g)}
-                    >
-                      <Text style={[styles.genderText, active && styles.genderTextActive]}>
-                        {g}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
               <Input
                 label="Contact Number"
                 value={form.contactNumber}
@@ -177,43 +238,61 @@ function createStyles(colors: AppPalette) {
       letterSpacing: 0.6,
       textTransform: 'uppercase',
       marginBottom: 10,
+      marginTop: 4,
+    },
+    photoRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 16,
+      padding: 16,
+    },
+    avatarWrap: {
+      width: 84,
+      height: 84,
+    },
+    avatar: {
+      width: 84,
+      height: 84,
+      borderRadius: 42,
+      backgroundColor: colors.surfaceRaised,
+    },
+    avatarFallback: {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    avatarLetter: {
+      color: colors.text,
+      fontSize: 28,
+      fontWeight: '700',
+    },
+    cameraBadge: {
+      position: 'absolute',
+      right: 0,
+      bottom: 0,
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      backgroundColor: colors.text,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    photoCopy: {
+      flex: 1,
+      gap: 4,
+    },
+    photoTitle: {
+      color: colors.text,
+      fontSize: 15,
+      fontWeight: '600',
+    },
+    photoHint: {
+      color: colors.textMuted,
+      fontSize: 13,
+      lineHeight: 18,
     },
     formPad: {
       padding: 14,
       paddingTop: 8,
-    },
-    fieldLabel: {
-      color: colors.textSecondary,
-      fontSize: 12,
-      marginBottom: 8,
-      marginTop: 6,
-      fontWeight: '600',
-    },
-    genderWrap: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 8,
-      marginBottom: 10,
-    },
-    genderChip: {
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: Radii.pill,
-      borderWidth: 1,
-      borderColor: colors.border,
-      backgroundColor: colors.surfaceRaised,
-    },
-    genderChipActive: {
-      backgroundColor: colors.text,
-      borderColor: colors.text,
-    },
-    genderText: {
-      color: colors.textSecondary,
-      fontSize: 12,
-      fontWeight: '600',
-    },
-    genderTextActive: {
-      color: colors.primaryButtonText,
     },
   });
 }
