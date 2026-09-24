@@ -49,7 +49,7 @@ async function getChannel(apiKey) {
     if (channelCache) return channelCache;
 
     const data = await youtubeGet('channels', {
-        part: 'contentDetails',
+        part: 'snippet,contentDetails',
         forHandle: CHANNEL_HANDLE,
         key: apiKey,
     });
@@ -57,11 +57,13 @@ async function getChannel(apiKey) {
     const item = data.items?.[0];
     const uploadsPlaylistId = item?.contentDetails?.relatedPlaylists?.uploads;
     const channelId = item?.id;
+    const thumbs = item?.snippet?.thumbnails || {};
+    const channelAvatar = thumbs.high?.url || thumbs.medium?.url || thumbs.default?.url || '';
     if (!uploadsPlaylistId || !channelId) {
         throw new Error('YouTube channel uploads were not found');
     }
 
-    channelCache = { uploadsPlaylistId, channelId };
+    channelCache = { uploadsPlaylistId, channelId, channelAvatar };
     return channelCache;
 }
 
@@ -112,6 +114,8 @@ exports.listLatestVideos = async (req, res) => {
 
         return res.status(200).json({
             success: true,
+            channelId: channel.channelId,
+            channelAvatar: channel.channelAvatar || '',
             videos,
             nextPageToken: data.nextPageToken || null,
         });
