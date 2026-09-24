@@ -28,6 +28,10 @@ const emptyExam = {
 const fieldClass =
   "mt-1.5 w-full rounded-lg border border-line bg-page px-3 py-2.5 text-sm text-fg outline-none focus:ring-2 focus:ring-blue-500";
 
+const ButtonSpinner = () => (
+  <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-r-transparent" />
+);
+
 const StudyPdfAdmin = () => {
   const [form, setForm] = useState(emptyForm);
   const [materials, setMaterials] = useState([]);
@@ -45,6 +49,8 @@ const StudyPdfAdmin = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [fileLabel, setFileLabel] = useState("");
   const [confirm, setConfirm] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [busyId, setBusyId] = useState(null);
 
   const load = async () => {
     try {
@@ -60,6 +66,8 @@ const StudyPdfAdmin = () => {
       setMocks(mockResponse.data?.data || []);
     } catch {
       toast.error("Couldn't load study PDFs");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -137,7 +145,13 @@ const StudyPdfAdmin = () => {
     }
   };
 
+  const markDeleting = (id) => {
+    setBusyId(id);
+    setConfirm((current) => (current ? { ...current, btn1Loading: true } : current));
+  };
+
   const removeCategory = async (category) => {
+    markDeleting(category._id);
     try {
       await apiConnector("DELETE", pdfEndpoints.DELETE_CATEGORY(category._id));
       toast.success("Category deleted");
@@ -146,6 +160,7 @@ const StudyPdfAdmin = () => {
     } catch (error) {
       toast.error(error?.response?.data?.message || "Could not delete category");
     } finally {
+      setBusyId(null);
       setConfirm(null);
     }
   };
@@ -190,6 +205,7 @@ const StudyPdfAdmin = () => {
   };
 
   const removeExam = async (exam) => {
+    markDeleting(exam._id);
     try {
       await apiConnector("DELETE", pdfEndpoints.DELETE_EXAM(exam._id));
       toast.success("Exam deleted");
@@ -197,6 +213,7 @@ const StudyPdfAdmin = () => {
     } catch (error) {
       toast.error(error?.response?.data?.message || "Could not delete exam");
     } finally {
+      setBusyId(null);
       setConfirm(null);
     }
   };
@@ -287,6 +304,7 @@ const StudyPdfAdmin = () => {
   };
 
   const remove = async (item) => {
+    markDeleting(item._id);
     try {
       await apiConnector("DELETE", pdfEndpoints.DELETE(item._id));
       toast.success("Deleted");
@@ -294,6 +312,7 @@ const StudyPdfAdmin = () => {
     } catch {
       toast.error("Could not delete");
     } finally {
+      setBusyId(null);
       setConfirm(null);
     }
   };
@@ -358,7 +377,13 @@ const StudyPdfAdmin = () => {
       </div>
 
       <section className="mb-8 min-w-0">
-        {categories.length === 0 ? (
+        {loading ? (
+          <div className="flex gap-2">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div key={index} className="h-9 w-24 shrink-0 animate-pulse rounded-lg bg-elevated" />
+            ))}
+          </div>
+        ) : categories.length === 0 ? (
           <button
             type="button"
             onClick={() => setCategoryOpen(true)}
@@ -415,9 +440,22 @@ const StudyPdfAdmin = () => {
       <section className="mb-8 min-w-0">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-medium text-muted">Exams</h2>
-          <span className="text-xs text-muted">{visibleExams.length}</span>
+          <span className="text-xs text-muted">{loading ? "" : visibleExams.length}</span>
         </div>
-        {visibleExams.length === 0 ? (
+        {loading ? (
+          <div className="flex gap-3 overflow-hidden">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div key={index} className="w-72 shrink-0 animate-pulse rounded-2xl border border-line bg-surface p-4">
+                <div className="h-4 w-2/3 rounded bg-elevated" />
+                <div className="mt-3 h-3 w-1/2 rounded bg-elevated" />
+                <div className="mt-4 flex gap-2">
+                  <div className="h-8 w-14 rounded-lg bg-elevated" />
+                  <div className="h-8 w-16 rounded-lg bg-elevated" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : visibleExams.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-line bg-surface px-6 py-10 text-center">
             <p className="text-sm text-muted">No exam in this category yet.</p>
           </div>
@@ -453,15 +491,18 @@ const StudyPdfAdmin = () => {
                       });
                       setExamOpen(true);
                     }}
-                    className="px-3 py-1.5 text-sm rounded-lg border border-line hover:bg-elevated"
+                    disabled={busyId === exam._id}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border border-line hover:bg-elevated disabled:opacity-60"
                   >
                     Edit
                   </button>
                   <button
                     type="button"
                     onClick={() => askDeleteExam(exam)}
-                    className="px-3 py-1.5 text-sm rounded-lg border border-line text-muted hover:text-fg hover:bg-elevated"
+                    disabled={busyId === exam._id}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border border-line text-muted hover:text-fg hover:bg-elevated disabled:opacity-60"
                   >
+                    {busyId === exam._id ? <ButtonSpinner /> : null}
                     Delete
                   </button>
                 </div>
@@ -476,9 +517,21 @@ const StudyPdfAdmin = () => {
           <h2 className="text-sm font-medium text-muted">
             {selectedCategory === "all" ? "All materials" : selectedCategory}
           </h2>
-          <span className="text-xs text-muted">{visibleMaterials.length}</span>
+          <span className="text-xs text-muted">{loading ? "" : visibleMaterials.length}</span>
         </div>
-        {visibleMaterials.length === 0 ? (
+        {loading ? (
+          <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <li key={index} className="flex items-center gap-4 px-4 py-3 sm:px-5">
+                <div className="min-w-0 flex-1 animate-pulse">
+                  <div className="h-4 w-1/3 rounded bg-elevated" />
+                  <div className="mt-2 h-3 w-1/2 rounded bg-elevated" />
+                </div>
+                <div className="h-8 w-14 shrink-0 animate-pulse rounded-lg bg-elevated" />
+              </li>
+            ))}
+          </ul>
+        ) : visibleMaterials.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-line bg-surface px-6 py-12 text-center">
             <p className="text-sm text-muted">No material in this view.</p>
             <button
@@ -523,15 +576,18 @@ const StudyPdfAdmin = () => {
                   <button
                     type="button"
                     onClick={() => startEdit(item)}
-                    className="px-3 py-1.5 text-sm rounded-lg border border-line hover:bg-elevated"
+                    disabled={busyId === item._id}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border border-line hover:bg-elevated disabled:opacity-60"
                   >
                     Edit
                   </button>
                   <button
                     type="button"
                     onClick={() => askDeleteMaterial(item)}
-                    className="px-3 py-1.5 text-sm rounded-lg border border-line text-muted hover:text-fg hover:bg-elevated"
+                    disabled={busyId === item._id}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border border-line text-muted hover:text-fg hover:bg-elevated disabled:opacity-60"
                   >
+                    {busyId === item._id ? <ButtonSpinner /> : null}
                     Delete
                   </button>
                 </div>
@@ -631,9 +687,10 @@ const StudyPdfAdmin = () => {
               <button
                 type="submit"
                 disabled={saving}
-                className="px-4 py-2 rounded-lg bg-solid text-solid-fg text-sm font-medium disabled:opacity-60"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-solid text-solid-fg text-sm font-medium disabled:opacity-60"
               >
-                {saving ? "Saving..." : editingExamId ? "Update" : "Create"}
+                {saving ? <ButtonSpinner /> : null}
+                {saving ? (editingExamId ? "Updating..." : "Saving...") : editingExamId ? "Update" : "Create"}
               </button>
             </div>
           </form>
@@ -673,8 +730,9 @@ const StudyPdfAdmin = () => {
               <button
                 type="submit"
                 disabled={saving}
-                className="px-4 py-2 rounded-lg bg-solid text-solid-fg text-sm font-medium disabled:opacity-60"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-solid text-solid-fg text-sm font-medium disabled:opacity-60"
               >
+                {saving ? <ButtonSpinner /> : null}
                 {saving ? "Saving..." : "Create"}
               </button>
             </div>
@@ -815,9 +873,10 @@ const StudyPdfAdmin = () => {
               <button
                 type="submit"
                 disabled={saving}
-                className="px-4 py-2 rounded-lg bg-solid text-solid-fg text-sm font-medium disabled:opacity-60"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-solid text-solid-fg text-sm font-medium disabled:opacity-60"
               >
-                {saving ? "Saving..." : editingId ? "Update" : "Add material"}
+                {saving ? <ButtonSpinner /> : null}
+                {saving ? (editingId ? "Updating..." : "Saving...") : editingId ? "Update" : "Add material"}
               </button>
             </div>
           </form>
