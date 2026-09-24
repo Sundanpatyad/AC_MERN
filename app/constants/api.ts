@@ -1,4 +1,4 @@
-// export const BASE_URL = 'https://b79e-2401-4900-1c71-76bd-748c-dc7b-ded0-70f5.ngrok-free.app';
+// export const BASE_URL = 'https://62d7-2404-7c80-5d-e8-e00e-3212-9219-1d50.ngrok-free.app';
 export const BASE_URL = 'https://ac-mern-279937570516.europe-west1.run.app';
 // export const BASE_URL = 'https://f163-223-178-210-23.ngrok-free.app';
 
@@ -22,6 +22,7 @@ export const endpoints = {
   GET_USER_DETAILS: `${BASE_URL}/api/v1/profile/getUserDetails`,
   GET_ENROLLED_MOCK_TESTS: `${BASE_URL}/api/v1/profile/getEnrolledMockTests`,
   UPDATE_PROFILE_API: `${BASE_URL}/api/v1/profile/updateProfile`,
+  UPDATE_DISPLAY_PICTURE_API: `${BASE_URL}/api/v1/profile/updateUserProfileImage`,
   DELETE_PROFILE_API: `${BASE_URL}/api/v1/profile/deleteProfile`,
   CHANGE_PASSWORD_API: `${BASE_URL}/api/v1/auth/changepassword`,
   GET_USER_ATTEMPTS: `${BASE_URL}/api/v1/mock/getAttemptsByUser`,
@@ -54,7 +55,22 @@ export const endpoints = {
   USAGE_SESSION_END: `${BASE_URL}/api/v1/usage/session/end`,
   ADMIN_APP_USAGE: `${BASE_URL}/api/v1/usage/admin`,
 
+  YOUTUBE_VIDEOS: `${BASE_URL}/api/v1/youtube/videos`,
+  YOUTUBE_VIDEO: (id: string) => `${BASE_URL}/api/v1/youtube/videos/${id}`,
+
   // Study materials
   GET_EXAMS: `${BASE_URL}/api/v1/materials/getExam`,
   GET_STUDY_MATERIALS: `${BASE_URL}/api/v1/materials/getAllStudyMaterials`,
+  PDF_LIST: `${BASE_URL}/api/v1/pdfs`,
+  PDF_FOR_MOCK: (mockId: string) => `${BASE_URL}/api/v1/pdfs/for-mock/${mockId}`,
+  PDF_TICKET: (id: string) => `${BASE_URL}/api/v1/pdfs/${id}/ticket`,
+  PDF_PREVIEW: (id: string) => `${BASE_URL}/api/v1/pdfs/${id}/preview`,
+  PDF_PAGES: (id: string) => `${BASE_URL}/api/v1/pdfs/${id}/pages`,
+  PDF_PAGE: (id: string, page: number) => `${BASE_URL}/api/v1/pdfs/${id}/page/${page}`,
+  PDF_FILE: (id: string) => `${BASE_URL}/api/v1/pdfs/${id}/file`,
+  PDF_ORDER: (id: string) => `${BASE_URL}/api/v1/pdfs/${id}/order`,
+  PDF_VERIFY: (id: string) => `${BASE_URL}/api/v1/pdfs/${id}/verify`,
+  PDF_EXAMS: `${BASE_URL}/api/v1/pdfs/exams`,
+  PDF_EXAM_ORDER: (id: string) => `${BASE_URL}/api/v1/pdfs/exams/${id}/order`,
+  PDF_EXAM_VERIFY: (id: string) => `${BASE_URL}/api/v1/pdfs/exams/${id}/verify`,
 };

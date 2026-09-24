@@ -20,6 +20,30 @@ export const studyMaterialEndPoints = {
 
 }
 
+export const youtubeEndpoints = {
+  VIDEOS: `${BASE_URL}/api/v1/youtube/videos`,
+}
+
+export const pdfEndpoints = {
+  LIST: `${BASE_URL}/api/v1/pdfs`,
+  CATEGORIES: `${BASE_URL}/api/v1/pdfs/categories`,
+  DELETE_CATEGORY: (id) => `${BASE_URL}/api/v1/pdfs/categories/${id}`,
+  FOR_MOCK: (mockId) => `${BASE_URL}/api/v1/pdfs/for-mock/${mockId}`,
+  CREATE: `${BASE_URL}/api/v1/pdfs`,
+  UPDATE: (id) => `${BASE_URL}/api/v1/pdfs/${id}`,
+  DELETE: (id) => `${BASE_URL}/api/v1/pdfs/${id}`,
+  TICKET: (id) => `${BASE_URL}/api/v1/pdfs/${id}/ticket`,
+  PREVIEW: (id) => `${BASE_URL}/api/v1/pdfs/${id}/preview`,
+  FILE: (id) => `${BASE_URL}/api/v1/pdfs/${id}/file`,
+  ORDER: (id) => `${BASE_URL}/api/v1/pdfs/${id}/order`,
+  VERIFY: (id) => `${BASE_URL}/api/v1/pdfs/${id}/verify`,
+  EXAMS: `${BASE_URL}/api/v1/pdfs/exams`,
+  UPDATE_EXAM: (id) => `${BASE_URL}/api/v1/pdfs/exams/${id}`,
+  DELETE_EXAM: (id) => `${BASE_URL}/api/v1/pdfs/exams/${id}`,
+  EXAM_ORDER: (id) => `${BASE_URL}/api/v1/pdfs/exams/${id}/order`,
+  EXAM_VERIFY: (id) => `${BASE_URL}/api/v1/pdfs/exams/${id}/verify`,
+}
+
 export const endpoints = {
   SENDOTP_API: `${BASE_URL}/api/v1/auth/sendotp`,
   SIGNUP_API: `${BASE_URL}/api/v1/auth/signup`,

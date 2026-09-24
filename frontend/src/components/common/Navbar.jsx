@@ -46,11 +46,12 @@ const Navbar = () => {
     const [confirmationModal, setConfirmationModal] = useState(null);
     const lastScrollY = useRef(0);
     const isHome = location.pathname === '/';
+    const lockHeader = location.pathname.startsWith('/study-material/');
 
     const { scrollY } = useScroll();
 
     useMotionValueEvent(scrollY, 'change', (latest) => {
-        if (latest > lastScrollY.current && latest > SCROLL_THRESHOLD) {
+        if (!lockHeader && latest > lastScrollY.current && latest > SCROLL_THRESHOLD) {
             setHidden(true);
         } else {
             setHidden(false);
@@ -77,6 +78,7 @@ const Navbar = () => {
 
     useEffect(() => {
         setIsMobileMenuOpen(false);
+        if (location.pathname.startsWith('/study-material/')) setHidden(false);
     }, [location.pathname]);
 
     return (
@@ -247,7 +249,7 @@ const Navbar = () => {
                                     { to: '/catalog/mock-tests', icon: AiOutlineBook, text: 'Courses' },
                                     { to: '/mocktest', icon: AiOutlineFileDone, text: 'Mock Tests' },
                                     { to: '/rankings', icon: FaRankingStar, text: 'Rankings' },
-                                    { to: '/exams', icon: BsFiletypePdf, text: 'Free PDF' },
+                                    { to: '/study-material', icon: BsFiletypePdf, text: 'Study Material' },
                                     { to: '/about', icon: AiOutlineInfoCircle, text: 'About' },
                                     { to: '/contact', icon: AiOutlineContacts, text: 'Contact' },
                                 ].map((item) => (

@@ -8,6 +8,7 @@ import AddMockTest from './AddTextQuestions';
 import AddAttachments from './AddOMRbased';
 import { uploadImageToCloudinary } from '../../../../services/operations/uploadToCloudinary';
 import toast from '@/utils/toast';
+import CustomSelect from '../../../common/CustomSelect';
 
 const EditMockTestSeries = () => {
   const { token } = useSelector((state) => state.auth);
@@ -552,16 +553,15 @@ const EditMockTestSeries = () => {
                   <label htmlFor="seriesStatus" className="block text-sm font-medium text-fg">
                     Series Status <sup className="text-pink-400">*</sup>
                   </label>
-                  <select
-                    id="seriesStatus"
-                    name="status"
+                  <CustomSelect
                     value={series.status}
-                    onChange={handleSeriesStatusChange}
-                    className="w-full px-4 py-3 rounded-lg bg-page border border-line text-fg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer"
-                  >
-                    <option value="draft">Draft</option>
-                    <option value="published">Published</option>
-                  </select>
+                    onChange={(status) => handleSeriesStatusChange({ target: { value: status } })}
+                    className="py-3"
+                    options={[
+                      { value: "draft", label: "Draft" },
+                      { value: "published", label: "Published" },
+                    ]}
+                  />
                 </div>
               </div>
             </div>
@@ -693,15 +693,15 @@ const EditMockTestSeries = () => {
                           <label className="block text-sm font-medium text-fg">
                             Status <sup className="text-pink-400">*</sup>
                           </label>
-                          <select
-                            name="status"
+                          <CustomSelect
                             value={test.status}
-                            onChange={(e) => handleTestStatusChange(e, testIndex)}
-                            className="w-full px-4 py-3 rounded-lg bg-page border border-line text-fg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer"
-                          >
-                            <option value="draft">Draft</option>
-                            <option value="published">Published</option>
-                          </select>
+                            onChange={(status) => handleTestStatusChange({ target: { value: status } }, testIndex)}
+                            className="py-3"
+                            options={[
+                              { value: "draft", label: "Draft" },
+                              { value: "published", label: "Published" },
+                            ]}
+                          />
                         </div>
                       </div>
 
@@ -874,24 +874,24 @@ const EditMockTestSeries = () => {
                                     <label className="block text-sm font-medium text-fg">
                                       Correct Answer <sup className="text-pink-400">*</sup>
                                     </label>
-                                    <select
-                                      name="correctAnswer"
+                                    <CustomSelect
                                       value={question.correctAnswer}
-                                      onChange={(e) => handleQuestionChange(e, testIndex, questionIndex)}
-                                      className="w-full px-4 py-3 rounded-lg bg-page border border-line text-fg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer"
-                                    >
-                                      <option value="">Select correct answer</option>
-                                      {question.options.map((opt, optionIndex) => {
-                                        const optionObj = typeof opt === 'string' ? { text: opt, image: '' } : { text: opt?.text || '', image: opt?.image || '' };
+                                      onChange={(correctAnswer) =>
+                                        handleQuestionChange(
+                                          { target: { name: "correctAnswer", value: correctAnswer } },
+                                          testIndex,
+                                          questionIndex
+                                        )
+                                      }
+                                      placeholder="Select correct answer"
+                                      className="py-3"
+                                      options={question.options.map((opt, optionIndex) => {
+                                        const optionObj = typeof opt === "string" ? { text: opt, image: "" } : { text: opt?.text || "", image: opt?.image || "" };
                                         const val = optionObj.text || optionObj.image;
                                         const label = optionObj.text || (optionObj.image ? `Image Option ${String.fromCharCode(65 + optionIndex)}` : `Option ${String.fromCharCode(65 + optionIndex)}`);
-                                        return (
-                                          <option key={optionIndex} value={val}>
-                                            {label}
-                                          </option>
-                                        );
+                                        return { value: val, label };
                                       })}
-                                    </select>
+                                    />
                                   </div>
                                 </>
                               )}

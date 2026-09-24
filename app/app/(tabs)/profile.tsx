@@ -33,6 +33,7 @@ export default function ProfileScreen() {
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   const [purchased, setPurchased] = useState<any[]>([]);
+  const [ownedPdfs, setOwnedPdfs] = useState<any[]>([]);
   const [attempts, setAttempts] = useState<any[]>([]);
   const [totalAttempts, setTotalAttempts] = useState(0);
   const [averageScoreLabel, setAverageScoreLabel] = useState<string | null>(null);
@@ -42,7 +43,7 @@ export default function ProfileScreen() {
 
   const fetchProfile = useCallback(async () => {
     try {
-      const [enrolledRes, attemptsRes, ranksRes] = await Promise.all([
+      const [enrolledRes, attemptsRes, ranksRes, pdfRes] = await Promise.all([
         apiConnector.get(endpoints.GET_ENROLLED_MOCK_TESTS).catch(() => null),
         apiConnector
           .get(endpoints.GET_USER_ATTEMPTS, { params: { page: 1, limit: 10 } })
@@ -50,6 +51,7 @@ export default function ProfileScreen() {
         apiConnector
           .get(endpoints.GET_RANKINGS, { params: { page: 1, limit: 5 } })
           .catch(() => null),
+        apiConnector.get(endpoints.PDF_LIST).catch(() => null),
       ]);
 
       if (enrolledRes?.data?.success) {
@@ -69,6 +71,8 @@ export default function ProfileScreen() {
       if (ranksRes?.data?.success) {
         setPersonalRank(ranksRes.data.loggedInUserRank?.[0] ?? null);
       }
+      const pdfs = pdfRes?.data?.data || [];
+      setOwnedPdfs(pdfs.filter((item: any) => item.access === 'paid' && item.canView));
     } catch (error) {
       console.error('Failed to fetch profile:', error);
     } finally {
@@ -179,6 +183,7 @@ export default function ProfileScreen() {
                 { icon: 'add-circle-outline', label: 'Create Mock Test', route: '/admin/create-series' },
                 { icon: 'notifications-outline', label: 'Send Notification', route: '/admin/send-notification' },
                 { icon: 'folder-open-outline', label: 'Study Materials', route: '/admin/study-materials' },
+                { icon: 'book-outline', label: 'Study library', route: '/study-material' },
               ].map((item, index, list) => (
                 <ListRow
                   key={item.route}
@@ -263,6 +268,32 @@ export default function ProfileScreen() {
                   style={styles.emptyButton}
                 />
               </View>
+            )}
+
+            <View style={[styles.sectionHead, { marginTop: 28 }]}>
+              <Text style={styles.sectionTitle}>Purchased material</Text>
+              <Pressable onPress={() => router.push('/study-material')} hitSlop={8}>
+                <Text style={styles.sectionLink}>Browse</Text>
+              </Pressable>
+            </View>
+            {ownedPdfs.length > 0 ? (
+              <View style={styles.mocksList}>
+                {ownedPdfs.map((item) => (
+                  <Pressable
+                    key={item._id}
+                    onPress={() => router.push(`/study-material/${item._id}`)}
+                    style={[styles.pdfRow, { borderColor: colors.border, backgroundColor: colors.surface }]}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.pdfTitle} numberOfLines={1}>{item.title}</Text>
+                      <Text style={styles.pdfMeta} numberOfLines={1}>{item.category || 'Study material'}</Text>
+                    </View>
+                    <Text style={styles.sectionLink}>Read</Text>
+                  </Pressable>
+                ))}
+              </View>
+            ) : (
+              <Text style={styles.emptyCopy}>Paid papers you buy will show up here.</Text>
             )}
           </>
         ) : null}
@@ -390,6 +421,26 @@ function createStyles(colors: AppPalette) {
     },
     mocksList: {
       gap: 10,
+    },
+    pdfRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderRadius: Radii.lg,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+    },
+    pdfTitle: {
+      fontSize: 14,
+      fontFamily: Fonts.semiBold,
+      color: colors.text,
+    },
+    pdfMeta: {
+      marginTop: 2,
+      fontSize: 12,
+      fontFamily: Fonts.sans,
+      color: colors.textSecondary,
     },
     empty: {
       alignItems: 'center',

@@ -21,6 +21,7 @@ import { AdminConsole } from '../../components/admin/AdminConsole';
 import { apiConnector } from '../../services/api';
 import { endpoints } from '../../constants/api';
 import { MockTestCard } from '../../components/MockTestCard';
+import { YoutubeVideo, YoutubeVideoCard } from '../../components/YoutubeVideoCard';
 import { MeshHero } from '../../components/ui/MeshHero';
 import { HomeSkeleton } from '../../components/ui/Skeleton';
 import { AppPalette, Fonts, Radii } from '../../constants/theme';
@@ -37,7 +38,7 @@ const SECTION = 20;
 const STACK = 8;
 
 const FILTERS = [
-  { id: 'all', label: 'All courses' },
+  { id: 'all', label: 'All tests' },
   { id: 'free', label: 'Free' },
   { id: 'premium', label: 'Premium' },
   { id: 'new', label: 'New arrivals' },
@@ -77,6 +78,9 @@ function StudentHomeScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [query, setQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterId>('all');
+  const [videos, setVideos] = useState<YoutubeVideo[]>([]);
+  const [videosLoading, setVideosLoading] = useState(true);
+  const [videosError, setVideosError] = useState('');
 
   const bannerHeight = Math.round((screenWidth - H_PAD * 2) / BANNER_ASPECT);
   const heroCardWidth = Math.min(260, screenWidth * 0.72);
@@ -126,9 +130,33 @@ function StudentHomeScreen() {
     }
   }, []);
 
+  const loadVideos = useCallback(async () => {
+    setVideosError('');
+    try {
+      const res = await apiConnector.get(endpoints.YOUTUBE_VIDEOS, {
+        params: { limit: 8 },
+      });
+
+      if (!res.data?.success) {
+        setVideos([]);
+        setVideosError(res.data?.message || 'Could not load videos');
+        return;
+      }
+
+      setVideos(res.data.videos || []);
+      setVideosError('');
+    } catch (error: any) {
+      setVideos([]);
+      setVideosError(error?.response?.data?.message || 'Could not load videos');
+    } finally {
+      setVideosLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchHomeData();
-  }, [fetchHomeData]);
+    loadVideos();
+  }, [fetchHomeData, loadVideos]);
 
   const filteredTests = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -196,6 +224,7 @@ function StudentHomeScreen() {
             onRefresh={() => {
               setRefreshing(true);
               fetchHomeData();
+              loadVideos();
             }}
             tintColor={colors.refreshTint}
           />
@@ -250,11 +279,11 @@ function StudentHomeScreen() {
                 <TextInput
                   value={query}
                   onChangeText={setQuery}
-                  placeholder="Search courses"
+                  placeholder="Search mock tests"
                   placeholderTextColor={colors.textMuted}
                   style={styles.searchInput}
                   returnKeyType="search"
-                  accessibilityLabel="Search courses"
+                  accessibilityLabel="Search mock tests"
                 />
               </View>
 
@@ -291,7 +320,7 @@ function StudentHomeScreen() {
             <View style={styles.section}>
               <View style={styles.sectionPad}>
                 <SectionHeading
-                  title="Courses"
+                  title="Mock tests"
                   compact
                   rightText="See all"
                   onPressRight={() => router.push('/(tabs)/mock-tests')}
@@ -317,9 +346,83 @@ function StudentHomeScreen() {
                 </ScrollView>
               ) : (
                 <View style={styles.sectionPad}>
-                  <Text style={styles.empty}>No courses match your search.</Text>
+                  <Text style={styles.empty}>No mock tests match your search.</Text>
                 </View>
               )}
+            </View>
+
+            <View style={styles.section}>
+              <View style={styles.sectionPad}>
+                <SectionHeading
+                  title="Videos"
+                  compact
+                  rightText="See all"
+                  onPressRight={() => router.push('/courses')}
+                />
+              </View>
+              {videosLoading && videos.length === 0 ? (
+                <View style={styles.sectionPad}>
+                  <Text style={styles.empty}>Loading videos...</Text>
+                </View>
+              ) : videosError && videos.length === 0 ? (
+                <View style={styles.sectionPad}>
+                  <Text style={styles.empty}>{videosError}</Text>
+                </View>
+              ) : videos.length === 0 ? (
+                <View style={styles.sectionPad}>
+                  <Text style={styles.empty}>No videos yet.</Text>
+                </View>
+              ) : (
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  decelerationRate="fast"
+                  snapToInterval={heroCardWidth + cardGap}
+                  snapToAlignment="start"
+                  contentContainerStyle={styles.carousel}
+                >
+                  {videos.map((video) => (
+                    <YoutubeVideoCard
+                      key={video.id}
+                      video={video}
+                      variant="hero"
+                      heroWidth={heroCardWidth}
+                      onPress={() =>
+                        router.push({
+                          pathname: '/watch/[id]',
+                          params: {
+                            id: video.id,
+                            title: video.title,
+                            publishedAt: video.publishedAt || '',
+                          },
+                        })
+                      }
+                    />
+                  ))}
+                </ScrollView>
+              )}
+            </View>
+
+            <View style={[styles.section, styles.sectionPad]}>
+              <SectionHeading
+                title="Study material"
+                compact
+                rightText="Open"
+                onPressRight={() => router.push('/study-material')}
+              />
+              <Pressable
+                onPress={() => router.push('/study-material')}
+                style={({ pressed }) => [
+                  styles.studyCard,
+                  { borderColor: colors.border, backgroundColor: colors.surface, opacity: pressed ? 0.92 : 1 },
+                ]}
+              >
+                <Ionicons name="document-text-outline" size={20} color={colors.text} />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.studyTitle}>Read papers in the app</Text>
+                  <Text style={styles.studyCopy}>Free and paid material. Purchases stay on your profile.</Text>
+                </View>
+              </Pressable>
             </View>
 
             <View style={[styles.section, styles.sectionPad]}>
@@ -479,6 +582,26 @@ function createStyles(colors: AppPalette) {
     chipTextActive: {
       color: colors.primaryButtonText,
       fontFamily: Fonts.semiBold,
+    },
+    studyCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderRadius: Radii.lg,
+      padding: 14,
+    },
+    studyTitle: {
+      fontSize: 14,
+      fontFamily: Fonts.semiBold,
+      color: colors.text,
+    },
+    studyCopy: {
+      marginTop: 3,
+      fontSize: 12,
+      lineHeight: 17,
+      fontFamily: Fonts.sans,
+      color: colors.textSecondary,
     },
     section: {
       paddingTop: SECTION,

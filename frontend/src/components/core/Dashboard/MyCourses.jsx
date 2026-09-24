@@ -59,7 +59,7 @@ export default function MyCoursesAndTests() {
         <div className="flex flex-wrap gap-3">
           <button
             onClick={() => navigate("/createStudyMaterial")}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-white bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+            className="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-white bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
           >
             <VscAdd size={20} />
             <span>Add PDF</span>

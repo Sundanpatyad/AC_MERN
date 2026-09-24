@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import { updateProfile } from "../../../../services/operations/SettingsAPI"
 import IconBtn from "../../../common/IconBtn"
+import CustomSelect from "../../../common/CustomSelect"
 
 const genders = ["Male", "Female", "Non-Binary", "Prefer not to say", "Other"]
 
@@ -12,7 +13,11 @@ export default function EditProfile() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
-  const { register, handleSubmit, formState: { errors } } = useForm()
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm({
+    defaultValues: {
+      gender: user?.additionalDetails?.gender || "",
+    },
+  })
 
   const submitProfileForm = async (data) => {
     try {
@@ -61,8 +66,9 @@ export default function EditProfile() {
             name="gender"
             options={genders}
             register={register}
+            setValue={setValue}
+            watch={watch}
             errors={errors}
-            defaultValue={user?.additionalDetails?.gender}
           />
           <InputField
             label="Contact Number"
@@ -126,24 +132,19 @@ function InputField({ label, name, type = "text", register, errors, defaultValue
   )
 }
 
-function SelectField({ label, name, options, register, errors, defaultValue }) {
+function SelectField({ label, name, options, register, setValue, watch, errors }) {
   return (
     <div>
       <label htmlFor={name} className="block text-sm font-medium text-muted mb-1">
         {label}
       </label>
-      <select
-        id={name}
-        {...register(name, { required: true })}
-        defaultValue={defaultValue}
-        className="w-full px-3 py-2 bg-gray-800 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-      >
-        {options.map((option, index) => (
-          <option key={index} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
+      <input className="sr-only" tabIndex={-1} {...register(name, { required: true })} />
+      <CustomSelect
+        value={watch(name)}
+        onChange={(next) => setValue(name, next, { shouldValidate: true })}
+        placeholder={`Select ${label.toLowerCase()}`}
+        options={options.map((option) => ({ value: option, label: option }))}
+      />
       {errors[name] && (
         <p className="mt-1 text-sm text-red-500">
           Please select your {label.toLowerCase()}.

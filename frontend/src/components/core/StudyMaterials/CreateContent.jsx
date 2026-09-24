@@ -16,6 +16,7 @@ import {
   deleteExam,
   deleteStudyMaterial,
 } from '../../../slices/contentSlice';
+import CustomSelect from '../../common/CustomSelect';
 
 function CreateContent() {
   const dispatch = useDispatch();
@@ -162,20 +163,14 @@ function CreateContent() {
                     <label htmlFor="exam" className="block text-sm font-medium text-muted">
                       Exam
                     </label>
-                    <select
-                      id="exam"
-                      value={selectedExamId}
-                      onChange={(e) => dispatch(setSelectedExamId(e.target.value))}
-                      required
-                      className="mt-2 block w-full rounded-md bg-elevated border-line text-fg focus:border-indigo-500 focus:ring-indigo-500 focus:ring-opacity-50"
-                    >
-                      <option value="">Select an exam</option>
-                      {exams.map((exam) => (
-                        <option key={exam._id} value={exam._id}>
-                          {exam.name}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="mt-2">
+                      <CustomSelect
+                        value={selectedExamId}
+                        onChange={(examId) => dispatch(setSelectedExamId(examId))}
+                        placeholder="Select an exam"
+                        options={exams.map((exam) => ({ value: exam._id, label: exam.name }))}
+                      />
+                    </div>
                   </div>
                 </>
               )}

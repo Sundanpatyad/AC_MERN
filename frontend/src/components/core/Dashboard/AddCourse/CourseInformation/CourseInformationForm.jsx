@@ -13,10 +13,11 @@ import IconBtn from "../../../../common/IconBtn"
 import Upload from "../Upload"
 import ChipInput from "./ChipInput"
 import RequirementsField from "./RequirementField"
+import CustomSelect from "../../../../common/CustomSelect"
 
 export default function CourseInformationForm() {
 
-  const { register, handleSubmit, setValue, getValues, formState: { errors } } = useForm()
+  const { register, handleSubmit, setValue, getValues, watch, formState: { errors } } = useForm()
 
   const dispatch = useDispatch()
   const { token } = useSelector((state) => state.auth)
@@ -204,22 +205,18 @@ export default function CourseInformationForm() {
         <label className="text-sm font-medium text-fg" htmlFor="courseCategory">
           Course Category <sup className="text-pink-400">*</sup>
         </label>
-        <select
-          {...register("courseCategory", { required: true })}
-          defaultValue=""
-          id="courseCategory"
-          className="w-full px-4 py-3 rounded-lg bg-surface border border-line text-fg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer"
-        >
-          <option value="" disabled className="bg-surface">
-            Choose a Category
-          </option>
-          {!categoriesLoading &&
-            courseCategories?.map((category, indx) => (
-              <option key={indx} value={category?._id} className="bg-surface">
-                {category?.name}
-              </option>
-            ))}
-        </select>
+        <input className="sr-only" tabIndex={-1} {...register("courseCategory", { required: true })} />
+        <CustomSelect
+          value={watch("courseCategory") || ""}
+          onChange={(categoryId) => setValue("courseCategory", categoryId, { shouldValidate: true })}
+          placeholder={categoriesLoading ? "Loading categories" : "Choose a Category"}
+          disabled={categoriesLoading}
+          className="py-3"
+          options={(courseCategories || []).map((category) => ({
+            value: category?._id,
+            label: category?.name,
+          }))}
+        />
         {errors.courseCategory && (
           <span className="ml-2 text-xs tracking-wide text-pink-400 flex items-center gap-1">
             <span>⚠</span> Course Category is required

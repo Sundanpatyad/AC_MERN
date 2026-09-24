@@ -12,6 +12,7 @@ import FloatingInquiryButton from "./components/common/FloatingInquiryButton";
 import YourComponent from "./components/ui/InitialLoader";
 import PhoneWizardPage from "./components/core/HomePage/Phone";
 import AdminCountMock from "./components/core/Admin/MockCountAdmin";
+import StudyPdfAdmin from "./components/core/Dashboard/StudyPdfAdmin";
 // import { checkAndVerifyPayment } from "./services/operations/studentFeaturesAPI";
 import PrivacyPolicy from "./pages/PrivicyPolicy";
 import CookiePolicy from "./pages/CookiePolicy";
@@ -45,6 +46,8 @@ const Catalog = lazy(() => import("./pages/Catalog"));
 const ViewCourse = lazy(() => import("./pages/ViewCourse"));
 const Mocktest = lazy(() => import("./pages/Mocktest"));
 const MockTestDetails = lazy(() => import("./pages/MockDetails"));
+const StudyLibrary = lazy(() => import("./pages/StudyLibrary"));
+const PdfReader = lazy(() => import("./pages/PdfReader"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const MyProfile = lazy(() => import("./components/core/Dashboard/MyProfile"));
 const Settings = lazy(() =>
@@ -226,6 +229,8 @@ function App() {
               <Route path="catalog/:catalogName" element={<Catalog />} />
               <Route path="courses/:courseId" element={<CourseDetails />} />
               <Route path="/mock-test/:mockId" element={<MockTestDetails />} />
+              <Route path="/study-material" element={<StudyLibrary />} />
+              <Route path="/study-material/:id" element={<PdfReader />} />
               <Route path="/exams" element={<ExamList />} />
 
               <Route
@@ -325,6 +330,10 @@ function App() {
                     <Route
                       path="dashboard/add-mocktest"
                       element={<AddMockTestSeries />}
+                    />
+                    <Route
+                      path="dashboard/study-pdfs"
+                      element={<StudyPdfAdmin />}
                     />
                     <Route
                       path="dashboard/my-courses"

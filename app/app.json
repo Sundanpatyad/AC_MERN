@@ -13,6 +13,7 @@
       "bundleIdentifier": "com.awakeningclasses",
       "icon": "./assets/images/icon.png",
       "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Choose a profile photo for your Awakening Classes account.",
         "CFBundleURLTypes": [
           {
             "CFBundleURLSchemes": [
@@ -22,7 +23,7 @@
           },
           {
             "CFBundleURLSchemes": [
-              "com.googleusercontent.apps.1004017212123-c7bbgnp0abm3gm3amjcrjkedcorqv9j1"
+              "com.googleusercontent.apps.279937570516-lun1lu6ie0ikg9ni0lb3qh6o4bjlhrl1"
             ]
           }
         ]
@@ -72,7 +73,7 @@
       [
         "@react-native-google-signin/google-signin",
         {
-          "iosUrlScheme": "com.googleusercontent.apps.1004017212123-c7bbgnp0abm3gm3amjcrjkedcorqv9j1"
+          "iosUrlScheme": "com.googleusercontent.apps.279937570516-lun1lu6ie0ikg9ni0lb3qh6o4bjlhrl1"
         }
       ],
       [
