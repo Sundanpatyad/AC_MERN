@@ -1,0 +1,67 @@
+name: Deploy API to Oracle
+
+# Runs when code is merged/pushed to backend/cicd (api changes),
+# or when started manually from the Actions tab.
+on:
+  push:
+    branches:
+      - backend/cicd
+    paths:
+      - 'api/**'
+      - '.github/workflows/deploy-api.yml'
+      - 'scripts/deploy-api.sh'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-api-oracle
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy to Oracle Free VM
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Sync API to Oracle (keep remote .env)
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.ORACLE_HOST }}
+          username: ${{ secrets.ORACLE_USER }}
+          key: ${{ secrets.ORACLE_SSH_KEY }}
+          port: 22
+          source: 'api/'
+          target: '/home/ubuntu/AC_MERN/'
+          overwrite: true
+          # Do not wipe secrets / deps on the server
+          exclude: 'api/node_modules/*,api/.env,api/.env.*,api/*.log'
+
+      - name: Install deps and restart PM2
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.ORACLE_HOST }}
+          username: ${{ secrets.ORACLE_USER }}
+          key: ${{ secrets.ORACLE_SSH_KEY }}
+          port: 22
+          script_stop: true
+          command_timeout: 10m
+          script: |
+            set -euo pipefail
+            cd /home/ubuntu/AC_MERN/api
+
+            if [ ! -f .env ]; then
+              echo "Missing /home/ubuntu/AC_MERN/api/.env on the server"
+              exit 1
+            fi
+
+            npm ci --omit=dev
+            pm2 restart ac-api --update-env || pm2 start server.js --name ac-api
+            pm2 save
+
+            sleep 2
+            curl -fsS http://127.0.0.1:8000/ | head -c 200
+            echo
+            echo "Deploy OK"
