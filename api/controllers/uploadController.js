@@ -20,7 +20,7 @@ exports.uploadImage = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Only image files are allowed (jpeg, png, webp, gif)' });
     }
 
-    const uploaded = await uploadImageToCloudinary(file, process.env.FOLDER_NAME, 1200, 1200);
+    const uploaded = await uploadImageToCloudinary(file, process.env.FOLDER_NAME, 1600, 82);
 
     return res.status(200).json({
       success: true,

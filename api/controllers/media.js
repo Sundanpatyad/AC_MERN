@@ -4,15 +4,13 @@ const { getPresignedGetUrl, r2DevUrlForKey } = require('../utils/r2Storage');
 const { requestAllowedForMedia } = require('../utils/mediaAccess');
 
 function serveMode() {
-  // redirect (default): browser downloads directly from R2/CDN — much faster
-  // proxy: stream bytes through this API (slower, Europe Cloud Run hop)
   const mode = String(process.env.MEDIA_SERVE_MODE || 'redirect').toLowerCase();
   return mode === 'proxy' ? 'proxy' : 'redirect';
 }
 
 /**
  * GET /api/v1/media/*
- * Access check (Referer / Sec-Fetch), then either redirect to R2 or proxy.
+ * Access check, then redirect to a short-lived R2 URL (fast) or proxy bytes.
  */
 exports.streamMedia = async (req, res) => {
   try {
@@ -42,17 +40,17 @@ exports.streamMedia = async (req, res) => {
       return res.status(403).type('text').send('This file can only be viewed on Awakening Classes');
     }
 
-    // Fast path: send browser straight to R2 (APAC) instead of streaming via this server
     if (serveMode() === 'redirect') {
-      let target = null;
-      if (getPublicBaseUrl()) {
+      const ttl = Math.max(60, Number(process.env.MEDIA_REDIRECT_TTL_SEC) || 3600);
+      // Prefer signed URLs — works even when R2 public access is disabled (401 on pub-*.r2.dev)
+      let target = await getPresignedGetUrl(key, ttl);
+
+      // Optional: only if you re-enable public bucket access
+      if (!target && process.env.MEDIA_USE_PUBLIC_URL === 'true' && getPublicBaseUrl()) {
         target = r2DevUrlForKey(key);
-      } else {
-        const ttl = Math.max(60, Number(process.env.MEDIA_REDIRECT_TTL_SEC) || 3600);
-        target = await getPresignedGetUrl(key, ttl);
       }
+
       if (target) {
-        // Short cache of the redirect itself; R2/CDN serves the heavy bytes
         res.setHeader('Cache-Control', 'private, max-age=60');
         res.setHeader('Vary', 'Sec-Fetch-Dest, Sec-Fetch-Mode, Referer');
         return res.redirect(302, target);
@@ -68,7 +66,6 @@ exports.streamMedia = async (req, res) => {
 
     if (result.ContentType) res.setHeader('Content-Type', result.ContentType);
     if (result.ContentLength != null) res.setHeader('Content-Length', String(result.ContentLength));
-    // Browser may cache embeds; new-tab navigation is still blocked above
     res.setHeader('Cache-Control', 'private, max-age=86400, stale-while-revalidate=604800');
     res.setHeader('Vary', 'Sec-Fetch-Dest, Sec-Fetch-Mode, Referer');
     res.setHeader('X-Content-Type-Options', 'nosniff');
