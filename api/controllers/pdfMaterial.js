@@ -12,13 +12,21 @@ const PdfExam = require('../models/pdfExam');
 const PdfPurchase = require('../models/pdfPurchase');
 const User = require('../models/user');
 const razorpay = require('../config/rajorpay');
+const { keepCloudinaryAssets } = require('../config/r2');
+const {
+  isR2Enabled,
+  uploadExpressFileToR2,
+  deleteFromR2,
+  getPresignedGetUrl,
+  getObjectBuffer,
+} = require('../utils/r2Storage');
 
 const STAFF = new Set(['Admin', 'Instructor']);
 
 const fileRevision = (material) =>
   crypto
     .createHash('sha1')
-    .update(String(material?.cloudinaryPublicId || material?._id || ''))
+    .update(String(material?.r2Key || material?.cloudinaryPublicId || material?._id || ''))
     .digest('hex')
     .slice(0, 16);
 
@@ -65,18 +73,33 @@ const uploadPdf = async (file) => {
     unique_filename: true,
     overwrite: false,
   };
+  let cloudinaryResult;
   try {
-    return await cloudinary.uploader.upload(file.tempFilePath, {
+    cloudinaryResult = await cloudinary.uploader.upload(file.tempFilePath, {
       ...base,
       type: 'authenticated',
     });
   } catch (error) {
     console.error('Authenticated PDF upload failed, retrying as private:', error?.message);
-    return cloudinary.uploader.upload(file.tempFilePath, {
+    cloudinaryResult = await cloudinary.uploader.upload(file.tempFilePath, {
       ...base,
       type: 'private',
     });
   }
+
+  let r2 = null;
+  if (isR2Enabled()) {
+    try {
+      r2 = await uploadExpressFileToR2(file, `${process.env.FOLDER_NAME || 'study-pdfs'}/pdfs`);
+    } catch (error) {
+      console.error('R2 PDF dual-write failed (Cloudinary kept):', error?.message);
+    }
+  }
+
+  return {
+    ...cloudinaryResult,
+    r2Key: r2?.key || '',
+  };
 };
 
 const countPdfPages = (buffer) => {
@@ -114,7 +137,7 @@ const uploadPreview = async (filePath) => {
 };
 
 const destroyPreview = async (publicId, type) => {
-  if (!publicId) return;
+  if (!publicId || keepCloudinaryAssets()) return;
   try {
     await cloudinary.uploader.destroy(publicId, {
       resource_type: 'image',
@@ -128,6 +151,16 @@ const destroyPreview = async (publicId, type) => {
 const previewLocks = new Map();
 
 const downloadOriginalPdf = async (material) => {
+  if (material?.r2Key) {
+    try {
+      const fromR2 = await getObjectBuffer(material.r2Key);
+      if (fromR2?.length) return fromR2;
+    } catch (error) {
+      console.error('R2 PDF download failed, trying Cloudinary:', error?.message);
+    }
+  }
+
+  if (!material?.cloudinaryPublicId) return null;
   const signedUrl = cloudinary.url(material.cloudinaryPublicId, {
     resource_type: 'raw',
     type: material.cloudinaryType || 'authenticated',
@@ -211,8 +244,9 @@ const ensurePreview = async (material) => {
   }
 };
 
-const destroyPdf = async (publicId, type) => {
-  if (!publicId) return;
+const destroyPdf = async (publicId, type, r2Key) => {
+  if (r2Key) await deleteFromR2(r2Key);
+  if (!publicId || keepCloudinaryAssets()) return;
   try {
     await cloudinary.uploader.destroy(publicId, {
       resource_type: 'raw',
@@ -499,6 +533,7 @@ exports.createPdf = async (req, res) => {
       price,
       cloudinaryPublicId: uploaded.public_id,
       cloudinaryType: uploaded.type || 'authenticated',
+      r2Key: uploaded.r2Key || '',
       previewPublicId: preview?.public_id || '',
       previewType: preview?.type || 'authenticated',
       mockTests: parseMockIds(req.body.mockTests),
@@ -565,11 +600,13 @@ exports.updatePdf = async (req, res) => {
       if (!uploaded?.public_id) {
         return res.status(500).json({ success: false, message: 'Could not store the PDF' });
       }
-      await destroyPdf(material.cloudinaryPublicId, material.cloudinaryType);
+      await destroyPdf(material.cloudinaryPublicId, material.cloudinaryType, material.r2Key);
       await destroyPreview(material.previewPublicId, material.previewType);
       material.cloudinaryPublicId = uploaded.public_id;
       material.cloudinaryType = uploaded.type || 'authenticated';
+      material.r2Key = uploaded.r2Key || '';
       material.previewPublicId = '';
+      material.pageCount = 0;
       try {
         const preview = await uploadPreview(file.tempFilePath);
         if (preview?.public_id) {
@@ -600,7 +637,7 @@ exports.deletePdf = async (req, res) => {
     if (!material) {
       return res.status(404).json({ success: false, message: 'Study material not found' });
     }
-    await destroyPdf(material.cloudinaryPublicId, material.cloudinaryType);
+    await destroyPdf(material.cloudinaryPublicId, material.cloudinaryType, material.r2Key);
     await destroyPreview(material.previewPublicId, material.previewType);
     await User.updateMany(
       { studyPdfs: material._id },
@@ -653,7 +690,7 @@ const assertCanView = async (material, user) => {
 
 exports.issueTicket = async (req, res) => {
   try {
-    const material = await PdfMaterial.findById(req.params.id).select('_id access price status exam cloudinaryPublicId');
+    const material = await PdfMaterial.findById(req.params.id).select('_id access price status exam cloudinaryPublicId r2Key');
     if (!material) {
       return res.status(404).json({ success: false, message: 'Study material not found' });
     }
@@ -830,16 +867,30 @@ exports.streamPdf = async (req, res) => {
     }
     await assertCanView(material, user);
 
-    const signedUrl = cloudinary.url(material.cloudinaryPublicId, {
-      resource_type: 'raw',
-      type: material.cloudinaryType || 'authenticated',
-      sign_url: true,
-      secure: true,
-      expires_at: Math.floor(Date.now() / 1000) + 90,
-    });
+    let upstream;
+    if (material.r2Key) {
+      try {
+        const signedUrl = await getPresignedGetUrl(material.r2Key, 120);
+        if (signedUrl) {
+          upstream = await fetch(signedUrl);
+        }
+      } catch (error) {
+        console.error('R2 stream failed, falling back to Cloudinary:', error?.message);
+      }
+    }
 
-    const upstream = await fetch(signedUrl);
-    if (!upstream.ok || !upstream.body) {
+    if (!upstream?.ok) {
+      const signedUrl = cloudinary.url(material.cloudinaryPublicId, {
+        resource_type: 'raw',
+        type: material.cloudinaryType || 'authenticated',
+        sign_url: true,
+        secure: true,
+        expires_at: Math.floor(Date.now() / 1000) + 90,
+      });
+      upstream = await fetch(signedUrl);
+    }
+
+    if (!upstream?.ok || !upstream.body) {
       return res.status(502).json({ success: false, message: 'Could not open this material' });
     }
 

@@ -11,10 +11,25 @@ export default function ConfirmationModal({ modalData }) {
                 </p>
 
                 <div className="flex items-center gap-3">
-                    <button className="btn-primary flex-1" onClick={modalData?.btn1Handler}>
-                        {modalData?.btn1Text}
+                    <button
+                        className="btn-primary flex-1 disabled:opacity-60"
+                        onClick={modalData?.btn1Handler}
+                        disabled={modalData?.btn1Loading}
+                    >
+                        {modalData?.btn1Loading ? (
+                            <span className="inline-flex items-center gap-2">
+                                <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-r-transparent" />
+                                {modalData?.btn1Text}
+                            </span>
+                        ) : (
+                            modalData?.btn1Text
+                        )}
                     </button>
-                    <button className="btn-secondary flex-1" onClick={modalData?.btn2Handler}>
+                    <button
+                        className="btn-secondary flex-1 disabled:opacity-60"
+                        onClick={modalData?.btn2Handler}
+                        disabled={modalData?.btn1Loading}
+                    >
                         {modalData?.btn2Text}
                     </button>
                 </div>
