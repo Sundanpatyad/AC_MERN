@@ -37,6 +37,9 @@ app.use(express.urlencoded({ limit: '15mb', extended: true }));
 
 app.use(cookieParser());
 
+// Expand /api/v1/media/... in JSON using this request's host (local vs production)
+app.use(require('./utils/mediaAccess').mediaUrlResponseMiddleware);
+
 // Allow all origins
 app.use(
   cors({

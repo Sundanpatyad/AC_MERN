@@ -1,6 +1,7 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { useAuthStore } from '../store/authStore';
+import { BASE_URL } from '../constants/api';
 
 export const apiConnector = axios.create({
   timeout: 10000,
@@ -26,6 +27,27 @@ function shouldLogoutOn401(url: string | undefined, hadAuthHeader: boolean): boo
   }
   const { token } = useAuthStore.getState();
   return hadAuthHeader || !!token;
+}
+
+function absolutizeMediaInClient(data: unknown, seen = new WeakSet<object>()): unknown {
+  if (data == null || typeof data !== 'object') {
+    if (typeof data !== 'string' || !data.includes('/api/v1/media/')) return data;
+    const base = String(BASE_URL || '').replace(/\/$/, '');
+    if (data.startsWith('/api/v1/media/')) return `${base}${data}`;
+    const idx = data.indexOf('/api/v1/media/');
+    return `${base}${data.slice(idx)}`;
+  }
+  if (seen.has(data as object)) return data;
+  if (Array.isArray(data)) {
+    seen.add(data);
+    return data.map((item) => absolutizeMediaInClient(item, seen));
+  }
+  seen.add(data as object);
+  const out: Record<string, unknown> = {};
+  for (const [key, val] of Object.entries(data as Record<string, unknown>)) {
+    out[key] = absolutizeMediaInClient(val, seen);
+  }
+  return out;
 }
 
 apiConnector.interceptors.request.use(
@@ -65,7 +87,12 @@ apiConnector.interceptors.request.use(
 );
 
 apiConnector.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (response?.data) {
+      response.data = absolutizeMediaInClient(response.data);
+    }
+    return response;
+  },
   async (error) => {
     const status = error?.response?.status;
     if (status === 401) {

@@ -61,6 +61,7 @@ async function uploadBufferToR2(buffer, { key, contentType, folder, originalName
       Key: objectKey,
       Body: buffer,
       ContentType: contentType || 'application/octet-stream',
+      CacheControl: 'public, max-age=31536000, immutable',
     })
   );
 
