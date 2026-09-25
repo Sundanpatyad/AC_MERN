@@ -37,6 +37,9 @@ axios.interceptors.request.use(attachAuthToken);
 // Response interceptor to handle token expiration
 axiosInstance.interceptors.response.use(
     (response) => {
+        if (response?.data) {
+            response.data = absolutizeMediaInClient(response.data);
+        }
         return response;
     },
     (error) => {
@@ -63,6 +66,27 @@ axiosInstance.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+
+function absolutizeMediaInClient(data, seen = new WeakSet()) {
+    if (data == null || typeof data !== "object") {
+        if (typeof data !== "string" || !data.includes("/api/v1/media/")) return data;
+        const base = String(BASE_URL || "").replace(/\/$/, "");
+        if (data.startsWith("/api/v1/media/")) return `${base}${data}`;
+        const idx = data.indexOf("/api/v1/media/");
+        return `${base}${data.slice(idx)}`;
+    }
+    if (seen.has(data)) return data;
+    if (Array.isArray(data)) {
+        seen.add(data);
+        return data.map((item) => absolutizeMediaInClient(item, seen));
+    }
+    seen.add(data);
+    const out = Array.isArray(data) ? [] : {};
+    for (const [key, val] of Object.entries(data)) {
+        out[key] = absolutizeMediaInClient(val, seen);
+    }
+    return out;
+}
 
 export const apiConnector = (method, url, bodyData, headers, params) => {
     return axiosInstance({

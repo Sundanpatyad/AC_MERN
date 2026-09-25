@@ -96,28 +96,70 @@ function signMediaKey(key, exp) {
   return crypto.createHmac('sha256', secret).update(`${key}:${exp}`).digest('hex').slice(0, 32);
 }
 
+/** Path only — store this in MongoDB (no host). */
 function mediaUrlForKey(key) {
   const encoded = String(key)
     .split('/')
     .map((part) => encodeURIComponent(part))
     .join('/');
-  return `${apiPublicBase()}/api/v1/media/${encoded}`;
+  return `/api/v1/media/${encoded}`;
+}
+
+function requestApiBase(req) {
+  if (!req) return apiPublicBase();
+  const proto = String(req.get('x-forwarded-proto') || req.protocol || 'http').split(',')[0].trim();
+  const host = String(req.get('x-forwarded-host') || req.get('host') || '').split(',')[0].trim();
+  if (!host) return apiPublicBase();
+  return `${proto}://${host}`.replace(/\/$/, '');
+}
+
+/** Turn relative /api/v1/media/... into absolute for the current API host. */
+function absolutizeMediaString(value, base) {
+  if (typeof value !== 'string' || !value.includes('/api/v1/media/')) return value;
+  const root = String(base || apiPublicBase()).replace(/\/$/, '');
+  if (value.startsWith('/api/v1/media/')) return `${root}${value}`;
+  const idx = value.indexOf('/api/v1/media/');
+  return `${root}${value.slice(idx)}`;
+}
+
+function toRelativeMediaPath(value) {
+  if (typeof value !== 'string' || !value.includes('/api/v1/media/')) return value;
+  const idx = value.indexOf('/api/v1/media/');
+  return value.slice(idx);
+}
+
+function absolutizeMediaInData(data, base, seen = new WeakSet()) {
+  if (data == null || typeof data !== 'object') {
+    return typeof data === 'string' ? absolutizeMediaString(data, base) : data;
+  }
+  if (typeof data.toJSON === 'function' && !(data instanceof Date) && !Array.isArray(data)) {
+    // Mongoose docs / ObjectId — serialize first when possible is handled by res.json already
+  }
+  if (seen.has(data)) return data;
+  if (Array.isArray(data)) {
+    seen.add(data);
+    return data.map((item) => absolutizeMediaInData(item, base, seen));
+  }
+  if (data instanceof Date) return data;
+  if (Buffer.isBuffer(data)) return data;
+  seen.add(data);
+  const out = {};
+  for (const [key, val] of Object.entries(data)) {
+    out[key] = absolutizeMediaInData(val, base, seen);
+  }
+  return out;
 }
 
 function signedMediaUrlForKey(key, ttlSeconds = 3600) {
   const exp = Math.floor(Date.now() / 1000) + ttlSeconds;
   const sig = signMediaKey(key, exp);
-  const base = mediaUrlForKey(key);
-  return `${base}?exp=${exp}&sig=${sig}`;
+  return `${mediaUrlForKey(key)}?exp=${exp}&sig=${sig}`;
 }
 
 function keyFromMediaUrl(url) {
   if (!url) return null;
-  const prefix = `${apiPublicBase()}/api/v1/media/`;
   const raw = String(url);
-  if (!raw.startsWith(prefix) && !raw.includes('/api/v1/media/')) {
-    return null;
-  }
+  if (!raw.includes('/api/v1/media/')) return null;
   const idx = raw.indexOf('/api/v1/media/');
   let pathPart = raw.slice(idx + '/api/v1/media/'.length).split('?')[0];
   try {
@@ -131,6 +173,21 @@ function keyFromMediaUrl(url) {
   return pathPart || null;
 }
 
+/** Express middleware: expand relative media paths using this request's host. */
+function mediaUrlResponseMiddleware(req, res, next) {
+  const base = requestApiBase(req);
+  const originalJson = res.json.bind(res);
+  res.json = (body) => {
+    try {
+      return originalJson(absolutizeMediaInData(body, base));
+    } catch (error) {
+      console.error('mediaUrlResponseMiddleware:', error?.message);
+      return originalJson(body);
+    }
+  };
+  next();
+}
+
 module.exports = {
   apiPublicBase,
   allowedMediaOrigins,
@@ -139,4 +196,9 @@ module.exports = {
   signedMediaUrlForKey,
   keyFromMediaUrl,
   signMediaKey,
+  requestApiBase,
+  absolutizeMediaString,
+  absolutizeMediaInData,
+  toRelativeMediaPath,
+  mediaUrlResponseMiddleware,
 };
