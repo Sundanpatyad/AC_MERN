@@ -40,12 +40,14 @@ exports.streamMedia = async (req, res) => {
       return res.status(403).type('text').send('This file can only be viewed on Awakening Classes');
     }
 
-    if (serveMode() === 'redirect') {
+    const mobile = require('../utils/mediaAccess').isMobileApiClient(req);
+    // React Native Image is unreliable with cross-host 302 → always proxy for apps
+    const useRedirect = serveMode() === 'redirect' && !mobile;
+
+    if (useRedirect) {
       const ttl = Math.max(60, Number(process.env.MEDIA_REDIRECT_TTL_SEC) || 3600);
-      // Prefer signed URLs — works even when R2 public access is disabled (401 on pub-*.r2.dev)
       let target = await getPresignedGetUrl(key, ttl);
 
-      // Optional: only if you re-enable public bucket access
       if (!target && process.env.MEDIA_USE_PUBLIC_URL === 'true' && getPublicBaseUrl()) {
         target = r2DevUrlForKey(key);
       }

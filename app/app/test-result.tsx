@@ -19,6 +19,7 @@ import { useTheme } from '../providers/AppThemeProvider';
 import { Button } from '../components/ui/Button';
 import { TickRing } from '../components/ui/TickRing';
 import { SectionHeading } from '../components/ui/SectionHeading';
+import { MediaImage } from '../components/MediaImage';
 
 const BRAND = '#B10207';
 const GREEN = '#2F6F4E';
@@ -134,7 +135,7 @@ function ReviewBlock({
       </View>
       <Text style={styles.questionText}>{formatMultiline(item.questionText)}</Text>
       {item.questionImage ? (
-        <Image source={{ uri: item.questionImage }} style={styles.questionImage} resizeMode="contain" />
+        <MediaImage uri={item.questionImage} style={styles.questionImage} resizeMode="contain" />
       ) : null}
 
       {item.questionType === 'MATCH' && item.leftColumn && item.rightColumn && (

@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   Pressable,
-  Image,
   StyleProp,
   ViewStyle,
 } from 'react-native';
@@ -14,6 +13,7 @@ import { useRouter } from 'expo-router';
 import { Fonts, Radii } from '@/constants/theme';
 import { useTheme } from '@/providers/AppThemeProvider';
 import { isInstructorAccount, useAuthStore } from '@/store/authStore';
+import { MediaImage } from '@/components/MediaImage';
 
 interface MockTestCardProps {
   test: any;
@@ -77,7 +77,7 @@ export function MockTestCard({
         ]}
       >
         {test.thumbnail ? (
-          <Image source={{ uri: test.thumbnail }} style={styles.heroImage} resizeMode="cover" />
+          <MediaImage uri={test.thumbnail} style={styles.heroImage} resizeMode="cover" />
         ) : (
           <View style={[styles.heroPlaceholder, { backgroundColor: colors.surfaceRaised }]}>
             <Ionicons name="book-outline" size={32} color={colors.textMuted} />
@@ -129,7 +129,7 @@ export function MockTestCard({
       >
         <View style={[styles.rowThumb, { backgroundColor: colors.surfaceRaised }]}>
           {test.thumbnail ? (
-            <Image source={{ uri: test.thumbnail }} style={styles.rowImage} />
+            <MediaImage uri={test.thumbnail} style={styles.rowImage} />
           ) : (
             <Ionicons name="book-outline" size={22} color={colors.textMuted} />
           )}
@@ -165,7 +165,7 @@ export function MockTestCard({
     >
       <View style={[styles.imageContainer, { backgroundColor: colors.surfaceRaised }]}>
         {test.thumbnail ? (
-          <Image source={{ uri: test.thumbnail }} style={styles.image} resizeMode="cover" />
+          <MediaImage uri={test.thumbnail} style={styles.image} resizeMode="cover" />
         ) : (
           <View style={styles.placeholderImage}>
             <Ionicons name="book-outline" size={36} color={colors.textMuted} />

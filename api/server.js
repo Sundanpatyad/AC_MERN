@@ -45,7 +45,7 @@ app.use(
   cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-AC-Viewer'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-AC-Viewer', 'X-AC-Client'],
   })
 );
 app.options('*', cors({ origin: '*' }));

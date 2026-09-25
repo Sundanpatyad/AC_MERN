@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Image,
   Pressable,
   RefreshControl,
 } from 'react-native';
@@ -23,6 +22,7 @@ import { MeshHero } from '../../components/ui/MeshHero';
 import { Button } from '../../components/ui/Button';
 import { AppPalette, Fonts, Radii } from '../../constants/theme';
 import { useTheme } from '../../providers/AppThemeProvider';
+import { MediaImage } from '../../components/MediaImage';
 
 export default function ProfileScreen() {
   const { user } = useAuthStore();
@@ -147,7 +147,7 @@ export default function ProfileScreen() {
       >
         <View style={styles.identity}>
           {user?.image ? (
-            <Image source={{ uri: user.image }} style={[styles.avatar, { borderColor: colors.border }]} />
+            <MediaImage uri={user.image} style={[styles.avatar, { borderColor: colors.border }]} />
           ) : (
             <View style={[styles.avatar, styles.avatarFallback, { borderColor: colors.border }]}>
               <Text style={styles.avatarLetter}>{initials}</Text>

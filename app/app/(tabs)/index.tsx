@@ -29,6 +29,7 @@ import { useTheme } from '../../providers/AppThemeProvider';
 import { SectionHeading } from '../../components/ui/SectionHeading';
 import { ProgressGlance } from '../../components/ui/ProgressGlance';
 import { useTabScreenBottomPadding } from '../../lib/safeArea';
+import { MediaImage } from '../../components/MediaImage';
 
 const YOUTUBE_CHANNEL = 'https://www.youtube.com/@awakeningclasses';
 const RANK_STORY_URL = 'https://youtu.be/zZqPFZo8IUo?si=MbeDgOr_YtO9bH_x';
@@ -253,7 +254,7 @@ function StudentHomeScreen() {
                 >
                   <View style={styles.avatar}>
                     {user?.image ? (
-                      <Image source={{ uri: user.image }} style={styles.avatarImage} />
+                      <MediaImage uri={user.image} style={styles.avatarImage} />
                     ) : (
                       <Text style={styles.avatarLetter}>{user?.firstName?.[0] || 'A'}</Text>
                     )}

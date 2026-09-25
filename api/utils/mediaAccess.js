@@ -68,9 +68,23 @@ function hasValidBearer(req) {
   }
 }
 
+function isMobileApiClient(req) {
+  const client = String(req.get('x-ac-client') || '').toLowerCase();
+  if (client === 'app' || client === 'mobile' || client === 'awakening-app') return true;
+  const ua = String(req.get('user-agent') || '');
+  // React Native / Expo image & API clients (not desktop Chrome)
+  if (/okhttp/i.test(ua)) return true;
+  if (/Expo/i.test(ua)) return true;
+  if (/CFNetwork/i.test(ua) && !/Chrome|Firefox|Safari\/[\d.]+$/.test(ua)) return true;
+  return false;
+}
+
 function requestAllowedForMedia(req) {
-  // App / signed links (optional)
+  // App / signed links
   if (hasValidMediaSignature(req) || hasValidBearer(req)) return true;
+
+  // React Native Image requests (no Referer) — allow native clients only
+  if (isMobileApiClient(req) && !isTopLevelNavigation(req)) return true;
 
   // Block "Open image in new tab" / paste in address bar (browser sends navigate/document)
   if (isTopLevelNavigation(req)) return false;
@@ -156,6 +170,33 @@ function signedMediaUrlForKey(key, ttlSeconds = 3600) {
   return `${mediaUrlForKey(key)}?exp=${exp}&sig=${sig}`;
 }
 
+function signMediaString(value, base, ttlSeconds) {
+  if (typeof value !== 'string' || !value.includes('/api/v1/media/')) return value;
+  if (/[?&]sig=/.test(value)) return absolutizeMediaString(value, base);
+  const key = keyFromMediaUrl(value);
+  if (!key) return absolutizeMediaString(value, base);
+  const root = String(base || apiPublicBase()).replace(/\/$/, '');
+  return `${root}${signedMediaUrlForKey(key, ttlSeconds)}`;
+}
+
+function signMediaUrlsInData(data, base, ttlSeconds, seen = new WeakSet()) {
+  if (data == null || typeof data !== 'object') {
+    return typeof data === 'string' ? signMediaString(data, base, ttlSeconds) : data;
+  }
+  if (seen.has(data)) return data;
+  if (Array.isArray(data)) {
+    seen.add(data);
+    return data.map((item) => signMediaUrlsInData(item, base, ttlSeconds, seen));
+  }
+  if (data instanceof Date || Buffer.isBuffer(data)) return data;
+  seen.add(data);
+  const out = {};
+  for (const [key, val] of Object.entries(data)) {
+    out[key] = signMediaUrlsInData(val, base, ttlSeconds, seen);
+  }
+  return out;
+}
+
 function keyFromMediaUrl(url) {
   if (!url) return null;
   const raw = String(url);
@@ -176,10 +217,14 @@ function keyFromMediaUrl(url) {
 /** Express middleware: expand relative media paths using this request's host. */
 function mediaUrlResponseMiddleware(req, res, next) {
   const base = requestApiBase(req);
+  const signForApp = isMobileApiClient(req);
+  const ttl = Math.max(300, Number(process.env.MEDIA_APP_URL_TTL_SEC) || 86400);
   const originalJson = res.json.bind(res);
   res.json = (body) => {
     try {
-      return originalJson(absolutizeMediaInData(body, base));
+      let data = absolutizeMediaInData(body, base);
+      if (signForApp) data = signMediaUrlsInData(data, base, ttl);
+      return originalJson(data);
     } catch (error) {
       console.error('mediaUrlResponseMiddleware:', error?.message);
       return originalJson(body);
@@ -201,4 +246,5 @@ module.exports = {
   absolutizeMediaInData,
   toRelativeMediaPath,
   mediaUrlResponseMiddleware,
+  isMobileApiClient,
 };
