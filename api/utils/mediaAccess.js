@@ -35,7 +35,46 @@ function originFromUrl(value) {
   }
 }
 
+/** True when user opened the URL as a page (new tab / address bar), not as <img>/<video>. */
+function isTopLevelNavigation(req) {
+  const dest = String(req.get('sec-fetch-dest') || '').toLowerCase();
+  const mode = String(req.get('sec-fetch-mode') || '').toLowerCase();
+  return dest === 'document' || mode === 'navigate';
+}
+
+function hasValidMediaSignature(req) {
+  const exp = Number(req.query.exp);
+  const sig = String(req.query.sig || '');
+  if (!exp || !sig || exp * 1000 <= Date.now()) return false;
+  const key = req.mediaKey || '';
+  const expected = signMediaKey(key, exp);
+  if (!expected || sig.length !== expected.length) return false;
+  try {
+    return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(sig));
+  } catch {
+    return false;
+  }
+}
+
+function hasValidBearer(req) {
+  const auth = req.get('authorization') || '';
+  if (!auth.toLowerCase().startsWith('bearer ') || !process.env.JWT_SECRET) return false;
+  try {
+    const jwt = require('jsonwebtoken');
+    jwt.verify(auth.slice(7).trim(), process.env.JWT_SECRET);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function requestAllowedForMedia(req) {
+  // App / signed links (optional)
+  if (hasValidMediaSignature(req) || hasValidBearer(req)) return true;
+
+  // Block "Open image in new tab" / paste in address bar (browser sends navigate/document)
+  if (isTopLevelNavigation(req)) return false;
+
   const origins = allowedMediaOrigins();
   const referer = req.get('referer') || req.get('referrer') || '';
   const origin = req.get('origin') || '';
@@ -46,33 +85,6 @@ function requestAllowedForMedia(req) {
   }
   if (origin && origins.some((o) => origin === o || origin.replace(/\/$/, '') === o)) {
     return true;
-  }
-
-  // Signed query for mobile / downloads (short-lived)
-  const exp = Number(req.query.exp);
-  const sig = String(req.query.sig || '');
-  if (exp && sig && exp * 1000 > Date.now()) {
-    const key = req.mediaKey || '';
-    const expected = signMediaKey(key, exp);
-    if (expected && sig.length === expected.length) {
-      try {
-        if (crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(sig))) return true;
-      } catch {
-        /* ignore */
-      }
-    }
-  }
-
-  // Authed app / dashboard requests
-  const auth = req.get('authorization') || '';
-  if (auth.toLowerCase().startsWith('bearer ') && process.env.JWT_SECRET) {
-    try {
-      const jwt = require('jsonwebtoken');
-      jwt.verify(auth.slice(7).trim(), process.env.JWT_SECRET);
-      return true;
-    } catch {
-      /* ignore */
-    }
   }
 
   return false;
