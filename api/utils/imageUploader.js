@@ -7,16 +7,34 @@ const {
   keyFromPublicUrl,
   isCloudinaryUrl,
 } = require('./r2Storage');
+const { compressUploadedImage } = require('./compressImage');
 
 /**
  * Dual-write media: always Cloudinary (for now), plus R2 when configured.
- * secure_url prefers protected API media URL (website-only), not public R2.
+ * Images are compressed first (smaller size, high quality).
+ * secure_url prefers protected API media path (website-only).
  */
 exports.uploadImageToCloudinary = async (file, folder, height, quality) => {
   try {
+    const mime = String(file?.mimetype || '');
+    const isImage = mime.startsWith('image/');
+
+    if (isImage) {
+      // height arg historically used as max edge (e.g. 1200); ignore bogus quality>100
+      const maxEdge = Number(height) > 100 ? Number(height) : undefined;
+      const jpegQuality = Number(quality) > 0 && Number(quality) <= 100 ? Number(quality) : undefined;
+      await compressUploadedImage(file, { maxEdge, quality: jpegQuality });
+    }
+
     const options = { folder, resource_type: 'auto' };
-    if (height) options.height = height;
-    if (quality) options.quality = quality;
+    if (isImage && Number(height) > 100) {
+      // Cloudinary side: optional bound (already resized locally)
+      options.height = Number(height);
+      options.crop = 'limit';
+    }
+    if (isImage && Number(quality) > 0 && Number(quality) <= 100) {
+      options.quality = Number(quality);
+    }
 
     const cloudinaryResult = await cloudinary.uploader.upload(file.tempFilePath, options);
     if (!cloudinaryResult) return null;
@@ -30,7 +48,6 @@ exports.uploadImageToCloudinary = async (file, folder, height, quality) => {
       }
     }
 
-    // Images: protected media URL. Videos: same (stream via /api/v1/media).
     const secureUrl = r2?.url || cloudinaryResult.secure_url;
 
     return {
@@ -55,12 +72,10 @@ exports.deleteResourceFromCloudinary = async (urlOrPublicId) => {
   }
 
   if (keepCloudinaryAssets()) {
-    // Transition mode: leave Cloudinary objects in place for existing users.
     return { skipped: true, reason: 'KEEP_CLOUDINARY_ASSETS' };
   }
 
   try {
-    // Legacy callers sometimes pass a full URL; destroy expects public_id.
     let publicId = urlOrPublicId;
     if (isCloudinaryUrl(urlOrPublicId)) {
       const match = String(urlOrPublicId).match(/\/upload\/(?:v\d+\/)?(.+)\.[a-z0-9]+$/i);
