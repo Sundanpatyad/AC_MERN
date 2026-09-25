@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Image,
   Pressable,
   useWindowDimensions,
 } from 'react-native';
@@ -18,6 +17,7 @@ import RazorpayCheckout from 'react-native-razorpay';
 import { isInstructorAccount, useAuthStore } from '../../store/authStore';
 import { apiConnector } from '../../services/api';
 import { endpoints } from '../../constants/api';
+import { MediaImage } from '../../components/MediaImage';
 import { Button } from '../../components/ui/Button';
 import { DetailSkeleton } from '../../components/ui/Skeleton';
 import { AppPalette, Fonts, Radii } from '../../constants/theme';
@@ -453,8 +453,8 @@ export default function MockTestDetailScreen() {
       >
         <View style={[styles.hero, { height: heroHeight }]}>
           {testDetails.thumbnail ? (
-            <Image
-              source={{ uri: testDetails.thumbnail }}
+            <MediaImage
+              uri={testDetails.thumbnail}
               style={styles.heroImage}
               resizeMode="cover"
             />

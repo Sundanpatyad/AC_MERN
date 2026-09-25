@@ -1,6 +1,7 @@
-// export const BASE_URL = 'https://62d7-2404-7c80-5d-e8-e00e-3212-9219-1d50.ngrok-free.app';
+// Local testing (iOS simulator). Android emulator: use http://10.0.2.2:8000
+export const BASE_URL = 'http://localhost:8000';
 // export const BASE_URL = 'https://ac-mern-279937570516.europe-west1.run.app';
-export const BASE_URL = 'https://api.awakeningclasses.in';
+// export const BASE_URL = 'https://api.awakeningclasses.in';
 
 export const endpoints = {
   // Auth
