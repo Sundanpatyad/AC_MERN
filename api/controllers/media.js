@@ -45,10 +45,11 @@ exports.streamMedia = async (req, res) => {
 
     if (result.ContentType) res.setHeader('Content-Type', result.ContentType);
     if (result.ContentLength != null) res.setHeader('Content-Length', String(result.ContentLength));
-    res.setHeader('Cache-Control', 'private, max-age=300');
+    // no-store so "open in new tab" cannot reuse a cached copy from <img>
+    res.setHeader('Cache-Control', 'private, no-store');
+    res.setHeader('Vary', 'Sec-Fetch-Dest, Sec-Fetch-Mode, Referer');
     res.setHeader('X-Content-Type-Options', 'nosniff');
-    // Discourage embedding on foreign sites even if somehow fetched
-    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader(
       'Content-Security-Policy',
       "default-src 'none'; img-src 'self'; media-src 'self'; sandbox"
