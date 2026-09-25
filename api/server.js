@@ -81,6 +81,7 @@ app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/usage', usageRoutes);
 app.use('/api/v1/pdfs', pdfRoutes);
 app.use('/api/v1/youtube', youtubeRoutes);
+app.use('/api/v1/media', require('./routes/media'));
 
 /* =========================
    HEALTH / DEFAULT ROUTE

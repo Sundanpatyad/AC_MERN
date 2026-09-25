@@ -14,6 +14,8 @@ const pdfMaterialSchema = new mongoose.Schema(
     price: { type: Number, default: 0, min: 0 },
     cloudinaryPublicId: { type: String, required: true },
     cloudinaryType: { type: String, default: 'authenticated' },
+    // R2 object key for the original PDF (Cloudinary kept during transition)
+    r2Key: { type: String, default: '' },
     previewPublicId: { type: String, default: '' },
     previewType: { type: String, default: 'authenticated' },
     pageCount: { type: Number, default: 0 },
