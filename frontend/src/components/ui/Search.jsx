@@ -14,7 +14,7 @@ export function PlaceholdersAndVanishInputDemo({ onResultClick }) {
 
   const placeholders = [
     "Search Mocktests...",
-    "Search Courses...",
+    "Search Study Material...",
   ];
 
   const handleChange = (e) => {

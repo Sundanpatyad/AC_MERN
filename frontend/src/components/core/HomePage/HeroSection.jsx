@@ -169,7 +169,7 @@ const HeroSection = () => {
               {token ? (
                 <>
                   <Link to="/dashboard/enrolled-courses" className="btn-primary">
-                    My courses
+                    My mock tests
                     <ArrowRight size={16} />
                   </Link>
                   <Link

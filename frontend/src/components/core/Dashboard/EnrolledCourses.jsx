@@ -1,13 +1,8 @@
 import { useEffect, useState } from "react"
-import ProgressBar from "@ramonak/react-progress-bar"
 import { useSelector, useDispatch } from "react-redux"
 import { useNavigate } from "react-router-dom"
-import { getUserEnrolledCourses, getUserAttempts, getUserEnrolledMockTests } from "../../../services/operations/profileAPI"
-import Img from './../../common/Img';
+import { getUserAttempts, getUserEnrolledMockTests } from "../../../services/operations/profileAPI"
 import {
-  setEnrolledCoursesStart,
-  setEnrolledCoursesSuccess,
-  setEnrolledCoursesFailure,
   setEnrolledMockTestsStart,
   setEnrolledMockTestsSuccess,
   setEnrolledMockTestsFailure,
@@ -18,37 +13,26 @@ import {
 
 export default function EnrolledCourses() {
   const { token } = useSelector((state) => state.auth)
-  const { enrolledCourses, enrolledMockTests, mockAttempts, loading, error } = useSelector((state) => state.enrolledContent)
+  const { enrolledMockTests, mockAttempts, loading, error } = useSelector((state) => state.enrolledContent)
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
   const [showMockAttempts, setShowMockAttempts] = useState(false)
 
   useEffect(() => {
-    const loadCourses = async () => {
-      if (enrolledCourses || loading.courses) return
-      dispatch(setEnrolledCoursesStart())
-      try {
-        const res = await getUserEnrolledCourses(token)
-        dispatch(setEnrolledCoursesSuccess(res))
-      } catch (error) {
-        dispatch(setEnrolledCoursesFailure(error.message))
-      }
-    }
-
     const loadMockTests = async () => {
       if (enrolledMockTests || loading.mockTests) return
       dispatch(setEnrolledMockTestsStart())
       try {
         const res = await getUserEnrolledMockTests(token)
         dispatch(setEnrolledMockTestsSuccess(res))
-      } catch (error) {
-        dispatch(setEnrolledMockTestsFailure(error.message))
+      } catch (err) {
+        dispatch(setEnrolledMockTestsFailure(err.message))
       }
     }
 
-    Promise.all([loadCourses(), loadMockTests()])
-  }, [token, dispatch, enrolledCourses, enrolledMockTests, loading.courses, loading.mockTests])
+    loadMockTests()
+  }, [token, dispatch, enrolledMockTests, loading.mockTests])
 
   const getMockAttempts = async () => {
     if (!mockAttempts && !loading.attempts) {
@@ -56,23 +40,23 @@ export default function EnrolledCourses() {
       try {
         const res = await getUserAttempts(token, { page: 1, limit: 100 })
         dispatch(setMockAttemptsSuccess(res?.attempts || []))
-      } catch (error) {
-        dispatch(setMockAttemptsFailure(error.message))
+      } catch (err) {
+        dispatch(setMockAttemptsFailure(err.message))
       }
     }
   }
 
   const groupAttemptsBySeriesName = (attempts) => {
-    if (!Array.isArray(attempts)) return {};
+    if (!Array.isArray(attempts)) return {}
     return attempts.reduce((acc, attempt) => {
-      const seriesName = attempt.mockTestSeries?.seriesName || 'Unknown Series';
+      const seriesName = attempt.mockTestSeries?.seriesName || "Unknown Series"
       if (!acc[seriesName]) {
-        acc[seriesName] = [];
+        acc[seriesName] = []
       }
-      acc[seriesName].push(attempt);
-      return acc;
-    }, {});
-  };
+      acc[seriesName].push(attempt)
+      return acc
+    }, {})
+  }
 
   return (
     <div className="min-h-screen rounded-md bg-page text-white py-12 px-4 sm:px-6 lg:px-8">
@@ -81,36 +65,6 @@ export default function EnrolledCourses() {
           Your Learning Dashboard
         </h1>
 
-        {/* Enrolled Courses Section */}
-        <section className="mb-16">
-          <h2 className="text-3xl text-center font-semibold mb-8 text-white">Enrolled Courses</h2>
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {loading.courses ? (
-              <p className="col-span-full text-center text-muted py-8">Loading enrolled courses...</p>
-            ) : error.courses ? (
-              <p className="col-span-full text-center text-red-500 py-8">Error: {error.courses}</p>
-            ) : !enrolledCourses || enrolledCourses.length === 0 ? (
-              <p className="col-span-full text-center text-muted py-8">You haven't enrolled in any courses yet.</p>
-            ) : (
-              enrolledCourses.map((course, i) => (
-                <div key={i} className="bg-surface rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300">
-                  <div className="p-6 cursor-pointer" onClick={() => navigate(`/view-course/${course?._id}/section/${course.courseContent?.[0]?._id}/sub-section/${course.courseContent?.[0]?.subSection?.[0]?._id}`)}>
-                    <Img src={course.thumbnail && course.thumbnail} alt="course_img" className="h-48 w-full rounded-lg object-cover mb-4" />
-                    <h3 className="font-bold text-xl mb-2 text-white">{course.courseName}</h3>
-                    <p className="text-muted mb-4">{course.courseDescription.slice(0, 100)}...</p>
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm text-muted">Duration: {course?.totalDuration}</span>
-                      <span className="text-sm font-semibold text-blue-400">Progress: {course.progressPercentage || 0}%</span>
-                    </div>
-                    <ProgressBar completed={course.progressPercentage || 0} height="8px" isLabelVisible={false} bgColor="#60A5FA" baseBgColor="#4B5563" />
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </section>
-
-        {/* Enrolled Mock Tests Section */}
         <section className="mb-16">
           <h2 className="text-3xl text-center font-semibold mb-8 text-white">Enrolled Mock Tests</h2>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -124,14 +78,22 @@ export default function EnrolledCourses() {
               enrolledMockTests.map((mockTest, i) => (
                 <div
                   onClick={() => navigate(`/mock-test/${mockTest._id}`)}
-                  key={i} className="bg-surface rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300">
+                  key={i}
+                  className="bg-surface rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300"
+                >
                   <div className="p-6">
                     <h3 className="font-bold text-xl flex flex-wrap mb-2 text-white">{mockTest.seriesName}</h3>
                     <p className="text-muted mb-4">{mockTest.description.slice(0, 100)}...</p>
                     <div className="flex justify-between items-center">
                       <span className="text-lg font-semibold text-green-400">Rs. {mockTest.price}</span>
-                      <span className={`text-sm font-medium px-3 py-1 rounded-full ${mockTest.status === 'completed' ? 'bg-green-500 text-green-100' : 'bg-yellow-500 text-yellow-100'}`}>
-                        {mockTest.status === 'draft' ? 'Draft' : 'Published'}
+                      <span
+                        className={`text-sm font-medium px-3 py-1 rounded-full ${
+                          mockTest.status === "completed"
+                            ? "bg-green-500 text-green-100"
+                            : "bg-yellow-500 text-yellow-100"
+                        }`}
+                      >
+                        {mockTest.status === "draft" ? "Draft" : "Published"}
                       </span>
                     </div>
                   </div>
@@ -141,7 +103,6 @@ export default function EnrolledCourses() {
           </div>
         </section>
 
-        {/* Mock Test Attempts Section */}
         <section className="text-center mb-16">
           <button
             onClick={() => {
@@ -170,9 +131,13 @@ export default function EnrolledCourses() {
                       {attempts.map((attempt, index) => (
                         <div key={index} className="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition-all duration-300">
                           <h4 className="text-lg text-white font-semibold mb-2">{attempt.testName}</h4>
-                          <p className="text-muted text-sm mb-3">{new Date(attempt.createdAt).toLocaleDateString()}</p>
+                          <p className="text-muted text-sm mb-3">
+                            {new Date(attempt.createdAt).toLocaleDateString()}
+                          </p>
                           <div className="flex justify-between items-center mb-2">
-                            <span className="text-blue-400 font-medium">Score: {attempt.score} / {attempt.totalQuestions}</span>
+                            <span className="text-blue-400 font-medium">
+                              Score: {attempt.score} / {attempt.totalQuestions}
+                            </span>
                             <span className="text-purple-400 font-medium">Time: {attempt.timeTaken}</span>
                           </div>
                           <div className="flex justify-between items-center">

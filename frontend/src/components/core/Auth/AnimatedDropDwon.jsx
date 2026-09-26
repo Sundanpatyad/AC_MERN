@@ -6,8 +6,8 @@ import { AiOutlineHome, AiOutlineBook, AiOutlineFileDone, AiOutlineInfoCircle, A
 const AnimatedDropdown = ({ isOpen, onClose }) => {
   const menuItems = [
     { to: "/", icon: AiOutlineHome, text: "Home" },
-    { to: "/catalog/mock-tests", icon: AiOutlineBook, text: "Courses" },
     { to: "/mocktest", icon: AiOutlineFileDone, text: "Mock Tests" },
+    { to: "/study-material", icon: AiOutlineBook, text: "Study Material" },
     { to: "/about", icon: AiOutlineInfoCircle, text: "About Us" },
     { to: "/contact", icon: AiOutlineContacts, text: "Contact Us" },
     { to: "/login", icon: AiOutlineLogin, text: "Log in" },

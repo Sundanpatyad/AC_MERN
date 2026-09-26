@@ -67,7 +67,7 @@ export default function DeleteAccountPage() {
             <ul className="mt-3 list-disc space-y-1 pl-5 text-muted">
               <li>Account profile: name, email, phone number, photo, and password</li>
               <li>App login sessions and device notification tokens</li>
-              <li>Course and mock-test enrollments tied to your account</li>
+              <li>Mock-test enrollments tied to your account</li>
               <li>Test attempts, scores, and in-app usage logs</li>
               <li>Saved profile details such as about, date of birth, and gender</li>
             </ul>

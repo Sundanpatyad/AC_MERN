@@ -58,7 +58,7 @@ export default function Cart() {
           </div>
           <h2 className="mt-5 text-lg font-medium text-fg">Your cart is empty</h2>
           <p className="mt-1.5 text-sm text-muted">
-            Browse our mock tests and courses to get started.
+            Browse our mock tests and study material to get started.
           </p>
           <Link to="/mocktest" className="btn-primary mt-6">
             Browse mock tests

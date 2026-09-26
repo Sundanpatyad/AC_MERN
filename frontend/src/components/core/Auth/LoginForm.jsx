@@ -35,7 +35,7 @@ function LoginForm() {
           Welcome back
         </h1>
         <p className="mt-2.5 text-sm text-muted leading-relaxed">
-          Sign in to resume your courses, track progress, and take mock tests.
+          Sign in to take mock tests, open study material, and track your progress.
         </p>
 
         <button

@@ -50,7 +50,6 @@ const Footer = () => {
           <div>
             <h3 className="text-sm font-semibold text-fg mb-3">Learn</h3>
             <div className="flex flex-col gap-2.5">
-              <Link to="/catalog/all-courses" className="text-sm text-muted hover:text-fg transition-colors">Courses</Link>
               <Link to="/mocktest" className="text-sm text-muted hover:text-fg transition-colors">Mock Tests</Link>
               <Link to="/study-material" className="text-sm text-muted hover:text-fg transition-colors">Study Material</Link>
             </div>

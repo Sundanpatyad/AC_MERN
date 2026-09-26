@@ -3,7 +3,6 @@ import { Link, matchPath, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, useMotionValueEvent, useScroll, AnimatePresence } from 'framer-motion';
 import { NavbarLinks } from '../../../data/navbar-links';
-import { useCategories } from '../../hooks/useCategories';
 import { logout } from '../../services/operations/authAPI';
 import ProfileDropDown from '../core/Auth/ProfileDropDown';
 import ConfirmationModal from './ConfirmationModal';
@@ -15,14 +14,12 @@ import { VscDashboard, VscShield, VscSignOut } from 'react-icons/vsc';
 import {
     AiOutlineSearch,
     AiOutlineHome,
-    AiOutlineBook,
     AiOutlineFileDone,
     AiOutlineInfoCircle,
     AiOutlineContacts,
 } from 'react-icons/ai';
 import { HiBars3BottomRight } from 'react-icons/hi2';
 import { IoClose } from 'react-icons/io5';
-import { MdKeyboardArrowDown } from 'react-icons/md';
 import rzpLogo from '../../assets/Logo/logo.png';
 import { PlaceholdersAndVanishInputDemo } from '../ui/Search';
 import { RxCross1 } from 'react-icons/rx';
@@ -36,7 +33,6 @@ const Navbar = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const { data: subLinks = [], isLoading: loading } = useCategories();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
     const { totalItems } = useSelector((state) => state.cart);
@@ -106,51 +102,23 @@ const Navbar = () => {
 
                     <ul className="hidden lg:flex items-center gap-1">
                         {NavbarLinks.map((link, index) => (
-                            <li key={index} className="relative group">
-                                {link.title === 'Courses' ? (
-                                    <div className="flex items-center gap-1 cursor-pointer px-3 py-2 text-sm text-muted hover:text-fg transition-colors">
-                                        <span>{link.title}</span>
-                                        <MdKeyboardArrowDown className="group-hover:rotate-180 transition-transform duration-300" />
-                                        <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                                            <div className="w-52 bg-surface border border-line rounded-xl p-1.5 shadow-lg">
-                                                {loading ? (
-                                                    <div className="p-4 text-center">
-                                                        <div className="w-4 h-4 border-2 border-line border-t-fg rounded-full animate-spin mx-auto" />
-                                                    </div>
-                                                ) : subLinks.length ? (
-                                                    subLinks.map((subLink, i) => (
-                                                        <Link
-                                                            key={i}
-                                                            to={`/catalog/${subLink.name.split(' ').join('-').toLowerCase()}`}
-                                                            className="block px-3 py-2.5 text-sm text-muted hover:text-fg hover:bg-elevated rounded-lg transition-colors"
-                                                        >
-                                                            {subLink.name}
-                                                        </Link>
-                                                    ))
-                                                ) : (
-                                                    <p className="p-3 text-sm text-subtle text-center">No categories</p>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <Link
-                                        to={link?.path}
-                                        className={`relative block px-3 py-2 text-sm transition-colors ${
-                                            matchRoute(link?.path)
-                                                ? 'text-fg font-medium'
-                                                : 'text-muted hover:text-fg'
-                                        }`}
-                                    >
-                                        {link.title}
-                                        {matchRoute(link?.path) && (
-                                            <motion.div
-                                                layoutId="nav-underline"
-                                                className="absolute bottom-0.5 left-3 right-3 h-0.5 rounded-full bg-fg"
-                                            />
-                                        )}
-                                    </Link>
-                                )}
+                            <li key={index}>
+                                <Link
+                                    to={link?.path}
+                                    className={`relative block px-3 py-2 text-sm transition-colors ${
+                                        matchRoute(link?.path)
+                                            ? 'text-fg font-medium'
+                                            : 'text-muted hover:text-fg'
+                                    }`}
+                                >
+                                    {link.title}
+                                    {matchRoute(link?.path) && (
+                                        <motion.div
+                                            layoutId="nav-underline"
+                                            className="absolute bottom-0.5 left-3 right-3 h-0.5 rounded-full bg-fg"
+                                        />
+                                    )}
+                                </Link>
                             </li>
                         ))}
                     </ul>
@@ -246,7 +214,6 @@ const Navbar = () => {
                             <div className="flex-1 overflow-y-auto p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] flex flex-col gap-1">
                                 {[
                                     { to: '/', icon: AiOutlineHome, text: 'Home' },
-                                    { to: '/catalog/mock-tests', icon: AiOutlineBook, text: 'Courses' },
                                     { to: '/mocktest', icon: AiOutlineFileDone, text: 'Mock Tests' },
                                     { to: '/rankings', icon: FaRankingStar, text: 'Rankings' },
                                     { to: '/study-material', icon: BsFiletypePdf, text: 'Study Material' },

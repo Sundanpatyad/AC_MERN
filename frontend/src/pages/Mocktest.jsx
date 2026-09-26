@@ -318,7 +318,7 @@ const MockTestComponent = () => {
         <div className="relative md:mt-8 text-center">
           <input
             type="text"
-            placeholder="Search Courses..."
+            placeholder="Search mock tests..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-80 py-3 px-8 rounded-2xl border border-line bg-transparent text-fg placeholder-muted focus:outline-none focus:ring-2 focus:ring-muted touch-action-manipulation select-none"

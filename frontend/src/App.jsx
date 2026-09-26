@@ -1,6 +1,6 @@
 import React, { Suspense, lazy, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { Route, Routes, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiArrowNarrowUp } from "react-icons/hi";
 
@@ -41,8 +41,6 @@ const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
 const About = lazy(() => import("./pages/About"));
 const Contact = lazy(() => import("./pages/Contact"));
 const PageNotFound = lazy(() => import("./pages/PageNotFound"));
-const CourseDetails = lazy(() => import("./pages/CourseDetails"));
-const Catalog = lazy(() => import("./pages/Catalog"));
 const ViewCourse = lazy(() => import("./pages/ViewCourse"));
 const Mocktest = lazy(() => import("./pages/Mocktest"));
 const MockTestDetails = lazy(() => import("./pages/MockDetails"));
@@ -226,8 +224,9 @@ function App() {
               <Route path="/about" element={<About />} />
               <Route path="/rankings" element={<RankingsPage />} />
               <Route path="/rankings/:testName" element={<RankingsPage />} />
-              <Route path="catalog/:catalogName" element={<Catalog />} />
-              <Route path="courses/:courseId" element={<CourseDetails />} />
+              <Route path="catalog/:catalogName" element={<Navigate to="/mocktest" replace />} />
+              <Route path="catalog" element={<Navigate to="/mocktest" replace />} />
+              <Route path="courses/:courseId" element={<Navigate to="/mocktest" replace />} />
               <Route path="/mock-test/:mockId" element={<MockTestDetails />} />
               <Route path="/study-material" element={<StudyLibrary />} />
               <Route path="/study-material/:id" element={<PdfReader />} />

@@ -1,6 +1,6 @@
 import React from 'react';
 import { AiOutlineHome } from 'react-icons/ai';
-import { PiNotebook, PiClipboardText } from 'react-icons/pi';
+import { PiClipboardText } from 'react-icons/pi';
 import { HiAcademicCap } from 'react-icons/hi2';
 import { MdOutlineAdminPanelSettings } from 'react-icons/md';
 import { Link, useLocation } from 'react-router-dom';
@@ -27,21 +27,12 @@ const BottomBar = () => {
         <NavItem to="/" icon={AiOutlineHome} label="Home" active={isActive('/')} />
         <NavItem to="/mocktest" icon={HiAcademicCap} label="Tests" active={isActive('/mocktest')} />
 
-        {user?.accountType !== 'Instructor' ? (
-          <NavItem
-            to="/catalog/mock-tests"
-            icon={PiNotebook}
-            label="Courses"
-            active={isActive('/catalog')}
-          />
-        ) : (
-          <NavItem
-            to="/study-material"
-            icon={BsFiletypePdf}
-            label="Study Material"
-            active={isActive('/study-material')}
-          />
-        )}
+        <NavItem
+          to="/study-material"
+          icon={BsFiletypePdf}
+          label="Study"
+          active={isActive('/study-material')}
+        />
 
         {user?.accountType !== 'Instructor' ? (
           <NavItem
