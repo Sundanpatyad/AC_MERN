@@ -427,8 +427,14 @@ const StudyLibrary = () => {
             {Array.from({ length: 6 }).map((_, index) => (
               <div
                 key={index}
-                className="h-28 animate-pulse rounded-xl border border-line bg-surface"
-              />
+                className="overflow-hidden rounded-xl border border-line bg-surface"
+              >
+                <div className="aspect-[16/10] animate-pulse bg-elevated" />
+                <div className="space-y-2 p-4">
+                  <div className="h-3 w-1/3 animate-pulse rounded bg-elevated" />
+                  <div className="h-4 w-4/5 animate-pulse rounded bg-elevated" />
+                </div>
+              </div>
             ))}
           </div>
         ) : !openExam ? (
@@ -446,37 +452,53 @@ const StudyLibrary = () => {
                     key={itemId(exam._id)}
                     type="button"
                     onClick={() => chooseExam(exam)}
-                    className="group flex items-stretch gap-3.5 rounded-xl border border-line bg-surface p-3.5 text-left transition hover:border-fg/25 hover:shadow-md sm:p-4"
+                    className="group overflow-hidden rounded-xl border border-line bg-surface text-left transition hover:border-fg/25 hover:shadow-md"
                   >
-                    <div
-                      className="flex h-16 w-14 shrink-0 items-center justify-center rounded-xl bg-elevated text-fg/80 ring-1 ring-line sm:h-[4.5rem] sm:w-16"
-                      aria-hidden
-                    >
-                      <BsFiletypePdf className="text-3xl sm:text-4xl" />
-                    </div>
-                    <div className="flex min-w-0 flex-1 flex-col">
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">
-                          {exam.category}
-                        </p>
+                    {/* 16:10 thumbnail frame */}
+                    <div className="relative aspect-[16/10] w-full overflow-hidden bg-elevated">
+                      {exam.thumbnail ? (
+                        <img
+                          src={exam.thumbnail}
+                          alt=""
+                          className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-fg/55">
+                          <BsFiletypePdf className="text-4xl sm:text-5xl" />
+                          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">
+                            Study pack
+                          </span>
+                        </div>
+                      )}
+                      <div className="absolute right-2 top-2">
                         {locked ? (
-                          <BiLockAlt className="shrink-0 text-muted" size={16} />
+                          <span className="inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-1 text-[10px] font-medium text-white backdrop-blur-sm">
+                            <BiLockAlt size={12} />
+                            ₹{exam.price}
+                          </span>
                         ) : exam.access === "paid" ? (
-                          <BiCheckCircle className="shrink-0 text-fg/70" size={16} />
-                        ) : null}
+                          <span className="inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-1 text-[10px] font-medium text-white backdrop-blur-sm">
+                            <BiCheckCircle size={12} />
+                            Unlocked
+                          </span>
+                        ) : (
+                          <span className="rounded-full bg-black/55 px-2 py-1 text-[10px] font-medium text-white backdrop-blur-sm">
+                            Free
+                          </span>
+                        )}
                       </div>
-                      <h2 className="mt-1 line-clamp-2 text-[15px] font-semibold leading-snug tracking-tight text-fg">
+                    </div>
+                    <div className="flex flex-col gap-2 p-3.5 sm:p-4">
+                      <p className="truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">
+                        {exam.category}
+                      </p>
+                      <h2 className="line-clamp-2 text-[15px] font-semibold leading-snug tracking-tight text-fg">
                         {exam.name}
                       </h2>
-                      <div className="mt-auto flex items-center justify-between gap-2 pt-2.5">
+                      <div className="mt-0.5 flex items-center justify-between gap-2">
                         <p className="truncate text-xs text-muted">
                           {exam.pdfCount} PDF{exam.pdfCount === 1 ? "" : "s"}
-                          {" · "}
-                          {locked
-                            ? `₹${exam.price}`
-                            : exam.access === "paid"
-                              ? "Unlocked"
-                              : "Free"}
                         </p>
                         <span className="inline-flex shrink-0 items-center gap-0.5 text-xs font-semibold text-fg opacity-80 group-hover:opacity-100">
                           Open

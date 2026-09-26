@@ -23,6 +23,10 @@ const emptyExam = {
   access: "free",
   price: "",
   status: "draft",
+  thumbnailFile: null,
+  thumbnailPreview: "",
+  existingThumbnail: "",
+  removeThumbnail: false,
 };
 
 const fieldClass =
@@ -166,6 +170,9 @@ const StudyPdfAdmin = () => {
   };
 
   const closeExam = () => {
+    if (examForm.thumbnailPreview?.startsWith("blob:")) {
+      URL.revokeObjectURL(examForm.thumbnailPreview);
+    }
     setExamOpen(false);
     setEditingExamId(null);
     setExamForm(emptyExam);
@@ -179,19 +186,23 @@ const StudyPdfAdmin = () => {
     }
     try {
       setSaving(true);
-      const payload = {
-        name: examForm.name,
-        category: examForm.category,
-        description: examForm.description,
-        access: examForm.access,
-        price: examForm.access === "paid" ? examForm.price : 0,
-        status: examForm.status,
-      };
+      const body = new FormData();
+      body.append("name", examForm.name);
+      body.append("category", examForm.category);
+      body.append("description", examForm.description || "");
+      body.append("access", examForm.access);
+      body.append("price", examForm.access === "paid" ? examForm.price : "0");
+      body.append("status", examForm.status);
+      if (examForm.thumbnailFile) {
+        body.append("thumbnail", examForm.thumbnailFile);
+      } else if (examForm.removeThumbnail) {
+        body.append("removeThumbnail", "1");
+      }
       if (editingExamId) {
-        await apiConnector("PUT", pdfEndpoints.UPDATE_EXAM(editingExamId), payload);
+        await apiConnector("PUT", pdfEndpoints.UPDATE_EXAM(editingExamId), body);
         toast.success("Exam updated");
       } else {
-        await apiConnector("POST", pdfEndpoints.EXAMS, payload);
+        await apiConnector("POST", pdfEndpoints.EXAMS, body);
         toast.success("Exam created");
       }
       closeExam();
@@ -462,7 +473,21 @@ const StudyPdfAdmin = () => {
         ) : (
           <div className="flex w-full min-w-0 gap-3 overflow-x-auto pb-2 [scrollbar-width:thin]">
             {visibleExams.map((exam) => (
-              <article key={exam._id} className="w-72 shrink-0 rounded-2xl border border-line bg-surface p-4">
+              <article key={exam._id} className="w-72 shrink-0 overflow-hidden rounded-2xl border border-line bg-surface">
+                <div className="aspect-[16/10] bg-elevated">
+                  {exam.thumbnail ? (
+                    <img
+                      src={exam.thumbnail}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-xs font-semibold tracking-wider text-muted">
+                      No thumbnail
+                    </div>
+                  )}
+                </div>
+                <div className="p-4">
                 <div className="flex items-start justify-between gap-3">
                   <p className="font-medium truncate">{exam.name}</p>
                   <span className={`shrink-0 rounded-full border px-2.5 py-1 text-xs ${exam.status === "draft" ? "border-amber-500/40 text-amber-300" : "border-line text-muted"}`}>
@@ -488,6 +513,10 @@ const StudyPdfAdmin = () => {
                         access: exam.access,
                         price: exam.price ? String(exam.price) : "",
                         status: exam.status === "draft" ? "draft" : "published",
+                        thumbnailFile: null,
+                        thumbnailPreview: "",
+                        existingThumbnail: exam.thumbnail || "",
+                        removeThumbnail: false,
                       });
                       setExamOpen(true);
                     }}
@@ -505,6 +534,7 @@ const StudyPdfAdmin = () => {
                     {busyId === exam._id ? <ButtonSpinner /> : null}
                     Delete
                   </button>
+                </div>
                 </div>
               </article>
             ))}
@@ -679,6 +709,53 @@ const StudyPdfAdmin = () => {
                   rows={3}
                 />
               </label>
+              <label className="block text-sm">
+                Thumbnail
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0] || null;
+                    if (examForm.thumbnailPreview?.startsWith("blob:")) {
+                      URL.revokeObjectURL(examForm.thumbnailPreview);
+                    }
+                    setExamForm({
+                      ...examForm,
+                      thumbnailFile: file,
+                      thumbnailPreview: file ? URL.createObjectURL(file) : "",
+                      removeThumbnail: false,
+                    });
+                  }}
+                  className="mt-1.5 block w-full text-sm text-muted file:mr-3 file:rounded-lg file:border-0 file:bg-elevated file:px-3 file:py-2 file:text-sm file:text-fg"
+                />
+              </label>
+              {(examForm.thumbnailPreview ||
+                (!examForm.removeThumbnail && examForm.existingThumbnail)) && (
+                <div className="flex items-center gap-3">
+                  <img
+                    src={examForm.thumbnailPreview || examForm.existingThumbnail}
+                    alt=""
+                    className="h-20 w-28 rounded-lg border border-line object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (examForm.thumbnailPreview?.startsWith("blob:")) {
+                        URL.revokeObjectURL(examForm.thumbnailPreview);
+                      }
+                      setExamForm({
+                        ...examForm,
+                        thumbnailFile: null,
+                        thumbnailPreview: "",
+                        removeThumbnail: Boolean(examForm.existingThumbnail),
+                      });
+                    }}
+                    className="text-xs font-medium text-muted hover:text-fg"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
             </div>
             <div className="flex justify-end gap-2 mt-6">
               <button type="button" onClick={closeExam} className="px-4 py-2 rounded-lg border border-line text-sm">
