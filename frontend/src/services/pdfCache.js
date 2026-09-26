@@ -17,6 +17,25 @@ const openDb = () =>
     request.onerror = () => reject(request.error);
   });
 
+const isPdfBytes = (bytes) => {
+  if (!bytes) return false;
+  const view =
+    bytes instanceof ArrayBuffer
+      ? new Uint8Array(bytes)
+      : bytes instanceof Uint8Array
+        ? bytes
+        : null;
+  if (!view || view.length < 5) return false;
+  // %PDF-
+  return (
+    view[0] === 0x25 &&
+    view[1] === 0x50 &&
+    view[2] === 0x44 &&
+    view[3] === 0x46 &&
+    view[4] === 0x2d
+  );
+};
+
 export const getCachedPdf = async (id, revision) => {
   try {
     const db = await openDb();
@@ -26,7 +45,7 @@ export const getCachedPdf = async (id, revision) => {
       const request = tx.objectStore(STORE).get(String(id));
       request.onsuccess = () => {
         const row = request.result;
-        if (row?.revision === revision && row?.bytes) {
+        if (row?.revision === revision && isPdfBytes(row?.bytes)) {
           resolve(row.bytes);
           return;
         }
@@ -42,7 +61,7 @@ export const getCachedPdf = async (id, revision) => {
 export const saveCachedPdf = async (id, revision, bytes) => {
   try {
     const db = await openDb();
-    if (!db || !id || !revision || !bytes) return;
+    if (!db || !id || !revision || !isPdfBytes(bytes)) return;
     await new Promise((resolve) => {
       const tx = db.transaction(STORE, 'readwrite');
       tx.objectStore(STORE).put({ revision, bytes }, String(id));

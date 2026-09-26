@@ -2,16 +2,22 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { BiArrowBack, BiMinus, BiPlus } from "react-icons/bi";
-import { GlobalWorkerOptions, getDocument } from "pdfjs-dist";
-import workerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import { axiosInstance } from "../services/apiConnector";
 import { pdfEndpoints } from "../services/apis";
 import { getCachedPdf, saveCachedPdf } from "../services/pdfCache";
+import {
+  ensurePdfWorker,
+  isPdfArrayBuffer,
+  openPdfDocument,
+  pageRenderScale,
+} from "../services/pdfEngine";
 import { toast } from "@/utils/toast";
+import { itemId, isMongoId } from "../utils/itemId";
 
-GlobalWorkerOptions.workerSrc = workerUrl;
+ensurePdfWorker();
 
 const readError = async (error) => {
+  if (error?.message && !error?.response) return error.message;
   const data = error?.response?.data;
   if (data instanceof ArrayBuffer) {
     try {
@@ -25,20 +31,131 @@ const readError = async (error) => {
 
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 3;
+const clampZoom = (value) =>
+  Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, Math.round(value * 20) / 20));
 
-const clampZoom = (value) => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, Math.round(value * 20) / 20));
+/** One page slot — renders only when near viewport; cancels work on leave. */
+function PdfPage({ pdf, pageNumber, zoom }) {
+  const wrapRef = useRef(null);
+  const canvasRef = useRef(null);
+  const renderTaskRef = useRef(null);
+  const [ratio, setRatio] = useState(1.414); // A4-ish until measured
+  const [visible, setVisible] = useState(false);
+  const [pageError, setPageError] = useState(false);
+
+  useEffect(() => {
+    const node = wrapRef.current;
+    if (!node) return undefined;
+    const io = new IntersectionObserver(
+      ([entry]) => setVisible(entry.isIntersecting),
+      { rootMargin: "600px 0px", threshold: 0.01 }
+    );
+    io.observe(node);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const run = async () => {
+      if (!visible || !pdf) return;
+      setPageError(false);
+      try {
+        const page = await pdf.getPage(pageNumber);
+        if (cancelled) return;
+
+        const baseViewport = page.getViewport({ scale: 1 });
+        setRatio(baseViewport.height / Math.max(baseViewport.width, 1));
+
+        const scale = pageRenderScale(zoom, baseViewport.width);
+        const viewport = page.getViewport({ scale });
+        const canvas = canvasRef.current;
+        if (!canvas || cancelled) return;
+
+        const ctx = canvas.getContext("2d", { alpha: false });
+        if (!ctx) return;
+
+        // Cancel any in-flight paint before starting a new one
+        if (renderTaskRef.current) {
+          try {
+            renderTaskRef.current.cancel();
+          } catch {
+            /* ignore */
+          }
+          renderTaskRef.current = null;
+        }
+
+        canvas.width = Math.floor(viewport.width);
+        canvas.height = Math.floor(viewport.height);
+
+        const task = page.render({ canvasContext: ctx, viewport });
+        renderTaskRef.current = task;
+        await task.promise;
+        renderTaskRef.current = null;
+      } catch (error) {
+        if (cancelled || error?.name === "RenderingCancelledException") return;
+        console.error(`pdf page ${pageNumber}:`, error);
+        setPageError(true);
+      }
+    };
+
+    run();
+    return () => {
+      cancelled = true;
+      if (renderTaskRef.current) {
+        try {
+          renderTaskRef.current.cancel();
+        } catch {
+          /* ignore */
+        }
+        renderTaskRef.current = null;
+      }
+    };
+  }, [pdf, pageNumber, zoom, visible]);
+
+  // Drop canvas pixels when far off-screen to free GPU memory
+  useEffect(() => {
+    if (visible) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.width = 0;
+    canvas.height = 0;
+  }, [visible]);
+
+  return (
+    <div
+      ref={wrapRef}
+      className="relative w-full overflow-hidden bg-white"
+      style={{ aspectRatio: `${1} / ${ratio}` }}
+    >
+      <canvas
+        ref={canvasRef}
+        className="block h-full w-full"
+        onDragStart={(event) => event.preventDefault()}
+      />
+      {pageError && (
+        <div className="absolute inset-0 grid place-items-center bg-surface/80 text-xs text-muted">
+          Page {pageNumber} failed
+        </div>
+      )}
+    </div>
+  );
+}
 
 const PdfReader = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { token } = useSelector((state) => state.auth);
-  const hostRef = useRef(null);
-  const pdfRef = useRef(null);
   const pinchRef = useRef(null);
+  const loadingTaskRef = useRef(null);
+  const pdfRef = useRef(null);
   const [status, setStatus] = useState("Loading material...");
   const [failed, setFailed] = useState(false);
   const [zoom, setZoom] = useState(1);
-  const [ready, setReady] = useState(false);
+  const [pdf, setPdf] = useState(null);
+  const [pageCount, setPageCount] = useState(0);
 
   const applyZoom = useCallback((value) => {
     setZoom((current) => clampZoom(typeof value === "number" ? value : current));
@@ -50,6 +167,13 @@ const PdfReader = () => {
       return undefined;
     }
 
+    const materialId = itemId(id);
+    if (!isMongoId(materialId)) {
+      setFailed(true);
+      setStatus("Could not open this material");
+      return undefined;
+    }
+
     let cancelled = false;
     const blockKeys = (event) => {
       const key = event.key?.toLowerCase();
@@ -57,34 +181,80 @@ const PdfReader = () => {
         event.preventDefault();
       }
     };
-    const blockMenu = (event) => {
-      if (hostRef.current?.contains(event.target)) event.preventDefault();
-    };
+    const blockMenu = (event) => event.preventDefault();
     document.addEventListener("keydown", blockKeys);
     document.addEventListener("contextmenu", blockMenu);
 
+    const destroyDoc = async ({ updateState = true } = {}) => {
+      if (updateState) {
+        setPdf(null);
+        setPageCount(0);
+      }
+      const doc = pdfRef.current;
+      pdfRef.current = null;
+      if (doc) {
+        try {
+          await doc.destroy();
+        } catch {
+          /* ignore */
+        }
+      }
+      const task = loadingTaskRef.current;
+      loadingTaskRef.current = null;
+      if (task) {
+        try {
+          await task.destroy();
+        } catch {
+          /* ignore */
+        }
+      }
+    };
+
     const open = async () => {
       try {
-        const ticketResponse = await axiosInstance.post(pdfEndpoints.TICKET(id));
+        setFailed(false);
+        setStatus("Loading material...");
+        await destroyDoc({ updateState: true });
+
+        const ticketResponse = await axiosInstance.post(pdfEndpoints.TICKET(materialId));
         const ticket = ticketResponse.data?.ticket;
         const revision = ticketResponse.data?.revision;
         if (!ticket) throw new Error("Could not open this material");
 
-        let bytes = revision ? await getCachedPdf(id, revision) : null;
+        let bytes = revision ? await getCachedPdf(materialId, revision) : null;
         if (!bytes) {
-          const fileResponse = await axiosInstance.get(pdfEndpoints.FILE(id), {
+          const fileResponse = await axiosInstance.get(pdfEndpoints.FILE(materialId), {
             headers: { "X-AC-Viewer": ticket },
             responseType: "arraybuffer",
           });
           bytes = fileResponse.data;
-          if (revision) await saveCachedPdf(id, revision, bytes);
+          if (!isPdfArrayBuffer(bytes)) {
+            try {
+              const msg = JSON.parse(new TextDecoder().decode(bytes))?.message;
+              throw new Error(msg || "Could not open this material");
+            } catch (inner) {
+              if (inner?.message) throw inner;
+              throw new Error("Could not open this material");
+            }
+          }
+          if (revision) await saveCachedPdf(materialId, revision, bytes);
         }
         if (cancelled) return;
 
-        const pdf = await getDocument({ data: new Uint8Array(bytes) }).promise;
-        if (cancelled) return;
-        pdfRef.current = pdf;
-        setReady(true);
+        const { loadingTask } = openPdfDocument(bytes);
+        loadingTaskRef.current = loadingTask;
+        const doc = await loadingTask.promise;
+        if (cancelled) {
+          try {
+            await doc.destroy();
+          } catch {
+            /* ignore */
+          }
+          return;
+        }
+        pdfRef.current = doc;
+        setPdf(doc);
+        setPageCount(doc.numPages || 0);
         setStatus("");
       } catch (error) {
         if (cancelled) return;
@@ -98,39 +268,11 @@ const PdfReader = () => {
     open();
     return () => {
       cancelled = true;
-      pdfRef.current = null;
+      destroyDoc({ updateState: false });
       document.removeEventListener("keydown", blockKeys);
       document.removeEventListener("contextmenu", blockMenu);
     };
   }, [id, navigate, token]);
-
-  useEffect(() => {
-    const pdf = pdfRef.current;
-    const host = hostRef.current;
-    if (!pdf || !host || !ready) return undefined;
-    let cancelled = false;
-
-    const draw = async () => {
-      host.replaceChildren();
-      for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
-        if (cancelled) return;
-        const page = await pdf.getPage(pageNumber);
-        const viewport = page.getViewport({ scale: 1.2 * zoom });
-        const canvas = document.createElement("canvas");
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        canvas.className = "block h-auto w-full bg-white";
-        canvas.addEventListener("dragstart", (event) => event.preventDefault());
-        host.appendChild(canvas);
-        await page.render({ canvasContext: canvas.getContext("2d"), viewport }).promise;
-      }
-    };
-
-    draw();
-    return () => {
-      cancelled = true;
-    };
-  }, [ready, zoom]);
 
   const watermark = "Awakening Classes";
 
@@ -146,6 +288,11 @@ const PdfReader = () => {
             Study material
           </Link>
           <div className="flex items-center gap-2">
+            {pageCount > 0 && (
+              <span className="hidden text-[11px] text-muted sm:inline">
+                {pageCount} pages
+              </span>
+            )}
             <div className="inline-flex items-center gap-1 rounded-full border border-line px-1.5 py-0.5">
               <button
                 type="button"
@@ -192,7 +339,7 @@ const PdfReader = () => {
         ) : null}
 
         <div
-          className="relative overflow-auto select-none"
+          className="relative select-none"
           onDragStart={(event) => event.preventDefault()}
           onDoubleClick={() => applyZoom(zoom > 1 ? 1 : 2)}
           onWheel={(event) => {
@@ -219,18 +366,32 @@ const PdfReader = () => {
             pinchRef.current = null;
           }}
         >
-          <div style={{ width: `${Math.max(100, zoom * 100)}%` }} className="min-w-full">
-            <div ref={hostRef} className="space-y-3" />
-          </div>
-          {!status && (
-            <div className="pointer-events-none absolute inset-0 flex flex-wrap content-start gap-16 overflow-hidden p-8 opacity-[0.12]">
-              {Array.from({ length: 12 }).map((_, index) => (
-                <span key={index} className="whitespace-nowrap text-sm text-black rotate-[-18deg]">
-                  {watermark}
-                </span>
+          <div
+            style={{ width: `${Math.max(100, zoom * 100)}%` }}
+            className="relative min-w-full space-y-3"
+          >
+            {pdf &&
+              Array.from({ length: pageCount }, (_, index) => (
+                <PdfPage
+                  key={`${id}-${index + 1}`}
+                  pdf={pdf}
+                  pageNumber={index + 1}
+                  zoom={zoom}
+                />
               ))}
-            </div>
-          )}
+            {!status && pdf && (
+              <div className="pointer-events-none absolute inset-0 flex flex-wrap content-start gap-16 overflow-hidden p-8 opacity-[0.12]">
+                {Array.from({ length: 12 }).map((_, index) => (
+                  <span
+                    key={index}
+                    className="whitespace-nowrap text-sm text-black rotate-[-18deg]"
+                  >
+                    {watermark}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
