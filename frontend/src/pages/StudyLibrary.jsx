@@ -5,6 +5,7 @@ import { apiConnector } from "../services/apiConnector";
 import { pdfEndpoints } from "../services/apis";
 import { toast } from "@/utils/toast";
 import Footer from "../components/common/Footer";
+import { itemId, isMongoId } from "../utils/itemId";
 
 function loadRazorpay() {
   return new Promise((resolve) => {
@@ -243,7 +244,12 @@ const StudyLibrary = () => {
         navigate("/login");
         return;
       }
-      navigate(`/study-material/${item._id}`);
+      const id = itemId(item._id);
+      if (!isMongoId(id)) {
+        toast.error("Could not open this material");
+        return;
+      }
+      navigate(`/study-material/${id}`);
       return;
     }
     buy(item);
@@ -252,8 +258,11 @@ const StudyLibrary = () => {
   const chooseExam = (exam) => {
     setOpenExam(exam);
     const next = new URLSearchParams(searchParams);
-    if (exam) next.set("exam", exam._id);
-    else next.delete("exam");
+    if (exam) {
+      const id = itemId(exam._id);
+      if (id) next.set("exam", id);
+      else next.delete("exam");
+    } else next.delete("exam");
     setSearchParams(next, { replace: true });
   };
 

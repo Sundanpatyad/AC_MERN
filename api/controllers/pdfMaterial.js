@@ -261,7 +261,7 @@ const examRecord = (exam) => {
   if (!exam || !exam._id) return null;
   const access = exam.access === 'paid' && Number(exam.price) > 0 ? 'paid' : 'free';
   return {
-    _id: exam._id,
+    _id: String(exam._id),
     name: exam.name,
     category: exam.category,
     access,
@@ -283,7 +283,7 @@ const toPublic = (doc, user) => {
   const price = soldAsSet ? exam.price : access === 'paid' ? Number(doc.price) || 0 : 0;
   const canView = staff || (soldAsSet ? examOwned : access === 'free' || pdfOwned);
   return {
-    _id: doc._id,
+    _id: String(doc._id),
     title: doc.title,
     description: doc.description || '',
     category: doc.category,
@@ -293,7 +293,7 @@ const toPublic = (doc, user) => {
     soldAsSet,
     mockTests: (doc.mockTests || []).map((item) =>
       item && item._id
-        ? { _id: item._id, seriesName: item.seriesName || '' }
+        ? { _id: String(item._id), seriesName: item.seriesName || '' }
         : item
     ),
     canView,
@@ -690,6 +690,9 @@ const assertCanView = async (material, user) => {
 
 exports.issueTicket = async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id) || String(req.params.id) === '[object Object]') {
+      return res.status(400).json({ success: false, message: 'Could not open this material' });
+    }
     const material = await PdfMaterial.findById(req.params.id).select('_id access price status exam cloudinaryPublicId r2Key');
     if (!material) {
       return res.status(404).json({ success: false, message: 'Study material not found' });
@@ -703,6 +706,7 @@ exports.issueTicket = async (req, res) => {
     res.setHeader('Cache-Control', 'private, no-store');
     res.status(200).json({ success: true, ticket, revision: fileRevision(material) });
   } catch (error) {
+    console.error('issueTicket:', error?.message || error);
     const status = error.status || 500;
     res.status(status).json({
       success: false,
@@ -861,36 +865,24 @@ exports.streamPdf = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Open this material on the website' });
     }
 
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'Could not open this material' });
+    }
+
     const material = await PdfMaterial.findById(req.params.id);
     if (!material) {
       return res.status(404).json({ success: false, message: 'Study material not found' });
     }
     await assertCanView(material, user);
 
-    let upstream;
-    if (material.r2Key) {
-      try {
-        const signedUrl = await getPresignedGetUrl(material.r2Key, 120);
-        if (signedUrl) {
-          upstream = await fetch(signedUrl);
-        }
-      } catch (error) {
-        console.error('R2 stream failed, falling back to Cloudinary:', error?.message);
-      }
-    }
-
-    if (!upstream?.ok) {
-      const signedUrl = cloudinary.url(material.cloudinaryPublicId, {
-        resource_type: 'raw',
-        type: material.cloudinaryType || 'authenticated',
-        sign_url: true,
-        secure: true,
-        expires_at: Math.floor(Date.now() / 1000) + 90,
+    // Prefer buffer download (R2 → Cloudinary). Avoid Readable.fromWeb — flaky on Cloud Run.
+    const buffer = await downloadOriginalPdf(material);
+    if (!buffer?.length) {
+      console.error('streamPdf: empty buffer', {
+        id: String(material._id),
+        r2Key: material.r2Key || null,
+        cloudinaryPublicId: material.cloudinaryPublicId || null,
       });
-      upstream = await fetch(signedUrl);
-    }
-
-    if (!upstream?.ok || !upstream.body) {
       return res.status(502).json({ success: false, message: 'Could not open this material' });
     }
 
@@ -901,12 +893,10 @@ exports.streamPdf = async (req, res) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('Content-Security-Policy', 'sandbox');
-    if (upstream.headers.get('content-length')) {
-      res.setHeader('Content-Length', upstream.headers.get('content-length'));
-    }
-
-    Readable.fromWeb(upstream.body).pipe(res);
+    res.setHeader('Content-Length', String(buffer.length));
+    return res.status(200).send(buffer);
   } catch (error) {
+    console.error('streamPdf:', error?.message || error);
     if (!res.headersSent) {
       const status = error.status || 500;
       res.status(status).json({
@@ -1081,7 +1071,7 @@ const escapeRegex = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$
 const publicExam = (exam, user, pdfCount) => {
   const access = examSoldAsSet(exam) ? 'paid' : 'free';
   return {
-    _id: exam._id,
+    _id: String(exam._id),
     name: exam.name,
     category: exam.category,
     description: exam.description || '',
