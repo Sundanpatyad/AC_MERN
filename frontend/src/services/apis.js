@@ -1,7 +1,7 @@
 // Override per environment with VITE_API_BASE_URL (see .env.example).
 // export const BASE_URL = 'https://ac-mern-279937570516.europe-west1.run.app';
-// export const BASE_URL = 'https://ac-mern-279937570516.europe-west1.run.app';
-export const BASE_URL = 'http://localhost:8000';
+export const BASE_URL = 'https://ac-mern-279937570516.europe-west1.run.app';
+// export const BASE_URL = 'http://localhost:8000';
 // export const BASE_URL = 'https://api.awakeningclasses.in';
 
 // 
