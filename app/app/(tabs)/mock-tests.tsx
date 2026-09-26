@@ -13,6 +13,7 @@ import { useTabScreenBottomPadding } from '../../lib/safeArea';
 import { TestListSkeleton } from '../../components/ui/Skeleton';
 import { AppPalette, Radii } from '../../constants/theme';
 import { useTheme } from '../../providers/AppThemeProvider';
+import { itemKey } from '../../utils/itemKey';
 
 export default function MockTestsScreen() {
   const { user } = useAuthStore();
@@ -107,7 +108,9 @@ function StudentMockTestsScreen() {
           {isLoading ? (
             <TestListSkeleton count={4} />
           ) : filteredTests.length > 0 ? (
-            filteredTests.map((test: any) => <MockTestCard key={test._id} test={test} />)
+            filteredTests.map((test: any, index: number) => (
+              <MockTestCard key={itemKey(test._id, index)} test={test} />
+            ))
           ) : (
             <Text style={styles.emptyText}>No mock tests found.</Text>
           )}

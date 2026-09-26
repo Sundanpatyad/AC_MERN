@@ -21,6 +21,7 @@ import { AppPalette, Fonts, Radii } from '../../constants/theme';
 import { useTheme } from '../../providers/AppThemeProvider';
 import { useAuthStore } from '../../store/authStore';
 import { showMessage } from '../../providers/DialogProvider';
+import { itemKey } from '../../utils/itemKey';
 
 const PAGE_SIZE = 8;
 
@@ -375,7 +376,7 @@ export default function StudyLibraryScreen() {
       <FlatList
         key={`${view}-${selectedExam?._id || 'exams'}`}
         data={selectedExam ? materials : exams}
-        keyExtractor={(item) => item._id}
+        keyExtractor={(item, index) => itemKey(item._id, index)}
         numColumns={view === 'grid' ? 2 : 1}
         columnWrapperStyle={view === 'grid' ? styles.gridRow : undefined}
         contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + 28 }]}

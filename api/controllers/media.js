@@ -40,9 +40,9 @@ exports.streamMedia = async (req, res) => {
       return res.status(403).type('text').send('This file can only be viewed on Awakening Classes');
     }
 
-    const mobile = require('../utils/mediaAccess').isMobileApiClient(req);
-    // React Native Image is unreliable with cross-host 302 → always proxy for apps
-    const useRedirect = serveMode() === 'redirect' && !mobile;
+    // Redirect to R2 for both web and app (proxy is slow — full bytes through Node).
+    // App Image loads work when no custom Authorization is forced on the follow-up.
+    const useRedirect = serveMode() === 'redirect';
 
     if (useRedirect) {
       const ttl = Math.max(60, Number(process.env.MEDIA_REDIRECT_TTL_SEC) || 3600);

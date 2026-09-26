@@ -30,6 +30,7 @@ import { SectionHeading } from '../../components/ui/SectionHeading';
 import { ProgressGlance } from '../../components/ui/ProgressGlance';
 import { useTabScreenBottomPadding } from '../../lib/safeArea';
 import { MediaImage } from '../../components/MediaImage';
+import { itemKey } from '../../utils/itemKey';
 
 const YOUTUBE_CHANNEL = 'https://www.youtube.com/@awakeningclasses';
 const RANK_STORY_URL = 'https://youtu.be/zZqPFZo8IUo?si=MbeDgOr_YtO9bH_x';
@@ -336,9 +337,9 @@ function StudentHomeScreen() {
                   snapToAlignment="start"
                   contentContainerStyle={styles.carousel}
                 >
-                  {filteredTests.map((test: any) => (
+                  {filteredTests.map((test: any, index: number) => (
                     <MockTestCard
-                      key={test._id}
+                      key={itemKey(test._id, index)}
                       test={test}
                       variant="hero"
                       heroWidth={heroCardWidth}

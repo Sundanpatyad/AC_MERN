@@ -33,6 +33,12 @@ function shouldLogoutOn401(url: string | undefined, hadAuthHeader: boolean): boo
   return hadAuthHeader || !!token;
 }
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  if (value === null || typeof value !== 'object') return false;
+  const proto = Object.getPrototypeOf(value);
+  return proto === Object.prototype || proto === null;
+}
+
 function absolutizeMediaInClient(data: unknown, seen = new WeakSet<object>()): unknown {
   if (data == null || typeof data !== 'object') {
     if (typeof data !== 'string' || !data.includes('/api/v1/media/')) return data;
@@ -43,9 +49,17 @@ function absolutizeMediaInClient(data: unknown, seen = new WeakSet<object>()): u
     seen.add(data);
     return data.map((item) => absolutizeMediaInClient(item, seen));
   }
+  // Keep ObjectId-like / non-plain values as strings so React keys stay stable
+  if (!isPlainObject(data)) {
+    if (typeof (data as { toString?: () => string }).toString === 'function') {
+      const s = (data as { toString: () => string }).toString();
+      if (s && s !== '[object Object]') return s;
+    }
+    return data;
+  }
   seen.add(data as object);
   const out: Record<string, unknown> = {};
-  for (const [key, val] of Object.entries(data as Record<string, unknown>)) {
+  for (const [key, val] of Object.entries(data)) {
     out[key] = absolutizeMediaInClient(val, seen);
   }
   return out;

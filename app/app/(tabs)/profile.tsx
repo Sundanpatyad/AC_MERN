@@ -23,6 +23,7 @@ import { Button } from '../../components/ui/Button';
 import { AppPalette, Fonts, Radii } from '../../constants/theme';
 import { useTheme } from '../../providers/AppThemeProvider';
 import { MediaImage } from '../../components/MediaImage';
+import { itemKey } from '../../utils/itemKey';
 
 export default function ProfileScreen() {
   const { user } = useAuthStore();
@@ -248,8 +249,8 @@ export default function ProfileScreen() {
               <Text style={styles.emptyCopy}>Loading…</Text>
             ) : purchased.length > 0 ? (
               <View style={styles.mocksList}>
-                {purchased.map((test: any) => (
-                  <MockTestCard key={test._id} test={test} variant="row" showStatus />
+                {purchased.map((test: any, index: number) => (
+                  <MockTestCard key={itemKey(test._id, index)} test={test} variant="row" showStatus />
                 ))}
               </View>
             ) : (
@@ -278,10 +279,10 @@ export default function ProfileScreen() {
             </View>
             {ownedPdfs.length > 0 ? (
               <View style={styles.mocksList}>
-                {ownedPdfs.map((item) => (
+                {ownedPdfs.map((item, index) => (
                   <Pressable
-                    key={item._id}
-                    onPress={() => router.push(`/study-material/${item._id}`)}
+                    key={itemKey(item._id, index)}
+                    onPress={() => router.push(`/study-material/${itemKey(item._id)}`)}
                     style={[styles.pdfRow, { borderColor: colors.border, backgroundColor: colors.surface }]}
                   >
                     <View style={{ flex: 1 }}>
