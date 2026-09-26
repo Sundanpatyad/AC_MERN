@@ -37,12 +37,15 @@ app.use(express.urlencoded({ limit: '15mb', extended: true }));
 
 app.use(cookieParser());
 
+// Expand /api/v1/media/... in JSON using this request's host (local vs production)
+app.use(require('./utils/mediaAccess').mediaUrlResponseMiddleware);
+
 // Allow all origins
 app.use(
   cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-AC-Viewer'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-AC-Viewer', 'X-AC-Client'],
   })
 );
 app.options('*', cors({ origin: '*' }));
@@ -81,6 +84,7 @@ app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/usage', usageRoutes);
 app.use('/api/v1/pdfs', pdfRoutes);
 app.use('/api/v1/youtube', youtubeRoutes);
+app.use('/api/v1/media', require('./routes/media'));
 
 /* =========================
    HEALTH / DEFAULT ROUTE

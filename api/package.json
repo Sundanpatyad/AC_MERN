@@ -1,5 +1,7 @@
 {
     "dependencies": {
+        "@aws-sdk/client-s3": "^3.1140.0",
+        "@aws-sdk/s3-request-presigner": "^3.1140.0",
         "bcrypt": "^5.1.1",
         "cloudinary": "^1.40.0",
         "cookie-parser": "^1.4.6",
@@ -20,7 +22,8 @@
         "otp-generator": "^4.0.1",
         "path": "^0.12.7",
         "razorpay": "^2.9.2",
-        "redis": "^4.7.0"
+        "redis": "^4.7.0",
+        "sharp": "^0.35.4"
     },
     "name": "backend",
     "version": "1.0.0",
@@ -29,7 +32,9 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "node server.js",
         "dev": "nodemon server.js",
-        "build": "npm i"
+        "build": "npm i",
+        "migrate:r2": "node scripts/migrate-to-r2.js",
+        "migrate:r2:dry": "node scripts/migrate-to-r2.js --dry-run"
     },
     "keywords": [],
     "author": "",

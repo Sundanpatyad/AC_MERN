@@ -12,6 +12,8 @@ import { useAuthStore } from '../store/authStore';
 import { AppPalette } from '../constants/theme';
 import { useTheme } from '../providers/AppThemeProvider';
 import { showMessage } from '../providers/DialogProvider';
+import { MediaImage } from '../components/MediaImage';
+import { resolveMediaUrl } from '../utils/mediaUrl';
 
 export default function EditProfileScreen() {
   const { user, setUser } = useAuthStore();
@@ -40,7 +42,7 @@ export default function EditProfileScreen() {
             contactNumber: details.additionalDetails?.contactNumber || '',
             about: details.additionalDetails?.about || '',
           });
-          if (details.image) setPhotoUri(details.image);
+          if (details.image) setPhotoUri(resolveMediaUrl(details.image) || details.image);
         } else if (user) {
           setForm((f) => ({
             ...f,
@@ -168,7 +170,7 @@ export default function EditProfileScreen() {
             <View style={styles.photoRow}>
               <Pressable onPress={handleChangePhoto} disabled={photoBusy} style={styles.avatarWrap}>
                 {photoUri ? (
-                  <Image source={{ uri: photoUri }} style={styles.avatar} />
+                  <MediaImage uri={photoUri} style={styles.avatar} />
                 ) : (
                   <View style={[styles.avatar, styles.avatarFallback]}>
                     <Text style={styles.avatarLetter}>{letter}</Text>

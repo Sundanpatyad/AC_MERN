@@ -1,8 +1,8 @@
 const { uploadImageToCloudinary } = require('../utils/imageUploader');
 
 /**
- * Generic image upload — returns the Cloudinary secure_url.
- * Used by the admin panel to upload question & option images.
+ * Generic image upload — dual-writes Cloudinary + R2 (when configured).
+ * Returns secure_url (R2 preferred).
  *
  * POST /api/v1/upload/image
  * Body: multipart/form-data  { file: <image> }
@@ -20,7 +20,7 @@ exports.uploadImage = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Only image files are allowed (jpeg, png, webp, gif)' });
     }
 
-    const uploaded = await uploadImageToCloudinary(file, process.env.FOLDER_NAME, 1200, 1200);
+    const uploaded = await uploadImageToCloudinary(file, process.env.FOLDER_NAME, 1600, 82);
 
     return res.status(200).json({
       success: true,

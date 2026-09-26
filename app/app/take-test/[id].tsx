@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -7,6 +7,7 @@ import { useNativeBottomInset } from '../../lib/safeArea';
 
 import { apiConnector } from '../../services/api';
 import { endpoints } from '../../constants/api';
+import { MediaImage } from '../../components/MediaImage';
 import { useTestStore } from '../../store/testStore';
 import { isInstructorAccount, useAuthStore } from '../../store/authStore';
 import { Button } from '../../components/ui/Button';
@@ -488,9 +489,9 @@ export default function TakeTestScreen() {
             </Text>
           )}
           {currentQuestion.questionImage && (
-            <Image 
-              source={{ uri: currentQuestion.questionImage }} 
-              style={styles.questionImage} 
+            <MediaImage
+              uri={currentQuestion.questionImage}
+              style={styles.questionImage}
               resizeMode="contain"
             />
           )}
@@ -557,9 +558,9 @@ export default function TakeTestScreen() {
                 </Text>
                 <View style={styles.optionTextContainer}>
                   {!!optionImage && (
-                    <Image 
-                      source={{ uri: optionImage }} 
-                      style={styles.optionImage} 
+                    <MediaImage
+                      uri={optionImage}
+                      style={styles.optionImage}
                       resizeMode="contain"
                     />
                   )}

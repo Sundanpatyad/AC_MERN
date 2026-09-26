@@ -14,6 +14,7 @@ import Footer from "../components/common/Footer";
 import { buyItem } from "../services/operations/studentFeaturesAPI";
 import { apiConnector } from "../services/apiConnector";
 import { pdfEndpoints } from "../services/apis";
+import { itemId, isMongoId } from "../utils/itemId";
 
 const MockTestDetails = () => {
   const { user } = useSelector((state) => state.profile);
@@ -252,7 +253,7 @@ const MockTestDetails = () => {
                 <h2 className="text-lg sm:text-xl font-bold text-fg mb-4">Study material</h2>
                 <div className="space-y-3">
                   {linkedPdfs.map((material) => (
-                    <div key={material._id} className="flex items-center justify-between gap-3 border-b border-line last:border-b-0 pb-3">
+                    <div key={itemId(material._id) || material.title} className="flex items-center justify-between gap-3 border-b border-line last:border-b-0 pb-3">
                       <div>
                         <p className="text-fg font-medium">{material.title}</p>
                         <p className="text-muted text-sm">
@@ -261,7 +262,23 @@ const MockTestDetails = () => {
                       </div>
                       <button
                         type="button"
-                        onClick={() => navigate(material.canView ? `/study-material/${material._id}` : "/study-material")}
+                        onClick={() => {
+                          const mid = itemId(material._id);
+                          const exam = itemId(material.exam?._id || material.exam);
+                          if (material.canView && isMongoId(mid)) {
+                            navigate(
+                              isMongoId(exam)
+                                ? `/study-material/${mid}?exam=${exam}`
+                                : `/study-material/${mid}`
+                            );
+                          } else {
+                            navigate(
+                              isMongoId(exam)
+                                ? `/study-material?exam=${exam}`
+                                : "/study-material"
+                            );
+                          }
+                        }}
                         className="shrink-0 px-3 py-1.5 text-sm rounded-lg bg-solid text-solid-fg"
                       >
                         {material.canView ? "Read" : "View"}

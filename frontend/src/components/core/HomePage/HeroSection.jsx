@@ -9,12 +9,32 @@ import { youtubeEndpoints } from "../../../services/apis";
 
 const EASE = [0.16, 1, 0.3, 1];
 
+const FALLBACK_VIDEOS = [
+  {
+    id: "Kyu0WStcnAs",
+    title: "Articles | General English | Marathon | JKSSB",
+    thumbnail: "https://i.ytimg.com/vi/Kyu0WStcnAs/hqdefault.jpg",
+    url: "https://www.youtube.com/watch?v=Kyu0WStcnAs",
+  },
+  {
+    id: "9XuMWYgg5as",
+    title: "Input & Output devices | Marathon Session | Latest PYQs | JKSSB",
+    thumbnail: "https://i.ytimg.com/vi/9XuMWYgg5as/hqdefault.jpg",
+    url: "https://www.youtube.com/watch?v=9XuMWYgg5as",
+  },
+  {
+    id: "SBYBCQYsPog",
+    title: "JKSSB Finance Account Assistant | Revision Plan",
+    thumbnail: "https://i.ytimg.com/vi/SBYBCQYsPog/hqdefault.jpg",
+    url: "https://www.youtube.com/watch?v=SBYBCQYsPog",
+  },
+];
+
 function LectureStack() {
   const reduceMotion = useReducedMotion();
-  const [videos, setVideos] = useState([]);
+  const [videos, setVideos] = useState(FALLBACK_VIDEOS);
   const [active, setActive] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -22,11 +42,10 @@ function LectureStack() {
       .then((response) => {
         if (cancelled) return;
         const latest = (response.data?.videos || []).filter((item) => item?.id).slice(0, 3);
-        if (!latest.length) setFailed(true);
-        else setVideos(latest);
+        if (latest.length) setVideos(latest);
       })
       .catch(() => {
-        if (!cancelled) setFailed(true);
+        // Keep FALLBACK_VIDEOS already in state
       });
     return () => {
       cancelled = true;
@@ -54,7 +73,7 @@ function LectureStack() {
         <div className="relative aspect-video">
           {count === 0 ? (
             <div className="flex h-full items-center justify-center rounded-2xl border border-line bg-surface text-sm text-muted">
-              {failed ? "Latest lectures unavailable" : "Loading lectures…"}
+              Loading lectures…
             </div>
           ) : (
             videos.map((video, index) => {

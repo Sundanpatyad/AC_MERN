@@ -12,13 +12,22 @@ const PdfExam = require('../models/pdfExam');
 const PdfPurchase = require('../models/pdfPurchase');
 const User = require('../models/user');
 const razorpay = require('../config/rajorpay');
+const { keepCloudinaryAssets } = require('../config/r2');
+const {
+  isR2Enabled,
+  uploadExpressFileToR2,
+  deleteFromR2,
+  getPresignedGetUrl,
+  getObjectBuffer,
+} = require('../utils/r2Storage');
+const { uploadImageToCloudinary, deleteResourceFromCloudinary } = require('../utils/imageUploader');
 
 const STAFF = new Set(['Admin', 'Instructor']);
 
 const fileRevision = (material) =>
   crypto
     .createHash('sha1')
-    .update(String(material?.cloudinaryPublicId || material?._id || ''))
+    .update(String(material?.r2Key || material?.cloudinaryPublicId || material?._id || ''))
     .digest('hex')
     .slice(0, 16);
 
@@ -65,18 +74,33 @@ const uploadPdf = async (file) => {
     unique_filename: true,
     overwrite: false,
   };
+  let cloudinaryResult;
   try {
-    return await cloudinary.uploader.upload(file.tempFilePath, {
+    cloudinaryResult = await cloudinary.uploader.upload(file.tempFilePath, {
       ...base,
       type: 'authenticated',
     });
   } catch (error) {
     console.error('Authenticated PDF upload failed, retrying as private:', error?.message);
-    return cloudinary.uploader.upload(file.tempFilePath, {
+    cloudinaryResult = await cloudinary.uploader.upload(file.tempFilePath, {
       ...base,
       type: 'private',
     });
   }
+
+  let r2 = null;
+  if (isR2Enabled()) {
+    try {
+      r2 = await uploadExpressFileToR2(file, `${process.env.FOLDER_NAME || 'study-pdfs'}/pdfs`);
+    } catch (error) {
+      console.error('R2 PDF dual-write failed (Cloudinary kept):', error?.message);
+    }
+  }
+
+  return {
+    ...cloudinaryResult,
+    r2Key: r2?.key || '',
+  };
 };
 
 const countPdfPages = (buffer) => {
@@ -114,7 +138,7 @@ const uploadPreview = async (filePath) => {
 };
 
 const destroyPreview = async (publicId, type) => {
-  if (!publicId) return;
+  if (!publicId || keepCloudinaryAssets()) return;
   try {
     await cloudinary.uploader.destroy(publicId, {
       resource_type: 'image',
@@ -128,6 +152,16 @@ const destroyPreview = async (publicId, type) => {
 const previewLocks = new Map();
 
 const downloadOriginalPdf = async (material) => {
+  if (material?.r2Key) {
+    try {
+      const fromR2 = await getObjectBuffer(material.r2Key);
+      if (fromR2?.length) return fromR2;
+    } catch (error) {
+      console.error('R2 PDF download failed, trying Cloudinary:', error?.message);
+    }
+  }
+
+  if (!material?.cloudinaryPublicId) return null;
   const signedUrl = cloudinary.url(material.cloudinaryPublicId, {
     resource_type: 'raw',
     type: material.cloudinaryType || 'authenticated',
@@ -211,8 +245,9 @@ const ensurePreview = async (material) => {
   }
 };
 
-const destroyPdf = async (publicId, type) => {
-  if (!publicId) return;
+const destroyPdf = async (publicId, type, r2Key) => {
+  if (r2Key) await deleteFromR2(r2Key);
+  if (!publicId || keepCloudinaryAssets()) return;
   try {
     await cloudinary.uploader.destroy(publicId, {
       resource_type: 'raw',
@@ -227,7 +262,7 @@ const examRecord = (exam) => {
   if (!exam || !exam._id) return null;
   const access = exam.access === 'paid' && Number(exam.price) > 0 ? 'paid' : 'free';
   return {
-    _id: exam._id,
+    _id: String(exam._id),
     name: exam.name,
     category: exam.category,
     access,
@@ -249,7 +284,7 @@ const toPublic = (doc, user) => {
   const price = soldAsSet ? exam.price : access === 'paid' ? Number(doc.price) || 0 : 0;
   const canView = staff || (soldAsSet ? examOwned : access === 'free' || pdfOwned);
   return {
-    _id: doc._id,
+    _id: String(doc._id),
     title: doc.title,
     description: doc.description || '',
     category: doc.category,
@@ -259,7 +294,7 @@ const toPublic = (doc, user) => {
     soldAsSet,
     mockTests: (doc.mockTests || []).map((item) =>
       item && item._id
-        ? { _id: item._id, seriesName: item.seriesName || '' }
+        ? { _id: String(item._id), seriesName: item.seriesName || '' }
         : item
     ),
     canView,
@@ -316,6 +351,14 @@ exports.listPdfs = async (req, res) => {
       .sort(latest ? { createdAt: -1 } : { category: 1, title: 1 })
       .populate('mockTests', 'seriesName')
       .populate('exam', 'name category access price status');
+
+    // Catalog lists: SWR at the HTTP layer (CDN / browser). Auth responses stay private.
+    if (!user?.id) {
+      res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+    } else {
+      res.setHeader('Cache-Control', 'private, max-age=30, stale-while-revalidate=120');
+    }
+    res.setHeader('Vary', 'Authorization');
 
     if (!paginate) {
       const materials = await query.lean();
@@ -499,6 +542,7 @@ exports.createPdf = async (req, res) => {
       price,
       cloudinaryPublicId: uploaded.public_id,
       cloudinaryType: uploaded.type || 'authenticated',
+      r2Key: uploaded.r2Key || '',
       previewPublicId: preview?.public_id || '',
       previewType: preview?.type || 'authenticated',
       mockTests: parseMockIds(req.body.mockTests),
@@ -565,11 +609,13 @@ exports.updatePdf = async (req, res) => {
       if (!uploaded?.public_id) {
         return res.status(500).json({ success: false, message: 'Could not store the PDF' });
       }
-      await destroyPdf(material.cloudinaryPublicId, material.cloudinaryType);
+      await destroyPdf(material.cloudinaryPublicId, material.cloudinaryType, material.r2Key);
       await destroyPreview(material.previewPublicId, material.previewType);
       material.cloudinaryPublicId = uploaded.public_id;
       material.cloudinaryType = uploaded.type || 'authenticated';
+      material.r2Key = uploaded.r2Key || '';
       material.previewPublicId = '';
+      material.pageCount = 0;
       try {
         const preview = await uploadPreview(file.tempFilePath);
         if (preview?.public_id) {
@@ -600,7 +646,7 @@ exports.deletePdf = async (req, res) => {
     if (!material) {
       return res.status(404).json({ success: false, message: 'Study material not found' });
     }
-    await destroyPdf(material.cloudinaryPublicId, material.cloudinaryType);
+    await destroyPdf(material.cloudinaryPublicId, material.cloudinaryType, material.r2Key);
     await destroyPreview(material.previewPublicId, material.previewType);
     await User.updateMany(
       { studyPdfs: material._id },
@@ -653,7 +699,10 @@ const assertCanView = async (material, user) => {
 
 exports.issueTicket = async (req, res) => {
   try {
-    const material = await PdfMaterial.findById(req.params.id).select('_id access price status exam cloudinaryPublicId');
+    if (!mongoose.Types.ObjectId.isValid(req.params.id) || String(req.params.id) === '[object Object]') {
+      return res.status(400).json({ success: false, message: 'Could not open this material' });
+    }
+    const material = await PdfMaterial.findById(req.params.id).select('_id access price status exam cloudinaryPublicId r2Key');
     if (!material) {
       return res.status(404).json({ success: false, message: 'Study material not found' });
     }
@@ -666,6 +715,7 @@ exports.issueTicket = async (req, res) => {
     res.setHeader('Cache-Control', 'private, no-store');
     res.status(200).json({ success: true, ticket, revision: fileRevision(material) });
   } catch (error) {
+    console.error('issueTicket:', error?.message || error);
     const status = error.status || 500;
     res.status(status).json({
       success: false,
@@ -824,22 +874,24 @@ exports.streamPdf = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Open this material on the website' });
     }
 
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'Could not open this material' });
+    }
+
     const material = await PdfMaterial.findById(req.params.id);
     if (!material) {
       return res.status(404).json({ success: false, message: 'Study material not found' });
     }
     await assertCanView(material, user);
 
-    const signedUrl = cloudinary.url(material.cloudinaryPublicId, {
-      resource_type: 'raw',
-      type: material.cloudinaryType || 'authenticated',
-      sign_url: true,
-      secure: true,
-      expires_at: Math.floor(Date.now() / 1000) + 90,
-    });
-
-    const upstream = await fetch(signedUrl);
-    if (!upstream.ok || !upstream.body) {
+    // Prefer buffer download (R2 → Cloudinary). Avoid Readable.fromWeb — flaky on Cloud Run.
+    const buffer = await downloadOriginalPdf(material);
+    if (!buffer?.length) {
+      console.error('streamPdf: empty buffer', {
+        id: String(material._id),
+        r2Key: material.r2Key || null,
+        cloudinaryPublicId: material.cloudinaryPublicId || null,
+      });
       return res.status(502).json({ success: false, message: 'Could not open this material' });
     }
 
@@ -850,12 +902,10 @@ exports.streamPdf = async (req, res) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('Content-Security-Policy', 'sandbox');
-    if (upstream.headers.get('content-length')) {
-      res.setHeader('Content-Length', upstream.headers.get('content-length'));
-    }
-
-    Readable.fromWeb(upstream.body).pipe(res);
+    res.setHeader('Content-Length', String(buffer.length));
+    return res.status(200).send(buffer);
   } catch (error) {
+    console.error('streamPdf:', error?.message || error);
     if (!res.headersSent) {
       const status = error.status || 500;
       res.status(status).json({
@@ -1030,10 +1080,11 @@ const escapeRegex = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$
 const publicExam = (exam, user, pdfCount) => {
   const access = examSoldAsSet(exam) ? 'paid' : 'free';
   return {
-    _id: exam._id,
+    _id: String(exam._id),
     name: exam.name,
     category: exam.category,
     description: exam.description || '',
+    thumbnail: exam.thumbnail || '',
     access,
     price: access === 'paid' ? Number(exam.price) || 0 : 0,
     pdfCount: pdfCount || 0,
@@ -1041,6 +1092,29 @@ const publicExam = (exam, user, pdfCount) => {
     status: exam.status === 'draft' ? 'draft' : 'published',
   };
 };
+
+const examThumbFolder = () =>
+  `${process.env.FOLDER_NAME || 'LMS_AC'}-exam-thumbs`;
+
+const isImageFile = (file) => {
+  const type = String(file?.mimetype || '').toLowerCase();
+  const name = String(file?.name || '').toLowerCase();
+  return type.startsWith('image/') || /\.(jpe?g|png|webp|gif)$/i.test(name);
+};
+
+async function uploadExamThumbnail(file, previousUrl = '') {
+  if (!file || !isImageFile(file)) return previousUrl || '';
+  const uploaded = await uploadImageToCloudinary(file, examThumbFolder(), 900, 82);
+  if (!uploaded?.secure_url) return previousUrl || '';
+  if (previousUrl && previousUrl !== uploaded.secure_url) {
+    try {
+      await deleteResourceFromCloudinary(previousUrl);
+    } catch (error) {
+      console.error('exam thumbnail cleanup:', error?.message);
+    }
+  }
+  return uploaded.secure_url;
+}
 
 exports.listExams = async (req, res) => {
   try {
@@ -1075,6 +1149,14 @@ exports.listExams = async (req, res) => {
       { $group: { _id: '$category', count: { $sum: 1 } } },
     ]);
     const categoryMap = new Map(examCounts.map((item) => [item._id, item.count]));
+
+    // HTTP caching: anonymous lists are public; logged-in lists stay private (owned flags).
+    if (!user?.id) {
+      res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+    } else {
+      res.setHeader('Cache-Control', 'private, max-age=30, stale-while-revalidate=120');
+    }
+    res.setHeader('Vary', 'Authorization');
 
     res.status(200).json({
       success: true,
@@ -1118,10 +1200,13 @@ exports.createExam = async (req, res) => {
       return res.status(400).json({ success: false, message: 'This exam already exists in the category' });
     }
 
+    const thumbnail = await uploadExamThumbnail(req.files?.thumbnail);
+
     const exam = await PdfExam.create({
       name,
       category,
       description,
+      thumbnail: thumbnail || '',
       access: price > 0 ? 'paid' : 'free',
       price,
       status: req.body.status === 'published' ? 'published' : 'draft',
@@ -1162,6 +1247,19 @@ exports.updateExam = async (req, res) => {
     }
     if (!exam.name || !exam.category) {
       return res.status(400).json({ success: false, message: 'Name and category are required' });
+    }
+
+    if (req.files?.thumbnail) {
+      exam.thumbnail = await uploadExamThumbnail(req.files.thumbnail, exam.thumbnail || '');
+    } else if (req.body.removeThumbnail === '1' || req.body.removeThumbnail === 'true') {
+      if (exam.thumbnail) {
+        try {
+          await deleteResourceFromCloudinary(exam.thumbnail);
+        } catch (error) {
+          console.error('exam thumbnail remove:', error?.message);
+        }
+      }
+      exam.thumbnail = '';
     }
 
     await exam.save();

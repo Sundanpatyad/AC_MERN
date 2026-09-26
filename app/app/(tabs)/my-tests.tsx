@@ -23,6 +23,7 @@ import { Button } from '../../components/ui/Button';
 import { MyTestsSkeleton } from '../../components/ui/Skeleton';
 import { AppPalette, Fonts, Radii } from '../../constants/theme';
 import { useTheme } from '../../providers/AppThemeProvider';
+import { itemKey } from '../../utils/itemKey';
 
 const PAGE_LIMIT = 10;
 
@@ -191,7 +192,7 @@ function StudentAttemptsScreen() {
       ) : (
         <FlatList
           data={attempts}
-          keyExtractor={(item) => item._id}
+          keyExtractor={(item, index) => itemKey(item._id, index)}
           renderItem={renderAttempt}
           contentContainerStyle={[
             styles.listPad,
