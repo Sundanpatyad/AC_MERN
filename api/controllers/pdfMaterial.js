@@ -352,6 +352,14 @@ exports.listPdfs = async (req, res) => {
       .populate('mockTests', 'seriesName')
       .populate('exam', 'name category access price status');
 
+    // Catalog lists: SWR at the HTTP layer (CDN / browser). Auth responses stay private.
+    if (!user?.id) {
+      res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+    } else {
+      res.setHeader('Cache-Control', 'private, max-age=30, stale-while-revalidate=120');
+    }
+    res.setHeader('Vary', 'Authorization');
+
     if (!paginate) {
       const materials = await query.lean();
       return res.status(200).json({
@@ -1141,6 +1149,14 @@ exports.listExams = async (req, res) => {
       { $group: { _id: '$category', count: { $sum: 1 } } },
     ]);
     const categoryMap = new Map(examCounts.map((item) => [item._id, item.count]));
+
+    // HTTP caching: anonymous lists are public; logged-in lists stay private (owned flags).
+    if (!user?.id) {
+      res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+    } else {
+      res.setHeader('Cache-Control', 'private, max-age=30, stale-while-revalidate=120');
+    }
+    res.setHeader('Vary', 'Authorization');
 
     res.status(200).json({
       success: true,
