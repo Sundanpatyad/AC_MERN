@@ -22,6 +22,7 @@ import { useTheme } from '../../providers/AppThemeProvider';
 import { useAuthStore } from '../../store/authStore';
 import { showMessage } from '../../providers/DialogProvider';
 import { itemKey } from '../../utils/itemKey';
+import { MediaImage } from '../../components/MediaImage';
 
 const PAGE_SIZE = 8;
 
@@ -41,6 +42,7 @@ export type StudyExam = {
   name: string;
   category: string;
   description: string;
+  thumbnail?: string;
   access: 'free' | 'paid';
   price: number;
   pdfCount: number;
@@ -438,7 +440,11 @@ export default function StudyLibraryScreen() {
                     { backgroundColor: colors.surfaceRaised, borderColor: colors.border },
                   ]}
                 >
-                  <Ionicons name="folder" size={grid ? 26 : 20} color={colors.text} />
+                  {exam.thumbnail ? (
+                    <MediaImage uri={exam.thumbnail} style={StyleSheet.absoluteFillObject} contentFit="cover" />
+                  ) : (
+                    <Ionicons name="folder" size={grid ? 26 : 20} color={colors.text} />
+                  )}
                 </View>
                 <View style={grid ? styles.gridBody : styles.cardBody}>
                   <Text style={grid ? styles.gridTitle : styles.title} numberOfLines={grid ? 2 : 1}>

@@ -264,10 +264,19 @@ const MockTestDetails = () => {
                         type="button"
                         onClick={() => {
                           const mid = itemId(material._id);
+                          const exam = itemId(material.exam?._id || material.exam);
                           if (material.canView && isMongoId(mid)) {
-                            navigate(`/study-material/${mid}`);
+                            navigate(
+                              isMongoId(exam)
+                                ? `/study-material/${mid}?exam=${exam}`
+                                : `/study-material/${mid}`
+                            );
                           } else {
-                            navigate("/study-material");
+                            navigate(
+                              isMongoId(exam)
+                                ? `/study-material?exam=${exam}`
+                                : "/study-material"
+                            );
                           }
                         }}
                         className="shrink-0 px-3 py-1.5 text-sm rounded-lg bg-solid text-solid-fg"

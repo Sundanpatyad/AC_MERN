@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { BiArrowBack, BiMinus, BiPlus } from "react-icons/bi";
 import { axiosInstance } from "../services/apiConnector";
@@ -15,6 +15,8 @@ import { toast } from "@/utils/toast";
 import { itemId, isMongoId } from "../utils/itemId";
 
 ensurePdfWorker();
+
+const EXAM_QUERY = "exam";
 
 const readError = async (error) => {
   if (error?.message && !error?.response) return error.message;
@@ -34,12 +36,11 @@ const MAX_ZOOM = 3;
 const clampZoom = (value) =>
   Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, Math.round(value * 20) / 20));
 
-/** One page slot — renders only when near viewport; cancels work on leave. */
 function PdfPage({ pdf, pageNumber, zoom }) {
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
   const renderTaskRef = useRef(null);
-  const [ratio, setRatio] = useState(1.414); // A4-ish until measured
+  const [ratio, setRatio] = useState(1.414);
   const [visible, setVisible] = useState(false);
   const [pageError, setPageError] = useState(false);
 
@@ -75,7 +76,6 @@ function PdfPage({ pdf, pageNumber, zoom }) {
         const ctx = canvas.getContext("2d", { alpha: false });
         if (!ctx) return;
 
-        // Cancel any in-flight paint before starting a new one
         if (renderTaskRef.current) {
           try {
             renderTaskRef.current.cancel();
@@ -113,7 +113,6 @@ function PdfPage({ pdf, pageNumber, zoom }) {
     };
   }, [pdf, pageNumber, zoom, visible]);
 
-  // Drop canvas pixels when far off-screen to free GPU memory
   useEffect(() => {
     if (visible) return;
     const canvas = canvasRef.current;
@@ -127,7 +126,7 @@ function PdfPage({ pdf, pageNumber, zoom }) {
   return (
     <div
       ref={wrapRef}
-      className="relative w-full overflow-hidden bg-white"
+      className="relative w-full overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-black/5"
       style={{ aspectRatio: `${1} / ${ratio}` }}
     >
       <canvas
@@ -146,6 +145,7 @@ function PdfPage({ pdf, pageNumber, zoom }) {
 
 const PdfReader = () => {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { token } = useSelector((state) => state.auth);
   const pinchRef = useRef(null);
@@ -157,9 +157,22 @@ const PdfReader = () => {
   const [pdf, setPdf] = useState(null);
   const [pageCount, setPageCount] = useState(0);
 
+  const examId = useMemo(() => {
+    const fromQuery = itemId(searchParams.get(EXAM_QUERY));
+    return isMongoId(fromQuery) ? fromQuery : "";
+  }, [searchParams]);
+
+  const libraryBackTo = examId
+    ? `/study-material?${EXAM_QUERY}=${examId}`
+    : "/study-material";
+
   const applyZoom = useCallback((value) => {
     setZoom((current) => clampZoom(typeof value === "number" ? value : current));
   }, []);
+
+  const goBackToLibrary = useCallback(() => {
+    navigate(libraryBackTo);
+  }, [navigate, libraryBackTo]);
 
   useEffect(() => {
     if (!token) {
@@ -278,58 +291,56 @@ const PdfReader = () => {
 
   return (
     <div className="min-h-screen bg-page print:hidden">
-      <div className="fixed top-16 inset-x-0 z-30 border-b border-line bg-page">
-        <div className="mx-auto flex h-12 max-w-3xl items-center justify-between gap-3 px-4">
-          <Link
-            to="/study-material"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-fg"
+      <div className="fixed top-16 inset-x-0 z-30 border-b border-line bg-page/95 backdrop-blur-sm">
+        <div className="mx-auto flex h-10 max-w-5xl items-center justify-between gap-2 px-3 sm:px-4">
+          <button
+            type="button"
+            onClick={goBackToLibrary}
+            className="inline-flex items-center gap-1 text-sm font-medium text-fg"
           >
-            <BiArrowBack className="text-lg" />
-            Study material
-          </Link>
+            <BiArrowBack className="text-base" />
+            <span className="truncate">Back to papers</span>
+          </button>
           <div className="flex items-center gap-2">
             {pageCount > 0 && (
-              <span className="hidden text-[11px] text-muted sm:inline">
+              <span className="hidden text-[11px] tabular-nums text-muted sm:inline">
                 {pageCount} pages
               </span>
             )}
-            <div className="inline-flex items-center gap-1 rounded-full border border-line px-1.5 py-0.5">
+            <div className="inline-flex items-center gap-0.5 rounded-lg border border-line px-1 py-0.5">
               <button
                 type="button"
                 onClick={() => applyZoom(zoom - 0.25)}
                 disabled={zoom <= MIN_ZOOM}
-                className="grid h-7 w-7 place-items-center text-fg disabled:text-muted"
+                className="grid h-6 w-6 place-items-center text-fg disabled:text-muted"
                 aria-label="Zoom out"
               >
                 <BiMinus />
               </button>
-              <span className="min-w-10 text-center text-[11px] font-medium text-fg">
+              <span className="min-w-9 text-center text-[11px] font-medium tabular-nums text-fg">
                 {Math.round(zoom * 100)}%
               </span>
               <button
                 type="button"
                 onClick={() => applyZoom(zoom + 0.25)}
                 disabled={zoom >= MAX_ZOOM}
-                className="grid h-7 w-7 place-items-center text-fg disabled:text-muted"
+                className="grid h-6 w-6 place-items-center text-fg disabled:text-muted"
                 aria-label="Zoom in"
               >
                 <BiPlus />
               </button>
             </div>
-            <span className="hidden rounded-full border border-line px-2.5 py-1 text-[11px] font-medium text-muted sm:inline">
-              View only
-            </span>
           </div>
         </div>
       </div>
 
-      <div className="mx-auto max-w-5xl px-3 pb-4 pt-16 sm:px-4">
+      <div className="mx-auto max-w-5xl px-3 pb-4 pt-14 sm:px-4">
         {status ? (
           <div className="rounded-xl border border-line bg-surface px-5 py-8 text-center">
             <p className="text-sm text-fg">{status}</p>
-            {failed && status === "Purchase required" && (
+            {failed && (
               <Link
-                to="/study-material"
+                to={libraryBackTo}
                 className="mt-4 inline-flex rounded-lg bg-solid px-4 py-2 text-sm font-medium text-solid-fg"
               >
                 Back to library

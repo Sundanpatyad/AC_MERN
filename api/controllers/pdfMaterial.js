@@ -20,6 +20,7 @@ const {
   getPresignedGetUrl,
   getObjectBuffer,
 } = require('../utils/r2Storage');
+const { uploadImageToCloudinary, deleteResourceFromCloudinary } = require('../utils/imageUploader');
 
 const STAFF = new Set(['Admin', 'Instructor']);
 
@@ -1075,6 +1076,7 @@ const publicExam = (exam, user, pdfCount) => {
     name: exam.name,
     category: exam.category,
     description: exam.description || '',
+    thumbnail: exam.thumbnail || '',
     access,
     price: access === 'paid' ? Number(exam.price) || 0 : 0,
     pdfCount: pdfCount || 0,
@@ -1082,6 +1084,29 @@ const publicExam = (exam, user, pdfCount) => {
     status: exam.status === 'draft' ? 'draft' : 'published',
   };
 };
+
+const examThumbFolder = () =>
+  `${process.env.FOLDER_NAME || 'LMS_AC'}-exam-thumbs`;
+
+const isImageFile = (file) => {
+  const type = String(file?.mimetype || '').toLowerCase();
+  const name = String(file?.name || '').toLowerCase();
+  return type.startsWith('image/') || /\.(jpe?g|png|webp|gif)$/i.test(name);
+};
+
+async function uploadExamThumbnail(file, previousUrl = '') {
+  if (!file || !isImageFile(file)) return previousUrl || '';
+  const uploaded = await uploadImageToCloudinary(file, examThumbFolder(), 900, 82);
+  if (!uploaded?.secure_url) return previousUrl || '';
+  if (previousUrl && previousUrl !== uploaded.secure_url) {
+    try {
+      await deleteResourceFromCloudinary(previousUrl);
+    } catch (error) {
+      console.error('exam thumbnail cleanup:', error?.message);
+    }
+  }
+  return uploaded.secure_url;
+}
 
 exports.listExams = async (req, res) => {
   try {
@@ -1159,10 +1184,13 @@ exports.createExam = async (req, res) => {
       return res.status(400).json({ success: false, message: 'This exam already exists in the category' });
     }
 
+    const thumbnail = await uploadExamThumbnail(req.files?.thumbnail);
+
     const exam = await PdfExam.create({
       name,
       category,
       description,
+      thumbnail: thumbnail || '',
       access: price > 0 ? 'paid' : 'free',
       price,
       status: req.body.status === 'published' ? 'published' : 'draft',
@@ -1203,6 +1231,19 @@ exports.updateExam = async (req, res) => {
     }
     if (!exam.name || !exam.category) {
       return res.status(400).json({ success: false, message: 'Name and category are required' });
+    }
+
+    if (req.files?.thumbnail) {
+      exam.thumbnail = await uploadExamThumbnail(req.files.thumbnail, exam.thumbnail || '');
+    } else if (req.body.removeThumbnail === '1' || req.body.removeThumbnail === 'true') {
+      if (exam.thumbnail) {
+        try {
+          await deleteResourceFromCloudinary(exam.thumbnail);
+        } catch (error) {
+          console.error('exam thumbnail remove:', error?.message);
+        }
+      }
+      exam.thumbnail = '';
     }
 
     await exam.save();
