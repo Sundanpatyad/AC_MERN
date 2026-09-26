@@ -6,10 +6,11 @@ import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import rootReducer from './reducer/index';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClientProvider } from 'react-query';
 import Toaster from './components/common/Toaster';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { unregisterStaleServiceWorkers } from './lib/pwa';
+import { createAppQueryClient } from './lib/queryClient';
 // Registers the axios auth interceptors before any component can issue a request.
 import './services/apiConnector';
 
@@ -18,8 +19,8 @@ const CLIENT_ID = '217412143147-6l1q2l190t36rp0452f3hl5mtl3nrhjq.apps.googleuser
 const store = configureStore({
   reducer: rootReducer,
 });
-//Google OAuth Provider
-const queryClient = new QueryClient();
+
+const queryClient = createAppQueryClient();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <QueryClientProvider client={queryClient}>

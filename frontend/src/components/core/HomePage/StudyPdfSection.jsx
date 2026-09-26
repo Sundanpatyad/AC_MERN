@@ -1,10 +1,19 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
+import { useQuery, useQueryClient } from "react-query";
+import { useSelector } from "react-redux";
 import { ArrowRight } from "lucide-react";
 import { BiCheckCircle, BiLockAlt } from "react-icons/bi";
 import { BsFiletypePdf } from "react-icons/bs";
-import { apiConnector } from "../../../services/apiConnector";
-import { pdfEndpoints } from "../../../services/apis";
+import {
+  STUDY_GC_MS,
+  STUDY_STALE_MS,
+  studyKeys,
+  fetchStudyHomeExams,
+  prefetchStudyExams,
+  prefetchStudyMaterials,
+} from "../../../services/studyMaterialCache";
+import { itemId, isMongoId } from "../../../utils/itemId";
 
 const Skeleton = () => (
   <div className="overflow-hidden rounded-xl border border-line bg-surface animate-pulse">
@@ -18,25 +27,30 @@ const Skeleton = () => (
 );
 
 const StudyPdfSection = () => {
-  const [exams, setExams] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const { token } = useSelector((state) => state.auth);
+  const authed = Boolean(token);
+  const key = useMemo(() => studyKeys.home({ authed }), [authed]);
 
-  useEffect(() => {
-    let cancelled = false;
-    apiConnector("GET", `${pdfEndpoints.EXAMS}?sort=latest`)
-      .then((response) => {
-        if (!cancelled) setExams((response.data?.data || []).slice(0, 4));
-      })
-      .catch(() => {
-        if (!cancelled) setExams([]);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const { data: exams = [], isLoading } = useQuery(key, fetchStudyHomeExams, {
+    staleTime: STUDY_STALE_MS,
+    cacheTime: STUDY_GC_MS,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+  });
+
+  const showSkeleton = isLoading && exams.length === 0;
+
+  const warmLibrary = () => {
+    prefetchStudyExams(queryClient, { query: "", category: "all", authed });
+  };
+
+  const warmExam = (exam) => {
+    const id = itemId(exam?._id);
+    if (!isMongoId(id)) return;
+    prefetchStudyMaterials(queryClient, { examId: id, query: "", authed });
+  };
 
   return (
     <section className="border-t border-line bg-page pt-10 pb-16 md:pt-[5.5rem] md:pb-[5.5rem]">
@@ -52,6 +66,8 @@ const StudyPdfSection = () => {
           </div>
           <Link
             to="/study-material"
+            onMouseEnter={warmLibrary}
+            onFocus={warmLibrary}
             className="inline-flex items-center gap-2 self-start text-sm font-medium text-muted transition-colors hover:text-fg sm:self-auto"
           >
             View all
@@ -59,7 +75,7 @@ const StudyPdfSection = () => {
           </Link>
         </div>
 
-        {loading ? (
+        {showSkeleton ? (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
             {Array.from({ length: 4 }).map((_, index) => (
               <Skeleton key={index} />
@@ -77,6 +93,8 @@ const StudyPdfSection = () => {
                 <Link
                   key={exam._id}
                   to={`/study-material?exam=${exam._id}`}
+                  onMouseEnter={() => warmExam(exam)}
+                  onFocus={() => warmExam(exam)}
                   className="group overflow-hidden rounded-xl border border-line bg-surface transition hover:border-fg/25 hover:shadow-md"
                 >
                   <div className="relative aspect-[16/10] w-full overflow-hidden bg-elevated">

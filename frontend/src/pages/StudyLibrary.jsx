@@ -1,13 +1,23 @@
-import { useEffect, useRef, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { BiLockAlt, BiCheckCircle, BiChevronRight } from "react-icons/bi";
-import { BsFiletypePdf } from "react-icons/bs";
-import { apiConnector } from "../services/apiConnector";
-import { pdfEndpoints } from "../services/apis";
-import { toast } from "@/utils/toast";
-import Footer from "../components/common/Footer";
-import { itemId, isMongoId } from "../utils/itemId";
+import { useMemo, useEffect, useState, useRef, useCallback } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useQuery, useInfiniteQuery, useQueryClient } from 'react-query';
+import { BiLockAlt, BiCheckCircle, BiChevronRight } from 'react-icons/bi';
+import { BsFiletypePdf } from 'react-icons/bs';
+import { apiConnector } from '../services/apiConnector';
+import { pdfEndpoints } from '../services/apis';
+import {
+  STUDY_GC_MS,
+  STUDY_STALE_MS,
+  studyKeys,
+  fetchStudyExams,
+  fetchStudyMaterialsPage,
+  prefetchStudyMaterials,
+  invalidateStudyQueries,
+} from '../services/studyMaterialCache';
+import { toast } from '@/utils/toast';
+import Footer from '../components/common/Footer';
+import { itemId, isMongoId } from '../utils/itemId';
 
 function loadRazorpay() {
   return new Promise((resolve) => {
@@ -15,8 +25,8 @@ function loadRazorpay() {
       resolve(true);
       return;
     }
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
     script.onload = () => resolve(true);
     script.onerror = () => resolve(false);
     document.body.appendChild(script);
@@ -24,7 +34,7 @@ function loadRazorpay() {
 }
 
 const PAGE_SIZE = 8;
-const EXAM_QUERY = "exam";
+const EXAM_QUERY = 'exam';
 
 const CardPreview = ({ id }) => {
   const [failed, setFailed] = useState(false);
@@ -50,170 +60,165 @@ const CardPreview = ({ id }) => {
 const StudyLibrary = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const queryClient = useQueryClient();
   const { token } = useSelector((state) => state.auth);
   const { user } = useSelector((state) => state.profile);
-  const [materials, setMaterials] = useState([]);
-  const [exams, setExams] = useState([]);
-  const [openExam, setOpenExam] = useState(null);
-  const [categories, setCategories] = useState([]);
-  const [total, setTotal] = useState(0);
-  const [search, setSearch] = useState("");
-  const [query, setQuery] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(false);
+  const [search, setSearch] = useState('');
+  const [query, setQuery] = useState('');
   const [buyingId, setBuyingId] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const sentinelRef = useRef(null);
-  const pageRef = useRef(1);
-  const requestRef = useRef(0);
-  const busyRef = useRef(false);
-  const examsRef = useRef([]);
+  const authed = Boolean(token);
+  const examQuery = searchParams.get(EXAM_QUERY) || '';
 
   useEffect(() => {
     const timer = setTimeout(() => setQuery(search.trim()), 350);
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Keep exam folder open when returning from PDF (?exam=…)
-  useEffect(() => {
-    const requested = searchParams.get(EXAM_QUERY);
-    if (!requested) {
-      if (openExam) setOpenExam(null);
-      return;
+  const examsKey = useMemo(
+    () => studyKeys.exams({ query, category: selectedCategory, authed }),
+    [query, selectedCategory, authed]
+  );
+
+  const {
+    data: examsData,
+    isLoading: examsLoading,
+    isFetching: examsFetching,
+    isPlaceholderData: examsPlaceholder,
+  } = useQuery(examsKey, () => fetchStudyExams({ query, category: selectedCategory }), {
+    staleTime: STUDY_STALE_MS,
+    cacheTime: STUDY_GC_MS,
+    keepPreviousData: true,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    onError: () => toast.error("Couldn't load study material"),
+  });
+
+  const exams = examsData?.exams || [];
+  const categories = examsData?.categories || [];
+
+  const openExam = useMemo(() => {
+    if (!examQuery) return null;
+    return exams.find((item) => itemId(item._id) === itemId(examQuery)) || null;
+  }, [exams, examQuery]);
+
+  const examId = openExam ? itemId(openExam._id) : '';
+  const materialsKey = useMemo(
+    () => studyKeys.materials({ examId, query, authed }),
+    [examId, query, authed]
+  );
+
+  const {
+    data: materialsPages,
+    isLoading: materialsLoading,
+    isFetching: materialsFetching,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery(
+    materialsKey,
+    ({ pageParam = 1 }) =>
+      fetchStudyMaterialsPage({
+        examId,
+        query,
+        page: pageParam,
+        limit: PAGE_SIZE,
+      }),
+    {
+      enabled: Boolean(examId),
+      staleTime: STUDY_STALE_MS,
+      cacheTime: STUDY_GC_MS,
+      keepPreviousData: true,
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+      getNextPageParam: (last) => (last?.hasMore ? last.page + 1 : undefined),
+      onError: () => toast.error("Couldn't load study material"),
     }
-    if (openExam && itemId(openExam._id) === itemId(requested)) return;
-    const match = examsRef.current.find((item) => itemId(item._id) === itemId(requested));
-    if (match) setOpenExam(match);
-  }, [searchParams, openExam]);
+  );
 
-  const fetchPage = async (page, append) => {
-    if (append && busyRef.current) return;
-    const requestId = ++requestRef.current;
-    busyRef.current = true;
-    if (append) setLoadingMore(true);
-    else setLoading(true);
-    try {
-      const examFromUrl = searchParams.get(EXAM_QUERY);
-      const activeExam =
-        openExam ||
-        (examFromUrl
-          ? examsRef.current.find((item) => itemId(item._id) === itemId(examFromUrl))
-          : null);
-
-      if (!activeExam) {
-        const params = new URLSearchParams();
-        if (query) params.set("q", query);
-        if (selectedCategory !== "all") params.set("category", selectedCategory);
-        const response = await apiConnector("GET", `${pdfEndpoints.EXAMS}?${params}`);
-        if (requestId !== requestRef.current) return;
-        const next = response.data?.data || [];
-        examsRef.current = next;
-        setExams(next);
-        if (examFromUrl) {
-          const match = next.find((item) => itemId(item._id) === itemId(examFromUrl));
-          if (match) setOpenExam(match);
-        }
-        setMaterials([]);
-        setTotal(next.length);
-        setHasMore(false);
-        setCategories(response.data?.categories || []);
-        pageRef.current = 1;
-        return;
-      }
-
-      const params = new URLSearchParams({
-        page: String(page),
-        limit: String(PAGE_SIZE),
-        exam: itemId(activeExam._id),
-      });
-      if (query) params.set("q", query);
-      const response = await apiConnector("GET", `${pdfEndpoints.LIST}?${params}`);
-      if (requestId !== requestRef.current) return;
-      const next = response.data?.data || [];
-      setMaterials((current) => (append ? [...current, ...next] : next));
-      setTotal(response.data?.total || 0);
-      setHasMore(Boolean(response.data?.hasMore));
-      pageRef.current = page;
-    } catch {
-      if (requestId === requestRef.current) toast.error("Couldn't load study material");
-    } finally {
-      if (requestId === requestRef.current) {
-        busyRef.current = false;
-        setLoading(false);
-        setLoadingMore(false);
-      }
-    }
-  };
-
-  const examQuery = searchParams.get(EXAM_QUERY) || "";
-
-  useEffect(() => {
-    pageRef.current = 1;
-    fetchPage(1, false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, selectedCategory, token, openExam?._id, examQuery]);
+  const materials = useMemo(
+    () => (materialsPages?.pages || []).flatMap((page) => page.items || []),
+    [materialsPages]
+  );
+  const materialsTotal = materialsPages?.pages?.[0]?.total ?? materials.length;
 
   useEffect(() => {
     const node = sentinelRef.current;
-    if (!node) return undefined;
+    if (!node || !examId) return undefined;
     const observer = new IntersectionObserver(
       (entries) => {
-        if (!entries[0]?.isIntersecting || !hasMore || loading || loadingMore || busyRef.current) return;
-        fetchPage(pageRef.current + 1, true);
+        if (!entries[0]?.isIntersecting || !hasNextPage || isFetchingNextPage) return;
+        fetchNextPage();
       },
-      { rootMargin: "240px" }
+      { rootMargin: '240px' }
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, [hasMore, loading, loadingMore, materials.length]);
+  }, [examId, hasNextPage, isFetchingNextPage, fetchNextPage, materials.length]);
+
+  const invalidateStudy = useCallback(() => {
+    invalidateStudyQueries(queryClient);
+  }, [queryClient]);
+
+  const warmExamFolder = useCallback(
+    (exam) => {
+      const id = itemId(exam?._id);
+      if (!isMongoId(id)) return;
+      prefetchStudyMaterials(queryClient, { examId: id, query: '', authed });
+    },
+    [queryClient, authed]
+  );
 
   const buy = async (item) => {
     if (!token) {
-      navigate("/login");
+      navigate('/login');
       return;
     }
     try {
       setBuyingId(item._id);
-      const response = await apiConnector("POST", pdfEndpoints.ORDER(item._id));
+      const response = await apiConnector('POST', pdfEndpoints.ORDER(item._id));
       const order = response.data;
       const loaded = await loadRazorpay();
       if (!loaded || !window.Razorpay) {
-        toast.error("Could not open payment");
+        toast.error('Could not open payment');
         return;
       }
       const checkout = new window.Razorpay({
         key: order.key,
         amount: order.amount,
-        currency: order.currency || "INR",
+        currency: order.currency || 'INR',
         order_id: order.orderId,
-        name: "Awakening Classes",
+        name: 'Awakening Classes',
         description: item.title,
         prefill: {
-          name: `${user?.firstName || ""} ${user?.lastName || ""}`.trim(),
-          email: user?.email || "",
+          name: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
+          email: user?.email || '',
         },
         handler: async (payment) => {
           try {
-            await apiConnector("POST", pdfEndpoints.VERIFY(item._id), {
+            await apiConnector('POST', pdfEndpoints.VERIFY(item._id), {
               razorpay_order_id: payment.razorpay_order_id,
               razorpay_payment_id: payment.razorpay_payment_id,
               razorpay_signature: payment.razorpay_signature,
             });
-            toast.success("Unlocked");
+            toast.success('Unlocked');
+            invalidateStudy();
             const mid = itemId(item._id);
             const exam = itemId(openExam?._id || item.exam?._id);
             navigate(
               exam ? `/study-material/${mid}?${EXAM_QUERY}=${exam}` : `/study-material/${mid}`
             );
           } catch {
-            toast.error("Payment received, but unlock failed. Contact support.");
+            toast.error('Payment received, but unlock failed. Contact support.');
           }
         },
       });
       checkout.open();
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Could not start payment");
+      toast.error(error?.response?.data?.message || 'Could not start payment');
     } finally {
       setBuyingId(null);
     }
@@ -221,51 +226,56 @@ const StudyLibrary = () => {
 
   const buyExam = async (exam) => {
     if (!token) {
-      navigate("/login");
+      navigate('/login');
       return;
     }
     try {
       setBuyingId(exam._id);
-      const response = await apiConnector("POST", pdfEndpoints.EXAM_ORDER(exam._id));
+      const response = await apiConnector('POST', pdfEndpoints.EXAM_ORDER(exam._id));
       const order = response.data;
       const loaded = await loadRazorpay();
       if (!loaded || !window.Razorpay) {
-        toast.error("Could not open payment");
+        toast.error('Could not open payment');
         return;
       }
       const checkout = new window.Razorpay({
         key: order.key,
         amount: order.amount,
-        currency: order.currency || "INR",
+        currency: order.currency || 'INR',
         order_id: order.orderId,
-        name: "Awakening Classes",
+        name: 'Awakening Classes',
         description: exam.name,
         prefill: {
-          name: `${user?.firstName || ""} ${user?.lastName || ""}`.trim(),
-          email: user?.email || "",
+          name: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
+          email: user?.email || '',
         },
         handler: async (payment) => {
           try {
-            await apiConnector("POST", pdfEndpoints.EXAM_VERIFY(exam._id), {
+            await apiConnector('POST', pdfEndpoints.EXAM_VERIFY(exam._id), {
               razorpay_order_id: payment.razorpay_order_id,
               razorpay_payment_id: payment.razorpay_payment_id,
               razorpay_signature: payment.razorpay_signature,
             });
-            toast.success("Exam unlocked");
-            const updated = { ...exam, owned: true };
-            examsRef.current = examsRef.current.map((e) =>
-              itemId(e._id) === itemId(exam._id) ? updated : e
-            );
-            setExams(examsRef.current);
-            setOpenExam(updated);
+            toast.success('Exam unlocked');
+            // Optimistic update then background refresh
+            queryClient.setQueriesData('study-exams', (current) => {
+              if (!current?.exams) return current;
+              return {
+                ...current,
+                exams: current.exams.map((row) =>
+                  itemId(row._id) === itemId(exam._id) ? { ...row, owned: true } : row
+                ),
+              };
+            });
+            invalidateStudy();
           } catch {
-            toast.error("Payment received, but unlock failed. Contact support.");
+            toast.error('Payment received, but unlock failed. Contact support.');
           }
         },
       });
       checkout.open();
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Could not start payment");
+      toast.error(error?.response?.data?.message || 'Could not start payment');
     } finally {
       setBuyingId(null);
     }
@@ -278,16 +288,15 @@ const StudyLibrary = () => {
     }
     if (item.canView) {
       if (!token) {
-        navigate("/login");
+        navigate('/login');
         return;
       }
       const id = itemId(item._id);
       if (!isMongoId(id)) {
-        toast.error("Could not open this material");
+        toast.error('Could not open this material');
         return;
       }
       const exam = itemId(openExam?._id || item.exam?._id);
-      // Keep exam folder in URL so back returns to paper list (2nd screen)
       navigate(exam ? `/study-material/${id}?${EXAM_QUERY}=${exam}` : `/study-material/${id}`);
       return;
     }
@@ -295,26 +304,28 @@ const StudyLibrary = () => {
   };
 
   const chooseExam = (exam) => {
-    setSearch("");
-    setQuery("");
+    setSearch('');
+    setQuery('');
     if (!exam) {
-      setOpenExam(null);
       const next = new URLSearchParams(searchParams);
       next.delete(EXAM_QUERY);
       setSearchParams(next, { replace: true });
       return;
     }
-    setOpenExam(exam);
     const id = itemId(exam._id);
     const next = new URLSearchParams(searchParams);
     if (id) next.set(EXAM_QUERY, id);
-    // Push history so browser/PDF back can restore this folder view
     setSearchParams(next, { replace: false });
   };
 
+  const showExamSkeleton = !openExam && examsLoading && exams.length === 0;
+  const showMaterialsSkeleton = Boolean(openExam) && materialsLoading && materials.length === 0;
+  const refreshing =
+    (openExam ? materialsFetching && !isFetchingNextPage : examsFetching) &&
+    !examsPlaceholder;
+
   return (
     <div className="min-h-screen bg-page">
-      {/* Compact header */}
       <section className="border-b border-line bg-page">
         <div className="page-shell flex items-end justify-between gap-4 py-5 sm:py-6">
           <div className="min-w-0">
@@ -325,15 +336,22 @@ const StudyLibrary = () => {
               Study material
             </h1>
           </div>
-          {openExam ? (
-            <p className="hidden shrink-0 text-xs text-muted sm:block">
-              {total} paper{total === 1 ? "" : "s"}
-            </p>
-          ) : (
-            <p className="hidden shrink-0 text-xs text-muted sm:block">
-              {exams.length} exam{exams.length === 1 ? "" : "s"}
-            </p>
-          )}
+          <div className="flex shrink-0 items-center gap-2">
+            {refreshing ? (
+              <span className="text-[10px] font-medium uppercase tracking-wide text-muted">
+                Updating…
+              </span>
+            ) : null}
+            {openExam ? (
+              <p className="hidden text-xs text-muted sm:block">
+                {materialsTotal} paper{materialsTotal === 1 ? '' : 's'}
+              </p>
+            ) : (
+              <p className="hidden text-xs text-muted sm:block">
+                {exams.length} exam{exams.length === 1 ? '' : 's'}
+              </p>
+            )}
+          </div>
         </div>
       </section>
 
@@ -344,7 +362,7 @@ const StudyLibrary = () => {
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder={openExam ? "Search papers…" : "Search exams…"}
+              placeholder={openExam ? 'Search papers…' : 'Search exams…'}
               className="w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm text-fg outline-none transition focus:border-fg/30 focus:ring-2 focus:ring-fg/10"
             />
           </label>
@@ -354,8 +372,8 @@ const StudyLibrary = () => {
           <div className="mb-4 flex min-w-0 gap-2 overflow-x-auto pb-1 [scrollbar-width:none] sm:mb-5">
             {[
               {
-                name: "all",
-                label: "All",
+                name: 'all',
+                label: 'All',
                 count: categories.reduce((sum, item) => sum + item.count, 0),
               },
               ...categories.map((item) => ({
@@ -375,12 +393,12 @@ const StudyLibrary = () => {
                   }}
                   className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition ${
                     active
-                      ? "bg-fg text-page shadow-sm"
-                      : "border border-line bg-surface text-muted hover:text-fg"
+                      ? 'bg-fg text-page shadow-sm'
+                      : 'border border-line bg-surface text-muted hover:text-fg'
                   }`}
                 >
                   {chip.label}
-                  <span className={`ml-1.5 tabular-nums ${active ? "text-page/70" : "text-subtle"}`}>
+                  <span className={`ml-1.5 tabular-nums ${active ? 'text-page/70' : 'text-subtle'}`}>
                     {chip.count}
                   </span>
                 </button>
@@ -402,27 +420,27 @@ const StudyLibrary = () => {
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold text-fg">{openExam.name}</p>
               <p className="truncate text-[11px] text-muted">
-                {openExam.access === "paid"
+                {openExam.access === 'paid'
                   ? openExam.owned
-                    ? "Unlocked — all papers included"
+                    ? 'Unlocked — all papers included'
                     : `₹${openExam.price} unlocks every PDF`
-                  : "Open papers individually"}
+                  : 'Open papers individually'}
               </p>
             </div>
-            {openExam.access === "paid" && !openExam.owned && (
+            {openExam.access === 'paid' && !openExam.owned && (
               <button
                 type="button"
                 disabled={buyingId === openExam._id}
                 onClick={() => buyExam(openExam)}
                 className="shrink-0 rounded-lg bg-solid px-3 py-1.5 text-xs font-semibold text-solid-fg hover:bg-solid-hover disabled:opacity-60"
               >
-                {buyingId === openExam._id ? "…" : `Buy ₹${openExam.price}`}
+                {buyingId === openExam._id ? '…' : `Buy ₹${openExam.price}`}
               </button>
             )}
           </div>
         )}
 
-        {loading ? (
+        {showExamSkeleton || showMaterialsSkeleton ? (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, index) => (
               <div
@@ -446,15 +464,17 @@ const StudyLibrary = () => {
           ) : (
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {exams.map((exam) => {
-                const locked = exam.access === "paid" && !exam.owned;
+                const locked = exam.access === 'paid' && !exam.owned;
                 return (
                   <button
                     key={itemId(exam._id)}
                     type="button"
                     onClick={() => chooseExam(exam)}
+                    onMouseEnter={() => warmExamFolder(exam)}
+                    onFocus={() => warmExamFolder(exam)}
+                    onTouchStart={() => warmExamFolder(exam)}
                     className="group overflow-hidden rounded-xl border border-line bg-surface text-left transition hover:border-fg/25 hover:shadow-md"
                   >
-                    {/* 16:10 thumbnail frame */}
                     <div className="relative aspect-[16/10] w-full overflow-hidden bg-elevated">
                       {exam.thumbnail ? (
                         <img
@@ -477,7 +497,7 @@ const StudyLibrary = () => {
                             <BiLockAlt size={12} />
                             ₹{exam.price}
                           </span>
-                        ) : exam.access === "paid" ? (
+                        ) : exam.access === 'paid' ? (
                           <span className="inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-1 text-[10px] font-medium text-white backdrop-blur-sm">
                             <BiCheckCircle size={12} />
                             Unlocked
@@ -498,7 +518,7 @@ const StudyLibrary = () => {
                       </h2>
                       <div className="mt-0.5 flex items-center justify-between gap-2">
                         <p className="truncate text-xs text-muted">
-                          {exam.pdfCount} PDF{exam.pdfCount === 1 ? "" : "s"}
+                          {exam.pdfCount} PDF{exam.pdfCount === 1 ? '' : 's'}
                         </p>
                         <span className="inline-flex shrink-0 items-center gap-0.5 text-xs font-semibold text-fg opacity-80 group-hover:opacity-100">
                           Open
@@ -529,11 +549,11 @@ const StudyLibrary = () => {
                   <div className="min-w-0 flex-1">
                     <h2 className="truncate text-sm font-semibold text-fg">{item.title}</h2>
                     <p className="mt-0.5 truncate text-[11px] text-muted">
-                      {item.category || "General"}
-                      {!locked && item.access === "paid" ? " · Owned" : null}
-                      {locked && item.soldAsSet ? " · Included in exam" : null}
+                      {item.category || 'General'}
+                      {!locked && item.access === 'paid' ? ' · Owned' : null}
+                      {locked && item.soldAsSet ? ' · Included in exam' : null}
                       {locked && !item.soldAsSet ? ` · ₹${item.price}` : null}
-                      {!locked && item.access !== "paid" ? " · Free" : null}
+                      {!locked && item.access !== 'paid' ? ' · Free' : null}
                     </p>
                   </div>
                   <button
@@ -543,12 +563,12 @@ const StudyLibrary = () => {
                     className="shrink-0 rounded-lg bg-solid px-3 py-1.5 text-xs font-semibold text-solid-fg hover:bg-solid-hover disabled:opacity-60"
                   >
                     {buyingId === item._id
-                      ? "…"
+                      ? '…'
                       : locked
                         ? item.soldAsSet
-                          ? "Buy exam"
-                          : "Buy"
-                        : "Read"}
+                          ? 'Buy exam'
+                          : 'Buy'
+                        : 'Read'}
                   </button>
                 </li>
               );
@@ -556,7 +576,7 @@ const StudyLibrary = () => {
           </ul>
         )}
         <div ref={sentinelRef} className="h-8" />
-        {loadingMore && (
+        {isFetchingNextPage && (
           <p className="pb-6 text-center text-sm text-muted">Loading more…</p>
         )}
       </div>
