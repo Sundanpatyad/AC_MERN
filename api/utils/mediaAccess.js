@@ -142,20 +142,51 @@ function toRelativeMediaPath(value) {
   return value.slice(idx);
 }
 
+function isPlainObject(value) {
+  if (value === null || typeof value !== 'object') return false;
+  const proto = Object.getPrototypeOf(value);
+  return proto === Object.prototype || proto === null;
+}
+
+/** Keep Mongo ObjectIds / special types intact (Object.entries turns them into {}). */
+function preserveSpecialValue(value) {
+  if (value == null || typeof value !== 'object') return null;
+  if (value instanceof Date || Buffer.isBuffer(value)) return value;
+  if (typeof value.toHexString === 'function') return value.toHexString();
+  if (value._bsontype === 'ObjectID' || value._bsontype === 'ObjectId') return String(value);
+  if (typeof value === 'object' && value.id && !isPlainObject(value) && typeof value.toString === 'function') {
+    const asString = value.toString();
+    if (/^[a-f\d]{24}$/i.test(asString)) return asString;
+  }
+  return null;
+}
+
 function absolutizeMediaInData(data, base, seen = new WeakSet()) {
   if (data == null || typeof data !== 'object') {
     return typeof data === 'string' ? absolutizeMediaString(data, base) : data;
   }
-  if (typeof data.toJSON === 'function' && !(data instanceof Date) && !Array.isArray(data)) {
-    // Mongoose docs / ObjectId — serialize first when possible is handled by res.json already
-  }
+
+  const special = preserveSpecialValue(data);
+  if (special !== null) return special;
+
   if (seen.has(data)) return data;
+
   if (Array.isArray(data)) {
     seen.add(data);
     return data.map((item) => absolutizeMediaInData(item, base, seen));
   }
-  if (data instanceof Date) return data;
-  if (Buffer.isBuffer(data)) return data;
+
+  // Mongoose documents: serialize then walk plain JSON
+  if (typeof data.toJSON === 'function' && !isPlainObject(data)) {
+    try {
+      return absolutizeMediaInData(data.toJSON(), base, seen);
+    } catch {
+      /* fall through */
+    }
+  }
+
+  if (!isPlainObject(data)) return data;
+
   seen.add(data);
   const out = {};
   for (const [key, val] of Object.entries(data)) {
@@ -183,18 +214,90 @@ function signMediaUrlsInData(data, base, ttlSeconds, seen = new WeakSet()) {
   if (data == null || typeof data !== 'object') {
     return typeof data === 'string' ? signMediaString(data, base, ttlSeconds) : data;
   }
+
+  const special = preserveSpecialValue(data);
+  if (special !== null) return special;
+
   if (seen.has(data)) return data;
+
   if (Array.isArray(data)) {
     seen.add(data);
     return data.map((item) => signMediaUrlsInData(item, base, ttlSeconds, seen));
   }
-  if (data instanceof Date || Buffer.isBuffer(data)) return data;
+
+  if (typeof data.toJSON === 'function' && !isPlainObject(data)) {
+    try {
+      return signMediaUrlsInData(data.toJSON(), base, ttlSeconds, seen);
+    } catch {
+      /* fall through */
+    }
+  }
+
+  if (!isPlainObject(data)) return data;
+
   seen.add(data);
   const out = {};
   for (const [key, val] of Object.entries(data)) {
     out[key] = signMediaUrlsInData(val, base, ttlSeconds, seen);
   }
   return out;
+}
+
+/**
+ * App: swap /api/v1/media URLs for short-lived R2 URLs so Image loads from CDN
+ * (no Node proxy hop). Local crypto only — no extra network round-trip.
+ */
+async function rewriteMediaToPresignedR2(data, ttlSeconds, seen = new WeakSet(), cache = new Map()) {
+  const { getPresignedGetUrl } = require('./r2Storage');
+
+  const presign = async (key) => {
+    if (cache.has(key)) return cache.get(key);
+    const pending = getPresignedGetUrl(key, ttlSeconds).then((url) => url || null);
+    cache.set(key, pending);
+    return pending;
+  };
+
+  const walk = async (node) => {
+    if (node == null || typeof node !== 'object') {
+      if (typeof node === 'string' && node.includes('/api/v1/media/')) {
+        const key = keyFromMediaUrl(node);
+        if (!key) return node;
+        const url = await presign(key);
+        return url || signMediaString(node, apiPublicBase(), ttlSeconds);
+      }
+      return node;
+    }
+
+    const special = preserveSpecialValue(node);
+    if (special !== null) return special;
+    if (seen.has(node)) return node;
+
+    if (Array.isArray(node)) {
+      seen.add(node);
+      return Promise.all(node.map((item) => walk(item)));
+    }
+
+    if (typeof node.toJSON === 'function' && !isPlainObject(node)) {
+      try {
+        return walk(node.toJSON());
+      } catch {
+        /* fall through */
+      }
+    }
+
+    if (!isPlainObject(node)) return node;
+
+    seen.add(node);
+    const out = {};
+    await Promise.all(
+      Object.entries(node).map(async ([key, val]) => {
+        out[key] = await walk(val);
+      })
+    );
+    return out;
+  };
+
+  return walk(data);
 }
 
 function keyFromMediaUrl(url) {
@@ -218,17 +321,29 @@ function keyFromMediaUrl(url) {
 function mediaUrlResponseMiddleware(req, res, next) {
   const base = requestApiBase(req);
   const signForApp = isMobileApiClient(req);
-  const ttl = Math.max(300, Number(process.env.MEDIA_APP_URL_TTL_SEC) || 86400);
+  // Cap at 7d (S3/R2 SigV4 max); shorter = safer if URL is shared
+  const ttl = Math.min(
+    604800,
+    Math.max(300, Number(process.env.MEDIA_APP_URL_TTL_SEC) || 3600)
+  );
   const originalJson = res.json.bind(res);
   res.json = (body) => {
-    try {
-      let data = absolutizeMediaInData(body, base);
-      if (signForApp) data = signMediaUrlsInData(data, base, ttl);
-      return originalJson(data);
-    } catch (error) {
-      console.error('mediaUrlResponseMiddleware:', error?.message);
-      return originalJson(body);
-    }
+    Promise.resolve()
+      .then(async () => {
+        let data = absolutizeMediaInData(body, base);
+        if (signForApp) {
+          data = await rewriteMediaToPresignedR2(data, ttl);
+        }
+        return originalJson(data);
+      })
+      .catch((error) => {
+        console.error('mediaUrlResponseMiddleware:', error?.message);
+        try {
+          originalJson(body);
+        } catch {
+          /* already sent */
+        }
+      });
   };
   next();
 }
@@ -245,6 +360,7 @@ module.exports = {
   absolutizeMediaString,
   absolutizeMediaInData,
   toRelativeMediaPath,
+  rewriteMediaToPresignedR2,
   mediaUrlResponseMiddleware,
   isMobileApiClient,
 };
